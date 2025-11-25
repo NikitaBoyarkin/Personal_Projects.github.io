@@ -195,6 +195,15 @@
         background: var(--accent);
         color: #fff;
       }
+
+      /* FIX: мобильная версия — иконка не перекрывает текст */
+      @media (max-width: 600px) {
+        #theme-toggle {
+          top: auto;
+          bottom: 20px;
+          right: 20px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -308,7 +317,10 @@
     </section>
 
     <footer id="contact">
-      <p>Moscow, Russia · <a href="mailto:boyarkin_yandex@mail.ru">boyarkin_yandex@mail.ru</a></p>
+      <p>
+        Moscow, Russia ·
+        <a href="mailto:boyarkin_yandex@mail.ru">boyarkin_yandex@mail.ru</a>
+      </p>
       <p>© 2025 Nikita Boyarkin</p>
     </footer>
 
