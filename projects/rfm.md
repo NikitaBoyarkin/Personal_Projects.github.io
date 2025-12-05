@@ -1,6 +1,6 @@
 # RFM Analysis of Bank Clients
 
-![hero](../images/rfm-distribution.png)
+![hero](images/rfm-distribution.png)
 
 RFM-анализ позволил сегментировать клиентов банка на основе их поведения и ценности для бизнеса. Анализ включал очистку данных, расчет метрик RFM (Recency, Frequency, Monetary) и кластеризацию клиентов для разработки таргетированных маркетинговых стратегий.
 
