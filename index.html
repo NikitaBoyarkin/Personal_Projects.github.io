@@ -1,349 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Nikita Boyarkin | Data Analyst Portfolio</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta
-      name="description"
-      content="Data Analyst skilled in SQL, Python, Tableau with experience in RFM analysis, cohort analysis and A/B testing"
-    />
-    <style>
-      :root {
-        --bg: #ffffff;
-        --text: #111111;
-        --accent: #2563eb;
-        --border: #e5e7eb;
-      }
+<head>
+  <meta charset="utf-8" />
+  <title>Nikita Boyarkin | Portfolio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      body.dark-mode {
-        --bg: #0f172a;
-        --text: #e2e8f0;
-        --accent: #60a5fa;
-        --border: #1e293b;
-      }
+  <link rel="stylesheet" href="project-style.css" />
 
-      body {
-        margin: 0;
-        font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        transition: background 0.3s, color 0.3s;
-      }
+  <!-- Markdown parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
 
-      a {
-        color: var(--accent);
-        text-decoration: none;
-        transition: color 0.3s;
-      }
+<body>
 
-      a:hover {
-        color: var(--text);
-      }
+  <!-- TOC (если нужно — можешь скрыть) -->
+  <aside id="toc">
+    <div class="toc-title">Contents</div>
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </aside>
 
-      header,
-      footer,
-      nav,
-      section {
-        max-width: 760px;
-        margin: auto;
-        padding: 2rem 1rem;
-      }
+  <!-- NAV -->
+  <nav>
+    <b>Welcome !</b>
+    <ul class="links">
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-      h1,
-      h2 {
-        font-weight: 600;
-        margin: 0 0 1rem 0;
-      }
+  <!-- INTRO -->
+  <section id="intro">
+    <h1>Nikita Boyarkin</h1>
+    <div class="subtitle">Data Analyst Portfolio</div>
 
-      h1 {
-        font-size: 2rem;
-      }
-
-      h2 {
-        font-size: 1.3rem;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 0.5rem;
-      }
-
-      p {
-        line-height: 1.6;
-      }
-
-      /* Navigation */
-      nav {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border);
-      }
-
-      nav .links {
-        display: flex;
-        gap: 1.5rem;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      /* Intro */
-      #intro {
-        text-align: center;
-        padding: 4rem 1rem;
-      }
-
-      .subtitle {
-        color: var(--accent);
-        font-size: 0.9rem;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-      }
-
-      .skills {
-        margin: 1.5rem 0;
-      }
-
-      .skill-badge {
-        display: inline-block;
-        background: var(--border);
-        color: var(--text);
-        padding: 6px 12px;
-        margin: 4px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        transition: background 0.3s;
-      }
-
-      body.dark-mode .skill-badge {
-        background: #1e293b;
-        color: #f1f5f9;
-      }
-
-      .skill-badge:hover {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      /* Projects */
-      .project {
-        margin-bottom: 3rem;
-      }
-
-      .project img {
-        width: 100%;
-        border-radius: 4px;
-        border: 1px solid var(--border);
-      }
-
-      .project-details {
-        margin-top: 1rem;
-      }
-
-      .project-details p {
-        margin: 0.5rem 0;
-      }
-
-      .button {
-        display: inline-block;
-        margin-top: 1rem;
-        padding: 0.6rem 1.2rem;
-        border: 1px solid var(--accent);
-        color: var(--accent);
-        background: transparent;
-        border-radius: 4px;
-        font-weight: 500;
-        transition: all 0.3s;
-      }
-
-      .button:hover {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      /* About */
-      #about {
-        border-top: 1px solid var(--border);
-      }
-
-      /* Footer */
-      footer {
-        border-top: 1px solid var(--border);
-        font-size: 0.9rem;
-        text-align: center;
-      }
-
-      /* Dark mode toggle */
-      #theme-toggle {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-      }
-
-      #toggleButton {
-        background: none;
-        border: 1px solid var(--border);
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        font-size: 1.2rem;
-        cursor: pointer;
-        color: var(--text);
-        transition: all 0.3s;
-      }
-
-      #toggleButton:hover {
-        background: var(--accent);
-        color: #fff;
-      }
-
-      /* FIX: мобильная версия — иконка не перекрывает текст */
-      @media (max-width: 600px) {
-        #theme-toggle {
-          top: auto;
-          bottom: 20px;
-          right: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <nav>
-      <div><strong>Nikita Boyarkin</strong></div>
-      <ul class="links">
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-
-    <section id="intro">
-      <h1>Nikita Boyarkin</h1>
-      <span class="subtitle">Data Analyst Portfolio</span>
-      <div class="skills">
-        <span class="skill-badge">SQL</span>
-        <span class="skill-badge">Python</span>
-        <span class="skill-badge">Tableau</span>
-        <span class="skill-badge">Data Visualization</span>
-        <span class="skill-badge">A/B Testing</span>
-        <span class="skill-badge">Pandas</span>
-      </div>
-      <p>
-        Turning data into actionable insights for better business decisions.
-        <br />
-        <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-        <a href="https://www.linkedin.com/in/lofinibo">LinkedIn</a>
-      </p>
-    </section>
-
-    <section id="projects">
-      <h2>Projects</h2>
-
-      <div class="project">
-        <h3>RFM Analysis of Bank Clients</h3>
-        <img src="images/распределение RFM.png" alt="RFM Analysis" />
-        <div class="project-details">
-          <p>
-            Segmented bank customers using RFM analysis in Python. Identified 9
-            customer groups enabling targeted campaigns that increased retention
-            by 12%.
-          </p>
-          <a
-            href="https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients"
-            class="button"
-            >View Project</a
-          >
-        </div>
-      </div>
-
-      <div class="project">
-        <h3>Reporting Automation Telegram Bot</h3>
-        <img src="images/Bot Logo.svg" alt="Telegram Bot" />
-        <div class="project-details">
-          <p>
-            Built a Python Telegram bot to automate report generation. Reduced
-            reporting time from 3 hours to 10 minutes.
-          </p>
-          <a
-            href="https://github.com/NikitaBoyarkin/telegram_bot_public"
-            class="button"
-            >View Project</a
-          >
-        </div>
-      </div>
-
-      <div class="project">
-        <h3>Cohort Analysis in Tableau</h3>
-        <img
-          src="images/когортный анализ удержания пользователей.png"
-          alt="Cohort Analysis"
-        />
-        <div class="project-details">
-          <p>
-            Designed a Tableau dashboard to track user retention cohorts.
-            Insights improved marketing efficiency by 22%.
-          </p>
-          <a
-            href="https://github.com/NikitaBoyarkin/tableau_cohort_analysis"
-            class="button"
-            >View Project</a
-          >
-        </div>
-      </div>
-
-      <div class="project">
-        <h3>E-commerce A/B Test Analysis</h3>
-        <img src="images/ab_test.jpeg" alt="A/B Test" />
-        <div class="project-details">
-          <p>
-            Analyzed A/B test data with Python (SciPy). Found a 15% lift in
-            conversions, increasing annual revenue by $420k.
-          </p>
-          <a
-            href="https://github.com/NikitaBoyarkin/ab_test"
-            class="button"
-            >View Project</a
-          >
-        </div>
-      </div>
-    </section>
-
-    <section id="about">
-      <h2>About Me</h2>
-      <p>
-        Data Analyst with 3+ years of experience transforming data into
-        insights. Specialized in customer behavior, marketing performance, and
-        process optimization.
-      </p>
-    </section>
-
-    <footer id="contact">
-      <p>
-        Moscow, Russia ·
-        <a href="https://t.me/lofinibo">Telegram</a>
-      </p>
-      <p>© 2025 Nikita Boyarkin</p>
-    </footer>
-
-    <!-- Dark Mode Toggle -->
-    <div id="theme-toggle">
-      <button id="toggleButton" title="Toggle dark mode">🌙</button>
+    <div class="skills">
+      <span class="skill-badge">SQL</span>
+      <span class="skill-badge">Python</span>
+      <span class="skill-badge">Tableau</span>
+      <span class="skill-badge">Data Visualization</span>
+      <span class="skill-badge">A/B Testing</span>
+      <span class="skill-badge">Pandas</span>
     </div>
 
-    <script>
-      const toggleButton = document.getElementById("toggleButton");
-      const body = document.body;
+    <p>
+      Turning data into actionable insights.<br>
+      <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/lofinibo">LinkedIn</a>
+    </p>
+  </section>
 
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark") {
-        body.classList.add("dark-mode");
-        toggleButton.textContent = "☀️";
-      }
+  <!-- PROJECTS -->
+  <section id="projects">
+    <h2>Projects</h2>
+    <div id="project-list"><!-- auto-generated --></div>
+  </section>
 
-      toggleButton.addEventListener("click", () => {
-        const isDark = body.classList.toggle("dark-mode");
-        toggleButton.textContent = isDark ? "☀️" : "🌙";
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-      });
-    </script>
-  </body>
+  <!-- ABOUT -->
+  <section id="about">
+    <h2>About Me</h2>
+    <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights. Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <p>Moscow, Russia · <a href="https://t.me/lofinibo">Telegram</a></p>
+    <p>© 2025 Nikita Boyarkin</p>
+  </footer>
+
+  <!-- Theme toggle -->
+  <div id="theme-toggle">
+    <button id="toggleButton">🌙</button>
+  </div>
+
+  <script src="generator.js"></script>
+</body>
 </html>
