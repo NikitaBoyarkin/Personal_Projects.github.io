@@ -140,30 +140,43 @@ nav ul.links a:hover {
 
 /* Intro Section */
 #intro {
-  text-align: center;
   margin-bottom: 4rem;
   padding: 2rem 0;
 }
 
-#intro h1 {
+.intro-container {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.intro-content {
+  text-align: left;
+}
+
+.intro-content h1 {
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
   color: var(--text-normal);
+  line-height: 1.2;
 }
 
-#intro .subtitle {
+.intro-content .subtitle {
   font-size: 1.2rem;
   color: var(--text-muted);
   margin-bottom: 2rem;
 }
 
-.skills {
+.intro-content .skills {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 0.8rem;
   margin-bottom: 2rem;
+  justify-content: flex-start;
 }
 
 .skill-badge {
@@ -176,19 +189,69 @@ nav ul.links a:hover {
   border: 1px solid var(--border-color);
 }
 
-#intro p {
+.intro-content p {
   font-size: 1.1rem;
   color: var(--text-muted);
+  line-height: 1.6;
 }
 
-#intro a {
+.intro-content a {
   color: var(--text-accent);
   text-decoration: none;
 }
 
-#intro a:hover {
+.intro-content a:hover {
   color: var(--text-accent-hover);
   text-decoration: underline;
+}
+
+/* Photo Section */
+.intro-photo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.photo-placeholder {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid var(--border-color);
+  background: var(--background-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.photo-placeholder:hover {
+  transform: scale(1.05);
+  border-color: var(--text-accent);
+  box-shadow: 0 10px 30px rgba(122, 156, 255, 0.2);
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Fallback for missing image */
+.photo-placeholder::before {
+  content: "👨‍💼";
+  font-size: 4rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.3;
+}
+
+.profile-image[src*="profile-photo"] + ::before {
+  display: none;
 }
 
 /* Projects Section */
@@ -400,8 +463,23 @@ footer a:hover {
     padding: 10px;
   }
   
-  #intro h1 {
+  .intro-container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2rem;
+  }
+  
+  .intro-content h1 {
     font-size: 2rem;
+  }
+  
+  .intro-content .skills {
+    justify-content: center;
+  }
+  
+  .photo-placeholder {
+    width: 250px;
+    height: 250px;
   }
   
   #project-list {
@@ -416,8 +494,20 @@ footer a:hover {
     flex-direction: column;
     gap: 1rem;
   }
+}
+
+@media (max-width: 480px) {
+  .intro-content h1 {
+    font-size: 1.8rem;
+  }
   
-  .skills {
-    justify-content: center;
+  .photo-placeholder {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .skill-badge {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
   }
 }
