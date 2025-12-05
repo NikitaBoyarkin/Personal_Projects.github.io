@@ -10,6 +10,8 @@ RFM-анализ позволил сегментировать клиентов 
 - Кластеризация методом K-means для выявления сегментов
 - Анализ полученных кластеров и разработка рекомендаций
 
+![rfm](images/rfm_analysis.png)
+
 ## Tools
 - Python
 - Pandas
@@ -17,4 +19,4 @@ RFM-анализ позволил сегментировать клиентов 
 - Matplotlib/Seaborn
 - Jupyter Notebook
 
-[GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)
+# --> [GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)
