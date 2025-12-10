@@ -2,20 +2,20 @@
 
 ![hero](images/rfm-distribution.png)
 
-RFM-анализ позволил сегментировать клиентов банка на основе их поведения и ценности для бизнеса. Анализ включал очистку данных, расчет метрик RFM (Recency, Frequency, Monetary) и кластеризацию клиентов для разработки таргетированных маркетинговых стратегий.
+Краткое описание проекта.
 
 ## Methodology
-- Очистка данных клиентов и транзакций
-- Построение метрик RFM (Recency, Frequency, Monetary)
-- Кластеризация методом K-means для выявления сегментов
-- Анализ полученных кластеров и разработка рекомендаций
+- Очистка данных
+- Построение RFM-метрик
+- Кластеризация
 
+## Segmentation
+- High-value customers
+- Medium-value customers
 
 ## Tools
 - Python
 - Pandas
-- Scikit-learn
-- Matplotlib/Seaborn
-- Jupyter Notebook
+- Matplotlib
 
-# [GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)
+## [GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)

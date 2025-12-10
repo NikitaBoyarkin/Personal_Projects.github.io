@@ -18,4 +18,4 @@
 - Requests
 - APScheduler
 
-[GitHub](https://github.com/NikitaBoyarkin/telegram_bot_public)
+## [GitHub](https://github.com/NikitaBoyarkin/telegram_bot_public)
