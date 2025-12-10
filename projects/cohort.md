@@ -17,4 +17,7 @@
 - SQL
 - Tableau
 
-## [GitHub](https://github.com/NikitaBoyarkin/cohort-analysis)
+## Documentation
+- [GitHub](https://github.com/NikitaBoyarkin/cohort-analysis)
+ - Presentation
+ - Notebook

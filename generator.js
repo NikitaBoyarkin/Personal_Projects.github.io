@@ -1,3 +1,20 @@
+// mdPath: путь к .md относительно корня, например "projects/rfm.md"
+// imgSrc: значение src из <img> в сгенерированном HTML, например "../images/foo.png" или "images/foo.png"
+function resolveImagePath(mdPath, imgSrc) {
+  try {
+    // base = абсолютный URL к md файлу, e.g. https://site.origin/projects/rfm.md
+    const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
+    const base = origin + '/' + mdPath.replace(/^\.\//, '');
+    // new URL резолвит ../ и т.п. и возвращает абсолютный URL
+    const abs = new URL(imgSrc, base).pathname; // возвращает, например, "/images/foo.png"
+    // используем путь от корня (без origin) — будет работать и на GitHub Pages
+    return abs.startsWith('/') ? abs : '/' + abs;
+  } catch (e) {
+    // fallback: если что-то сломалось — вернём оригинал
+    return imgSrc;
+  }
+}
+
 /* ===============================
    PROJECT LIST (пример)
    =============================== */

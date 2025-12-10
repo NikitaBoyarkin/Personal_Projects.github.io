@@ -18,4 +18,7 @@
 - Pandas
 - Matplotlib
 
-## [GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)
+## Documentation
+- [GitHub](https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients)
+ - Presentation
+ - Notebook
