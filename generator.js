@@ -3,12 +3,14 @@
 function resolveImagePath(mdPath, imgSrc) {
   try {
     // base = абсолютный URL к md файлу, e.g. https://site.origin/projects/rfm.md
-    const origin = window.location.origin || (window.location.protocol + '//' + window.location.host);
-    const base = origin + '/' + mdPath.replace(/^\.\//, '');
+    const origin =
+      window.location.origin ||
+      window.location.protocol + "//" + window.location.host;
+    const base = origin + "/" + mdPath.replace(/^\.\//, "");
     // new URL резолвит ../ и т.п. и возвращает абсолютный URL
     const abs = new URL(imgSrc, base).pathname; // возвращает, например, "/images/foo.png"
     // используем путь от корня (без origin) — будет работать и на GitHub Pages
-    return abs.startsWith('/') ? abs : '/' + abs;
+    return abs.startsWith("/") ? abs : "/" + abs;
   } catch (e) {
     // fallback: если что-то сломалось — вернём оригинал
     return imgSrc;
@@ -19,10 +21,10 @@ function resolveImagePath(mdPath, imgSrc) {
    PROJECT LIST (пример)
    =============================== */
 const projects = [
-  { id: "rfm",    md: "projects/rfm.md" },
-  { id: "bot",    md: "projects/bot.md" },
+  { id: "rfm", md: "projects/rfm.md" },
+  { id: "bot", md: "projects/bot.md" },
   { id: "cohort", md: "projects/cohort.md" },
-  { id: "abtest", md: "projects/abtest.md" }
+  { id: "abtest", md: "projects/abtest.md" },
 ];
 
 /* ===============================
@@ -30,17 +32,19 @@ const projects = [
    =============================== */
 // Преобразует заголовок в безопасный slug (удаляет спецсимволы, транслит/кирилица оставляем, но чистим)
 function slugify(text) {
-  return text
-    .toString()
-    .trim()
-    .toLowerCase()
-    // заменяем кириллические пробелы и спецсимволы на дефис
-    .replace(/[\s]+/g, "-")
-    // удалить всё кроме букв, цифр, дефиса и подчеркивания
-    .replace(/[^a-z0-9\u0400-\u04FF\-\_]/g, "")
-    // убрать повторяющиеся дефисы
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  return (
+    text
+      .toString()
+      .trim()
+      .toLowerCase()
+      // заменяем кириллические пробелы и спецсимволы на дефис
+      .replace(/[\s]+/g, "-")
+      // удалить всё кроме букв, цифр, дефиса и подчеркивания
+      .replace(/[^a-z0-9\u0400-\u04FF\-\_]/g, "")
+      // убрать повторяющиеся дефисы
+      .replace(/-+/g, "-")
+      .replace(/^-+|-+$/g, "")
+  );
 }
 
 /* ===============================
@@ -74,7 +78,9 @@ async function renderProjectCards() {
           ${imgSrc ? `<img src="${imgSrc}" alt="${title}">` : ""}
           <h3>${title}</h3>
           <p>${desc}</p>
-          <a class="button" href="./projects/${p.id}/index.html">View Project</a>
+          <a class="button" href="./projects/${
+            p.id
+          }/index.html">View Project</a>
         </div>
       `;
     } catch (e) {
@@ -90,11 +96,13 @@ async function renderProjectCards() {
    =============================== */
 async function generateProjectPage() {
   // путь: /projects/<id>/index.html
-  const match = window.location.pathname.match(/projects\/([^\/]+)\/index\.html/);
+  const match = window.location.pathname.match(
+    /projects\/([^\/]+)\/index\.html/
+  );
   if (!match) return;
 
   const id = match[1];
-  const project = projects.find(p => p.id === id);
+  const project = projects.find((p) => p.id === id);
   if (!project) return;
 
   try {
@@ -123,8 +131,10 @@ async function generateProjectPage() {
     if (img) {
       const hero = document.querySelector("#project-image");
       if (hero) {
-        // нормализуем путь (если в MD ../images/...)
-        hero.src = img.getAttribute("src").replace(/^\.\.\//, "../../");
+        // нормализуем путь (images/... -> ../../images/...)
+        hero.src = img
+          .getAttribute("src")
+          .replace(/^images\//, "../../images/");
       }
       img.remove();
     }
@@ -132,7 +142,6 @@ async function generateProjectPage() {
     // после вставки контента — генерируем внутреннее оглавление
     generateInnerTOC();
     enableSmoothScrollForTOC();
-
   } catch (e) {
     console.error("generateProjectPage error:", e);
   }
@@ -160,7 +169,7 @@ function generateInnerTOC() {
   // Для уникальности id — учитываем уже встреченные
   const used = new Map();
 
-  headers.forEach(h => {
+  headers.forEach((h) => {
     const text = h.textContent || "";
     let idBase = slugify(text) || "section";
     let id = idBase;
@@ -189,7 +198,7 @@ function generateInnerTOC() {
       if (h.offsetTop <= pos) current = h.id;
     }
 
-    document.querySelectorAll("#inner-toc a").forEach(a => {
+    document.querySelectorAll("#inner-toc a").forEach((a) => {
       a.classList.toggle("active", a.dataset.id === current);
     });
   }
@@ -219,7 +228,9 @@ function enableSmoothScrollForTOC() {
     const top = window.scrollY + target.getBoundingClientRect().top - offset;
     window.scrollTo({ top, behavior: "smooth" });
     // обновим подсветку
-    document.querySelectorAll("#inner-toc a").forEach(el => el.classList.remove("active"));
+    document
+      .querySelectorAll("#inner-toc a")
+      .forEach((el) => el.classList.remove("active"));
     a.classList.add("active");
   });
 }
@@ -230,9 +241,10 @@ function enableSmoothScrollForTOC() {
 document.addEventListener("DOMContentLoaded", () => {
   // Убедись, что marked уже загружен (если нет — попробуем дождаться)
   if (typeof marked === "undefined") {
-    console.error("marked.js not found. Make sure you included it BEFORE generator.js");
+    console.error(
+      "marked.js not found. Make sure you included it BEFORE generator.js"
+    );
   }
   renderProjectCards();
   generateProjectPage();
 });
-
