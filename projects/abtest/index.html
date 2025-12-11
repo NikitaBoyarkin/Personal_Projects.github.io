@@ -1,33 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Project | Portfolio</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Project | Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <link rel="stylesheet" href="../../project-style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="../../generator.js"></script>
-</head>
+    <link rel="stylesheet" href="../../project-style.css" />
 
-<body>
+    <!-- Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-<div class="container">
+    <!-- Generator -->
+    <script src="../../generator.js"></script>
+  </head>
 
-  <a href="../../index.html" class="back">← Back to portfolio</a>
+  <body>
+    <!-- INNER TOC -->
+    <div id="inner-toc">
+      <div class="toc-title">На этой странице</div>
+      <ul id="inner-toc-list"></ul>
+    </div>
 
-  <h1 id="project-title"></h1>
+    <div class="container">
+      <a class="back" href="../../index.html">← Back to portfolio</a>
 
-  <img id="project-image" class="hero-image">
+      <h1 id="project-title"></h1>
 
-  <div id="project-content"></div>
+      <img id="project-image" class="hero-image" />
 
-</div>
-
-</body>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="../../generator.js"></script>
-</body>
-
-
+      <div id="project-content"></div>
+    </div>
+  </body>
 </html>

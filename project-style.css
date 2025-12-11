@@ -17,8 +17,9 @@
   --blockquote-border: #4a4a4a;
   --table-border: #404040;
   --table-header-background: #2d2d2d;
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  --font-mono: 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
+  --font-mono: "SF Mono", Monaco, "Cascadia Mono", "Roboto Mono", monospace;
 }
 
 [data-theme="light"] {
@@ -44,7 +45,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 body {
@@ -437,7 +439,8 @@ footer a:hover {
   color: var(--text-muted);
 }
 
-#project-content ul, #project-content ol {
+#project-content ul,
+#project-content ol {
   margin: 1rem 0;
   padding-left: 2rem;
   color: var(--text-muted);
@@ -462,34 +465,34 @@ footer a:hover {
   body {
     padding: 10px;
   }
-  
+
   .intro-container {
     grid-template-columns: 1fr;
     text-align: center;
     gap: 2rem;
   }
-  
+
   .intro-content h1 {
     font-size: 2rem;
   }
-  
+
   .intro-content .skills {
     justify-content: center;
   }
-  
+
   .photo-placeholder {
     width: 250px;
     height: 250px;
   }
-  
+
   #project-list {
     grid-template-columns: 1fr;
   }
-  
+
   #toc {
     display: none;
   }
-  
+
   nav {
     flex-direction: column;
     gap: 1rem;
@@ -500,12 +503,12 @@ footer a:hover {
   .intro-content h1 {
     font-size: 1.8rem;
   }
-  
+
   .photo-placeholder {
     width: 200px;
     height: 200px;
   }
-  
+
   .skill-badge {
     font-size: 0.8rem;
     padding: 0.3rem 0.6rem;
@@ -518,7 +521,7 @@ footer a:hover {
   right: 40px;
   width: 200px;
   padding-left: 12px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid var(--border-color);
   font-size: 0.9rem;
   max-height: 70vh;
   overflow-y: auto;
@@ -527,7 +530,7 @@ footer a:hover {
 #inner-toc .toc-title {
   font-size: 0.75rem;
   text-transform: uppercase;
-  color: var(--subtext);
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 
@@ -541,17 +544,17 @@ footer a:hover {
   display: block;
   padding: 4px 6px;
   border-radius: 4px;
-  color: var(--subtext);
+  color: var(--text-muted);
   text-decoration: none;
 }
 
 #inner-toc a:hover {
-  background: var(--border);
+  background: var(--border-color);
   padding-left: 10px;
 }
 
 #inner-toc a.active {
-  color: var(--accent);
+  color: var(--text-accent);
   font-weight: 600;
   padding-left: 10px;
 }
@@ -561,4 +564,3 @@ footer a:hover {
     display: none;
   }
 }
-
