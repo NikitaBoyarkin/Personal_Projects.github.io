@@ -70,6 +70,20 @@ async function renderProjectCards() {
       const img = temp.querySelector("img")?.getAttribute("src") || "";
       const desc = temp.querySelector("p")?.textContent || "";
 
+      // извлекаем инструменты
+      const toolsHeader = Array.from(temp.querySelectorAll("h2")).find(
+        (h) => h.textContent.trim() === "Tools"
+      );
+      let tools = "";
+      if (toolsHeader) {
+        const ul = toolsHeader.nextElementSibling;
+        if (ul && ul.tagName === "UL") {
+          tools = Array.from(ul.querySelectorAll("li"))
+            .map((li) => li.textContent.trim())
+            .join(", ");
+        }
+      }
+
       // нормализуем путь к картинке (если в md указан ../images/...)
       const imgSrc = img ? img.replace(/^\.\.\//, "") : "";
 
@@ -78,6 +92,7 @@ async function renderProjectCards() {
           ${imgSrc ? `<img src="${imgSrc}" alt="${title}">` : ""}
           <h3>${title}</h3>
           <p>${desc}</p>
+          ${tools ? `<p class="tools">Tools: ${tools}</p>` : ""}
           <a class="button" href="./projects/${
             p.id
           }/index.html">View Project</a>

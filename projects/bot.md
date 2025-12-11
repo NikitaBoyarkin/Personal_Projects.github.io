@@ -2,9 +2,10 @@
 
 ![hero](images/bot-logo.png)
 
-Бот автоматизирует отправку еженедельных отчётов в Telegram, сокращая время на рутинные задачи и обеспечивая своевременную доставку важной информации команде. Интегрирован с внешними API и работает по расписанию.
+Telegram-бот для автоматизации еженедельных отчётов, интегрированный с внешними API. Сокращает время на рутинные задачи, обеспечивает своевременную доставку важной информации и улучшает командную коммуникацию.
 
 ## Features
+
 - Автоматическая отправка отчётов по расписанию
 - Интеграция с внешними API для получения данных
 - Настраиваемые шаблоны отчётов
@@ -12,13 +13,16 @@
 - Простое управление через команды
 
 ## Tools
+
 - Python
 - python-telegram-bot
 - Pandas
 - Requests
 - APScheduler
+- Jupyter Notebook
 
 ## Documentation
- - [GitHub](https://github.com/NikitaBoyarkin/telegram_bot_public)
+
+- [GitHub](https://github.com/NikitaBoyarkin/telegram_bot_public)
 - Presentation
- - Notebook
+- Notebook
