@@ -1,6 +1,6 @@
 # RFM Analysis of Bank Clients
 
-![hero](images/rfm_analysis.png)
+![hero](images/RFM.png)
 
 RFM-анализ клиентов банка для сегментации пользователей на основе Recency, Frequency и Monetary метрик. Проект позволил выявить ключевые группы клиентов, оптимизировать маркетинговые кампании и повысить эффективность удержания.
 
