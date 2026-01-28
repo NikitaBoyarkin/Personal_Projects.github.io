@@ -263,3 +263,43 @@ document.addEventListener("DOMContentLoaded", () => {
   renderProjectCards();
   generateProjectPage();
 });
+
+// Theme Toggle functionality
+const themeToggle = document.getElementById('theme-toggle');
+const themeIcon = themeToggle.querySelector('.theme-icon');
+const html = document.documentElement;
+
+// Проверяем сохраненную тему или системные предпочтения
+const getPreferredTheme = () => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) return savedTheme;
+  
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+};
+
+// Применяем тему
+const setTheme = (theme) => {
+  html.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  
+  // Меняем иконку
+  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+};
+
+// Инициализация
+setTheme(getPreferredTheme());
+
+// Обработчик клика
+themeToggle.addEventListener('click', () => {
+  const currentTheme = html.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+});
+
+// Слушаем изменения системных предпочтений
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  if (!localStorage.getItem('theme')) {
+    setTheme(e.matches ? 'dark' : 'light');
+  }
+});
+
