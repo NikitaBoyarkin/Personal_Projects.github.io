@@ -1,6 +1,6 @@
 # Cohort Analysis Dashboard
 
-![hero](images/cohort-dashboard.png)
+![hero](images/business_intelligence.png)
 
 Интерактивный дашборд для когортного анализа клиентов, помогающий понять поведение пользователей и оптимизировать стратегии удержания. Отслеживает метрики retention по когортам и выявляет паттерны оттока.
 
