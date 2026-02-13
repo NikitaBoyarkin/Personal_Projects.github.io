@@ -25,7 +25,7 @@ const projects = [
   { id: "bot", md: "projects/bot.md" },
   { id: "cohort", md: "projects/cohort.md" },
   { id: "abtest", md: "projects/abtest.md" },
-  { id: "project_test", md: "projects/project_test.md" },
+  { id: "test", md: "projects/test.md" },
 ];
 
 /* ===============================
