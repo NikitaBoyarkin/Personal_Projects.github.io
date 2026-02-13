@@ -155,6 +155,14 @@ async function generateProjectPage() {
       img.remove();
     }
 
+    // преобразуем пути для всех оставшихся картинок в контенте
+    content.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+      if (src && src.startsWith("images/")) {
+        img.src = src.replace(/^images\//, "../../images/");
+      }
+    });
+
     // после вставки контента — генерируем внутреннее оглавление
     generateInnerTOC();
     enableSmoothScrollForTOC();
