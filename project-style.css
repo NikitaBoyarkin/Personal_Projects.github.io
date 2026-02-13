@@ -481,6 +481,8 @@ footer p {
 
 .hero-image {
   width: 100%;
+  max-width: 100%;
+  height: auto;
   max-height: 400px;
   object-fit: cover;
   border-radius: 12px;
@@ -490,6 +492,16 @@ footer p {
 
 #project-content {
   line-height: 1.7;
+}
+
+/* Адаптивные картинки в контенте проекта */
+#project-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  border: 1px solid var(--border-color);
+  display: block;
 }
 
 #project-content h2 {
