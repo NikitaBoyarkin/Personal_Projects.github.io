@@ -1,17 +1,17 @@
 # Cohort Analysis Dashboard
 
-![hero](images/business_intelligence.png)
+![hero](images/bi.png)
 
+# Business context
 Интерактивный дашборд для когортного анализа клиентов, помогающий понять поведение пользователей и оптимизировать стратегии удержания. Отслеживает метрики retention по когортам и выявляет паттерны оттока.
 
-## Methodology
 
-- Разделение клиентов на когорты по дате регистрации
-- Расчет метрик удержания и конверсии
-- Анализ жизненного цикла клиентов
-- Выявление паттернов оттока
+## Hypothesis
 
-## Tools
+
+## Data & Method
+
+### Tools
 
 - Python
 - Pandas
@@ -19,6 +19,16 @@
 - SQL
 - Tableau
 - Jupyter Notebook
+
+## Insight
+
+
+
+## Impact 
+- 1
+- 2
+- 3
+
 
 ## Documentation
 

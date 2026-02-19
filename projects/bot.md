@@ -1,8 +1,28 @@
 # Reporting Automation Telegram Bot
 
-![hero](images/AUTOMATION.png)
+![hero](images/auto.png)
+
+## Business context
 
 Telegram-бот для автоматизации еженедельных отчётов, интегрированный с внешними API. Сокращает время на рутинные задачи, обеспечивает своевременную доставку важной информации и улучшает командную коммуникацию.
+
+## Hypothesis
+
+
+## Data & Method
+### Tools
+
+- Python
+- python-telegram-bot
+- Pandas
+- Requests
+- APScheduler
+- Jupyter Notebook
+
+
+## Insight
+
+## Decision / Impact
 
 ## Features
 
@@ -12,14 +32,12 @@ Telegram-бот для автоматизации еженедельных от�
 - Обработка ошибок и логирование
 - Простое управление через команды
 
-## Tools
 
-- Python
-- python-telegram-bot
-- Pandas
-- Requests
-- APScheduler
-- Jupyter Notebook
+
+## Impact 
+- 1
+- 2
+- 3
 
 ## Documentation
 

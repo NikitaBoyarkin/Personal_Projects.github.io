@@ -73,7 +73,7 @@ async function renderProjectCards() {
 
       // извлекаем инструменты
       const toolsHeader = Array.from(temp.querySelectorAll("h2")).find(
-        (h) => h.textContent.trim() === "Tools",
+        (h) => h.textContent.trim() === "Impact",
       );
       let tools = "";
       if (toolsHeader) {
@@ -93,7 +93,7 @@ async function renderProjectCards() {
           ${imgSrc ? `<img src="${imgSrc}" alt="${title}">` : ""}
           <h3>${title}</h3>
           <p>${desc}</p>
-          ${tools ? `<p class="tools">Tools: ${tools}</p>` : ""}
+          ${tools ? `<p class="Impact">Impact: ${tools}</p>` : ""}
           <a class="button" href="./projects/${
             p.id
           }/index.html">View Project</a>
