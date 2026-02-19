@@ -2,13 +2,13 @@
 
 ![hero](images/test.png)
 
-# Business context
+## Business context
 
 ## Hypothesis
 
-# Data & Method
+## Data & Method
 
-# Insight
+## Insight
 
 
 ## Impact 

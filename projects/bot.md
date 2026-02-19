@@ -10,22 +10,15 @@ Telegram-бот для автоматизации еженедельных от�
 
 
 ## Data & Method
-### Tools
 
-- Python
-- python-telegram-bot
-- Pandas
-- Requests
-- APScheduler
-- Jupyter Notebook
+> Tools: Python, SQL, Tableau
+
+
 
 
 ## Insight
 
-## Decision / Impact
-
-## Features
-
+> Features
 - Автоматическая отправка отчётов по расписанию
 - Интеграция с внешними API для получения данных
 - Настраиваемые шаблоны отчётов

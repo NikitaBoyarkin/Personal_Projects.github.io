@@ -2,7 +2,7 @@
 
 ![hero](images/ab.png)
 
-# Business context
+## Business context
 
 Комплексный фреймворк для проведения A/B тестов с автоматическим расчетом статистической значимости и визуализацией результатов. Обеспечивает надежную оценку эффективности изменений и способствует принятию data-driven решений.
 
@@ -10,7 +10,7 @@
 ## Hypothesis
 
 
-# Data & Method
+## Data & Method
 
 - Python
 - SciPy/Statsmodels

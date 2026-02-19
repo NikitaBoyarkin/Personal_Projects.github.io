@@ -2,7 +2,7 @@
 
 ![hero](images/bi.png)
 
-# Business context
+## Business context
 Интерактивный дашборд для когортного анализа клиентов, помогающий понять поведение пользователей и оптимизировать стратегии удержания. Отслеживает метрики retention по когортам и выявляет паттерны оттока.
 
 
@@ -11,14 +11,7 @@
 
 ## Data & Method
 
-### Tools
-
-- Python
-- Pandas
-- Plotly/Dash
-- SQL
-- Tableau
-- Jupyter Notebook
+> Tools: Python, SQL, Tableau
 
 ## Insight
 
