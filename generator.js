@@ -73,7 +73,7 @@ async function renderProjectCards() {
 
       // извлекаем инструменты
       const toolsHeader = Array.from(temp.querySelectorAll("h2")).find(
-        (h) => h.textContent.trim() === "Tools"
+        (h) => h.textContent.trim() === "Tools",
       );
       let tools = "";
       if (toolsHeader) {
@@ -113,7 +113,7 @@ async function renderProjectCards() {
 async function generateProjectPage() {
   // путь: /projects/<id>/index.html
   const match = window.location.pathname.match(
-    /projects\/([^\/]+)\/index\.html/
+    /projects\/([^\/]+)\/index\.html/,
   );
   if (!match) return;
 
@@ -266,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Убедись, что marked уже загружен (если нет — попробуем дождаться)
   if (typeof marked === "undefined") {
     console.error(
-      "marked.js not found. Make sure you included it BEFORE generator.js"
+      "marked.js not found. Make sure you included it BEFORE generator.js",
     );
   }
   renderProjectCards();
@@ -274,41 +274,44 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Theme Toggle functionality
-const themeToggle = document.getElementById('theme-toggle');
-const themeIcon = themeToggle.querySelector('.theme-icon');
+const themeToggle = document.getElementById("theme-toggle");
+const themeIcon = themeToggle.querySelector(".theme-icon");
 const html = document.documentElement;
 
 // Проверяем сохраненную тему или системные предпочтения
 const getPreferredTheme = () => {
-  const savedTheme = localStorage.getItem('theme');
+  const savedTheme = localStorage.getItem("theme");
   if (savedTheme) return savedTheme;
-  
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 };
 
 // Применяем тему
 const setTheme = (theme) => {
-  html.setAttribute('data-theme', theme);
-  localStorage.setItem('theme', theme);
-  
+  html.setAttribute("data-theme", theme);
+  localStorage.setItem("theme", theme);
+
   // Меняем иконку
-  themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
 };
 
 // Инициализация
 setTheme(getPreferredTheme());
 
 // Обработчик клика
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+themeToggle.addEventListener("click", () => {
+  const currentTheme = html.getAttribute("data-theme");
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
   setTheme(newTheme);
 });
 
 // Слушаем изменения системных предпочтений
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  if (!localStorage.getItem('theme')) {
-    setTheme(e.matches ? 'dark' : 'light');
-  }
-});
-
+window
+  .matchMedia("(prefers-color-scheme: dark)")
+  .addEventListener("change", (e) => {
+    if (!localStorage.getItem("theme")) {
+      setTheme(e.matches ? "dark" : "light");
+    }
+  });
