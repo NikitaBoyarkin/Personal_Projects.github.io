@@ -49,13 +49,32 @@ function slugify(text) {
 }
 
 /* ===============================
+   Skeleton HTML generator
+   =============================== */
+function createSkeletonCard() {
+  return `
+    <div class="project skeleton-card" aria-busy="true" aria-label="Loading project">
+      <div class="skeleton skeleton-img"></div>
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text short"></div>
+      <div class="skeleton skeleton-btn"></div>
+    </div>
+  `;
+}
+
+/* ===============================
    1) GENERATE CARDS FROM MD
    =============================== */
 async function renderProjectCards() {
   const container = document.querySelector("#project-list");
   if (!container) return;
 
+  // Show skeleton loading state
+  container.innerHTML = projects.map(() => createSkeletonCard()).join("");
+
   let output = "";
+  let delay = 0;
 
   for (const p of projects) {
     try {
@@ -89,8 +108,8 @@ async function renderProjectCards() {
       const imgSrc = img ? img.replace(/^\.\.\//, "") : "";
 
       output += `
-        <div class="project">
-          ${imgSrc ? `<img src="${imgSrc}" alt="${title}">` : ""}
+        <div class="project reveal" style="transition-delay: ${delay}ms">
+          ${imgSrc ? `<img src="${imgSrc}" alt="${title}" loading="lazy">` : ""}
           <h3>${title}</h3>
           <p>${desc}</p>
           ${tools ? `<p class="Impact">Impact: ${tools}</p>` : ""}
@@ -99,6 +118,7 @@ async function renderProjectCards() {
           }/index.html">View Project</a>
         </div>
       `;
+      delay += 100;
     } catch (e) {
       console.warn("Failed to load", p.md, e);
     }
@@ -260,6 +280,44 @@ function enableSmoothScrollForTOC() {
 }
 
 /* ===============================
+   Intersection Observer for reveal animations
+   =============================== */
+function initRevealObserver() {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+}
+
+/* ===============================
+   Navbar scroll detection
+   =============================== */
+function initNavbarScroll() {
+  const nav = document.querySelector("nav");
+  if (!nav) return;
+
+  let lastScroll = 0;
+  window.addEventListener("scroll", () => {
+    const currentScroll = window.scrollY;
+    if (currentScroll > 20) {
+      nav.classList.add("scrolled");
+    } else {
+      nav.classList.remove("scrolled");
+    }
+    lastScroll = currentScroll;
+  });
+}
+
+/* ===============================
    INIT
    =============================== */
 document.addEventListener("DOMContentLoaded", () => {
@@ -269,8 +327,11 @@ document.addEventListener("DOMContentLoaded", () => {
       "marked.js not found. Make sure you included it BEFORE generator.js",
     );
   }
-  renderProjectCards();
+  renderProjectCards().then(() => {
+    initRevealObserver();
+  });
   generateProjectPage();
+  initNavbarScroll();
 });
 
 // Theme Toggle functionality
