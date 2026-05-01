@@ -22,7 +22,6 @@
       <li><a href="writing.html" class="active">Writing</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
-
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
       <span class="theme-icon">🌙</span>
     </button>
@@ -34,34 +33,15 @@
     <div class="filter-row reveal reveal-delay-1">
       <button class="filter-tag active" data-filter="all">All</button>
       <button class="filter-tag" data-filter="decision-log">Decision Logs</button>
-      <button class="filter-tag" data-filter="framework">Frameworks</button>
-      <button class="filter-tag" data-filter="guide">Annotated Guides</button>
-      <button class="filter-tag" data-filter="note">Notes</button>
     </div>
 
     <div class="blog-list reveal reveal-delay-2">
-
-      <a href="post.html" class="blog-card" data-category="decision-log">
+      <a href="posts/why-we-switched-to-bayesian-ab-testing.html" class="blog-card" data-category="decision-log">
         <span class="blog-card-tag">Decision Log</span>
         <div class="blog-card-title">Why We Switched to Bayesian A/B Testing</div>
-        <div class="blog-card-meta">12 min read · Mar 15, 2025</div>
+        <div class="blog-card-meta">1 min read · Mar 15, 2025</div>
         <div class="blog-card-excerpt">Frequentist p-values were creating a culture of peeking. Here's how Bayesian inference changed our experiment workflow.</div>
       </a>
-
-      <a href="post.html" class="blog-card" data-category="framework">
-        <span class="blog-card-tag">Framework</span>
-        <div class="blog-card-title">My A/B Test Prioritization Framework</div>
-        <div class="blog-card-meta">8 min read · Feb 28, 2025</div>
-        <div class="blog-card-excerpt">A systematic approach to prioritizing experiments when you have more ideas than traffic.</div>
-      </a>
-
-      <a href="post.html" class="blog-card" data-category="guide">
-        <span class="blog-card-tag">Annotated Guide</span>
-        <div class="blog-card-title">SQL Snippet: Rolling Retention Cohort</div>
-        <div class="blog-card-meta">3 min read · Jan 10, 2025</div>
-        <div class="blog-card-excerpt">Reusable query for 7-day rolling retention with user acquisition cohorts.</div>
-      </a>
-
     </div>
   </main>
 
@@ -74,22 +54,15 @@
 
   <script src="theme.js"></script>
   <script>
-    // Filter logic
     const filterTags = document.querySelectorAll('.filter-tag');
     const cards = document.querySelectorAll('.blog-card');
-
     filterTags.forEach(tag => {
       tag.addEventListener('click', () => {
         filterTags.forEach(t => t.classList.remove('active'));
         tag.classList.add('active');
         const filter = tag.dataset.filter;
-
         cards.forEach(card => {
-          if (filter === 'all' || card.dataset.category === filter) {
-            card.style.display = 'block';
-          } else {
-            card.style.display = 'none';
-          }
+          card.style.display = (filter === 'all' || card.dataset.category === filter) ? 'block' : 'none';
         });
       });
     });
