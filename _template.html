@@ -1,40 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <title>Project | Portfolio</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Project details — Nikita Boyarkin portfolio." />
 
-  <link rel="stylesheet" href="project-style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Markdown -->
+  <link rel="stylesheet" href="../../project-style.css" />
+
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-  <!-- Generator -->
-  <script src="generator.js"></script>
 </head>
 
 <body>
 
-<!-- INNER TOC -->
-<div id="inner-toc">
-  <div class="toc-title">On this page</div>
-  <ul id="inner-toc-list"></ul>
-</div>
+  <a href="#main" class="skip-link">Skip to content</a>
 
-<div class="container">
+  <nav aria-label="Main navigation">
+    <a href="../../index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
+    <ul class="links">
+      <li><a href="../../writing.html">Writing</a></li>
+      <li><a href="../../index.html#projects">Projects</a></li>
+      <li><a href="../../contact.html">Contact</a></li>
+    </ul>
 
-  <a class="back" href="../../index.html">← Back to portfolio</a>
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+      <span class="theme-icon" aria-hidden="true">🌙</span>
+    </button>
+  </nav>
 
-  <h1 id="project-title"></h1>
+  <main id="main" class="container">
+    <!-- INNER TOC -->
+    <aside id="inner-toc" aria-label="Table of contents">
+      <div class="toc-title">On this page</div>
+      <ul id="inner-toc-list"></ul>
+    </aside>
 
-  <img id="project-image" class="hero-image">
+    <a class="back" href="../../index.html">← Back to portfolio</a>
 
-  <div id="project-content"></div>
+    <h1 id="project-title"></h1>
 
-</div>
+    <img id="project-image" class="hero-image" alt="" />
 
+    <article id="project-content"></article>
+  </main>
 
+  <script src="../../theme.js"></script>
+  <script src="../../generator.js"></script>
 
 </body>
 </html>

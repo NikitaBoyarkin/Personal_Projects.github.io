@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>Writing | Nikita Boyarkin</title>
@@ -16,18 +16,22 @@
 
 <body>
 
-  <nav>
-    <a href="index.html" style="text-decoration: none; color: inherit;"><b>Portfolio</b></a>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Main navigation">
+    <a href="index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
-      <li><a href="writing.html" class="active">Writing</a></li>
+      <li><a href="writing.html" class="active" aria-current="page">Writing</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <main>
+  <main id="main">
     <h1 class="page-title reveal">Writing</h1>
 
     <div class="filter-row reveal reveal-delay-1">
@@ -40,7 +44,7 @@
         <span class="blog-card-tag">Decision Log</span>
         <div class="blog-card-title">Why We Switched to Bayesian A/B Testing</div>
         <div class="blog-card-meta">1 min read · Mar 15, 2025</div>
-        <div class="blog-card-excerpt">Frequentist p-values were creating a culture of peeking. Here's how Bayesian inference changed our experiment workflow.</div>
+        <div class="blog-card-excerpt">Frequentist p-values were creating a culture of peeking. Here&#039;s how Bayesian inference changed our experiment workflow.</div>
       </a>
     </div>
   </main>

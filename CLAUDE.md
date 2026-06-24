@@ -35,8 +35,9 @@ If images break after adding a project, check the raw `src` in the `.md` and the
 
 ## Development workflow
 
-- **Run locally**: `python3 -m http.server 8000` from the repo root. Open `http://localhost:8000/`.
-- **No build, test, or lint tools** are configured. Verify changes manually in the browser.
+- **Run locally**: `python3 -m http.server 8000` from the repo root, or `make serve`.
+- **Validate before deploying**: `make check` runs `scripts/check_site.py` to verify that every project has a markdown source + wrapper, all internal links resolve, required assets exist, and the profile image is under the size threshold.
+- **Manual verification**: Load `http://localhost:8000/` and at least one `projects/<id>/index.html` in a browser; verify card rendering, image paths, TOC generation, and the theme toggle.
 - **Add a project**:
   1. Create `projects/<id>.md` with the expected structure (see below).
   2. Copy `_template.html` to `projects/<id>/index.html` and adjust relative paths if necessary.

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>Nikita Boyarkin | Portfolio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing." />
+  <link rel="canonical" href="https://nikitaboyarkin.github.io/Personal_Projects.github.io/" />
+
   <meta property="og:title" content="Nikita Boyarkin | Portfolio" />
   <meta property="og:description" content="Data Analyst with 3+ years of experience turning complex data into actionable business insights." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="images/00_profile.png" />
+  <meta property="og:url" content="https://nikitaboyarkin.github.io/Personal_Projects.github.io/" />
+  <meta property="og:image" content="https://nikitaboyarkin.github.io/Personal_Projects.github.io/images/00_profile.jpg" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,66 +26,66 @@
 
 <body>
 
-  <!-- TOC (если нужно — можешь скрыть) -->
-  <!--<aside id="toc">
-    <div class="toc-title">Contents</div>
-    <ul>
-      <li><a href="#intro">Intro</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#about">About</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </aside>
+  <a href="#main" class="skip-link">Skip to content</a>
 
-  <!-- NAV -->
-  <nav>
-    <b>Portfolio</b>
+  <nav aria-label="Main navigation">
+    <a href="index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
       <li><a href="writing.html">Writing</a></li>
       <li><a href="#projects">Projects</a></li>
-      <li><a href="#contact">Contact</a></li>
+      <li><a href="contact.html">Contact</a></li>
     </ul>
 
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <!-- INTRO -->
-  <section id="intro">
-    <div class="intro-container">
-      <div class="intro-content">
-        <h1>Nikita Boyarkin</h1>
-        <div class="subtitle">Data Analyst/ Product Analyst</div>
+  <main id="main">
 
-        <div class="skills">
-          <span class="skill-badge">SQL</span>
-          <span class="skill-badge">Python</span>
-          <span class="skill-badge">Visualization</span>
-          <span class="skill-badge">A/B Testing</span>
-    
+    <!-- INTRO -->
+    <section id="intro" class="reveal">
+      <div class="intro-container">
+        <div class="intro-content">
+          <h1>Nikita Boyarkin</h1>
+          <div class="subtitle">Data Analyst / Product Analyst</div>
+
+          <div class="skills">
+            <span class="skill-badge">SQL</span>
+            <span class="skill-badge">Python</span>
+            <span class="skill-badge">Visualization</span>
+            <span class="skill-badge">A/B Testing</span>
+          </div>
+
+          <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
+          <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
+
+          <p>
+            <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+            <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+            <a href="writing.html">Writing</a>
+          </p>
         </div>
-    <h2>About Me</h2>
-
-              
-    <br>
-    <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
-    <br>
-     <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
-        <br>
-          <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-          <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-          <a href="writing.html">Writing</a>
-        </p>
+        <div class="intro-photo">
+          <div class="">
+            <img src="images/00_profile.jpg" alt="Nikita Boyarkin" class="profile-image" width="800" height="792" loading="eager" fetchpriority="high">
+          </div>
+        </div>
       </div>
-  <div class="intro-photo">
-          <img src="images/00_profile.png" alt="Nikita Boyarkin" class="profile-image" loading="lazy">
-        </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- LATEST WRITING -->
-  <section id="writing">
+
+  <!-- PROJECTS -->
+    <section id="projects" class="reveal reveal-delay-2">
+      <h2>Projects</h2>
+      <div id="project-list"><!-- auto-generated --></div>
+    </section>
+
+
+    <!-- LATEST WRITING -->
+  <section id="writing" class="reveal reveal-delay-1">
     <h2>Latest Writing</h2>
     <div class="blog-list">
       <a href="posts/why-we-switched-to-bayesian-ab-testing.html" class="blog-card">
@@ -95,27 +98,29 @@
     <p style="margin-top: 1.5rem;"><a href="writing.html">View all writing →</a></p>
   </section>
 
-  <!-- PROJECTS -->
-  <section id="projects">
-    <h2>Projects</h2>
-    <div id="project-list"><!-- auto-generated --></div>
-  </section>
+    <!-- ABOUT -->
+    <section id="about" class="reveal reveal-delay-3">
+      <h2>About Me</h2>
+      <p>I work at the intersection of product, data, and experimentation. My background spans customer analytics, A/B testing, dashboard design, and building data pipelines that help teams make faster decisions.</p>
+      <p>Outside of work I maintain an Obsidian knowledge base on product analytics, experiment with AI-assisted workflows, and write about practical data techniques.</p>
+    </section>
 
+  </main>
 
   <!-- FOOTER -->
-  <footer id="contact"> 
-     <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-     <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·   
-     <a href="https://t.me/lofinibo">Telegram</a> ·
-     <a href="writing.html">Writing</a> 
+  <footer id="contact">
+    <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+    <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+    <a href="https://t.me/lofinibo">Telegram</a> ·
+    <a href="writing.html">Writing</a>
     <p>© 2026 Nikita Boyarkin</p>
   </footer>
 
-
-
+  <script src="theme.js"></script>
   <script src="generator.js"></script>
 
+
   
+
 </body>
 </html>
-

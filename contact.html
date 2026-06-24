@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>Now & Contact | Nikita Boyarkin</title>
@@ -16,19 +16,23 @@
 
 <body>
 
-  <nav>
-    <a href="index.html" style="text-decoration: none; color: inherit;"><b>Portfolio</b></a>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Main navigation">
+    <a href="index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
       <li><a href="writing.html">Writing</a></li>
-      <li><a href="contact.html" class="active">Contact</a></li>
+      <li><a href="contact.html" class="active" aria-current="page">Contact</a></li>
     </ul>
 
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <main>
+  <main id="main">
     <section class="now-section reveal">
       <h1 class="now-title">Now</h1>
       <p class="now-subtitle">What I'm focused on right now.</p>

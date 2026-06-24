@@ -1,24 +1,7 @@
-// mdPath: путь к .md относительно корня, например "projects/rfm.md"
-// imgSrc: значение src из <img> в сгенерированном HTML, например "../images/foo.png" или "images/foo.png"
-function resolveImagePath(mdPath, imgSrc) {
-  try {
-    // base = абсолютный URL к md файлу, e.g. https://site.origin/projects/rfm.md
-    const origin =
-      window.location.origin ||
-      window.location.protocol + "//" + window.location.host;
-    const base = origin + "/" + mdPath.replace(/^\.\//, "");
-    // new URL резолвит ../ и т.п. и возвращает абсолютный URL
-    const abs = new URL(imgSrc, base).pathname; // возвращает, например, "/images/foo.png"
-    // используем путь от корня (без origin) — будет работать и на GitHub Pages
-    return abs.startsWith("/") ? abs : "/" + abs;
-  } catch (e) {
-    // fallback: если что-то сломалось — вернём оригинал
-    return imgSrc;
-  }
-}
+/* generator.js — render project cards and project detail pages from Markdown */
 
 /* ===============================
-   PROJECT LIST (пример)
+   PROJECT LIST
    =============================== */
 const projects = [
   { id: "rfm", md: "projects/rfm.md" },
@@ -29,28 +12,30 @@ const projects = [
 ];
 
 /* ===============================
-   Утилиты
+   Utilities
    =============================== */
-// Преобразует заголовок в безопасный slug (удаляет спецсимволы, транслит/кирилица оставляем, но чистим)
 function slugify(text) {
-  return (
-    text
-      .toString()
-      .trim()
-      .toLowerCase()
-      // заменяем кириллические пробелы и спецсимволы на дефис
-      .replace(/[\s]+/g, "-")
-      // удалить всё кроме букв, цифр, дефиса и подчеркивания
-      .replace(/[^a-z0-9\u0400-\u04FF\-\_]/g, "")
-      // убрать повторяющиеся дефисы
-      .replace(/-+/g, "-")
-      .replace(/^-+|-+$/g, "")
-  );
+  return text
+    .toString()
+    .trim()
+    .toLowerCase()
+    .replace(/[\s]+/g, "-")
+    .replace(/[^a-z0-9Ѐ-ӿ\-_]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-/* ===============================
-   Skeleton HTML generator
-   =============================== */
+function escapeHtml(text) {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.toString().replace(/[&<>"']/g, (c) => map[c]);
+}
+
 function createSkeletonCard() {
   return `
     <div class="project skeleton-card" aria-busy="true" aria-label="Loading project">
@@ -70,27 +55,24 @@ async function renderProjectCards() {
   const container = document.querySelector("#project-list");
   if (!container) return;
 
-  // Show skeleton loading state
   container.innerHTML = projects.map(() => createSkeletonCard()).join("");
 
-  let output = "";
-  let delay = 0;
+  const cards = [];
 
   for (const p of projects) {
     try {
       const res = await fetch(p.md);
-      if (!res.ok) throw new Error("Not found");
+      if (!res.ok) throw new Error(`Failed to load ${p.md}: ${res.status}`);
       const md = await res.text();
       const html = marked.parse(md);
 
       const temp = document.createElement("div");
       temp.innerHTML = html;
 
-      const title = temp.querySelector("h1")?.textContent || "Project";
+      const title = escapeHtml(temp.querySelector("h1")?.textContent || "Project");
       const img = temp.querySelector("img")?.getAttribute("src") || "";
-      const desc = temp.querySelector("p")?.textContent || "";
+      const desc = escapeHtml(temp.querySelector("p")?.textContent || "");
 
-      // извлекаем инструменты
       const toolsHeader = Array.from(temp.querySelectorAll("h2")).find(
         (h) => h.textContent.trim() === "Impact",
       );
@@ -98,101 +80,113 @@ async function renderProjectCards() {
       if (toolsHeader) {
         const ul = toolsHeader.nextElementSibling;
         if (ul && ul.tagName === "UL") {
-          tools = Array.from(ul.querySelectorAll("li"))
-            .map((li) => li.textContent.trim())
-            .join(", ");
+          tools = escapeHtml(
+            Array.from(ul.querySelectorAll("li"))
+              .map((li) => li.textContent.trim())
+              .join(", "),
+          );
         }
       }
 
-      // нормализуем путь к картинке (если в md указан ../images/...)
-      const imgSrc = img ? img.replace(/^\.\.\//, "") : "";
+      // Markdown images are usually "images/..." or "../images/...".
+      // On the landing page both resolve to the same root-relative images/ folder.
+      const imgSrc = img ? escapeHtml(img.replace(/^\.\.\//, "")) : "";
 
-      output += `
-        <div class="project reveal" style="transition-delay: ${delay}ms">
+      cards.push(`
+        <article class="project reveal">
           ${imgSrc ? `<img src="${imgSrc}" alt="${title}" loading="lazy">` : ""}
           <h3>${title}</h3>
           <p>${desc}</p>
           ${tools ? `<p class="Impact">Impact: ${tools}</p>` : ""}
-          <a class="button" href="./projects/${
-            p.id
-          }/index.html">View Project</a>
-        </div>
-      `;
-      delay += 100;
+          <a class="button" href="./projects/${p.id}/index.html">View Project</a>
+        </article>
+      `);
     } catch (e) {
       console.warn("Failed to load", p.md, e);
     }
   }
 
-  container.innerHTML = output;
+  container.innerHTML = cards.join("");
 }
 
 /* ===============================
    2) GENERATE A PROJECT PAGE FROM MD
    =============================== */
 async function generateProjectPage() {
-  // путь: /projects/<id>/index.html
-  const match = window.location.pathname.match(
-    /projects\/([^\/]+)\/index\.html/,
-  );
+  // Match /projects/<id>/index.html, /projects/<id>/, or /projects/<id>
+  const match = window.location.pathname.match(/projects\/([^\/]+)(?:\/index\.html|\/)?$/);
   if (!match) return;
 
   const id = match[1];
   const project = projects.find((p) => p.id === id);
-  if (!project) return;
+  if (!project) {
+    console.warn("Unknown project id:", id);
+    return;
+  }
 
   try {
-    const res = await fetch("../../" + project.md);
-    if (!res.ok) throw new Error("MD not found");
+    // Resolve the markdown path from the current page location. Using "../../"
+    // keeps the URL correct whether the page is /projects/<id>/index.html,
+    // /projects/<id>/, or /projects/<id>.
+    const mdUrl = new URL("../../" + project.md, window.location.href).href;
+    const res = await fetch(mdUrl);
+    if (!res.ok) throw new Error(`MD not found: ${res.status}`);
     const md = await res.text();
     const html = marked.parse(md);
 
     const content = document.querySelector("#project-content");
     if (!content) return;
 
-    // вставляем HTML из Markdown
-    content.innerHTML = html;
+    // Parse markdown HTML off-DOM so we can rewrite paths before the browser
+    // starts fetching images with wrong relative URLs.
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
 
-    // обрабатываем <h1> — ставим заголовок страницы и удаляем из контента
-    const h1 = content.querySelector("h1");
-    if (h1) {
-      const projectTitleEl = document.querySelector("#project-title");
-      if (projectTitleEl) projectTitleEl.textContent = h1.textContent;
-      document.title = h1.textContent + " | Portfolio";
-      h1.remove();
-    }
-
-    // берем первую картинку как hero
-    const img = content.querySelector("img");
-    if (img) {
-      const hero = document.querySelector("#project-image");
-      if (hero) {
-        // нормализуем путь (images/... -> ../../images/...)
-        hero.src = img
-          .getAttribute("src")
-          .replace(/^images\//, "../../images/");
-      }
-      img.remove();
-    }
-
-    // преобразуем пути для всех оставшихся картинок в контенте
-    content.querySelectorAll("img").forEach((img) => {
+    // Normalize all image paths (images/... -> ../../images/...)
+    temp.querySelectorAll("img").forEach((img) => {
       const src = img.getAttribute("src");
       if (src && src.startsWith("images/")) {
         img.src = src.replace(/^images\//, "../../images/");
       }
     });
 
-    // после вставки контента — генерируем внутреннее оглавление
+    // Promote h1 to page title and remove it from content
+    let projectTitle = "";
+    const h1 = temp.querySelector("h1");
+    if (h1) {
+      projectTitle = h1.textContent;
+      const projectTitleEl = document.querySelector("#project-title");
+      if (projectTitleEl) projectTitleEl.textContent = projectTitle;
+      document.title = projectTitle + " | Portfolio";
+      h1.remove();
+    }
+
+    // Use the first image as the hero image
+    const img = temp.querySelector("img");
+    if (img) {
+      const hero = document.querySelector("#project-image");
+      if (hero) {
+        hero.src = img.getAttribute("src");
+        hero.alt = projectTitle ? `${projectTitle} preview` : document.title;
+      }
+      img.remove();
+    }
+
+    content.innerHTML = temp.innerHTML;
+
     generateInnerTOC();
     enableSmoothScrollForTOC();
   } catch (e) {
     console.error("generateProjectPage error:", e);
+    const content = document.querySelector("#project-content");
+    if (content) {
+      content.innerHTML = `<p class="error">Unable to load project content. Please try again later.</p>`;
+    }
   }
 }
 
 /* ===============================
-   3) INNER TOC (H2 + H3) - улучшенная
+   3) INNER TOC
    =============================== */
 function generateInnerTOC() {
   const tocList = document.querySelector("#inner-toc-list");
@@ -201,16 +195,13 @@ function generateInnerTOC() {
 
   tocList.innerHTML = "";
 
-  // Получаем заголовки H2 и H3
   const headers = Array.from(container.querySelectorAll("h2, h3"));
   if (!headers.length) {
-    // если заголовков нет — скрываем TOC
     const tocWrap = document.getElementById("inner-toc");
     if (tocWrap) tocWrap.style.display = "none";
     return;
   }
 
-  // Для уникальности id — учитываем уже встреченные
   const used = new Map();
 
   headers.forEach((h) => {
@@ -224,17 +215,14 @@ function generateInnerTOC() {
     used.set(id, true);
     h.id = id;
 
-    // создаём пункт TOC, вложение для h3
     const li = document.createElement("li");
-    // add class by tagName to allow slight indenting for h3 via CSS if needed
     li.className = h.tagName.toLowerCase() === "h3" ? "toc-h3" : "toc-h2";
     li.innerHTML = `<a href="#${id}" data-id="${id}">${text}</a>`;
     tocList.appendChild(li);
   });
 
-  // подсветка на скролле
   function updateActive() {
-    let pos = window.scrollY + 160;
+    const pos = window.scrollY + 160;
     let current = "";
 
     for (let i = 0; i < headers.length; i++) {
@@ -252,9 +240,6 @@ function generateInnerTOC() {
   window.addEventListener("scroll", updateActive);
 }
 
-/* ===============================
-   Smooth scroll: перехватываем клики на TOC и делаем плавный скролл
-   =============================== */
 function enableSmoothScrollForTOC() {
   const toc = document.getElementById("inner-toc");
   if (!toc) return;
@@ -267,11 +252,10 @@ function enableSmoothScrollForTOC() {
     const target = document.getElementById(id);
     if (!target) return;
     e.preventDefault();
-    // плавный скролл с учётом фиксированного header (пример 120px)
     const offset = 110;
     const top = window.scrollY + target.getBoundingClientRect().top - offset;
     window.scrollTo({ top, behavior: "smooth" });
-    // обновим подсветку
+
     document
       .querySelectorAll("#inner-toc a")
       .forEach((el) => el.classList.remove("active"));
@@ -292,7 +276,7 @@ function initRevealObserver() {
         }
       });
     },
-    { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+    { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
   );
 
   document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
@@ -305,15 +289,9 @@ function initNavbarScroll() {
   const nav = document.querySelector("nav");
   if (!nav) return;
 
-  let lastScroll = 0;
   window.addEventListener("scroll", () => {
     const currentScroll = window.scrollY;
-    if (currentScroll > 20) {
-      nav.classList.add("scrolled");
-    } else {
-      nav.classList.remove("scrolled");
-    }
-    lastScroll = currentScroll;
+    nav.classList.toggle("scrolled", currentScroll > 20);
   });
 }
 
@@ -321,59 +299,16 @@ function initNavbarScroll() {
    INIT
    =============================== */
 document.addEventListener("DOMContentLoaded", () => {
-  // Убедись, что marked уже загружен (если нет — попробуем дождаться)
   if (typeof marked === "undefined") {
     console.error(
       "marked.js not found. Make sure you included it BEFORE generator.js",
     );
+    return;
   }
+
   renderProjectCards().then(() => {
     initRevealObserver();
   });
   generateProjectPage();
   initNavbarScroll();
 });
-
-// Theme Toggle functionality
-const themeToggle = document.getElementById("theme-toggle");
-const themeIcon = themeToggle.querySelector(".theme-icon");
-const html = document.documentElement;
-
-// Проверяем сохраненную тему или системные предпочтения
-const getPreferredTheme = () => {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) return savedTheme;
-
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
-};
-
-// Применяем тему
-const setTheme = (theme) => {
-  html.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
-
-  // Меняем иконку
-  themeIcon.textContent = theme === "dark" ? "☀️" : "🌙";
-};
-
-// Инициализация
-setTheme(getPreferredTheme());
-
-// Обработчик клика
-themeToggle.addEventListener("click", () => {
-  const currentTheme = html.getAttribute("data-theme");
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
-  setTheme(newTheme);
-});
-
-// Слушаем изменения системных предпочтений
-window
-  .matchMedia("(prefers-color-scheme: dark)")
-  .addEventListener("change", (e) => {
-    if (!localStorage.getItem("theme")) {
-      setTheme(e.matches ? "dark" : "light");
-    }
-  });
-

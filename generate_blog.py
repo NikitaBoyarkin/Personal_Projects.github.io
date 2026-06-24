@@ -38,7 +38,7 @@ DEFAULT_SOURCE = "posts"
 DEFAULT_OUTPUT = "."
 POSTS_DIR = "posts"  # where individual post HTMLs go
 TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>{title} | Nikita Boyarkin</title>
@@ -52,24 +52,28 @@ TEMPLATE = """<!DOCTYPE html>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="project-style.css" />
-  <link rel="stylesheet" href="blog-style.css" />
+  <link rel="stylesheet" href="../project-style.css" />
+  <link rel="stylesheet" href="../blog-style.css" />
 </head>
 
 <body>
 
-  <nav>
-    <a href="index.html" style="text-decoration: none; color: inherit;"><b>Portfolio</b></a>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Main navigation">
+    <a href="../index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
-      <li><a href="writing.html" class="active">Writing</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="../writing.html" class="active" aria-current="page">Writing</a></li>
+      <li><a href="../contact.html">Contact</a></li>
     </ul>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <main>
+  <main id="main">
     <article class="post-content">
       <header class="post-header">
         <span class="post-tag">{category_display}</span>
@@ -79,7 +83,7 @@ TEMPLATE = """<!DOCTYPE html>
 
       {content}
 
-      <a href="writing.html" class="post-back">← Back to Writing</a>
+      <a href="../writing.html" class="post-back">← Back to Writing</a>
     </article>
   </main>
 
@@ -90,7 +94,7 @@ TEMPLATE = """<!DOCTYPE html>
     <p>© {year} Nikita Boyarkin</p>
   </footer>
 
-  <script src="theme.js"></script>
+  <script src="../theme.js"></script>
 </body>
 </html>
 """
@@ -143,6 +147,17 @@ def slugify(title: str) -> str:
     return slug.strip("-")
 
 
+def escape_html(text: str) -> str:
+    """Escape HTML special characters in plain text before template interpolation."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#039;")
+    )
+
+
 def generate_post_html(post: dict, output_dir: str) -> str:
     """Generate individual post HTML file. Returns relative filename."""
     slug = post.get("slug") or slugify(post["title"])
@@ -154,11 +169,11 @@ def generate_post_html(post: dict, output_dir: str) -> str:
     category_display = CATEGORY_MAP.get(category, category.replace("-", " ").title())
 
     html = TEMPLATE.format(
-        title=post["title"],
-        excerpt=post.get("excerpt", ""),
+        title=escape_html(post["title"]),
+        excerpt=escape_html(post.get("excerpt", "")),
         content=post["html_content"],
-        category_display=category_display,
-        date_display=post.get("date_display", ""),
+        category_display=escape_html(category_display),
+        date_display=escape_html(post.get("date_display", "")),
         read_time=post["read_time"],
         year=datetime.now().year,
     )
@@ -180,10 +195,10 @@ def generate_writing_page(posts: list[dict], output_dir: str) -> None:
             excerpt = excerpt[:160].rsplit(" ", 1)[0] + "..."
 
         card = f'''      <a href="posts/{post["filename"]}" class="blog-card" data-category="{category}">
-        <span class="blog-card-tag">{category_display}</span>
-        <div class="blog-card-title">{post["title"]}</div>
-        <div class="blog-card-meta">{post["read_time"]} min read · {post.get("date_display", "")}</div>
-        <div class="blog-card-excerpt">{excerpt}</div>
+        <span class="blog-card-tag">{escape_html(category_display)}</span>
+        <div class="blog-card-title">{escape_html(post["title"])}</div>
+        <div class="blog-card-meta">{post["read_time"]} min read · {escape_html(post.get("date_display", ""))}</div>
+        <div class="blog-card-excerpt">{escape_html(excerpt)}</div>
       </a>'''
         cards_html.append(card)
 
@@ -198,7 +213,7 @@ def generate_writing_page(posts: list[dict], output_dir: str) -> None:
     writing_path = os.path.join(output_dir, "writing.html")
 
     page = f'''<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>Writing | Nikita Boyarkin</title>
@@ -215,18 +230,22 @@ def generate_writing_page(posts: list[dict], output_dir: str) -> None:
 
 <body>
 
-  <nav>
-    <a href="index.html" style="text-decoration: none; color: inherit;"><b>Portfolio</b></a>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Main navigation">
+    <a href="index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
-      <li><a href="writing.html" class="active">Writing</a></li>
+      <li><a href="writing.html" class="active" aria-current="page">Writing</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <main>
+  <main id="main">
     <h1 class="page-title reveal">Writing</h1>
 
     <div class="filter-row reveal reveal-delay-1">
@@ -288,14 +307,14 @@ def update_index_latest(posts: list[dict], output_dir: str) -> None:
         if len(excerpt) > 140:
             excerpt = excerpt[:140].rsplit(" ", 1)[0] + "..."
         cards.append(f'''      <a href="posts/{post["filename"]}" class="blog-card">
-        <span class="blog-card-tag">{category_display}</span>
-        <div class="blog-card-title">{post["title"]}</div>
-        <div class="blog-card-meta">{post["read_time"]} min read · {post.get("date_display", "")}</div>
+        <span class="blog-card-tag">{escape_html(category_display)}</span>
+        <div class="blog-card-title">{escape_html(post["title"])}</div>
+        <div class="blog-card-meta">{post["read_time"]} min read · {escape_html(post.get("date_display", ""))}</div>
         <div class="blog-card-excerpt">{excerpt}</div>
       </a>''')
 
     new_section = f'''<!-- LATEST WRITING -->
-  <section id="writing">
+  <section id="writing" class="reveal reveal-delay-1">
     <h2>Latest Writing</h2>
     <div class="blog-list">
 {"\n".join(cards)}
@@ -306,7 +325,7 @@ def update_index_latest(posts: list[dict], output_dir: str) -> None:
 
     # Replace existing writing section
     pattern = r'<!-- LATEST WRITING -->.*?<!-- PROJECTS -->'
-    replacement = new_section + '\n  <!-- PROJECTS -->'
+    replacement = new_section + '\n\n  <!-- PROJECTS -->'
     content = re.sub(pattern, replacement, content, flags=re.DOTALL)
 
     with open(index_path, "w", encoding="utf-8") as f:

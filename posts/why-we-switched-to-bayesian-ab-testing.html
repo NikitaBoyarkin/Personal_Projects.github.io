@@ -1,36 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <title>Why We Switched to Bayesian A/B Testing | Nikita Boyarkin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Frequentist p-values were creating a culture of peeking. Here's how Bayesian inference changed our experiment workflow." />
+  <meta name="description" content="Frequentist p-values were creating a culture of peeking. Here&#039;s how Bayesian inference changed our experiment workflow." />
   <meta property="og:title" content="Why We Switched to Bayesian A/B Testing" />
-  <meta property="og:description" content="Frequentist p-values were creating a culture of peeking. Here's how Bayesian inference changed our experiment workflow." />
+  <meta property="og:description" content="Frequentist p-values were creating a culture of peeking. Here&#039;s how Bayesian inference changed our experiment workflow." />
   <meta property="og:type" content="article" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="project-style.css" />
-  <link rel="stylesheet" href="blog-style.css" />
+  <link rel="stylesheet" href="../project-style.css" />
+  <link rel="stylesheet" href="../blog-style.css" />
 </head>
 
 <body>
 
-  <nav>
-    <a href="index.html" style="text-decoration: none; color: inherit;"><b>Portfolio</b></a>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Main navigation">
+    <a href="../index.html" class="nav-brand" aria-label="Portfolio home">
+      <b>Portfolio</b>
+    </a>
     <ul class="links">
-      <li><a href="writing.html" class="active">Writing</a></li>
-      <li><a href="contact.html">Contact</a></li>
+      <li><a href="../writing.html" class="active" aria-current="page">Writing</a></li>
+      <li><a href="../contact.html">Contact</a></li>
     </ul>
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-      <span class="theme-icon">🌙</span>
+      <span class="theme-icon" aria-hidden="true">🌙</span>
     </button>
   </nav>
 
-  <main>
+  <main id="main">
     <article class="post-content">
       <header class="post-header">
         <span class="post-tag">Decision Log</span>
@@ -59,7 +63,7 @@ with pm.Model() as model:
 <li>Zero cases of "early significance reversal"</li>
 </ul>
 
-      <a href="writing.html" class="post-back">← Back to Writing</a>
+      <a href="../writing.html" class="post-back">← Back to Writing</a>
     </article>
   </main>
 
@@ -70,6 +74,6 @@ with pm.Model() as model:
     <p>© 2026 Nikita Boyarkin</p>
   </footer>
 
-  <script src="theme.js"></script>
+  <script src="../theme.js"></script>
 </body>
 </html>

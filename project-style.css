@@ -85,6 +85,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Skip link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  z-index: 200;
+  background: var(--text-accent);
+  color: white;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--space-2);
+  text-decoration: none;
+  font-weight: 500;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
 /* Reveal animations */
 .reveal {
   opacity: 0;
@@ -130,6 +149,8 @@ nav.scrolled {
   display: flex;
   align-items: center;
   gap: 0.8rem;
+  text-decoration: none;
+  color: inherit;
 }
 
 .nav-brand b {
@@ -181,7 +202,8 @@ nav ul.links a {
   transition: all 0.2s ease;
 }
 
-nav ul.links a:hover {
+nav ul.links a:hover,
+nav ul.links a[aria-current="page"] {
   background-color: var(--interactive-hover);
   color: var(--text-accent);
 }
