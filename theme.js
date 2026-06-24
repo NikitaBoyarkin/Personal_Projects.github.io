@@ -21,3 +21,4 @@
     if (icon) icon.textContent = next === "dark" ? "☀️" : "🌙";
   });
 })();
+
