@@ -1,0 +1,51 @@
+<div id="intro-shader" aria-hidden="true"></div>
+
+<script is:inline type="module">
+  import { ShaderMount, meshGradientFragmentShader, getShaderColorFromString } from 'https://esm.sh/@paper-design/shaders';
+
+  const container = document.getElementById('intro-shader');
+  if (!container) {
+    console.warn('Paper shader container not found');
+  } else {
+    const darkColors = ['#5100ff', '#00ff80', '#ffcc00', '#ea00ff'];
+    const lightColors = ['#c4b5fd', '#86efac', '#fde047', '#f0abfc'];
+
+    const makeUniforms = (colors) => ({
+      u_colors: colors.map(getShaderColorFromString),
+      u_colorsCount: colors.length,
+      u_distortion: 0.7,
+      u_swirl: 0.4,
+      u_grainMixer: 0.3,
+      u_grainOverlay: 0.15,
+    });
+
+    let mount;
+    try {
+      mount = new ShaderMount(
+        container,
+        meshGradientFragmentShader,
+        makeUniforms(darkColors),
+        { alpha: true, antialias: false },
+        0.15
+      );
+    } catch (error) {
+      console.warn('Paper shader init failed:', error);
+    }
+
+    if (mount) {
+      const syncTheme = () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        mount.setUniforms(makeUniforms(isDark ? darkColors : lightColors));
+      };
+
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.attributeName === 'data-theme') {
+            syncTheme();
+          }
+        }
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+  }
+</script>

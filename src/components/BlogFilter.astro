@@ -1,0 +1,23 @@
+<div class="filter-row reveal reveal-delay-1">
+  <button class="filter-tag active" data-filter="all">All</button>
+  <button class="filter-tag" data-filter="decision-log">Decision Logs</button>
+</div>
+
+<script>
+  const filterTags = document.querySelectorAll('.filter-tag');
+  const cards = document.querySelectorAll('.blog-card');
+
+  filterTags.forEach((tag) => {
+    const btn = tag as HTMLElement;
+    btn.addEventListener('click', () => {
+      filterTags.forEach((t) => t.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      cards.forEach((card) => {
+        const el = card as HTMLElement;
+        el.style.display =
+          filter === 'all' || el.dataset.category === filter ? 'block' : 'none';
+      });
+    });
+  });
+</script>

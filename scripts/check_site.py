@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""check_site.py — lightweight validation for the static portfolio.
+"""check_site.py — validate the built Astro portfolio.
 
 Checks:
-- Every project declared in generator.js has a .md source and an HTML wrapper.
-- Every projects/*.md with a matching wrapper is registered in generator.js.
-- Internal links in HTML files point to existing files.
+- Required pages exist in dist/.
+- All internal links in dist/ HTML resolve to existing files.
 - Profile image exists and is under a size threshold.
-- Required JS/CSS assets are referenced on index.html.
+- Images referenced in HTML exist in dist/.
+- Required assets are present in index.html.
 """
 
 import re
@@ -15,24 +15,19 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-IMAGES_DIR = ROOT / "images"
-PROJECTS_DIR = ROOT / "projects"
+DIST = ROOT / "dist"
 MAX_PROFILE_KB = 500
 
 
 class LinkExtractor(HTMLParser):
-    def __init__(self, base_dir: Path, page: Path):
+    def __init__(self, page: Path):
         super().__init__()
-        self.base_dir = base_dir
         self.page = page
         self.links: list[tuple[str, int]] = []
         self.srcs: list[tuple[str, int]] = []
 
     def error(self, message):
         pass
-
-    def getpos(self):
-        return super().getpos()
 
     def handle_starttag(self, tag, attrs):
         attr = dict(attrs)
@@ -43,56 +38,10 @@ class LinkExtractor(HTMLParser):
             self.srcs.append((attr["src"], line))
 
 
-def read_generator_projects() -> list[str]:
-    """Extract the project id list from generator.js."""
-    generator = (ROOT / "generator.js").read_text(encoding="utf-8")
-    match = re.search(r"const\s+projects\s*=\s*\[(.*?)\];", generator, re.DOTALL)
-    if not match:
-        print("ERROR: cannot find projects array in generator.js")
-        return []
-
-    ids = re.findall(r'id:\s*"([^"]+)"', match.group(1))
-    return ids
-
-
-def check_projects(ids: list[str]) -> int:
-    errors = 0
-    print(f"Checking {len(ids)} project(s) from generator.js...")
-    for pid in ids:
-        md = PROJECTS_DIR / f"{pid}.md"
-        wrapper = PROJECTS_DIR / pid / "index.html"
-        if not md.exists():
-            print(f"  ERROR: missing markdown source {md}")
-            errors += 1
-        if not wrapper.exists():
-            print(f"  ERROR: missing project wrapper {wrapper}")
-            errors += 1
-        else:
-            print(f"  OK    {pid}: {md.name} + {pid}/index.html")
-    return errors
-
-
-def check_orphan_wrappers(ids: list[str]) -> int:
-    errors = 0
-    registered = set(ids)
-    wrappers = [d.name for d in PROJECTS_DIR.iterdir() if d.is_dir() and (d / "index.html").exists()]
-    markdowns = [p.stem for p in PROJECTS_DIR.glob("*.md")]
-
-    for pid in wrappers:
-        if pid not in registered:
-            print(f"  ERROR: wrapper {PROJECTS_DIR / pid / 'index.html'} exists but {pid} is not in generator.js")
-            errors += 1
-
-    for pid in markdowns:
-        if pid not in registered:
-            print(f"  ERROR: markdown {PROJECTS_DIR / (pid + '.md')} exists but {pid} is not in generator.js")
-            errors += 1
-
-    return errors
-
-
 def is_internal(url: str) -> bool:
-    return bool(url) and not url.startswith(("http://", "https://", "//", "mailto:", "tel:", "#"))
+    return bool(url) and not url.startswith(
+        ("http://", "https://", "//", "mailto:", "tel:", "#", "data:")
+    )
 
 
 def strip_fragment(url: str) -> str:
@@ -102,36 +51,60 @@ def strip_fragment(url: str) -> str:
 def resolve_relative(page: Path, url: str) -> Path:
     url = strip_fragment(url)
     if url.startswith("/"):
-        return (ROOT / url.lstrip("/")).resolve()
+        # The base path is part of the URL; strip it to resolve against dist/
+        base = "/Personal_Projects.github.io"
+        if url.startswith(base):
+            url = url[len(base):]
+        return (DIST / url.lstrip("/")).resolve()
     return (page.parent / url).resolve()
+
+
+def check_required_pages() -> int:
+    errors = 0
+    required = [
+        DIST / "index.html",
+        DIST / "writing" / "index.html",
+        DIST / "contact" / "index.html",
+        DIST / "projects" / "rfm" / "index.html",
+        DIST / "projects" / "bot" / "index.html",
+        DIST / "projects" / "cohort" / "index.html",
+        DIST / "projects" / "abtest" / "index.html",
+        DIST / "posts" / "bayesian-ab-testing" / "index.html",
+    ]
+    print(f"Checking {len(required)} required page(s)...")
+    for path in required:
+        if not path.exists():
+            print(f"  ERROR: missing required page {path.relative_to(DIST)}")
+            errors += 1
+        else:
+            print(f"  OK    {path.relative_to(DIST)}")
+    return errors
 
 
 def check_internal_links() -> int:
     errors = 0
-    html_files = list(ROOT.rglob("*.html"))
-    # Skip legacy/template artifacts we don't validate deeply
-    skip = {ROOT / "elements.html", ROOT / "generic.html", ROOT / "_template.html"}
-    html_files = [p for p in html_files if p not in skip and "assets/" not in str(p)]
-
+    html_files = list(DIST.rglob("*.html"))
     print(f"Checking internal links in {len(html_files)} HTML file(s)...")
     for page in html_files:
         text = page.read_text(encoding="utf-8")
-        extractor = LinkExtractor(ROOT, page)
+        extractor = LinkExtractor(page)
         try:
             extractor.feed(text)
         except Exception as e:
-            print(f"  ERROR parsing {page}: {e}")
+            print(f"  ERROR parsing {page.relative_to(DIST)}: {e}")
             errors += 1
             continue
 
         for url, line in extractor.links + extractor.srcs:
             if not is_internal(url):
                 continue
+            # Skip CSS/JS assets handled by Astro bundler
+            if url.startswith("/_astro/"):
+                continue
             target = resolve_relative(page, url)
             if not target.exists():
-                print(f"  ERROR {page}:{line} broken link: {url} -> {target}")
+                print(f"  ERROR {page.relative_to(DIST)}:{line} broken link: {url} -> {target.relative_to(ROOT)}")
                 errors += 1
-
     return errors
 
 
@@ -140,12 +113,12 @@ def check_profile_image() -> int:
     profile_candidates = ["images/00_profile.jpg", "images/00_profile.png"]
     profile = None
     for cand in profile_candidates:
-        if (ROOT / cand).exists():
-            profile = ROOT / cand
+        if (DIST / cand).exists():
+            profile = DIST / cand
             break
 
     if not profile:
-        print("  ERROR: profile image not found (expected images/00_profile.jpg or .png)")
+        print("  ERROR: profile image not found in dist/images/")
         return 1
 
     size_kb = profile.stat().st_size / 1024
@@ -158,9 +131,9 @@ def check_profile_image() -> int:
 
 def check_index_assets() -> int:
     errors = 0
-    index = ROOT / "index.html"
+    index = DIST / "index.html"
     text = index.read_text(encoding="utf-8")
-    required = ["project-style.css", "theme.js", "generator.js", "marked.min.js"]
+    required = ["_astro/", "theme-toggle"]
     for asset in required:
         if asset not in text:
             print(f"  ERROR: index.html missing reference to {asset}")
@@ -169,11 +142,13 @@ def check_index_assets() -> int:
 
 
 def main() -> int:
+    if not DIST.exists():
+        print("ERROR: dist/ not found. Run 'npm run build' first.")
+        return 1
+
     print("=== Portfolio site validation ===\n")
-    ids = read_generator_projects()
     errors = 0
-    errors += check_projects(ids)
-    errors += check_orphan_wrappers(ids)
+    errors += check_required_pages()
     errors += check_internal_links()
     errors += check_profile_image()
     errors += check_index_assets()

@@ -1,0 +1,89 @@
+---
+interface Props {
+  selector?: string;
+}
+
+const { selector = '#project-content' } = Astro.props;
+---
+
+<aside id="inner-toc" aria-label="Table of contents">
+  <div class="toc-title">On this page</div>
+  <ul id="inner-toc-list"></ul>
+</aside>
+
+<script is:inline define:vars={{ selector }}>
+  function slugify(text) {
+    return text
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[\s]+/g, '-')
+      .replace(/[^a-z0-9Ѐ-ӿ\-_]/g, '')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function initTOC() {
+    const tocList = document.getElementById('inner-toc-list');
+    const container = document.querySelector(selector);
+    const tocWrap = document.getElementById('inner-toc');
+    if (!tocList || !container) return;
+
+    const headers = Array.from(container.querySelectorAll('h2, h3'));
+    if (!headers.length) {
+      if (tocWrap) tocWrap.style.display = 'none';
+      return;
+    }
+
+    const used = new Map();
+    headers.forEach((h) => {
+      const text = h.textContent || '';
+      let idBase = slugify(text) || 'section';
+      let id = idBase;
+      let count = 1;
+      while (used.has(id)) {
+        id = `${idBase}-${count++}`;
+      }
+      used.set(id, true);
+      h.id = id;
+
+      const li = document.createElement('li');
+      li.className = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
+      li.innerHTML = `<a href="#${id}" data-id="${id}">${text}</a>`;
+      tocList.appendChild(li);
+    });
+
+    function updateActive() {
+      const pos = window.scrollY + 160;
+      let current = '';
+      for (let i = 0; i < headers.length; i++) {
+        const h = headers[i];
+        if (h.offsetTop <= pos) current = h.id;
+      }
+      document.querySelectorAll('#inner-toc a').forEach((a) => {
+        a.classList.toggle('active', a.dataset.id === current);
+      });
+    }
+
+    updateActive();
+    window.addEventListener('scroll', updateActive, { passive: true });
+
+    tocWrap?.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a) return;
+      const id = a.getAttribute('href')?.slice(1);
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      e.preventDefault();
+      const offset = 110;
+      const top = window.scrollY + target.getBoundingClientRect().top - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+
+      document.querySelectorAll('#inner-toc a').forEach((el) => el.classList.remove('active'));
+      a.classList.add('active');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initTOC);
+</script>

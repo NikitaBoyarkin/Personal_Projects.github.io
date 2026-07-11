@@ -1,0 +1,21 @@
+---
+import { withBase } from '../lib/path';
+import { formatDate } from '../lib/date';
+
+interface Props {
+  slug: string;
+  title: string;
+  category: string;
+  date: Date;
+  excerpt: string;
+}
+
+const { slug, title, category, date, excerpt } = Astro.props;
+---
+
+<a href={withBase(`posts/${slug}/`)} class="blog-card" data-category={category}>
+  <span class="blog-card-tag">{category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+  <div class="blog-card-title">{title}</div>
+  <div class="blog-card-meta">{formatDate(date)}</div>
+  <div class="blog-card-excerpt">{excerpt}</div>
+</a>
