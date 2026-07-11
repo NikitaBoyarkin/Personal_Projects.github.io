@@ -95,3 +95,7 @@ dist/
 .astro/
 .cache/
 
+# Allow src/lib/ even though generic 'lib/' is ignored above
+!src/lib/
+
+
