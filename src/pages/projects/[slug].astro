@@ -17,17 +17,16 @@ const { Content } = await render(project);
 ---
 
 <Base
-  title={`${project.data.title} | Portfolio`}
+  title={`${project.data.title} | Nikita Boyarkin`}
   description={project.data.description}
   ogType="article"
   activeNav="home"
+  canonical={withBase(`projects/${project.id.replace(/\.md$/, '')}/`)}
 >
   <InnerTOC />
 
   <div class="container reveal">
     <a class="back" href={withBase('/')}>← Back to portfolio</a>
-
-    <h1 id="project-title">{project.data.title}</h1>
 
     {
       project.data.hero && (
@@ -36,9 +35,55 @@ const { Content } = await render(project);
           class="hero-image"
           src={withBase(project.data.hero)}
           alt={`${project.data.title} preview`}
+          width="1200"
+          height="600"
         />
       )
     }
+
+    <div class="project-meta">
+      {
+        project.data.tools && project.data.tools.length > 0 && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Stack</span>
+            <div class="project-tools project-tools-inline">
+              {project.data.tools.map((tool) => (
+                <span class="project-tool">{tool}</span>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        project.data.impact && project.data.impact.length > 0 && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Impact</span>
+            <ul class="project-meta-list">
+              {project.data.impact.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        project.data.github && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Source</span>
+            <a
+              class="project-meta-link"
+              href={project.data.github}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View on GitHub →
+            </a>
+          </div>
+        )
+      }
+    </div>
 
     <article id="project-content">
       <Content />

@@ -9,13 +9,27 @@ import { withBase } from '../lib/path';
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Nikita Boyarkin',
+  url: 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/',
+  jobTitle: 'Data Analyst / Product Analyst',
+  sameAs: [
+    'https://github.com/NikitaBoyarkin',
+    'https://www.linkedin.com/in/nikita-boyarkin',
+  ],
+};
 ---
 
 <Base
-  title="Nikita Boyarkin | Portfolio"
-  description="Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing."
+  title="Nikita Boyarkin | Data Analyst / Product Analyst"
+  description="Portfolio of Nikita Boyarkin — Data Analyst / Product Analyst. Projects in SQL, Python, A/B testing, visualization, and customer analytics."
   ogImage="/images/00_profile.jpg"
+  canonical={withBase('/')}
   activeNav="home"
+  jsonLd={jsonLd}
 >
   <!-- INTRO -->
   <section id="intro" class="reveal">

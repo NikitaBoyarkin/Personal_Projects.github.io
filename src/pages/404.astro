@@ -1,0 +1,17 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/path';
+---
+
+<Base
+  title="404 | Nikita Boyarkin"
+  description="Page not found."
+  activeNav="home"
+>
+  <meta slot="scripts" name="robots" content="noindex" />
+  <section class="now-section reveal" style="text-align: center; padding-top: 4rem;">
+    <h1 class="now-title" style="font-size: 4rem;">404</h1>
+    <p class="now-subtitle" style="font-size: 1.25rem;">This page does not exist.</p>
+    <a class="button" href={withBase('/')}>← Back home</a>
+  </section>
+</Base>

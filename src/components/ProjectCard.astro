@@ -7,16 +7,45 @@ interface Props {
   description: string;
   image?: string;
   impact?: string[];
+  tools?: string[];
+  github?: string;
 }
 
-const { slug, title, description, image, impact } = Astro.props;
+const { slug, title, description, image, impact, tools, github } = Astro.props;
 const impactText = impact?.join(', ');
 ---
 
 <article class="project reveal">
-  {image && <img src={withBase(image)} alt={title} loading="lazy" />}
+  {image && <img src={withBase(image)} alt={title} loading="lazy" width="600" height="200" />}
   <h3>{title}</h3>
   <p>{description}</p>
+
+  {
+    tools && tools.length > 0 && (
+      <div class="project-tools">
+        {tools.map((tool) => (
+          <span class="project-tool">{tool}</span>
+        ))}
+      </div>
+    )
+  }
+
   {impactText && <p class="Impact">Impact: {impactText}</p>}
-  <a class="button" href={withBase(`projects/${slug}/`)}>View Project</a>
+
+  <div class="project-actions">
+    <a class="button" href={withBase(`projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;">View Project</a>
+    {
+      github && (
+        <a
+          class="button button-secondary"
+          href={github}
+          target="_blank"
+          rel="noopener noreferrer"
+          style="flex: 1 1 auto; justify-content: center;"
+        >
+          GitHub
+        </a>
+      )
+    }
+  </div>
 </article>

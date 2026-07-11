@@ -1,6 +1,21 @@
+---
+const categories = [
+  { key: 'all', label: 'All' },
+  { key: 'decision-log', label: 'Decision Logs' },
+  { key: 'framework', label: 'Frameworks' },
+  { key: 'guide', label: 'Guides' },
+  { key: 'note', label: 'Notes' },
+];
+---
+
 <div class="filter-row reveal reveal-delay-1">
-  <button class="filter-tag active" data-filter="all">All</button>
-  <button class="filter-tag" data-filter="decision-log">Decision Logs</button>
+  {
+    categories.map((cat) => (
+      <button class={`filter-tag ${cat.key === 'all' ? 'active' : ''}`} data-filter={cat.key}>
+        {cat.label}
+      </button>
+    ))
+  }
 </div>
 
 <script>

@@ -1,12 +1,12 @@
 <div id="intro-shader" aria-hidden="true"></div>
 
 <script is:inline type="module">
-  import { ShaderMount, meshGradientFragmentShader, getShaderColorFromString } from 'https://esm.sh/@paper-design/shaders';
-
   const container = document.getElementById('intro-shader');
-  if (!container) {
-    console.warn('Paper shader container not found');
-  } else {
+  if (!container) return;
+
+  try {
+    const { ShaderMount, meshGradientFragmentShader, getShaderColorFromString } = await import('https://esm.sh/@paper-design/shaders');
+
     const darkColors = ['#5100ff', '#00ff80', '#ffcc00', '#ea00ff'];
     const lightColors = ['#c4b5fd', '#86efac', '#fde047', '#f0abfc'];
 
@@ -19,33 +19,28 @@
       u_grainOverlay: 0.15,
     });
 
-    let mount;
-    try {
-      mount = new ShaderMount(
-        container,
-        meshGradientFragmentShader,
-        makeUniforms(darkColors),
-        { alpha: true, antialias: false },
-        0.15
-      );
-    } catch (error) {
-      console.warn('Paper shader init failed:', error);
-    }
+    const mount = new ShaderMount(
+      container,
+      meshGradientFragmentShader,
+      makeUniforms(darkColors),
+      { alpha: true, antialias: false },
+      0.15
+    );
 
-    if (mount) {
-      const syncTheme = () => {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        mount.setUniforms(makeUniforms(isDark ? darkColors : lightColors));
-      };
+    const syncTheme = () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      mount.setUniforms(makeUniforms(isDark ? darkColors : lightColors));
+    };
 
-      const observer = new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-          if (mutation.attributeName === 'data-theme') {
-            syncTheme();
-          }
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === 'data-theme') {
+          syncTheme();
         }
-      });
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  } catch {
+    // Shader is decorative; failure should not break the page.
   }
 </script>

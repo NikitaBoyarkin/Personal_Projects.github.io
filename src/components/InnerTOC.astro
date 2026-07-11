@@ -49,7 +49,11 @@ const { selector = '#project-content' } = Astro.props;
 
       const li = document.createElement('li');
       li.className = h.tagName.toLowerCase() === 'h3' ? 'toc-h3' : 'toc-h2';
-      li.innerHTML = `<a href="#${id}" data-id="${id}">${text}</a>`;
+      const a = document.createElement('a');
+      a.href = `#${id}`;
+      a.dataset.id = id;
+      a.textContent = text;
+      li.appendChild(a);
       tocList.appendChild(li);
     });
 
