@@ -434,21 +434,6 @@ nav ul.links a[aria-current="page"] {
   border-radius: 50%;
 }
 
-/* Fallback for missing image */
-.photo-placeholder::before {
-  content: "👨‍💼";
-  font-size: 4rem;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  opacity: 0.3;
-}
-
-.profile-image[src*="profile-photo"] + ::before {
-  display: none;
-}
-
 /* Projects Section */
 #projects {
   margin-bottom: var(--space-16);
