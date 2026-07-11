@@ -1,0 +1,172 @@
+---
+import '../styles/global.css';
+import '../styles/blog.css';
+import { withBase } from '../lib/path';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogType?: 'website' | 'article';
+  ogImage?: string;
+  canonical?: string;
+  activeNav?: 'writing' | 'contact' | 'home';
+}
+
+const {
+  title,
+  description = 'Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing.',
+  ogType = 'website',
+  ogImage = '/images/00_profile.jpg',
+  canonical,
+  activeNav = 'home'
+} = Astro.props;
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const pageUrl = canonical ? `${siteUrl}${canonical}` : Astro.url.toString();
+const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${withBase(ogImage)}`;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={pageUrl} />}
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:image" content={fullOgImage} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <script is:inline>
+      // Prevent theme flash: apply saved or preferred theme before first paint.
+      (function () {
+        const html = document.documentElement;
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        let theme = prefersDark ? 'dark' : 'light';
+        try {
+          const saved = localStorage.getItem('theme');
+          if (saved) theme = saved;
+        } catch (e) {
+          // localStorage may be unavailable
+        }
+        html.setAttribute('data-theme', theme);
+      })();
+    </script>
+  </head>
+
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <nav aria-label="Main navigation">
+      <a href={withBase('/')} class="nav-brand" aria-label="Portfolio home">
+        <b>Portfolio</b>
+      </a>
+      <ul class="links">
+        <li><a href={withBase('writing/')} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
+        <li><a href={withBase('#projects')}>Projects</a></li>
+        <li><a href={withBase('contact/')} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a></li>
+      </ul>
+
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon" aria-hidden="true">🌙</span>
+      </button>
+    </nav>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer id="contact">
+      <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+      <a href="https://t.me/lofinibo">Telegram</a> ·
+      <a href={withBase('writing/')}>Writing</a>
+      <p>© {new Date().getFullYear()} Nikita Boyarkin</p>
+    </footer>
+
+    <script is:inline>
+      // Theme toggle
+      (function () {
+        const html = document.documentElement;
+        const toggle = document.getElementById('theme-toggle');
+        const icon = toggle ? toggle.querySelector('.theme-icon') : null;
+
+        function applyTheme(theme) {
+          html.setAttribute('data-theme', theme);
+          if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function persistTheme(theme) {
+          try {
+            localStorage.setItem('theme', theme);
+          } catch (e) {
+            // ignore storage errors
+          }
+        }
+
+        // Sync icon with already-applied theme
+        const current = html.getAttribute('data-theme') || 'dark';
+        applyTheme(current);
+
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            applyTheme(next);
+            persistTheme(next);
+          });
+        }
+
+        window
+          .matchMedia('(prefers-color-scheme: dark)')
+          .addEventListener('change', (e) => {
+            try {
+              if (localStorage.getItem('theme')) return;
+            } catch (e) {
+              return;
+            }
+            applyTheme(e.matches ? 'dark' : 'light');
+          });
+      })();
+
+      // Reveal on scroll
+      (function () {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.querySelectorAll('.reveal').forEach((el) => el.classList.add('visible'));
+          return;
+        }
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+        );
+        document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      })();
+
+      // Navbar scroll shadow
+      (function () {
+        const nav = document.querySelector('nav');
+        if (!nav) return;
+        window.addEventListener('scroll', () => {
+          nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+      })();
+    </script>
+
+    <slot name="scripts" />
+  </body>
+</html>

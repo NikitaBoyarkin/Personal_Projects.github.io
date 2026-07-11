@@ -4,57 +4,149 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a static GitHub Pages portfolio site. It has **no build step** — the browser loads plain HTML/CSS/JS directly. The site is deployed from the `master` branch.
+This is an Astro-powered static portfolio site deployed to GitHub Pages. The source lives in `src/`, content is authored in Markdown with YAML frontmatter, and the production build is emitted to `dist/`.
 
-## Architecture
+The site is published at `https://nikitaboyarkin.github.io/Personal_Projects.github.io/`, so `base: '/Personal_Projects.github.io'` is configured in `astro.config.mjs`.
 
-### Client-side rendering from Markdown
+## Development Commands
 
-`generator.js` is the core engine. It does two things depending on the page:
+```bash
+# Install dependencies
+npm install
 
-1. **Landing page (`index.html`)**: `renderProjectCards()` fetches each `projects/<id>.md`, parses it with `marked.js`, and injects card HTML into `#project-list`. It extracts the `h1` as title, first paragraph as description, first `img` as thumbnail, and the bullet list under `## Impact` as impact text.
-2. **Project pages (`projects/<id>/index.html`)**: `generateProjectPage()` fetches the corresponding `.md`, injects the full parsed HTML into `#project-content`, promotes the `h1` to the page title, and extracts the first image as a hero image.
+# Start dev server (default port 4321)
+npm run dev
 
-### Dual file structure for projects
+# Build for production
+npm run build
 
-Each project requires **two files**:
-- `projects/<id>.md` — the Markdown source.
-- `projects/<id>/index.html` — a thin wrapper that loads `../../project-style.css`, `marked.js`, and `../../generator.js`. Use `_template.html` as the base for new wrappers.
+# Preview production build locally
+npm run preview
 
-### Image path rewriting
+# Type-check Astro files
+npm run check
 
-`generator.js` rewrites image paths depending on context:
-- On the landing page, `../images/...` in Markdown is stripped to `images/...` so cards reference `images/<file>` from the site root.
-- On project pages, `images/...` in Markdown is rewritten to `../../images/...` because the wrapper lives two levels deep.
+# Validate built site
+make check
+```
 
-If images break after adding a project, check the raw `src` in the `.md` and the rewritten path in the browser dev tools.
+## Project Structure
 
-### Theme system
+```text
+├── astro.config.mjs          # site, base path, output mode
+├── package.json
+├── tsconfig.json
+├── public/                    # static assets copied as-is to dist/
+│   ├── images/                # profile photo + project thumbnails
+│   ├── assets/                # legacy HTML5 UP template assets
+│   └── design/                # legacy design mockups
+├── src/
+│   ├── content/               # Markdown content collections
+│   │   ├── config.ts          # Zod schemas for projects + posts
+│   │   ├── projects/          # project markdown files
+│   │   └── posts/             # blog post markdown files
+│   ├── layouts/
+│   │   ├── Base.astro         # nav, footer, fonts, meta, theme
+│   │   └── Post.astro         # blog post wrapper
+│   ├── components/
+│   │   ├── ProjectCard.astro
+│   │   ├── ProjectGrid.astro
+│   │   ├── BlogCard.astro
+│   │   ├── BlogFilter.astro   # client-side category filter
+│   │   ├── InnerTOC.astro     # client-side TOC + scrollspy
+│   │   └── IntroShader.astro  # Paper mesh gradient background
+│   ├── pages/
+│   │   ├── index.astro
+│   │   ├── writing.astro
+│   │   ├── contact.astro
+│   │   ├── projects/[slug].astro
+│   │   └── posts/[slug].astro
+│   ├── styles/
+│   │   ├── global.css         # ported from project-style.css
+│   │   └── blog.css           # ported from blog-style.css
+│   └── lib/
+│       ├── date.ts            # formatting + read-time estimate
+│       └── path.ts            # base-path aware URL helper
+├── scripts/
+│   └── check_site.py          # validates the dist/ build
+└── .github/workflows/
+    └── deploy.yml             # builds and deploys dist/ to GitHub Pages
+```
 
-`project-style.css` uses CSS variables scoped to `:root` and `[data-theme="light"]`. The theme toggle in `generator.js` sets `data-theme` on `<html>` and persists the choice to `localStorage`. It also respects `prefers-color-scheme` when no saved preference exists.
+## Content Collections
 
-## Development workflow
+### Projects
 
-- **Run locally**: `python3 -m http.server 8000` from the repo root, or `make serve`.
-- **Validate before deploying**: `make check` runs `scripts/check_site.py` to verify that every project has a markdown source + wrapper, all internal links resolve, required assets exist, and the profile image is under the size threshold.
-- **Manual verification**: Load `http://localhost:8000/` and at least one `projects/<id>/index.html` in a browser; verify card rendering, image paths, TOC generation, and the theme toggle.
-- **Add a project**:
-  1. Create `projects/<id>.md` with the expected structure (see below).
-  2. Copy `_template.html` to `projects/<id>/index.html` and adjust relative paths if necessary.
-  3. Add `{ id: "<id>", md: "projects/<id>.md" }` to the `projects` array in `generator.js`.
-  4. Place images in `images/`.
-  5. Test both the landing page card and the project detail page.
+Each project is a Markdown file in `src/content/projects/` with frontmatter matching the Zod schema in `src/content/config.ts`:
 
-## Markdown conventions for projects
+| Field | Purpose |
+|---|---|
+| `title` | Project title (also page `<title>`) |
+| `description` | Short summary used on the project card |
+| `hero` | Path to thumbnail/hero image relative to `public/` (e.g. `images/rfm.png`) |
+| `impact` | Array of bullet points rendered as card subtitle |
+| `tools` | Array of tools/technologies |
+| `github` | URL to the project repository |
+| `draft` | If `true`, omitted from the build |
 
-The `projects/*.md` files are parsed with specific assumptions in `generator.js`:
+### Posts
 
-- Start with `# Title` — used as the card title and page `<title>`.
-- First paragraph is the card summary.
-- First `![alt](images/...)` becomes the card thumbnail and project-page hero.
-- Include `## Impact` followed by a bullet list. The list items are joined with commas for the card subtitle.
-- Remaining headings (`h2`, `h3`) populate the inner TOC on the project page.
+Each post is a Markdown file in `src/content/posts/` with frontmatter:
 
-## Legacy files
+| Field | Purpose |
+|---|---|
+| `title` | Post title |
+| `date` | Publication date (`YYYY-MM-DD`) |
+| `category` | Used for filtering (e.g. `decision-log`) |
+| `tags` | Array of tags |
+| `excerpt` | Short description for cards and meta tags |
+| `draft` | If `true`, omitted from the build |
 
-`elements.html`, `generic.html`, and the `assets/` directory are leftovers from the original HTML5 UP "Massively" template. The active site uses `index.html`, `project-style.css`, and `generator.js` instead.
+## Adding Content
+
+### Add a project
+
+1. Create `src/content/projects/<id>.md` with the required frontmatter.
+2. Add the project thumbnail to `public/images/`.
+3. Run `npm run build` and `make check`.
+4. No manual HTML wrappers or `generator.js` edits are needed.
+
+### Add a blog post
+
+1. Create `src/content/posts/<slug>.md` with the required frontmatter.
+2. Run `npm run build` and `make check`.
+3. No Python generation step is needed.
+
+## Internal Links
+
+Always use the `withBase()` helper from `src/lib/path.ts` for internal links and image paths so the `base` path is applied correctly:
+
+```astro
+import { withBase } from '../lib/path';
+
+<a href={withBase('writing/')}>Writing</a>
+<img src={withBase('images/00_profile.jpg')} alt="..." />
+```
+
+## Theme System
+
+The theme toggle is implemented in `src/layouts/Base.astro`:
+
+- An inline script in `<head>` reads `localStorage` or `prefers-color-scheme` and sets `data-theme` before first paint to avoid flashes.
+- The toggle button updates `data-theme` and persists the choice.
+- CSS custom properties in `src/styles/global.css` react to `[data-theme="light"]`.
+
+## Deployment
+
+Pushing to `master` (or `main`) triggers `.github/workflows/deploy.yml`, which:
+
+1. Installs Node dependencies.
+2. Builds the site to `dist/`.
+3. Runs `make check`.
+4. Deploys `dist/` to GitHub Pages.
+
+Do **not** push directly to `master` without confirming the workflow is enabled in the repository settings (`Settings → Pages → Build and deployment → GitHub Actions`).
+
+## Legacy Files
+
+`public/assets/` and `public/design/` are leftovers from the original HTML5 UP "Massively" template and are not referenced by the active site. They are kept in `public/` for now but can be removed once confirmed unused.

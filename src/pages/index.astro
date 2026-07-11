@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectGrid from '../components/ProjectGrid.astro';
+import IntroShader from '../components/IntroShader.astro';
+import { getCollection } from 'astro:content';
+import BlogCard from '../components/BlogCard.astro';
+import { withBase } from '../lib/path';
+
+const posts = (await getCollection('posts', (p) => !p.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+---
+
+<Base
+  title="Nikita Boyarkin | Portfolio"
+  description="Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing."
+  ogImage="/images/00_profile.jpg"
+  activeNav="home"
+>
+  <!-- INTRO -->
+  <section id="intro" class="reveal">
+    <IntroShader />
+    <div class="intro-container">
+      <div class="intro-content">
+        <h1>Nikita Boyarkin</h1>
+        <div class="subtitle">Data Analyst / Product Analyst</div>
+
+        <div class="skills">
+          <span class="skill-badge">SQL</span>
+          <span class="skill-badge">Python</span>
+          <span class="skill-badge">Visualization</span>
+          <span class="skill-badge">A/B Testing</span>
+        </div>
+
+        <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
+        <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
+
+        <p>
+          <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+          <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+          <a href={withBase('writing/')}>Writing</a>
+        </p>
+      </div>
+      <div class="intro-photo">
+        <div class="photo-placeholder">
+          <img
+            src={withBase('images/00_profile.jpg')}
+            alt="Nikita Boyarkin"
+            class="profile-image"
+            width="800"
+            height="792"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <ProjectGrid />
+
+  <!-- LATEST WRITING -->
+  <section id="writing" class="reveal reveal-delay-1">
+    <h2>Latest Writing</h2>
+    <div class="blog-list">
+      {
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            excerpt={post.data.excerpt}
+          />
+        ))
+      }
+    </div>
+    <p style="margin-top: 1.5rem;">
+      <a href={withBase('writing/')}>View all writing →</a>
+    </p>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="reveal reveal-delay-3">
+    <h2>About Me</h2>
+    <p>
+      I work at the intersection of product, data, and experimentation. My background spans customer analytics, A/B
+      testing, dashboard design, and building data pipelines that help teams make faster decisions.
+    </p>
+    <p>
+      Outside of work I maintain an Obsidian knowledge base on product analytics, experiment with AI-assisted workflows,
+      and write about practical data techniques.
+    </p>
+  </section>
+</Base>

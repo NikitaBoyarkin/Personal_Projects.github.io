@@ -1,0 +1,40 @@
+---
+import Base from './Base.astro';
+import { formatDate, estimateReadTime } from '../lib/date';
+import { withBase } from '../lib/path';
+
+interface Props {
+  title: string;
+  date: Date;
+  category: string;
+  excerpt: string;
+  slug: string;
+}
+
+const { title, date, category, excerpt, slug } = Astro.props;
+const rendered = await Astro.slots.render('default');
+const readTime = estimateReadTime(rendered.replace(/<[^>]*>/g, ' '));
+const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+---
+
+<Base
+  title={`${title} | Nikita Boyarkin`}
+  description={excerpt}
+  ogType="article"
+  activeNav="writing"
+  canonical={withBase(`posts/${slug}/`)}
+>
+  <article class="post-content">
+    <header class="post-header reveal">
+      <span class="post-tag">{categoryDisplay}</span>
+      <h1 class="post-title">{title}</h1>
+      <div class="post-meta">{formatDate(date)} · {readTime} min read · Nikita Boyarkin</div>
+    </header>
+
+    <div class="reveal reveal-delay-1">
+      <slot />
+    </div>
+
+    <a href={withBase('writing/')} class="post-back">← Back to Writing</a>
+  </article>
+</Base>

@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+
+const projects = await getCollection('projects', (p) => !p.data.draft);
+---
+
+<section id="projects" class="reveal reveal-delay-2">
+  <h2>Projects</h2>
+  <div id="project-list">
+    {
+      projects.map((project) => (
+        <ProjectCard
+          slug={project.id.replace(/\.md$/, '')}
+          title={project.data.title}
+          description={project.data.description}
+          image={project.data.hero}
+          impact={project.data.impact}
+        />
+      ))
+    }
+  </div>
+</section>

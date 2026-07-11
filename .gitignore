@@ -88,3 +88,10 @@ target/
 
 # Virtual environment
 .venv/
+
+# Node / Astro
+node_modules/
+dist/
+.astro/
+.cache/
+

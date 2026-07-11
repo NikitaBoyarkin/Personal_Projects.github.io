@@ -1,0 +1,22 @@
+---
+import { withBase } from '../lib/path';
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  image?: string;
+  impact?: string[];
+}
+
+const { slug, title, description, image, impact } = Astro.props;
+const impactText = impact?.join(', ');
+---
+
+<article class="project reveal">
+  {image && <img src={withBase(image)} alt={title} loading="lazy" />}
+  <h3>{title}</h3>
+  <p>{description}</p>
+  {impactText && <p class="Impact">Impact: {impactText}</p>}
+  <a class="button" href={withBase(`projects/${slug}/`)}>View Project</a>
+</article>
