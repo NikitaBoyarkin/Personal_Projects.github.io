@@ -9,6 +9,8 @@
   --text-muted: #a1a1aa;
   --text-accent: #60a5fa;
   --text-accent-hover: #93c5fd;
+  --button-bg: #2563eb;
+  --button-bg-hover: #1d4ed8;
   --interactive-normal: #27272a;
   --interactive-hover: #3f3f46;
   --border-color: #3f3f46;
@@ -51,6 +53,8 @@
   --text-muted: #71717a;
   --text-accent: #2563eb;
   --text-accent-hover: #1d4ed8;
+  --button-bg: #2563eb;
+  --button-bg-hover: #1d4ed8;
   --interactive-normal: #f4f4f5;
   --interactive-hover: #e4e4e7;
   --border-color: #e4e4e7;
@@ -332,8 +336,8 @@ nav ul.links a[aria-current="page"] {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--text-accent);
-  color: white;
+  background: var(--button-bg);
+  color: #fff;
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -345,7 +349,7 @@ nav ul.links a[aria-current="page"] {
 }
 
 .button:hover {
-  background: var(--text-accent-hover);
+  background: var(--button-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px color-mix(in srgb, var(--text-accent) 25%, transparent);
 }
@@ -427,6 +431,16 @@ nav ul.links a[aria-current="page"] {
 
 .intro-content a:hover::after {
   width: 100%;
+}
+
+/* CTA button inside intro: beat .intro-content a link color (specificity) + drop the animated underline */
+.intro-content a.button,
+.intro-content a.button:hover {
+  color: #fff;
+}
+
+.intro-content a.button::after {
+  display: none;
 }
 
 /* Photo Section */
@@ -587,8 +601,8 @@ nav ul.links a[aria-current="page"] {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  background: var(--text-accent);
-  color: white;
+  background: var(--button-bg);
+  color: #fff;
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -607,7 +621,7 @@ nav ul.links a[aria-current="page"] {
 }
 
 .project .button:hover {
-  background: var(--text-accent-hover);
+  background: var(--button-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px color-mix(in srgb, var(--text-accent) 25%, transparent);
 }
