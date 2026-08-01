@@ -1,6 +1,7 @@
 <div id="intro-shader" aria-hidden="true"></div>
 
 <script is:inline type="module">
+  (async () => {
   const container = document.getElementById('intro-shader');
   if (!container) return;
 
@@ -43,4 +44,5 @@
   } catch {
     // Shader is decorative; failure should not break the page.
   }
+  })();
 </script>

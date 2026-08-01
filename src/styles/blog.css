@@ -295,6 +295,23 @@
   text-underline-offset: 0.15em;
 }
 
+.linkedin-badge {
+  margin-top: var(--space-8);
+  display: flex;
+  justify-content: flex-start;
+}
+
+.linkedin-badge .badge-base {
+  display: block;
+}
+
+/* LinkedIn badge iframe sits in a fixed-size card; keep it from overflowing on narrow screens */
+@media (max-width: 480px) {
+  .linkedin-badge {
+    justify-content: center;
+  }
+}
+
 /* Blog nav link highlight */
 nav ul.links a.active {
   color: var(--text-accent);
