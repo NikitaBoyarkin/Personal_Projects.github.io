@@ -52,7 +52,7 @@ def resolve_relative(page: Path, url: str) -> Path:
     url = strip_fragment(url)
     if url.startswith("/"):
         # The base path is part of the URL; strip it to resolve against dist/
-        base = "/Personal_Projects.github.io"
+        base = "/lofinibo"
         if url.startswith(base):
             url = url[len(base):]
         return (DIST / url.lstrip("/")).resolve()
@@ -65,6 +65,8 @@ def check_required_pages() -> int:
         DIST / "index.html",
         DIST / "writing" / "index.html",
         DIST / "contact" / "index.html",
+        DIST / "cv" / "index.html",
+        DIST / "rss.xml",
         DIST / "projects" / "rfm" / "index.html",
         DIST / "projects" / "bot" / "index.html",
         DIST / "projects" / "cohort" / "index.html",

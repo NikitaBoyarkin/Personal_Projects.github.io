@@ -1,48 +1,68 @@
 <div id="intro-shader" aria-hidden="true"></div>
 
-<script is:inline type="module">
-  (async () => {
-  const container = document.getElementById('intro-shader');
-  if (!container) return;
+<script>
+  // Decorative mesh-gradient background.
+  // - Bundled locally (no runtime CDN import → no third-party tracking / dependency).
+  // - Skipped entirely for reduced-motion users.
+  // - Deferred until idle so it never blocks first paint / LCP.
+  import {
+    ShaderMount,
+    meshGradientFragmentShader,
+    getShaderColorFromString,
+  } from '@paper-design/shaders';
 
-  try {
-    const { ShaderMount, meshGradientFragmentShader, getShaderColorFromString } = await import('https://esm.sh/@paper-design/shaders');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced) {
+    const start = () => {
+      const container = document.getElementById('intro-shader');
+      if (!container) return;
 
-    const darkColors = ['#5100ff', '#00ff80', '#ffcc00', '#ea00ff'];
-    const lightColors = ['#c4b5fd', '#86efac', '#fde047', '#f0abfc'];
+      try {
+        const darkColors = ['#5100ff', '#00ff80', '#ffcc00', '#ea00ff'];
+        const lightColors = ['#c4b5fd', '#86efac', '#fde047', '#f0abfc'];
 
-    const makeUniforms = (colors) => ({
-      u_colors: colors.map(getShaderColorFromString),
-      u_colorsCount: colors.length,
-      u_distortion: 0.7,
-      u_swirl: 0.4,
-      u_grainMixer: 0.3,
-      u_grainOverlay: 0.15,
-    });
+        const makeUniforms = (colors: string[]) => ({
+          u_colors: colors.map(getShaderColorFromString),
+          u_colorsCount: colors.length,
+          u_distortion: 0.7,
+          u_swirl: 0.4,
+          u_grainMixer: 0.3,
+          u_grainOverlay: 0.15,
+        });
 
-    const mount = new ShaderMount(
-      container,
-      meshGradientFragmentShader,
-      makeUniforms(darkColors),
-      { alpha: true, antialias: false },
-      0.15
-    );
+        const mount = new ShaderMount(
+          container,
+          meshGradientFragmentShader,
+          makeUniforms(darkColors),
+          { alpha: true, antialias: false },
+          0.15
+        );
 
-    const syncTheme = () => {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      mount.setUniforms(makeUniforms(isDark ? darkColors : lightColors));
+        const syncTheme = () => {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          mount.setUniforms(makeUniforms(isDark ? darkColors : lightColors));
+        };
+
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            if (mutation.attributeName === 'data-theme') {
+              syncTheme();
+            }
+          }
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      } catch {
+        // Shader is decorative; failure should not break the page.
+      }
     };
 
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.attributeName === 'data-theme') {
-          syncTheme();
-        }
-      }
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  } catch {
-    // Shader is decorative; failure should not break the page.
+    const win = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => void;
+    };
+    if (win.requestIdleCallback) {
+      win.requestIdleCallback(start, { timeout: 2500 });
+    } else {
+      window.addEventListener('load', () => setTimeout(start, 300));
+    }
   }
-  })();
 </script>

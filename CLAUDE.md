@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an Astro-powered static portfolio site deployed to GitHub Pages. The source lives in `src/`, content is authored in Markdown with YAML frontmatter, and the production build is emitted to `dist/`.
 
-The site is published at `https://nikitaboyarkin.github.io/Personal_Projects.github.io/`, so `base: '/Personal_Projects.github.io'` is configured in `astro.config.mjs`.
+The site is published at `https://nikitaboyarkin.github.io/lofinibo/`, so `base: '/lofinibo'` is configured in `astro.config.mjs`. The GitHub repo is named `lofinibo` (a project-pages repo under the `NikitaBoyarkin` account).
 
 ## Development Commands
 

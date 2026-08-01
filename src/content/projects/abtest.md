@@ -1,11 +1,11 @@
 ---
 title: A/B Testing Framework
-description: Комплексный фреймворк для проведения A/B тестов с автоматическим расчетом статистической значимости и визуализацией результатов. Обеспечивает надежную оценку эффективности изменений и способствует принятию data-driven решений.
+description: A comprehensive A/B testing framework with automated statistical significance calculation and result visualization. Enables reliable evaluation of changes and supports data-driven decisions.
 hero: images/ab.png
 impact:
-  - Автоматизирован расчёт статистической значимости
-  - Ускорена визуализация результатов тестов
-  - Повышена надёжность экспериментальных решений
+  - Automated statistical significance calculation
+  - Sped up test result visualization
+  - Improved reliability of experimental decisions
 tools:
   - Python
   - SciPy/Statsmodels

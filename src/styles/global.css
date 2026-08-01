@@ -327,6 +327,47 @@ nav ul.links a[aria-current="page"] {
   font-weight: 400;
 }
 
+/* Generic CTA button (intro + reuse across pages) */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--text-accent);
+  color: white;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button:hover {
+  background: var(--text-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--text-accent) 25%, transparent);
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.cta-links {
+  color: var(--text-muted);
+}
+
+.open-to {
+  color: var(--text-accent) !important;
+  font-weight: 600;
+  margin-bottom: var(--space-4) !important;
+}
+
 .intro-content .skills {
   display: flex;
   flex-wrap: wrap;

@@ -1,11 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import { formatDate } from '../lib/date';
 ---
 
 <Base title="Now & Contact | Nikita Boyarkin" description="What Nikita Boyarkin is focused on right now." activeNav="contact">
   <section class="now-section reveal">
     <h1 class="now-title">Now</h1>
     <p class="now-subtitle">What I'm focused on right now.</p>
+    <p class="now-subtitle now-updated">Last updated · {formatDate('2026-08-01')}</p>
 
     <ul class="now-list">
       <li class="now-item">

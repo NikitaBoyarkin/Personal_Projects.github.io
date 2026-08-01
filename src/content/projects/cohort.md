@@ -1,11 +1,11 @@
 ---
 title: Cohort Analysis Dashboard
-description: Интерактивный дашборд для когортного анализа клиентов, помогающий понять поведение пользователей и оптимизировать стратегии удержания. Отслеживает метрики retention по когортам и выявляет паттерны оттока.
+description: An interactive cohort analysis dashboard that reveals user behavior and optimizes retention strategies. Tracks retention metrics by cohort and surfaces churn patterns.
 hero: images/bi.png
 impact:
-  - Выявлены паттерны оттока по когортам
-  - Оптимизированы стратегии удержания
-  - Ускорен анализ поведения пользователей
+  - Identified cohort churn patterns
+  - Optimized retention strategies
+  - Sped up user behavior analysis
 tools:
   - Python
   - SQL

@@ -14,7 +14,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Nikita Boyarkin',
-  url: 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/',
+  url: 'https://nikitaboyarkin.github.io/lofinibo/',
   jobTitle: 'Data Analyst / Product Analyst',
   sameAs: [
     'https://github.com/NikitaBoyarkin',
@@ -46,13 +46,17 @@ const jsonLd = {
           <span class="skill-badge">A/B Testing</span>
         </div>
 
+        <p class="open-to">Open to Data / Product Analyst roles — remote or EU.</p>
         <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
         <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
 
-        <p>
-          <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-          <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-          <a href={withBase('writing/')}>Writing</a>
+        <p class="cta-row">
+          <a class="button" href={withBase('cv/')} target="_blank" rel="noopener">Download CV</a>
+          <span class="cta-links">
+            <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+            <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+            <a href={withBase('writing/')}>Writing</a>
+          </span>
         </p>
       </div>
       <div class="intro-photo">

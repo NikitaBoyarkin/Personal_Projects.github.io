@@ -1,11 +1,11 @@
 ---
 title: Reporting Automation Telegram Bot
-description: Telegram-бот для автоматизации еженедельных отчётов, интегрированный с внешними API. Сокращает время на рутинные задачи, обеспечивает своевременную доставку важной информации и улучшает командную коммуникацию.
+description: A Telegram bot that automates weekly reporting and integrates with external APIs. Cuts time on routine tasks, ensures timely delivery of key metrics, and improves team communication.
 hero: images/auto.png
 impact:
-  - Сокращено время на подготовку отчётов
-  - Обеспечена своевременная доставка метрик
-  - Улучшена командная коммуникация
+  - Cut report preparation time
+  - Ensured timely metric delivery
+  - Improved team communication
 tools:
   - Python
   - SQL

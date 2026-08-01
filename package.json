@@ -12,6 +12,8 @@
     "check": "astro check"
   },
   "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@paper-design/shaders": "^0.0.78",
     "astro": "^5.0.0"
   },
   "devDependencies": {
