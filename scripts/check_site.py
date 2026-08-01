@@ -52,7 +52,7 @@ def resolve_relative(page: Path, url: str) -> Path:
     url = strip_fragment(url)
     if url.startswith("/"):
         # The base path is part of the URL; strip it to resolve against dist/
-        base = "/lofinibo"
+        base = "/Personal_Projects.github.io"
         if url.startswith(base):
             url = url[len(base):]
         return (DIST / url.lstrip("/")).resolve()
