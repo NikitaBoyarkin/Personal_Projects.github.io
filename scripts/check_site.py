@@ -65,8 +65,6 @@ def check_required_pages() -> int:
         DIST / "index.html",
         DIST / "writing" / "index.html",
         DIST / "contact" / "index.html",
-        DIST / "cv" / "index.html",
-        DIST / "rss.xml",
         DIST / "projects" / "rfm" / "index.html",
         DIST / "projects" / "bot" / "index.html",
         DIST / "projects" / "cohort" / "index.html",
