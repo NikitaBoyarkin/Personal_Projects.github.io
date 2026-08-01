@@ -50,7 +50,10 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   text-decoration: none;
-  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .blog-card:hover {

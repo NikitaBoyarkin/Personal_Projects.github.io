@@ -20,8 +20,9 @@
   --table-border: #3f3f46;
   --table-header-background: #27272a;
   --shadow-color: rgba(0, 0, 0, 0.4);
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, sans-serif;
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, sans-serif;
   --font-mono: "SF Mono", Monaco, "Cascadia Mono", "Roboto Mono", monospace;
 
   /* Spacing scale */
@@ -70,7 +71,9 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: background-color 0.3s ease, color 0.3s ease,
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
     border-color 0.3s ease;
 }
 
@@ -112,17 +115,26 @@ body {
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+  transition:
+    opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
     transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
-.reveal-delay-1 { transition-delay: 0.1s; }
-.reveal-delay-2 { transition-delay: 0.2s; }
-.reveal-delay-3 { transition-delay: 0.3s; }
-.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-1 {
+  transition-delay: 0.1s;
+}
+.reveal-delay-2 {
+  transition-delay: 0.2s;
+}
+.reveal-delay-3 {
+  transition-delay: 0.3s;
+}
+.reveal-delay-4 {
+  transition-delay: 0.4s;
+}
 
 /* Navigation */
 nav {
@@ -134,7 +146,11 @@ nav {
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: var(--space-2);
-  background-color: color-mix(in srgb, var(--background-primary) 85%, transparent);
+  background-color: color-mix(
+    in srgb,
+    var(--background-primary) 85%,
+    transparent
+  );
   z-index: 100;
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
@@ -171,7 +187,10 @@ nav.scrolled {
   width: 32px;
   height: 32px;
   cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease,
+    border-color 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -288,7 +307,11 @@ nav ul.links a[aria-current="page"] {
   right: -100px;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--text-accent) 8%, transparent) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--text-accent) 8%, transparent) 0%,
+    transparent 70%
+  );
   pointer-events: none;
   z-index: 0;
 }
@@ -457,15 +480,27 @@ nav ul.links a[aria-current="page"] {
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--text-accent), var(--text-accent-hover), var(--text-accent));
+  background: conic-gradient(
+    from 0deg,
+    var(--text-accent),
+    var(--text-accent-hover),
+    var(--text-accent)
+  );
   opacity: 0.15;
   filter: blur(30px);
   animation: pulse-glow 4s ease-in-out infinite;
 }
 
 @keyframes pulse-glow {
-  0%, 100% { transform: scale(1); opacity: 0.15; }
-  50% { transform: scale(1.05); opacity: 0.25; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.15;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.25;
+  }
 }
 
 .photo-placeholder {
@@ -486,7 +521,8 @@ nav ul.links a[aria-current="page"] {
 .photo-placeholder:hover {
   transform: scale(1.03);
   border-color: color-mix(in srgb, var(--text-accent) 50%, transparent);
-  box-shadow: 0 20px 50px color-mix(in srgb, var(--text-accent) 12%, transparent);
+  box-shadow: 0 20px 50px
+    color-mix(in srgb, var(--text-accent) 12%, transparent);
 }
 
 .profile-image {
@@ -513,7 +549,7 @@ nav ul.links a[aria-current="page"] {
 }
 
 #projects h2::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -547,14 +583,19 @@ nav ul.links a[aria-current="page"] {
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--text-accent), var(--text-accent-hover));
+  background: linear-gradient(
+    90deg,
+    var(--text-accent),
+    var(--text-accent-hover)
+  );
   opacity: 0;
   transition: opacity 0.35s ease;
 }
 
 .project:hover {
   transform: translateY(-6px);
-  box-shadow: 0 20px 40px color-mix(in srgb, var(--shadow-color) 60%, transparent);
+  box-shadow: 0 20px 40px
+    color-mix(in srgb, var(--shadow-color) 60%, transparent);
   border-color: color-mix(in srgb, var(--text-accent) 30%, transparent);
 }
 
@@ -1035,7 +1076,7 @@ footer p {
   footer {
     padding: 1.5rem 0;
   }
-  
+
   /* Smaller toggle on mobile */
   #theme-toggle {
     width: 28px;
@@ -1048,7 +1089,12 @@ footer p {
   background: linear-gradient(
     90deg,
     var(--background-secondary) 25%,
-    color-mix(in srgb, var(--background-tertiary) 50%, var(--background-secondary)) 50%,
+    color-mix(
+        in srgb,
+        var(--background-tertiary) 50%,
+        var(--background-secondary)
+      )
+      50%,
     var(--background-secondary) 75%
   );
   background-size: 200% 100%;
@@ -1057,8 +1103,12 @@ footer p {
 }
 
 @keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .skeleton-card {

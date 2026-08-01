@@ -9,7 +9,6 @@ Checks:
 - Required assets are present in index.html.
 """
 
-import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
@@ -54,7 +53,7 @@ def resolve_relative(page: Path, url: str) -> Path:
         # The base path is part of the URL; strip it to resolve against dist/
         base = "/Personal_Projects.github.io"
         if url.startswith(base):
-            url = url[len(base):]
+            url = url[len(base) :]
         return (DIST / url.lstrip("/")).resolve()
     return (page.parent / url).resolve()
 
@@ -103,7 +102,9 @@ def check_internal_links() -> int:
                 continue
             target = resolve_relative(page, url)
             if not target.exists():
-                print(f"  ERROR {page.relative_to(DIST)}:{line} broken link: {url} -> {target.relative_to(ROOT)}")
+                print(
+                    f"  ERROR {page.relative_to(DIST)}:{line} broken link: {url} -> {target.relative_to(ROOT)}"
+                )
                 errors += 1
     return errors
 
