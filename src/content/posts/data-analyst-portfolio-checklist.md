@@ -1,7 +1,7 @@
 ---
 title: "Чек-лист портфолио дата-аналитика"
 date: 2025-05-22
-category: article
+category: note
 tags:
   - portfolio
   - career

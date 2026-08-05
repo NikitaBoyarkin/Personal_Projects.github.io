@@ -12,6 +12,7 @@ interface Props {
   canonical?: string;
   activeNav?: 'writing' | 'contact' | 'home';
   jsonLd?: Record<string, unknown>;
+  lang?: string;
 }
 
 const {
@@ -23,6 +24,7 @@ const {
   canonical,
   activeNav = 'home',
   jsonLd,
+  lang = 'en',
 } = Astro.props;
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
@@ -32,7 +34,7 @@ const faviconUrl = withBase('favicon.svg');
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang={lang} data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -65,7 +67,8 @@ const faviconUrl = withBase('favicon.svg');
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" /></noscript>
 
     <script is:inline>
       // Prevent theme flash: apply saved or preferred theme before first paint.

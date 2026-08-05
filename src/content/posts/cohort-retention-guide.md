@@ -1,7 +1,8 @@
 ---
 title: "Когортный анализ удержания"
 date: 2025-04-10
-category: doka
+category: guide
+image: /images/bi.png
 tags:
   - retention
   - cohort-analysis
@@ -90,7 +91,7 @@ retention = retention.divide(size, axis=0)
 
 На выходе `retention` — DataFrame, где `retention.loc['2025-01', 3]` — доля январской когорты, вернувшейся через 3 месяца.
 
-<iframe src="/Personal_Projects.github.io/demos/cohort/index.html" title="Треугольная матрица удержания: когорты по строкам, месяцы с момента старта по столбцам, наведите на ячейку" height="520" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
+<iframe src="../../demos/cohort/index.html" title="Треугольная матрица удержания: когорты по строкам, месяцы с момента старта по столбцам, наведите на ячейку" height="520" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
 ## Как пишется
 

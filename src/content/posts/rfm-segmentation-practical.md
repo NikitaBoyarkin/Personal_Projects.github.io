@@ -1,7 +1,8 @@
 ---
 title: "RFM-сегментация клиентов"
 date: 2025-04-24
-category: doka
+category: framework
+image: /images/rfm.png
 tags:
   - rfm
   - segmentation

@@ -11,7 +11,12 @@ const categories = [
 <div class="filter-row reveal reveal-delay-1">
   {
     categories.map((cat) => (
-      <button class={`filter-tag ${cat.key === 'all' ? 'active' : ''}`} data-filter={cat.key}>
+      <button
+        class={`filter-tag ${cat.key === 'all' ? 'active' : ''}`}
+        data-filter={cat.key}
+        aria-pressed={cat.key === 'all' ? 'true' : 'false'}
+        type="button"
+      >
         {cat.label}
       </button>
     ))
@@ -22,17 +27,37 @@ const categories = [
   const filterTags = document.querySelectorAll('.filter-tag');
   const cards = document.querySelectorAll('.blog-card');
 
+  function applyFilter(filter: string) {
+    filterTags.forEach((t) => {
+      const isActive = (t as HTMLElement).dataset.filter === filter;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-pressed', String(isActive));
+    });
+    cards.forEach((card) => {
+      const el = card as HTMLElement;
+      el.style.display =
+        filter === 'all' || el.dataset.category === filter ? 'block' : 'none';
+    });
+  }
+
   filterTags.forEach((tag) => {
     const btn = tag as HTMLElement;
     btn.addEventListener('click', () => {
-      filterTags.forEach((t) => t.classList.remove('active'));
-      btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      cards.forEach((card) => {
-        const el = card as HTMLElement;
-        el.style.display =
-          filter === 'all' || el.dataset.category === filter ? 'block' : 'none';
-      });
+      const filter = btn.dataset.filter || 'all';
+      applyFilter(filter);
+      const hash = filter === 'all' ? '' : `#${filter}`;
+      if (location.hash !== hash) {
+        history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+      }
     });
   });
+
+  // Restore filter from URL hash on load.
+  const initial = location.hash.replace(/^#/, '');
+  if (initial) {
+    const match = Array.from(filterTags).find(
+      (t) => (t as HTMLElement).dataset.filter === initial
+    );
+    if (match) applyFilter(initial);
+  }
 </script>

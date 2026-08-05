@@ -1,5 +1,6 @@
 ---
 import Base from './Base.astro';
+import InnerTOC from '../components/InnerTOC.astro';
 import { formatDate, estimateReadTime } from '../lib/date';
 import { withBase } from '../lib/path';
 
@@ -18,6 +19,18 @@ const { title, date, category, excerpt, slug, image, related = [], keywords = []
 const rendered = await Astro.slots.render('default');
 const readTime = estimateReadTime(rendered.replace(/<[^>]*>/g, ' '));
 const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description: excerpt,
+  datePublished: date.toISOString(),
+  author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
+  publisher: { '@type': 'Person', name: 'Nikita Boyarkin' },
+  mainEntityOfPage: `${siteUrl}${withBase(`posts/${slug}/`)}`,
+};
 ---
 
 <Base
@@ -28,7 +41,11 @@ const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toU
   ogType="article"
   activeNav="writing"
   canonical={withBase(`posts/${slug}/`)}
+  lang="ru"
+  jsonLd={articleJsonLd}
 >
+  <InnerTOC selector="#post-content" />
+
   <article class="post-content">
     <header class="post-header reveal">
       <span class="post-tag">{categoryDisplay}</span>
@@ -36,7 +53,7 @@ const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toU
       <div class="post-meta">{formatDate(date)} · {readTime} min read · Nikita Boyarkin</div>
     </header>
 
-    <div class="reveal reveal-delay-1">
+    <div class="post-body" id="post-content">
       <slot />
     </div>
 

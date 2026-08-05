@@ -1,14 +1,14 @@
 ---
 title: "Почему мы перешли на байесовское A/B-тестирование"
 date: 2025-03-15
-category: article
+category: decision-log
+image: "/images/ab.png"
 tags:
   - ab-testing
   - bayesian
   - statistics
   - article
 excerpt: "Frequentist p-values плодили культуру peeking: 34 из 127 экспериментов показывали значимость, а потом разворачивались. Как Bayesian inference поменял workflow."
-image: "/images/ab.png"
 related:
   - /projects/abtest/
   - /posts/rfm-segmentation-practical/

@@ -69,6 +69,10 @@ def check_required_pages() -> int:
         DIST / "projects" / "cohort" / "index.html",
         DIST / "projects" / "abtest" / "index.html",
         DIST / "posts" / "bayesian-ab-testing" / "index.html",
+        DIST / "posts" / "cohort-retention-guide" / "index.html",
+        DIST / "posts" / "rfm-segmentation-practical" / "index.html",
+        DIST / "posts" / "telegram-reporting-bot" / "index.html",
+        DIST / "posts" / "data-analyst-portfolio-checklist" / "index.html",
     ]
     print(f"Checking {len(required)} required page(s)...")
     for path in required:
