@@ -14,6 +14,7 @@ related:
   - /posts/cohort-retention-guide/
   - /posts/bayesian-ab-testing/
   - /posts/telegram-reporting-bot/
+  - https://github.com/NikitaBoyarkin/volta-banking
 keywords:
   - RFM-сегментация SQL
   - RFM скоринг квантили
@@ -123,7 +124,7 @@ Recency — единственная ось, где «меньше» означ�
 
 ## На практике
 
-В проекте [volta-banking](https://github.com/NikitaBoyarkin) — аналитика необанка — я не использовал классический RFM с квантильными баллами 1–5. Вместо этого применил K-Means на наборе поведенческих признаков: число транзакций в месяц, средний чек, баланс сбережений, логины в неделю, P2P-переводы, месячная выручка. Это RFM-style подход: та же идея «давность + активность + деньги», но в многомерном виде.
+В проекте [volta-banking](https://github.com/NikitaBoyarkin/volta-banking) — аналитика необанка — я не использовал классический RFM с квантильными баллами 1–5. Вместо этого применил K-Means на наборе поведенческих признаков: число транзакций в месяц, средний чек, баланс сбережений, логины в неделю, P2P-переводы, месячная выручка. Это RFM-style подход: та же идея «давность + активность + деньги», но в многомерном виде.
 
 Почему не классический RFM:
 
@@ -166,3 +167,10 @@ Recency — единственная ось, где «меньше» означ�
 
 — Nikita Boyarkin
 </details>
+
+## Ссылки
+
+- [volta-banking — RFM-кластеризация необанка](https://github.com/NikitaBoyarkin/volta-banking) — полный код анализа с K-Means, профилями сегментов и стратегиями монетизации
+- [Cohort Retention Guide](/posts/cohort-retention-guide/) — когортный анализ как дополнение к RFM
+- [Bayesian A/B Testing](/posts/bayesian-ab-testing/) — проверка гипотез на сегментах
+- [RFM-дашборд](/projects/rfm/) — интерактивная карта сегментов

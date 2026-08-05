@@ -9,11 +9,12 @@ interface Props {
   category: string;
   excerpt: string;
   slug: string;
+  image?: string;
   related?: { href: string; title: string }[];
   keywords?: string[];
 }
 
-const { title, date, category, excerpt, slug, related = [], keywords = [] } = Astro.props;
+const { title, date, category, excerpt, slug, image, related = [], keywords = [] } = Astro.props;
 const rendered = await Astro.slots.render('default');
 const readTime = estimateReadTime(rendered.replace(/<[^>]*>/g, ' '));
 const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
@@ -23,6 +24,7 @@ const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toU
   title={`${title} | Nikita Boyarkin`}
   description={excerpt}
   keywords={keywords}
+  ogImage={image}
   ogType="article"
   activeNav="writing"
   canonical={withBase(`posts/${slug}/`)}
