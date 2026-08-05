@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/portfolio-category-guard.js\"",
+        "description": "Validate post frontmatter category against BlogFilter taxonomy (decision-log/framework/guide/note)"
+      }
+    ]
+  }
+}
