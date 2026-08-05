@@ -1,62 +1,168 @@
 ---
-title: RFM Segmentation for Customer Analytics
+title: "RFM-сегментация клиентов"
 date: 2025-04-24
-category: framework
+category: doka
 tags:
   - rfm
   - segmentation
   - customer-analytics
   - sql
-excerpt: A practical framework for RFM segmentation — Recency, Frequency, Monetary — and how to turn scores into action.
+  - doka
+excerpt: "RFM раскладывает клиентов по трём осям — давность, частота, сумма — и превращает скоринг в действия. Практический фреймворк с SQL, разбором нюансов и кейсом."
+related:
+  - /projects/rfm/
+  - /posts/cohort-retention-guide/
+  - /posts/bayesian-ab-testing/
+  - /posts/telegram-reporting-bot/
+keywords:
+  - RFM-сегментация SQL
+  - RFM скоринг квантили
+  - сегментация клиентов по давности и частоте
 draft: false
 ---
 
-# RFM Segmentation for Customer Analytics
+## Кратко
 
-RFM segmentation splits customers along three dimensions:
+RFM-сегментация раскладывает каждого клиента по трём осям:
 
-- **Recency** — how recently did they buy?
-- **Frequency** — how often do they buy?
-- **Monetary** — how much have they spent?
+- **Recency** (давность) — сколько дней прошло с последней покупки.
+- **Frequency** (частота) — сколько покупок за период.
+- **Monetary** (сумма) — сколько денег клиент принёс.
 
-It is simple, interpretable, and works with almost any transactional data.
+Каждой оси присваивают балл от 1 до 5 по квантилям. Три балла вместе дают ячейку вроде `R5-F4-M3` — это «лояльный клиент с высокой давностью, но средней суммой». Ячейка превращается в сегмент: «чемпионы», «в зоне риска», «потерянные» — и каждый сегмент получает своё действие.
 
-## Calculating RFM Scores
+Метод популярен, потому что работает почти на любых транзакционных данных и не требует машинного обучения. Он интерпретируем: маркетинг понимает «чемпионы» без перевода.
 
-For each customer, compute:
+## Пример
+
+Базовый SQL для расчёта трёх метрик по каждому клиенту за последние 12 месяцев:
 
 ```sql
 SELECT
   customer_id,
-  DATEDIFF(CURRENT_DATE, MAX(order_date)) AS recency,
+  -- Давность: дни с последней покупки
+  DATEDIFF(
+    CURRENT_DATE,
+    MAX(order_date)
+  ) AS recency,
+  -- Частота: число уникальных заказов
   COUNT(DISTINCT order_id) AS frequency,
+  -- Сумма: выручка за период
   SUM(amount) AS monetary
 FROM orders
-WHERE order_date >= DATE_SUB(CURRENT_DATE, INTERVAL 12 MONTH)
+WHERE order_date >= DATE_SUB(
+  CURRENT_DATE,
+  INTERVAL 12 MONTH
+)
 GROUP BY customer_id;
 ```
 
-Then assign scores from 1 to 5 for each metric. Higher scores are better for Frequency and Monetary, but for Recency a lower value means a better score.
+На выходе — таблица из одного клиента на строку с тремя числами. Дальше эти числа превращают в баллы 1–5 и собирают в сегменты.
 
-## Turning Scores into Segments
+<iframe src="/Personal_Projects.github.io/demos/rfm/index.html" title="Интерактивная карта RFM-сегментов: сетка 5×5 по давности и частоте, наведите на ячейку" height="540" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
-A common approach:
+## Как пишется
 
-| Segment | Pattern | Action |
-|---------|---------|--------|
-| Champions | R=5, F=5, M=5 | Loyalty programs, early access |
-| At Risk | R=1–2, F/M high | Win-back campaigns |
-| New Customers | R=5, F/M low | Onboarding, first-repeat offers |
-| Hibernating | R=1, F=1, M=1 | Cheap reactivation or ignore |
+Балл по каждой оси — это номер квантиля, в который попал клиент. Пять квантилей = пять баллов. В SQL удобно считать через `NTILE(5)`:
 
-## From Scores to Strategy
+```sql
+WITH metrics AS (
+  -- Здесь запрос из раздела «Пример»
+  SELECT customer_id, recency, frequency, monetary
+  FROM rfm_raw
+),
+scored AS (
+  SELECT
+    customer_id,
+    -- Recency инвертируем: меньше дней = лучше
+    6 - NTILE(5) OVER (ORDER BY recency) AS r,
+    NTILE(5) OVER (ORDER BY frequency) AS f,
+    NTILE(5) OVER (ORDER BY monetary) AS m
+  FROM metrics
+)
+SELECT *,
+  CONCAT('R', r, '-F', f, '-M', m) AS rfm_cell
+FROM scored;
+```
 
-The main value of RFM is not the labels — it is that different segments justify different costs of contact. Champions can receive expensive personalized offers. Hibernating users get only low-cost channels, if any.
+`NTILE(5)` делит строки на пять групп равного размера и возвращает номер группы. Для Frequency и Monetary «больше = лучше», поэтому сортировка по возрастанию. Для Recency «меньше дней = лучше», поэтому балл инвертируем через `6 - NTILE(...)`.
 
-## Watch Out For
+Возможные значения балла — целые от 1 до 5 по каждой оси. Итоговая ячейка — строка вида `R4-F3-M5`. Всего 5 × 5 × 5 = 125 ячеек. На практике столько сегментов не нужно, поэтому ячейки группируют в 5–10 бизнес-сегментов по правилам.
 
-- **Skewed Monetary.** A few whales can dominate the distribution. Use quintiles, not absolute thresholds.
-- **Static view.** RFM should be refreshed monthly or quarterly.
-- **Action bias.** Labeling a customer as "At Risk" only helps if you have a specific plan for them.
+## Как понять
 
-RFM is a starting point, not the final answer. Combine it with product usage, support tickets, and channel preferences to make the segmentation richer.
+### Почему Recency инвертируется
+
+Recency — единственная ось, где «меньше» означает «лучше». Клиент, который покупал вчера, ценнее того, кто покупал полгода назад. Если этого не учесть и поставить балл по возрастанию, чемпионы получат `R1`, а потерянные — `R5`, и логика сегментов перевернётся. Инверсия через `6 - NTILE(5)` ставит давних клиентов в `R1`, недавних — в `R5`.
+
+### Окно наблюдения меняет сегмент
+
+Период, за который считаются метрики, определяет результат. За 30 дней частота 2 — это активный клиент. За 365 дней частота 2 — это случайный покупатель. Окно выбирают под цикл продукта: для подписок — 1–3 месяца, для ритейла — 6–12 месяцев, для недвижимости — несколько лет.
+
+### `NTILE` ломается на ties
+
+`NTILE(5)` делит на равные группы по строкам, а не по значениям. Если у многих клиентов одинаковая частота (например, 1 покупка), границы квантилей проходят внутри группы одинаковых значений — два клиента с частотой 1 получают разные баллы. Это шум. Решения:
+
+- Использовать ранги (`RANK`/`DENSE_RANK`) и делить вручную по порогам.
+- Заранее договориться о порогах: «Recency ≤ 30 дней = 5 баллов».
+- Для Frequency учитывать «не было покупок» отдельным нулёвым сегментом.
+
+### Квантили vs среднее
+
+Иногда балл считают относительно среднего: «выше среднего = 5». Это ломает сегментацию при скошенном распределении — в e-commerce 80% клиентов имеют 1 покупку, и «выше среднего» почти никого не ловит. Квантили стабильнее: каждый балл содержит ~20% базы, сегменты сопоставимы по размеру.
+
+## Подсказки
+
+- Окно наблюдения выбирайте под цикл продукта, не по умолчанию 12 месяцев.
+- Recency обязательно инвертируйте — это самая частая ошибка.
+- Частота = 0 (клиент не покупал в окне) — отдельный сегмент «спящие», не смешивайте с частотой 1.
+- Сегментов делайте 5–10, не 125. Бизнес не справится с большим числом действий.
+- Проверяйте размер сегментов: «чемпионов» должно быть 5–20%, не 80%.
+- Один и тот же клиент в разных окнах попадает в разные сегменты — это нормально, не баг.
+- Monetary без Frequency малозначим: один крупный чек ≠ лояльность.
+
+## На практике
+
+В проекте [volta-banking](https://github.com/NikitaBoyarkin) — аналитика необанка — я не использовал классический RFM с квантильными баллами 1–5. Вместо этого применил K-Means на наборе поведенческих признаков: число транзакций в месяц, средний чек, баланс сбережений, логины в неделю, P2P-переводы, месячная выручка. Это RFM-style подход: та же идея «давность + активность + деньги», но в многомерном виде.
+
+Почему не классический RFM:
+
+- У необанка «активность» — не только покупки. Логины, P2P, сбережения несут сигнал о лояльности, а в R/F/M их не впихнуть.
+- K-Means на стандартизованных признаках находит естественные кластеры, а не навязывает границы квантилями.
+- Сегменты получились содержательнее: «Power Users», «Growth Users», «Casual Users», «Dormant Users» — с привязкой к выручке и стратегию монетизации на каждый кластер.
+
+Классический RFM с квантилями хорош, когда данных немного, признаков три, и нужна быстрая интерпретируемая сегментация без ML. Когда признаков больше трёх и они разношёрстные — кластеризация честнее. В обоих случаях главный результат — не баллы, а действие на сегмент: «Dormant Users → реактивация пушем с кэшбэком», «Growth Users → апсейл на Premium».
+
+Рецепт для старта с классическим RFM:
+
+1. Посчитайте R/F/M за окно под цикл продукта.
+2. Поставьте баллы через `NTILE(5)`, Recency инвертируйте.
+3. Сведите 125 ячеек в 6–8 сегментов правилами `CASE WHEN`.
+4. На каждый сегмент — одно действие и одна метрика успеха.
+5. Перепроверяйте через 2–4 недели: сегменты сдвигаются, действия уточняются.
+
+## На собеседовании
+
+<details>
+<summary>❓ Сколько сегментов должно получиться после RFM?</summary>
+
+5–10. Меньше пяти — слишком грубо, теряются отличия между группами. Больше десяти — маркетинг не справится с отдельным действием на каждый, сегментация превращается в академическое упражнение. 125 ячеек R×F×M сводят правилами `CASE WHEN` к 6–8 бизнес-сегментам. Правило: один сегмент = одно действие = одна метрика успеха.
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Когда выбрать классический RFM, а когда K-Means кластеризацию?</summary>
+
+Классический RFM — когда признаков ровно три (давность, частота, сумма), данных немного, и нужна интерпретируемость без ML: сегменты читаются бизнесом без перевода. K-Means — когда признаков больше трёх и они разношёрстные (логины, P2P, баланс, канал), а границы квантилей навязывают искусственные пороги. K-Means находит естественные кластеры, но требует стандартизации признаков и проверки на устойчивость (перезапуск с разными seed).
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Что делать с клиентами, у которых Monetary = 0?</summary>
+
+Это клиенты с покупками на нулевую сумму — возвраты, бесплатные триалы, ошибки учёта. Не смешивайте их с платящими в общем скоринге. Варианты: отдельный сегмент «нулевая сумма», фильтр перед скорингом, или замена Monetary на «средний чек» / «маржа». Главное — не давать им балл M5 по квантилю, если нулей много: они исказят распределение и вытолкнут реальных крупных клиентов в M4.
+
+— Nikita Boyarkin
+</details>

@@ -1,58 +1,84 @@
 ---
-title: A Checklist for a Data Analyst Portfolio
+title: "Чек-лист портфолио дата-аналитика"
 date: 2025-05-22
-category: note
+category: article
 tags:
   - portfolio
   - career
   - data-analyst
-excerpt: What I would check before sending a portfolio to a hiring manager — based on reviewing my own and others.
+  - article
+excerpt: "Что я проверяю перед тем, как отправить портфолио найм-менеджеру — на основе ревью своего и чужих. Семь пунктов в трёх группах."
+related:
+  - /posts/rfm-segmentation-practical/
+  - /posts/cohort-retention-guide/
+  - /posts/bayesian-ab-testing/
+keywords:
+  - чеклист портфолио аналитика
+  - портфолио data analyst
+  - как оформить портфолио аналитика
 draft: false
 ---
 
-# A Checklist for a Data Analyst Portfolio
+Хорошее портфолио — не десяток проектов, а несколько ясных историй, показывающих, как вы мыслите данными. Ниже — что я проверяю перед отправкой найм-менеджеру. Семь пунктов, сгруппированных в три части.
 
-A good portfolio does not need dozens of projects. It needs a few clear stories that show how you think with data.
+## Часть 1. Сила контента
 
-## 1. One Strong Project Beats Five Weak Ones
+### Один сильный проект лучше пяти слабых
 
-Pick 2–4 projects where you can explain:
+Выберите 2–4 проекта, где вы можете объяснить:
 
-- What question you were answering
-- What data you used
-- What method you chose and why
-- What recommendation followed from the analysis
+- Какой вопрос закрывали.
+- Какие данные использовали.
+- Какой метод выбрали и почему.
+- Какая рекомендация последовала из анализа.
 
-## 2. Show the Mess, Not Just the Result
+### Метрики — конкретные
 
-Real analysis includes missing data, weird distributions, and dead ends. Mention them briefly. Hiring managers want to see judgment, not a polished final chart.
+Избегайте фраз вроде «улучшили удержание». Используйте числа: «нашли разрыв в 14 пп в retention второй недели между платной и органической когортами». Конкретное число проверяемо и запоминается.
 
-## 3. Code Should Be Readable
+### Контекст, а не только вывод
 
-Even if the project is mostly SQL or Python, add a README and clean variable names. No one expects production code, but unreadable notebooks hurt.
+На каждый проект — пять пунктов:
 
-## 4. Make Metrics Concrete
+- Бизнес-контекст.
+- Гипотеза.
+- Метод.
+- Инсайт.
+- Impact или рекомендация.
 
-Avoid phrases like "improved retention." Use numbers: "identified a 14 percentage point gap in Week-2 retention between paid and organic cohorts."
+Без контекста красивый график — просто картинка. С контекстом — аргумент.
 
-## 5. Add Context, Not Just Output
+## Часть 2. Честность и качество
 
-For each project, include:
+### Показывайте месиво, не только результат
 
-- Business context
-- Hypothesis
-- Method
-- Insight
-- Impact or recommendation
+Настоящий анализ включает пропуски, странные распределения и тупики. Упомяните их кратко. Найм-менеджер хочет видеть суждение, не отполированный финальный график. Честность про тупики сигнализирует о зрелости сильнее, чем успех.
 
-## 6. Keep the Site Fast
+### Код должен быть читаемым
 
-A portfolio site should load quickly. Large images, slow dashboards, or broken links create a bad first impression before anyone reads a project.
+Даже если проект в основном SQL или Python — добавьте README и понятные имена переменных. Продакшн-качества никто не ждёт, но нечитаемый ноутбук режет глаз. Бонус: один абзац «как запустить» — и ревьюер не закроет вкладку.
 
-## 7. Update Regularly
+## Часть 3. Подача и поддержка
 
-A portfolio that looks abandoned signals that you are not actively working on your skills. Add a "Now" page or a blog to show current work.
+### Держите сайт быстрым
 
-## Final Thought
+Сайт портфолио должен грузиться быстро. Тяжёлые картинки, медленные дашборды, битые ссылки дают плохое первое впечатление до того, как кто-то прочтёт проект. Проверьте: LCP < 2,5 с, изображения ≤ 200 КБ, никаких растёт-по-вертикали макетов.
 
-Your portfolio is an argument that you can be useful to a team. Make every project answer the implicit question: "What would this person do for us?"
+### Обновляйте регулярно
+
+Портфолио, которое выглядит заброшенным, сигнализирует, что вы не работаете над навыками. Добавьте страницу «Now» или блог — они показывают текущую работу. Дата последнего обновления в подвале снимает вопрос «это ещё живое?».
+
+## На практике
+
+Я применил этот чек-лист к собственному портфолио — этому сайту. Что нашёл:
+
+- **Сила контента**: четыре проекта (funnel, A/B, retention, segmentation) — каждый с контекстом, методом, инсайтом. Соответствует пункту 1.
+- **Конкретные метрики**: в A/B-тесте указано +4,82 пп, p < 0,0001, MDE +5 пп. Не «стало лучше».
+- **Честность**: в project-заметках упоминаю, где данные синтетические (fit-trek), а где реальные (volta-banking). Без этого ревьюер не отличит симуляцию от работы с реальным DWH.
+- **Код**: README у каждого проекта, `uv`-окружение описано. Но часть ноутбуков всё ещё нечитаема — в работе.
+- **Сайт**: статический Astro, грузится быстро. Битых ссылок нет — `make check` ловит.
+- **Обновление**: блог «Writing» с датами показывает, что сайт жив.
+
+Чек-лист — не вето, а зеркало. Прогоняйте им портфолио перед отправкой: что попадает в «в работе», то переносится в backlog, не в оправдание.
+
+Финальная мысль: портфолио — аргумент, что вы будете полезны команде. Каждый проект должен отвечать на неявный вопрос: «что этот человек сделает для нас?»

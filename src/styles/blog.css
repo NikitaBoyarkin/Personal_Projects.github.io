@@ -220,6 +220,41 @@
   color: var(--text-accent-hover);
 }
 
+.post-related {
+  margin-top: var(--space-10);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--blockquote-border);
+}
+
+.post-related h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-normal);
+  margin-bottom: var(--space-4);
+  letter-spacing: -0.01em;
+}
+
+.post-related ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.post-related li a {
+  color: var(--text-accent);
+  text-decoration: none;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  transition: color 0.2s ease;
+}
+
+.post-related li a:hover {
+  color: var(--text-accent-hover);
+}
+
 /* Now page */
 .now-section {
   margin-bottom: var(--space-12);

@@ -1,51 +1,106 @@
 ---
-title: Automating Weekly Reports with a Telegram Bot
+title: "Автоматизация недельных отчётов через Telegram-бота"
 date: 2025-05-08
-category: decision-log
+category: article
 tags:
   - automation
   - telegram
   - reporting
   - python
-excerpt: Why we moved weekly metric reports from manual slides to a scheduled Telegram bot and what we learned.
+  - article
+excerpt: "Недельные отчёты выглядят мелкой задачей, но съедают часы. Как вынести рутину из слайдов в расписание Telegram-бота и что из этого вышло."
+related:
+  - /projects/bot/
+  - /posts/rfm-segmentation-practical/
+  - /posts/cohort-retention-guide/
+  - /posts/bayesian-ab-testing/
+keywords:
+  - telegram бот отчётность
+  - автоматизация отчётов Python
+  - scheduled report telegram bot
 draft: false
 ---
 
-# Automating Weekly Reports with a Telegram Bot
+Недельная отчётность — одна из тех задач, что выглядят мелкими, но съедают часы. Каждый понедельник кто-то тянет числа из SQL, копирует скриншоты, пишет саммари, кидает в канал. Мы решили автоматизировать это Telegram-ботом. Это decision-log: что получилось, что нет.
 
-Weekly reporting is one of those tasks that looks small but eats time. Every Monday someone pulls numbers from SQL, copies screenshots, writes a summary, and sends it to a channel. We decided to automate it with a Telegram bot.
+## Проблема ручных отчётов
 
-## The Problem with Manual Reports
+У ручной отчётности скрытые издержки:
 
-Manual reporting has hidden costs:
+- Зависит от одного человека — он в отпуске, отчёта нет.
+- Приходит нерегулярно — то в 9:00, то после обеда.
+- Формат плывёт со временем — то таблица, то текст, то скриншот.
+- Люди копируют числа вместо того, чтобы интерпретировать их.
 
-- It depends on one person.
-- It arrives inconsistently.
-- Formatting drifts over time.
-- People spend time copying numbers instead of interpreting them.
+Главная цена — не часы, а внимание: аналитик тратит фокус на механику вместо разбора показателей.
 
-## What the Bot Does
+## Что делает бот
 
-Every Monday at 9:00 the bot:
+Каждый понедельник в 9:00 бот:
 
-1. Connects to the data warehouse and runs predefined SQL queries.
-2. Calculates week-over-week and year-over-year changes.
-3. Formats the output into a compact message with key numbers.
-4. Sends it to the team channel.
-5. Logs the run so failures are visible.
+1. Коннектится к хранилищу и прогоняет заранее согласованные SQL-запросы.
+2. Считает изменения неделя к неделе и год к году.
+3. Собирает компактное сообщение с 5–7 ключевыми метриками.
+4. Кидает в командный канал.
+5. Логирует запуск — сбой виден сразу, не через неделю.
 
-A `/report` command lets anyone request the latest version manually.
+Команда `/report` даёт любому запросить свежую версию вручную. Это страховка от «опубликуй прямо сейчас».
 
-## Why Telegram
+<iframe src="/Personal_Projects.github.io/demos/telegram/index.html" title="Схема пайплайна: хранилище → SQL → форматирование → Telegram API → канал. Наведите на этап" height="280" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
-The team already used Telegram for daily communication. Adding reports there removed friction: no new tool, no login, no email filters. The report lives where people actually check messages.
+## Почему Telegram
 
-## Lessons Learned
+Команда уже жила в Telegram. Добавить отчёт туда убрало трение: новый инструмент не нужен, логин не нужен, почтовые фильтры не нужны. Отчёт лежит там, где люди всё равно проверяют сообщения. Отдельный BI-дашборд для еженедельного среза — оверкилл: его никто не откроет в понедельник утром.
 
-- **Reliability matters more than formatting.** A broken bot destroys trust faster than an ugly report.
-- **Fallback is essential.** If the database is down, the bot should say so explicitly, not stay silent.
-- **Keep it scannable.** One message with 5–7 metrics beats a long document.
+## На практике
 
-## When Not to Do It
+В pet-проекте [telegram_bot](https://github.com/NikitaBoyarkin) я собрал минимальный пайплайн: SQL-запрос → `schedule` → `telebot` → канал. Без фреймворков и оркестраторов — одна страница кода. Это не прод-система, а проверка концепта: хватает ли Telegram как канал для операционных срезов. Хватает.
 
-If the audience needs deep context, interactive slicing, or formal governance, a bot is not enough. Use it for operational snapshots, not board decks.
+Каркас бота:
+
+```python
+import telebot
+import schedule
+import time
+from db import run_report_queries
+
+bot = telebot.TeleBot(TOKEN)
+CHANNEL = "@team_metrics"
+
+def send_weekly():
+    # SQL → словарь метрик с WoW и YoY
+    metrics = run_report_queries()
+    text = format_report(metrics)
+    try:
+        bot.send_message(CHANNEL, text, parse_mode="HTML")
+        log_run(status="ok")
+    except Exception as e:
+        # Явный фолбэк: молчание хуже ошибки
+        bot.send_message(CHANNEL, "⚠️ Отчёт не собран: "+str(e))
+        log_run(status="error", err=str(e))
+
+# Понедельник 09:00
+schedule.every().monday.at("09:00").do(send_weekly)
+
+@bot.message_handler(commands=["report"])
+def manual(message):
+    send_weekly()
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+```
+
+Чему научился:
+
+- **Надёжность важнее формата.** Сломанный бот разрушает доверие быстрее, чем некрасивый отчёт.
+- **Фолбэк обязателен.** Если база лежит, бот должен сказать это явно, а не молчать — молчание через неделю обнаруживается как «а где отчёт?».
+- **Держите сканируемым.** Одно сообщение с 5–7 метриками бьёт длинный документ. Бейджи ▲▼ для WoW, цвет не нужен — Telegram его всё равно порежет.
+- **Логируйте запуск.** Таблица `report_runs(status, ts, err)` — первый шаг к мониторингу без мониторинга.
+- **SQL отдельно от бота.** Запросы — в репозитории, ревьюятся как код. Бот только вызывает и форматирует.
+
+Когда не надо:
+
+- Аудитории нужен глубокий контекст, интерактивные срезы или формальное согласование — бота мало. Это для операционных снепшотов, не для советов директоров.
+- Метрики меняются каждую неделю — бот устареет быстрее, чем окупится.
+- Команда не в Telegram — канал не приживётся, трение не снимется.

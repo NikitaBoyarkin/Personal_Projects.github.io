@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Пайплайн Telegram-отчёта</title>
+<style>
+  :root{--bg:#fafaf7; --ink:#1f2430; --muted:#6b7280; --line:#d1d5db; --acc:#2e7d32; --acc2:#3b82f6}
+  *{box-sizing:border-box}
+  body{margin:0; padding:22px; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; font-size:14px; line-height:1.5}
+  h1{font-size:17px; margin:0 0 4px}
+  .lede{margin:0 0 20px; color:var(--muted); font-size:13px}
+  .flow{display:flex; align-items:stretch; gap:0; max-width:720px; position:relative}
+  .stage{flex:1; position:relative; display:flex; flex-direction:column; align-items:center;
+    gap:8px; padding:14px 6px; cursor:default; transition:transform .15s ease}
+  .stage:hover{transform:translateY(-3px)}
+  .node{width:64px; height:64px; border-radius:14px; display:flex; align-items:center;
+    justify-content:center; font-size:26px; background:#fff; border:2px solid var(--line);
+    box-shadow:0 2px 6px rgba(0,0,0,.05); position:relative; z-index:2}
+  .stage:hover .node{border-color:var(--acc); box-shadow:0 6px 16px rgba(46,125,50,.18)}
+  .label{font-size:12px; font-weight:600; text-align:center; color:var(--ink)}
+  .sub{font-size:11px; color:var(--muted); text-align:center; min-height:28px}
+  .arrow{flex:0 0 28px; align-self:center; position:relative; height:2px; background:var(--line); margin-top:-38px}
+  .arrow::after{content:""; position:absolute; right:-1px; top:-4px; border:5px solid transparent;
+    border-left-color:var(--line); border-right:0}
+  .dot{position:absolute; top:-3px; left:0; width:8px; height:8px; border-radius:50%;
+    background:var(--acc); animation:flow 2.4s linear infinite}
+  .arrow:nth-child(2n) .dot{animation-delay:.6s}
+  .arrow:nth-child(3n) .dot{animation-delay:1.2s}
+  @keyframes flow{0%{left:0; opacity:0} 15%{opacity:1} 85%{opacity:1} 100%{left:100%; opacity:0}}
+  .tip{margin-top:18px; padding:12px 14px; border-radius:8px; background:#1f2430; color:#fff;
+    font-size:13px; line-height:1.5; min-height:48px; transition:background .2s ease}
+  .tip b{color:#a5d6a7}
+  @media (max-width:560px){
+    .node{width:48px; height:48px; font-size:20px}
+    .label{font-size:10px} .sub{font-size:10px; min-height:36px}
+    .arrow{flex:0 0 16px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .dot{animation:none; display:none}
+  }
+</style>
+</head>
+<body>
+  <h1>Пайплайн Telegram-отчёта</h1>
+  <p class="lede">Понедельник 09:00 → пять этапов. Наведите на блок, чтобы увидеть detail.</p>
+
+  <div class="flow" id="flow"></div>
+  <div class="tip" id="tip"><b>Хранилище</b> — наведите на этап, чтобы увидеть его роль.</div>
+
+<script>
+const STAGES = [
+  {icon:"🗄️", name:"Хранилище", role:"DWH / PostgreSQL. Источник сырых событий и агрегатов. Бот читает, не пишет."},
+  {icon:"📜", name:"SQL-запросы", role:"Заранее согласованные запросы в репозитории, ревьюятся как код. WoW и YoY считаются здесь."},
+  {icon:"🧮", name:"Форматирование", role:"Сборка компактного сообщения: 5–7 метрик, бейджи ▲▼, HTML-разметка под Telegram."},
+  {icon:"🤖", name:"Telegram API", role:"telebot.send_message в канал. Фолбэк при ошибке — явное сообщение, не молчание."},
+  {icon:"📢", name:"Канал", role:"@team_metrics. Отчёт лежит там, где команда уже сидит. /report — ручной запрос."}
+];
+
+const flow = document.getElementById("flow");
+const tip = document.getElementById("tip");
+
+STAGES.forEach((s, i)=>{
+  const st = document.createElement("div");
+  st.className = "stage";
+  st.innerHTML = '<div class="node">'+s.icon+'</div>'+
+    '<div class="label">'+s.name+'</div>'+
+    '<div class="sub">'+(i===0?"источник":i===STAGES.length-1?"приёмник":"шаг "+i)+'</div>';
+  st.addEventListener("mouseenter", ()=>{
+    tip.innerHTML = "<b>"+s.name+"</b> — "+s.role;
+  });
+  flow.appendChild(st);
+  if (i < STAGES.length-1){
+    const ar = document.createElement("div");
+    ar.className = "arrow";
+    ar.innerHTML = '<span class="dot"></span>';
+    flow.appendChild(ar);
+  }
+});
+</script>
+</body>
+</html>

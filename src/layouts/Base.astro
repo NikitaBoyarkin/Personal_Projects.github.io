@@ -6,6 +6,7 @@ import { withBase } from '../lib/path';
 interface Props {
   title: string;
   description?: string;
+  keywords?: string[];
   ogType?: 'website' | 'article';
   ogImage?: string;
   canonical?: string;
@@ -16,6 +17,7 @@ interface Props {
 const {
   title,
   description = 'Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing.',
+  keywords = [],
   ogType = 'website',
   ogImage = '/images/00_profile.jpg',
   canonical,
@@ -36,6 +38,7 @@ const faviconUrl = withBase('favicon.svg');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     {canonical && <link rel="canonical" href={pageUrl} />}
 
     <link rel="icon" type="image/svg+xml" href={faviconUrl} />

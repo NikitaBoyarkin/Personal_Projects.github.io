@@ -1,17 +1,35 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Post from '../../layouts/Post.astro';
+import { withBase } from '../../lib/path';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts', (p) => !p.data.draft);
   return posts.map((post) => ({
     params: { slug: post.id.replace(/\.md$/, '') },
-    props: { post },
+    props: { post, allPosts: posts },
   }));
 }
 
-const { post } = Astro.props;
+const { post, allPosts } = Astro.props;
 const { Content } = await render(post);
+
+// Резолвим related-пути вида /posts/<slug>/ и /projects/<slug>/ в { href, title }
+const allProjects = await getCollection('projects', (p) => !p.data.draft);
+const lookup = new Map<string, { kind: string; title: string }>();
+[...allPosts, ...allProjects].forEach((x) => {
+  const slug = x.id.replace(/\.md$/, '');
+  const kind = x.collection === 'projects' ? 'projects' : 'posts';
+  lookup.set(slug, { kind, title: x.data.title });
+});
+
+const related = (post.data.related ?? [])
+  .map((p) => {
+    const slug = p.replace(/^\//, '').replace(/\/$/, '').replace(/^(posts|projects)\//, '');
+    const found = lookup.get(slug);
+    return found ? { href: withBase(`${found.kind}/${slug}/`), title: found.title } : null;
+  })
+  .filter((x): x is { href: string; title: string } => x !== null);
 ---
 
 <Post
@@ -19,6 +37,8 @@ const { Content } = await render(post);
   date={post.data.date}
   category={post.data.category}
   excerpt={post.data.excerpt}
+  related={related}
+  keywords={post.data.keywords ?? []}
   slug={post.id.replace(/\.md$/, '')}
 >
   <Content />

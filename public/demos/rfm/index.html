@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта RFM-сегментов</title>
+<style>
+  :root{
+    --bg:#fafaf7; --ink:#1f2430; --muted:#6b7280; --line:#e5e7eb;
+    --cell-gap:6px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:24px; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:14px; line-height:1.5;
+  }
+  h1{font-size:18px; margin:0 0 4px}
+  .lede{margin:0 0 18px; color:var(--muted); font-size:13px}
+  .board{
+    display:grid;
+    grid-template-columns: 44px repeat(5, 1fr);
+    grid-template-rows: 28px repeat(5, 1fr);
+    gap:var(--cell-gap);
+    max-width:560px;
+  }
+  .corner{background:transparent}
+  .axis{
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:600; color:var(--muted);
+  }
+  .cell{
+    position:relative; border-radius:8px; padding:8px;
+    display:flex; align-items:flex-end;
+    font-size:11px; font-weight:600; color:#1f2430;
+    cursor:default; min-height:64px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .cell:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 18px rgba(0,0,0,.12), inset 0 0 0 1px rgba(0,0,0,.08);
+    z-index:2;
+  }
+  .cell small{
+    display:block; font-weight:400; font-size:10px; color:rgba(31,36,48,.72);
+    margin-top:2px;
+  }
+  .row-label{
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:600; color:var(--muted);
+  }
+  .ytitle, .xtitle{
+    font-size:11px; color:var(--muted); text-align:center; font-weight:600;
+  }
+  .ytitle{grid-column:1; grid-row:1 / span 6; writing-mode:vertical-rl; transform:rotate(180deg); display:flex; align-items:center; justify-content:center}
+  .legend{
+    margin-top:18px; display:flex; flex-wrap:wrap; gap:6px 14px; font-size:12px;
+  }
+  .legend span{display:inline-flex; align-items:center; gap:6px}
+  .dot{width:12px; height:12px; border-radius:3px; display:inline-block}
+  .tip{
+    position:fixed; pointer-events:none; background:#1f2430; color:#fff;
+    padding:10px 12px; border-radius:8px; font-size:12px; line-height:1.45;
+    max-width:240px; box-shadow:0 8px 24px rgba(0,0,0,.25); opacity:0;
+    transition:opacity .12s ease; z-index:50;
+  }
+  .tip b{font-size:13px}
+  .tip .act{color:#c8e6c9; margin-top:4px; display:block}
+  @media (max-width:520px){
+    body{padding:14px}
+    .cell{min-height:54px; font-size:10px}
+    .cell small{font-size:9px}
+  }
+</style>
+</head>
+<body>
+  <h1>Карта RFM-сегментов</h1>
+  <p class="lede">Сетка 5×5 по давности (R, строки) и частоте (F, столбцы). Наведите на ячейку — сегмент и действие. Сумма (M) уточняет сегмент внутри ячейки.</p>
+
+  <div class="board" id="board"></div>
+
+  <div class="legend" id="legend"></div>
+  <div class="tip" id="tip"></div>
+
+<script>
+const SEG = {
+  champions:      {name:"Чемпионы",          color:"#2e7d32", act:"Программа лояльности, ранний доступ, рефералы."},
+  loyal:          {name:"Лояльные",          color:"#66bb6a", act:"Апсейл, награды за повторные покупки."},
+  potentialLoyal: {name:"Потенциально лояльные", color:"#a5d6a7", act:"Стимул ко второй покупке, подписка."},
+  recent:         {name:"Недавние",          color:"#c8e6c9", act:"Онбординг, приветственная серия."},
+  new:            {name:"Новички",           color:"#dcedc8", act:"Первый повторный оффер."},
+  aboutToSleep:   {name:"Засыпают",          color:"#fff9c4", act:"Реактивация, напоминание о бренде."},
+  needAttention:  {name:"Требуют внимания",  color:"#ffe082", act:"Персональная акция, опрос причин."},
+  atRisk:         {name:"В зоне риска",      color:"#ffb74d", act:"Win-back, скидка на возврат."},
+  cantLose:       {name:"Нельзя потерять",   color:"#ef6c5a", act:"Дорогая реактивация, личный менеджер."},
+  hibernating:    {name:"Спящие",            color:"#b0bec5", act:"Дешёвая реактивация или пауза."},
+  lost:           {name:"Потерянные",        color:"#90a4ae", act:"Игнорировать или массовая реактивация."}
+};
+
+// Матрица: [R][F], R=5..1 (строки сверху вниз), F=1..5 (слева направо)
+const M = {
+  5: ["new","new","recent","potentialLoyal","champions"],
+  4: ["new","recent","potentialLoyal","loyal","loyal"],
+  3: ["aboutToSleep","aboutToSleep","needAttention","potentialLoyal","loyal"],
+  2: ["hibernating","hibernating","needAttention","atRisk","atRisk"],
+  1: ["lost","lost","hibernating","cantLose","cantLose"]
+};
+
+const board = document.getElementById("board");
+// Заголовок оси Y (вертикально)
+const ytitle = document.createElement("div");
+ytitle.className = "ytitle";
+ytitle.textContent = "Recency →";
+board.appendChild(ytitle);
+
+// Верхний левый угол + заголовки столбцов F1..F5
+const corner = document.createElement("div");
+corner.className = "axis corner";
+corner.textContent = "";
+board.appendChild(corner);
+for (let f=1; f<=5; f++){
+  const ax = document.createElement("div");
+  ax.className = "axis";
+  ax.textContent = "F" + f;
+  board.appendChild(ax);
+}
+
+// Строки R=5..1
+for (let r=5; r>=1; r--){
+  const rl = document.createElement("div");
+  rl.className = "row-label";
+  rl.textContent = "R" + r;
+  board.appendChild(rl);
+  for (let f=1; f<=5; f++){
+    const key = M[r][f-1];
+    const seg = SEG[key];
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.style.background = seg.color;
+    cell.dataset.segment = key;
+    cell.dataset.r = r;
+    cell.dataset.f = f;
+    cell.innerHTML = seg.name;
+    board.appendChild(cell);
+  }
+}
+
+// Легенда
+const legend = document.getElementById("legend");
+Object.keys(SEG).forEach(key=>{
+  const s = document.createElement("span");
+  s.innerHTML = '<i class="dot" style="background:'+SEG[key].color+'"></i>'+SEG[key].name;
+  legend.appendChild(s);
+});
+
+// Тултип
+const tip = document.getElementById("tip");
+board.addEventListener("mouseover", e=>{
+  const c = e.target.closest(".cell");
+  if (!c) return;
+  const seg = SEG[c.dataset.segment];
+  tip.innerHTML = "<b>"+seg.name+"</b><br>R"+c.dataset.r+" · F"+c.dataset.f+
+    '<span class="act">'+seg.act+"</span>";
+  tip.style.opacity = 1;
+});
+board.addEventListener("mousemove", e=>{
+  tip.style.left = (e.clientX + 14) + "px";
+  tip.style.top  = (e.clientY + 14) + "px";
+});
+board.addEventListener("mouseout", e=>{
+  if (!e.target.closest(".cell")) return;
+  tip.style.opacity = 0;
+});
+</script>
+</body>
+</html>

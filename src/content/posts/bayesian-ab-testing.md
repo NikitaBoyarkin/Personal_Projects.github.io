@@ -1,39 +1,115 @@
 ---
-title: Why We Switched to Bayesian A/B Testing
+title: "Почему мы перешли на байесовское A/B-тестирование"
 date: 2025-03-15
-category: decision-log
+category: article
 tags:
   - ab-testing
   - bayesian
   - statistics
-excerpt: Frequentist p-values were creating a culture of peeking. Here's how Bayesian inference changed our experiment workflow.
+  - article
+excerpt: "Frequentist p-values плодили культуру peeking: 34 из 127 экспериментов показывали значимость, а потом разворачивались. Как Bayesian inference поменял workflow."
+related:
+  - /projects/abtest/
+  - /posts/rfm-segmentation-practical/
+  - /posts/cohort-retention-guide/
+  - /posts/telegram-reporting-bot/
+keywords:
+  - байесовское A/B тестирование
+  - peeking p-value ошибка
+  - probability of direction A/B
+draft: false
 ---
 
-In 2024, our team ran 127 experiments. 34 of them showed early significance, only to reverse once we reached the planned sample size. The cost: delayed launches, frustrated stakeholders, and a creeping distrust in data.
+За 2024 год команда прогнала 127 экспериментов. 34 показали раннюю значимость, а потом разворачивались при достижении планового размера выборки. Цена — отложенные запуски, разочарованные стейкхолдеры и creeping-недоверие к данным. Эта заметка — decision-log: почему ушли от частотного p-value к байесовскому выводу.
 
-## The Problem with Peeking
+## Проблема peeking
 
-The classical frequentist approach assumes a fixed sample size decided before the experiment starts. Every time you look at the results before reaching that sample size, you're inflating your Type I error rate.
+Классический частотный подход предполагает фиксированный размер выборки, заданный до старта эксперимента. Каждый раз, когда вы заглядываете в результаты до достижения этого размера, вы раздуваете ошибку I рода. На практике это значит: «p < 0.05 на половине выборки» — не доказательство, а лотерея.
 
-We tried sequential testing with O'Brien-Fleming boundaries. It helped, but the math was opaque to stakeholders.
+Мы пробовали sequential testing с границами О’Брайена–Флеминга. Это помогает, но математика непрозрачна для продакт-менеджеров: «почему сейчас p < 0.05, а остановить нельзя?» — объяснить трудно.
 
-## The Bayesian Alternative
+<iframe src="/Personal_Projects.github.io/demos/bayesian/index.html" title="Peeking у p-value vs байесовский posterior: двигайте размер выборки, сравните, как ведёт себя каждая метрика" height="460" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
-Instead of asking "is there an effect?", Bayesian inference asks "how likely is it that the effect is positive?" This subtle reframing changes everything about how you communicate results to product managers.
+## Байесовская альтернатива
 
-The key metric becomes the **Probability of Direction (PoD)**: the probability that the treatment is better than control.
+Байесовский вывод отвечает не «есть ли эффект», а «насколько вероятно, что эффект положительный». Это переформулирование меняет коммуникацию с продактом.
+
+Ключевая метрика — **Probability of Direction (PoD)**: вероятность, что лечение лучше контроля. PoD = 0,97 читается как «с вероятностью 97% вариант B лучше». Продакт понимает это без курса статистики.
+
+Минимальный пример на PyMC — сравнение двух конверсий через бета-приоры:
 
 ```python
 import pymc as pm
+import arviz as az
 
-with pm.Model() as model:
-    mu_control = pm.Normal("mu_control", mu=0.10, sigma=0.02)
-    mu_treatment = pm.Normal("mu_treatment", mu=0.10, sigma=0.02)
-    # ...
+# Успехи и попытки по группам
+ctrl_s, ctrl_n = 320, 5000
+trt_s,  trt_n  = 380, 5000
+
+with pm.Model() as m:
+    # Бета-приоры — равномерные, без сильных предположений
+    p_ctrl = pm.Beta("p_ctrl", alpha=1, beta=1)
+    p_trt  = pm.Beta("p_trt",  alpha=1, beta=1)
+    # Правдоподобия — биномиальные
+    pm.Binomial("y_ctrl", n=ctrl_n, p=p_ctrl, observed=ctrl_s)
+    pm.Binomial("y_trt",  n=trt_n,  p=p_trt,  observed=trt_s)
+    # Разница и вероятность, что она положительная
+    delta = pm.Deterministic("delta", p_trt - p_ctrl)
+    trace = pm.sample(2000, tune=1000, random_seed=42)
+
+# Probability of Direction
+pod = (trace.posterior["delta"] > 0).mean()
+print(f"PoD = {float(pod):.3f}")
 ```
 
-## Results After 6 Months
+`az.summary(trace)` покажет апостериорные средние, HDI и вероятность направления. Главное — апостериор обновляется плавно при добавлении данных, без порогов «значим/не значим».
 
-- Experiment duration reduced by 15% on average
-- Stakeholder confidence in results increased
-- Zero cases of "early significance reversal"
+## На практике
+
+В проекте [volta-banking](https://github.com/NikitaBoyarkin) — A/B-тест прогресс-бара в KYC — я использовал **частотный** подход: chi-square test на завершение KYC, MDE +5 пп, α = 0,05, power = 80%, длительность 28 дней, фиксированный размер выборки. Плюс bootstrap 95% CI для разницы конверсий. Результат: +4,82 пп, p < 0,0001, эффект подтверждён на 7 из 11 сегментов.
+
+Почему не Bayesian в том конкретном тесте:
+
+- MDE и размер выборки были заранее согласованы со стейкхолдерами — peeking исключён процедурно, не статистически.
+- Один первичный критерий, короткая длительность — частотный тест быстрее и понятнее команде.
+- Bootstrap CI дал бизнес-читаемую оценку эффекта без MCMC.
+
+Где Bayesian был бы честнее:
+
+- Длинные эксперименты, где стейкхолдеры заглядывают каждую неделю — peeking неизбежен, PoD устойчив к досмотрным проверкам.
+- Несколько связанных метрик — байесовская иерархическая модель учитывает их вместе, без поправок Бонферрони.
+- Ранние стопы — когда нужно решить «продолжать ли» до планового конца, posterior даёт вероятность эффекта прямо сейчас.
+
+В обоих случаях главное — не метод, а дисциплина: заранее зафиксируйте гипотезу, первичную метрику, MDE, длительность. Без этого и Bayesian не спасёт.
+
+## На собеседовании
+
+<details>
+<summary>❓ Чем Bayesian A/B-тестирование отличается от частотного на уровне вопроса, на который отвечает каждый метод?</summary>
+
+Частотный отвечает «какова вероятность увидеть такие или более экстремальные данные при условии, что нулевая гипотеза верна» — это p-value, он не говорит о вероятности гипотезы. Байесовский отвечает «какова вероятность, что эффект положительный, учитывая данные и приоры» — это прямое высказывание о параметре. Разница фундаментальна: p-value про данные при фиксированной гипотезе, posterior про гипотезу при фиксированных данных.
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Что такое peeking и почему он раздувает ошибку I рода?</summary>
+
+Peeking — многократная проверка p-value до планового размера выборки. При α = 0,05 каждая проверка даёт 5% шанс ложноположительного при верной нулевой гипотезе. При k проверках вероятность хотя бы одного ложного срабатывания растёт как `1 − (1 − α)^k` — при 10 проверках это ~40%. Решения: фиксированный размер выборки и решение по факту достижения, sequential testing с поправленными границами (О’Брайен–Флеминг, alpha-spending), или Bayesian posterior, который корректно обновляется при досмотре.
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Как выбрать приор для байесовского A/B-теста и что будет при слабых данных?</summary>
+
+Слабые данные — мало наблюдений или редкое событие. Приор тогда определяет вывод. Бета(1,1) — равномерный, неинформативный, безопасный старт. Если есть историческая конверсия — берите информативный приор (например, Beta с mean = исторической конверсии). Антипаттерн — очень узкий сильный приор на малых данных: он задавит наблюдения. Правило: при малой выборке явно указывайте приор и делайте sensitivity-анализ (проверьте вывод при двух разных приорах).
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ В каких случаях Bayesian A/B-тестирование проигрывает частотному?</summary>
+
+Ответит сообщество — призываем контрибьюторов поделиться кейсами.
+</details>

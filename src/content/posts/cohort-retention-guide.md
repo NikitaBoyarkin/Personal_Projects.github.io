@@ -1,67 +1,187 @@
 ---
-title: Cohort Retention Analysis in Python
+title: "Когортный анализ удержания"
 date: 2025-04-10
-category: guide
+category: doka
 tags:
   - retention
   - cohort-analysis
   - python
   - pandas
-excerpt: A practical guide to building a cohort retention matrix in Pandas and interpreting what it actually tells you about the product.
+  - doka
+excerpt: "Когортная матрица удержания в Pandas: почему агрегат врёт, как строить треугольную таблицу и что она реально говорит о продукте."
+related:
+  - /projects/cohort/
+  - /posts/rfm-segmentation-practical/
+  - /posts/bayesian-ab-testing/
+  - /posts/telegram-reporting-bot/
+keywords:
+  - когортный анализ Python
+  - cohort retention matrix pandas
+  - удержание пользователей когортами
 draft: false
 ---
 
-# Cohort Retention Analysis in Python
+## Кратко
 
-Cohort analysis is one of the most useful tools for understanding whether your product keeps users over time. It groups users by when they started and tracks how many of them come back each subsequent period.
+Когортный анализ группирует пользователей по моменту старта и отслеживает, какая доля возвращается в каждый следующий период. Это отвечает на вопрос «удерживает ли продукт пользователей со временем» — но честнее, чем единое число retention.
 
-## Why Cohorts Beat Aggregate Retention
+Когорта — группа людей, у которых первое действие пришлось на один период (обычно месяц). Матрица удержания: строки — когорты, столбцы — месяцы с момента старта, ячейка — доля вернувшихся. Получается треугольная таблица: у свежих когорт заполнены только первые столбцы.
 
-Aggregate retention can hide problems. If you see 30% monthly retention, it could mean:
+## Пример
 
-- All cohorts retain at 30%, or
-- New cohorts retain at 50% while old cohorts dropped to 10%
-
-The second case is much more actionable, but aggregate numbers will not show it.
-
-## Building the Matrix in Pandas
+Построение матрицы в Pandas. На входе таблица событий `events` с `user_id` и `event_date`:
 
 ```python
 import pandas as pd
 
-# events has user_id, event_date, event_type
-df = pd.read_csv('events.csv', parse_dates=['event_date'])
+df = pd.read_csv(
+  'events.csv', parse_dates=['event_date']
+)
 
-# first activity per user
-cohort = df.groupby('user_id')['event_date'].min().reset_index()
+# Месяц первого действия = когорта
+cohort = (
+  df.groupby('user_id')['event_date'].min()
+  .reset_index()
+)
 cohort.columns = ['user_id', 'cohort_month']
-cohort['cohort_month'] = cohort['cohort_month'].dt.to_period('M')
+cohort['cohort_month'] = (
+  cohort['cohort_month'].dt.to_period('M')
+)
 
-# merge back
+# Смерим когорту обратно к событиям
 events = df.merge(cohort, on='user_id')
-events['activity_month'] = events['event_date'].dt.to_period('M')
-events['period'] = (events['activity_month'] - events['cohort_month']).apply(attrgetter('n'))
+events['activity_month'] = (
+  events['event_date'].dt.to_period('M')
+)
+# Номер месяца с момента старта
+events['period'] = (
+  (events['activity_month']
+   - events['cohort_month'])
+  .apply(lambda p: p.n)
+)
 
-# matrix
-cohort_counts = events.groupby(['cohort_month', 'period'])['user_id'].nunique().reset_index()
-cohort_size = cohort.groupby('cohort_month')['user_id'].nunique()
-retention = cohort_counts.pivot(index='cohort_month', columns='period', values='user_id')
-retention = retention.divide(cohort_size, axis=0)
+# Матрица: уникальные пользователи по когортам
+counts = (
+  events
+  .groupby(['cohort_month', 'period'])
+  ['user_id'].nunique().reset_index()
+)
+size = cohort.groupby('cohort_month')['user_id'].nunique()
+retention = counts.pivot(
+  index='cohort_month',
+  columns='period',
+  values='user_id',
+)
+# Делим на размер когорты → доли
+retention = retention.divide(size, axis=0)
 ```
 
-## Reading the Result
+На выходе `retention` — DataFrame, где `retention.loc['2025-01', 3]` — доля январской когорты, вернувшейся через 3 месяца.
 
-- **Row** = users who started in a given month.
-- **Column 0** = 100% by definition.
-- **Column 1** = share of the cohort that returned one month later.
-- Diagonal drops usually point to seasonality or product changes.
+<iframe src="/Personal_Projects.github.io/demos/cohort/index.html" title="Треугольная матрица удержания: когорты по строкам, месяцы с момента старта по столбцам, наведите на ячейку" height="520" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
-## Common Mistakes
+## Как пишется
 
-1. **Wrong cohort definition.** First visit is safer than first purchase unless you analyze monetization specifically.
-2. **Ignoring the acquisition channel.** Cohorts from paid ads often behave differently from organic ones.
-3. **Looking at retention without a target.** A number alone does not tell you if it is good.
+### Определение когорты
 
-## Next Steps
+Когорта задаётся точкой первого действия. Что считать «первым» — решает задача:
 
-Once the matrix works, add slices: channel, device, country, onboarding version. That turns a dashboard into a diagnosis tool.
+- **Первый визит** — для продукта, где активность = присутствие.
+- **Первая покупка** — для монетизации и LTV.
+- **Регистрация** — для онбординг-метрик.
+
+Первый визит безопаснее по умолчанию: он ловит всех, кто попал в продукт. Первая покупка отсекает тех, кто зарегистрировался, но не купил — они отдельная история.
+
+### Период
+
+Период — шаг столбцов. Месяц — стандарт для B2C, неделя — для ранних стартапов с быстрым циклом, день — для мобильных игр. Период выбирают так, чтобы внутри него большинство пользователей совершили возврат хотя бы раз.
+
+### Смещение периода
+
+`period` — разница между месяцем активности и месяцем когорты. `period = 0` — месяц старта, `period = 1` — следующий месяц. Это не «календарный месяц номер 2», а «месяц N с момента старта конкретной когорты».
+
+## Как понять
+
+### Почему матрица треугольная
+
+Когорта «январь 2025» к марту имеет `period` 0, 1, 2. Когорта «март 2025» к тому же моменту имеет только `period` 0. Поэтому правый верхний угол пустой — будущие периоды ещё не наступили. Это не пропуски в данных, а структура.
+
+### Правый край ненадёжен
+
+У поздних столбцов меньше когорт, поэтому среднее по столбцу прыгает. Если в `period = 6` попала только одна когорта, её 35% — это не «удержание на шестом месяце», а «удержание одной когорты». Не делайте выводов о долгосрочном удержании по правому краю, пока не наберётся 5–10 когорт.
+
+### Столбец 0 = 100% по определению
+
+В нулевом месяце клиент присутствует всегда — он же только что стартовал. Поэтому `period = 0` всегда 100% (или близко). Этот столбец не несёт сигнала об удержании, он — база. Его оставляют для самопроверки: если `period = 0` не 100%, в коде ошибка.
+
+### Диагонали и сезонность
+
+Если у всех когорт провал на `period = 3`, это цикл продукта. Если провал в конкретном календарном месяце у всех когорт одновременно — сезонность или общая проблема (сбой, релиз). Диагональ «по календарному месяцу» ловит сезонность; «по периоду» — ловит продуктовый цикл.
+
+### Агрегатное удержание врёт
+
+Единый «30% monthly retention» может означать:
+
+- Все когорты удерживают по 30%.
+- Новые удерживают 50%, старые скатились до 10%.
+
+Второй случай — продуктовая проблема, но агрегат его прячет. Когортная матрица разделяет эти сценария: на строках видно, кто держится, кто падает.
+
+## Подсказки
+
+- Когорту определяйте под вопрос: визит / покупка / регистрация.
+- `period = 0` всегда 100% — если нет, ищите баг в коде.
+- Правый край матрицы нечитаем при малом числе когорт — не делайте выводов.
+- Срезайте по каналу, платформе, плану: когорты из платной рекламы ведут себя иначе, чем органика.
+- Удержание без цели — просто число. Сравнивайте с бенчмарком продукта или прошлыми когортами.
+- Обновляйте матрицу ежемесячно; сдвиг шага пересчитывает все когорты.
+- Не путайте retention с churn: retention = доля вернувшихся, churn = доля ушедших.
+
+## На практике
+
+В проекте [volta-banking](https://github.com/NikitaBoyarkin) — аналитика необанка — когортная матрица нашла step-change, который агрегат прятал. В сентябре 2024 поменяли прогресс-бар в KYC-флоу (проект 2: A/B-тест дал +4,82 пп, p<0,0001). Когорты до и после фикса разошлись:
+
+- Пост-фикс когорты (сен–дек 2024) показывают M1 retention на +10–12 пп выше, чем пре-фикс.
+- Все когорты выходят на плато к M5–M6 — естественный сегмент лояльных.
+- Пост-фикс плато стабилизируется выше (~25–28%), то есть фикс поднял не только активацию, но и долгосрочное удержание.
+
+Что дала матрица, чего не дал бы агрегат:
+
+- Видно, где именно улучшилось (M1, не M0) — значит, фикс повлиял на возврат, а не на старт.
+- Видно плато — значит, после M5 качать удержание дороже, чем активацию.
+- Срезы по каналу и плану показали 3× разрыв LTV между Premium и Free — отдельная гипотеза для монетизации.
+
+Рецепт старта:
+
+1. Возьмите сырые события, определите когорту по первому визиту.
+2. Считайте `period` через разность Period-объектов.
+3. Пивот в матрицу, делите на размер когорты.
+4. Сначала читайте столбец M1 — он самый чувствительный к качеству онбординга.
+5. Добавьте срезы: канал, план, платформа. Один срез = одна гипотеза.
+6. Сравнивайте когорты до/после изменения продукта — step-change виден на строках.
+
+## На собеседовании
+
+<details>
+<summary>❓ Чем retention отличается от churn?</summary>
+
+Retention — доля пользователей, вернувшихся в период N. Churn — доля ушедших. В простом случае `retention + churn = 1`, но определения расходятся: retention считают от исходной когорты, churn часто считают от активной базы на начало периода. Поэтому «retention 30%» и «churn 70%» могут описывать разное. Уточняйте определение на месте.
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Когорту определять по первому визиту или по первой покупке?</summary>
+
+Зависит от вопроса. Первая покупка — для монетизации, LTV, RFM. Первый визит — для удержания как присутствия, онбординга, активации. Частая ошибка — считать retention по покупкам там, где продукт freemium и 80% никогда не платят: матрица покажет «все отваливаются», хотя пользователи просто не покупают, а заходят. Подбирайте определение под метрику вопроса.
+
+— Nikita Boyarkin
+</details>
+
+<details>
+<summary>❓ Почему правый край когортной матрицы ненадёжен и как с этим жить?</summary>
+
+У поздних столбцов меньше когорт — к марту cohort «январь» дошла до M2, а «март» только до M0. Среднее по столбцу M6 при одной когорте — это не «удержание на шестом месяце», а удержание одной когорты. Жить так: не делайте выводов о долгосрочном удержании, пока не наберётся 5–10 когорт в столбце; для прогноза LTV используйте только заполненные столбцы и модель распадения, а не среднее по правому краю.
+
+— Nikita Boyarkin
+</details>
