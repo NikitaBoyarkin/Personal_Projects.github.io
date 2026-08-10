@@ -15,6 +15,8 @@ tools:
   - Matplotlib / Seaborn
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
+related:
+  - /posts/bayesian-ab-testing/
 ---
 
 # Volta Neobank — Product Analytics

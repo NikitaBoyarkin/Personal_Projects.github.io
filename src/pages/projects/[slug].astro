@@ -6,14 +6,43 @@ import { withBase } from '../../lib/path';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects', (p) => !p.data.draft);
+  const allPosts = await getCollection('posts', (p) => !p.data.draft);
   return projects.map((project) => ({
     params: { slug: project.id.replace(/\.md$/, '') },
-    props: { project },
+    props: { project, allPosts, allProjects: projects },
   }));
 }
 
-const { project } = Astro.props;
+const { project, allPosts, allProjects } = Astro.props;
 const { Content } = await render(project);
+const slug = project.id.replace(/\.md$/, '');
+
+// Резолвим related-пути вида /posts/<slug>/ и /projects/<slug>/ в { href, title }
+const lookup = new Map<string, { kind: string; title: string }>();
+[...allPosts, ...allProjects].forEach((x) => {
+  const s = x.id.replace(/\.md$/, '');
+  const kind = x.collection === 'projects' ? 'projects' : 'posts';
+  lookup.set(s, { kind, title: x.data.title });
+});
+
+const related = (project.data.related ?? [])
+  .map((p) => {
+    const s = p.replace(/^\//, '').replace(/\/$/, '').replace(/^(posts|projects)\//, '');
+    const found = lookup.get(s);
+    return found ? { href: withBase(`${found.kind}/${s}/`), title: found.title } : null;
+  })
+  .filter((x): x is { href: string; title: string } => x !== null);
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const projectJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: project.data.title,
+  description: project.data.description,
+  author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
+  url: `${siteUrl}${withBase(`projects/${slug}/`)}`,
+  keywords: project.data.tools?.join(', '),
+};
 ---
 
 <Base
@@ -21,8 +50,9 @@ const { Content } = await render(project);
   description={project.data.description}
   ogType="article"
   activeNav="home"
-  canonical={withBase(`projects/${project.id.replace(/\.md$/, '')}/`)}
+  canonical={withBase(`projects/${slug}/`)}
   lang="ru"
+  jsonLd={projectJsonLd}
 >
   <InnerTOC />
 
@@ -89,5 +119,18 @@ const { Content } = await render(project);
     <article id="project-content">
       <Content />
     </article>
+
+    {
+      related.length > 0 && (
+        <section class="post-related reveal reveal-delay-2" aria-label="Связанные материалы">
+          <h2>Смотрите также</h2>
+          <ul>
+            {related.map((r) => (
+              <li><a href={r.href}>{r.title}</a></li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
   </div>
 </Base>
