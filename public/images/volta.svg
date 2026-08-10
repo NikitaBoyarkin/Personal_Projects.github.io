@@ -1,0 +1,57 @@
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Volta Neobank analytics: funnel, A/B test, retention, segmentation">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f0f11"/>
+      <stop offset="1" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#bg)"/>
+
+  <!-- faint grid -->
+  <g stroke="#27272a" stroke-width="1">
+    <line x1="0" y1="150" x2="1200" y2="150"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="450" x2="1200" y2="450"/>
+    <line x1="300" y1="0" x2="300" y2="600"/>
+    <line x1="600" y1="0" x2="600" y2="600"/>
+    <line x1="900" y1="0" x2="900" y2="600"/>
+  </g>
+
+  <!-- Funnel: 4 descending trapezoids (left half) -->
+  <g>
+    <polygon points="60,90 540,90 500,180 100,180" fill="url(#accent)" opacity="0.95"/>
+    <polygon points="100,195 500,195 460,285 140,285" fill="url(#accent)" opacity="0.75"/>
+    <polygon points="140,300 460,300 420,390 180,390" fill="url(#accent)" opacity="0.55"/>
+    <polygon points="180,405 420,405 380,495 220,495" fill="url(#accent)" opacity="0.38"/>
+  </g>
+
+  <!-- A/B split bars (center) -->
+  <g>
+    <rect x="640" y="120" width="70" height="240" fill="#3f3f46"/>
+    <rect x="730" y="80" width="70" height="280" fill="url(#accent)"/>
+    <line x1="675" y1="360" x2="675" y2="380" stroke="#a1a1aa" stroke-width="2"/>
+    <line x1="765" y1="360" x2="765" y2="380" stroke="#a1a1aa" stroke-width="2"/>
+    <text x="675" y="400" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#a1a1aa" text-anchor="middle">A</text>
+    <text x="765" y="400" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#60a5fa" text-anchor="middle">B</text>
+  </g>
+
+  <!-- Retention curve (right) -->
+  <polyline points="850,470 910,360 970,300 1030,270 1090,255 1150,248"
+    fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="850,470 910,420 970,390 1030,372 1090,362 1150,358"
+    fill="none" stroke="#3f3f46" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round"/>
+
+  <!-- Segmentation cluster (bottom-right) -->
+  <g>
+    <circle cx="880" cy="540" r="14" fill="#2563eb"/>
+    <circle cx="920" cy="525" r="11" fill="#60a5fa"/>
+    <circle cx="955" cy="545" r="9" fill="#93c5fd"/>
+    <circle cx="990" cy="530" r="8" fill="#3f3f46"/>
+    <circle cx="1025" cy="548" r="7" fill="#60a5fa" opacity="0.6"/>
+  </g>
+</svg>

@@ -1,53 +1,72 @@
 ---
 title: Cohort Analysis Dashboard
-description: An interactive cohort analysis dashboard that reveals user behavior and optimizes retention strategies. Tracks retention metrics by cohort and surfaces churn patterns.
+description: Cohort retention and LTV analysis on synthetic data — retention curves, churn patterns, and revenue/LTV by acquisition cohort. Python pipeline (pandas + matplotlib/seaborn) plus a Tableau-ready export with CSV and Hyper extract.
 hero: images/bi.png
 impact:
-  - Identified cohort churn patterns
-  - Optimized retention strategies
-  - Sped up user behavior analysis
+  - Cohort retention matrix with triangular decay
+  - ARPU / LTV by cohort with proper observation-age caveat
+  - Tableau-ready export (CSV + .hyper extract)
+  - Reproducible seeded pipeline (seed=42)
 tools:
   - Python
-  - SQL
-  - Tableau
-github: https://github.com/NikitaBoyarkin/cohort-analysis
+  - pandas
+  - matplotlib / seaborn
+  - Jupyter Notebook
+  - Tableau (Hyper API)
+github: https://github.com/NikitaBoyarkin/tableau_cohort_analysis
 ---
 
 # Cohort Analysis Dashboard
 
 ## Business Context
 
-Продукт активно привлекал новых пользователей, но retention плохо отслеживался по отдельным когортам. Команда видела общий показатель удержания, но не понимала, у каких групп проблемы и на каком этапе жизненного цикла они возникают. Задача — построить инструмент для регулярного когортного анализа.
+Когортный анализ удержания и LTV на синтетических данных: удержание пользователей, кривые оттока и выручка/LTV по когортам прихода. Пайплайн на Python (pandas + matplotlib/seaborn) плюс выгрузка, готовая к загрузке в Tableau. Данные синтетические, детерминированные (seed=42), воспроизводятся из кода.
 
 ## Hypothesis
 
-Если разбить пользователей на когорты по дате первой активации и построить retention-матрицу, станет видно, какие когорты удерживаются лучше, на какой неделе происходит основной отток и какие изменения продукта коррелируют с улучшением удержания.
+Если разбить пользователей на когорты по месяцу первой активации и построить retention-матрицу + кривые удержания + ARPU/LTV, станет видно скорость оттока по когортам и где монетизация падает быстрее удержания.
 
 ## Data & Method
 
-**Данные:** события активации, сессий и ключевых действий пользователей за несколько месяцев.
+**Модель данных** — одна строка = «пользователь × месяц наблюдения»:
 
-**Шаги построения дашборда:**
-1. **Формирование когорт** — пользователи группируются по неделе/месяцу первого входа.
-2. **Расчёт retention** — доля пользователей когорты, вернувшихся на N-ную неделю.
-3. **Когортная матрица** — строки = когорты, столбцы = недели, ячейки = retention.
-4. **Кривые retention** — визуальное сравнение когорт во времени.
-5. **Сегментация** — разрез по каналам привлечения, платформам и типам пользователей.
+| Поле | Тип | Описание |
+|---|---|---|
+| `user_id` | int | идентификатор пользователя |
+| `cohort_month` | date | месяц прихода (выводится из `join_date`, не отдельное поле) |
+| `join_date` | date | дата регистрации (первое число месяца) |
+| `period` | int | месяцев с прихода (0 = месяц регистрации) |
+| `is_active` | int 0/1 | активен ли в этом месяце |
+| `revenue` | int | выручка за месяц (0, если не активен) |
 
-**Инструменты:** Python и SQL для подготовки данных, Tableau для интерактивного дашборда.
+`cohort_month` выводится из `join_date`, как в реальном продакшене. Младшие когорты наблюдались меньше месяцев — матрица удержания треугольная.
+
+**Методология:**
+
+- **Period 0 = 100% удержания** по определению (все активны в месяц прихода). Кривая убывает с периода 1: `retention(p) = 0.85 · 0.75^(p-1)`.
+- **Выручка:** активный месяц → `Poisson(λ=10)`; неактивный → 0.
+- **Размеры когорт** — число уникальных `user_id` в `period == 0`.
+- **ARPU** — средняя выручка на пользователя когорты; **LTV** — кумулятивный ARPU по периодам.
+
+**Функции:** `cohort_sizes()` (приток по месяцам), `retention_matrix()` (матрица + кривые), `revenue_by_cohort()` (ARPU/LTV).
+
+**Tableau-выгрузка** (`tableau_export.py`) создаёт в `tableau/`:
+- `cohort_export.csv` — плоский shape для Tableau (доб. `cohort_label` и `period_date` — календарный месяц наблюдения);
+- `cohort_extract.hyper` — Tableau Hyper-экстракт через официальный Hyper API.
+
+**Heatmap в Tableau:** Columns = `period`, Rows = `cohort_label`, Marks = Square, Color = AVG(`is_active`), Text = `% of Total` по строке.
 
 ## Insight
 
-Анализ показал, что основной отток происходит в первые две недели после активации, а неравномерно по когортам: некоторые каналы привлекали пользователей с заметно более низкой второй неделей retention. Это сдвинуло фокус команды с привлечения новых пользователей к проработке onboarding и качества трафика.
-
-Ключевой инсайт: когортный взгляд важнее среднего retention — он показывает, когда именно пользователи уходят и где вмешательство даст максимальный эффект.
+Когортный вид важнее среднего retention: видна не только скорость оттока, но и монетизация в сравнении с удержанием. LTV младших когорт занижен из-за короткой истории — сравнивать LTV корректно только при равном «возрасте» когорты. Ключевое улучшение: `cohort_month` выводится из `join_date` (а не отдельным случайным полем), period 0 = 100% по конвенции, NaN замаскированы в heatmap вместо рендера `nan%`.
 
 ## Impact
 
-- **Выявлены паттерны оттока по когортам** — стало видно, на какой неделе теряются пользователи.
-- **Оптимизированы стратегии удержания** — ресурсы переключены на onboarding и слабые каналы.
-- **Ускорен анализ поведения пользователей** — вместо ad-hoc запросов команда использует регулярный дашборд.
+- **Когортная матрица удержания** с треугольным убыванием — видно, на каком месяце когорта теряет активность.
+- **ARPU / LTV по когортам** с корректным caveat по возрасту наблюдения.
+- **Tableau-ready экспорт** — CSV + `.hyper`-экстракт, инструкция по сборке view.
+- **Воспроизводимый пайплайн** — `uv` + `pyproject.toml` + `.python-version`, seed=42.
 
 ## Documentation
 
-- [GitHub → cohort-analysis](https://github.com/NikitaBoyarkin/cohort-analysis)
+- [GitHub → tableau_cohort_analysis](https://github.com/NikitaBoyarkin/tableau_cohort_analysis)
