@@ -2,6 +2,7 @@
 title: "Чек-лист портфолио дата-аналитика"
 date: 2025-05-22
 category: note
+image: /images/og/data-analyst-portfolio-checklist.png
 tags:
   - portfolio
   - career

@@ -1,0 +1,64 @@
+---
+const tools = [
+  { key: 'all', label: 'All' },
+  { key: 'python', label: 'Python' },
+  { key: 'sql', label: 'SQL' },
+  { key: 'tableau', label: 'Tableau' },
+  { key: 'jupyter', label: 'Jupyter' },
+  { key: 'typescript', label: 'TypeScript' },
+];
+---
+
+<div class="filter-row project-filter reveal reveal-delay-1">
+  {
+    tools.map((t) => (
+      <button
+        class={`filter-tag ${t.key === 'all' ? 'active' : ''}`}
+        data-filter={t.key}
+        aria-pressed={t.key === 'all' ? 'true' : 'false'}
+        type="button"
+      >
+        {t.label}
+      </button>
+    ))
+  }
+</div>
+
+<script>
+  const filterTags = document.querySelectorAll('.project-filter .filter-tag');
+  const cards = document.querySelectorAll('#project-list .project');
+
+  function applyFilter(filter: string) {
+    filterTags.forEach((t) => {
+      const isActive = (t as HTMLElement).dataset.filter === filter;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-pressed', String(isActive));
+    });
+    cards.forEach((card) => {
+      const el = card as HTMLElement;
+      const techs = (el.dataset.tools || '').toLowerCase();
+      el.style.display = filter === 'all' || techs.includes(filter) ? '' : 'none';
+    });
+  }
+
+  filterTags.forEach((tag) => {
+    const btn = tag as HTMLElement;
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter || 'all';
+      applyFilter(filter);
+      const hash = filter === 'all' ? '' : `#tool-${filter}`;
+      if (location.hash !== hash) {
+        history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+      }
+    });
+  });
+
+  // Restore filter from URL hash on load (#tool-<key>).
+  const initial = location.hash.replace(/^#tool-/, '');
+  if (initial) {
+    const match = Array.from(filterTags).find(
+      (t) => (t as HTMLElement).dataset.filter === initial,
+    );
+    if (match) applyFilter(initial);
+  }
+</script>

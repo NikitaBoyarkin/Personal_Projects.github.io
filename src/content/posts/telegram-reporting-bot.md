@@ -2,7 +2,7 @@
 title: "Автоматизация недельных отчётов через Telegram-бота"
 date: 2025-05-08
 category: decision-log
-image: /images/auto.png
+image: /images/og/telegram-reporting-bot.png
 tags:
   - automation
   - telegram

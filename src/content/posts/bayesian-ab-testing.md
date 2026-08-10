@@ -2,7 +2,7 @@
 title: "Почему мы перешли на байесовское A/B-тестирование"
 date: 2025-03-15
 category: decision-log
-image: "/images/ab.png"
+image: /images/og/bayesian-ab-testing.png
 tags:
   - ab-testing
   - bayesian

@@ -2,7 +2,7 @@
 title: "Когортный анализ удержания"
 date: 2025-04-10
 category: guide
-image: /images/bi.png
+image: /images/og/cohort-retention-guide.png
 tags:
   - retention
   - cohort-analysis

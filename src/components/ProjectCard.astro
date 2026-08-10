@@ -15,7 +15,7 @@ const { slug, title, description, image, impact, tools, github } = Astro.props;
 const impactText = impact?.join(', ');
 ---
 
-<article class="project reveal">
+<article class="project reveal" data-tools={(tools ?? []).join(',').toLowerCase()}>
   {image && <img src={withBase(image)} alt={title} loading="lazy" width="600" height="200" />}
   <h3>{title}</h3>
   <p>{description}</p>
