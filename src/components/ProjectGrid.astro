@@ -2,7 +2,11 @@
 import { getCollection } from 'astro:content';
 import ProjectCard from './ProjectCard.astro';
 
-const projects = await getCollection('projects', (p) => !p.data.draft);
+const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
+const projects = (await getCollection('projects', (p) => !p.data.draft)).sort(
+  (a, b) =>
+    ORDER.indexOf(a.id.replace(/\.md$/, '')) - ORDER.indexOf(b.id.replace(/\.md$/, '')),
+);
 ---
 
 <section id="projects" class="reveal reveal-delay-2">

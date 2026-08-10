@@ -1,0 +1,44 @@
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RFM segmentation: Recency, Frequency, Monetary value bars by segment">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f0f11"/>
+      <stop offset="1" stop-color="#18181b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#bg)"/>
+
+  <g stroke="#27272a" stroke-width="1">
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="120" y1="60" x2="120" y2="500"/>
+  </g>
+
+  <!-- RFM segment bars: Champions / Loyal / Potential / At-Risk / Hibernating -->
+  <g>
+    <rect x="180" y="120" width="120" height="380" fill="url(#accent)"/>
+    <rect x="360" y="200" width="120" height="300" fill="url(#accent)" opacity="0.82"/>
+    <rect x="540" y="250" width="120" height="250" fill="url(#accent)" opacity="0.66"/>
+    <rect x="720" y="320" width="120" height="180" fill="url(#accent)" opacity="0.5"/>
+    <rect x="900" y="380" width="120" height="120" fill="#3f3f46"/>
+  </g>
+
+  <!-- 3D R/F/M axis ticks -->
+  <g font-family="SF Mono, Monaco, monospace" font-size="14" fill="#a1a1aa">
+    <text x="100" y="130" text-anchor="end">R</text>
+    <text x="100" y="260" text-anchor="end">F</text>
+    <text x="100" y="390" text-anchor="end">M</text>
+  </g>
+
+  <!-- segment dots -->
+  <g>
+    <circle cx="240" cy="95" r="6" fill="#93c5fd"/>
+    <circle cx="420" cy="175" r="5" fill="#60a5fa"/>
+    <circle cx="600" cy="225" r="5" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="780" cy="295" r="4" fill="#a1a1aa"/>
+    <circle cx="960" cy="355" r="4" fill="#3f3f46"/>
+  </g>
+</svg>

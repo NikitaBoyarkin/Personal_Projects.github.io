@@ -69,6 +69,8 @@ def check_required_pages() -> int:
         DIST / "projects" / "cohort" / "index.html",
         DIST / "projects" / "volta" / "index.html",
         DIST / "projects" / "sql" / "index.html",
+        DIST / "projects" / "garden" / "index.html",
+        DIST / "projects" / "site" / "index.html",
         DIST / "posts" / "bayesian-ab-testing" / "index.html",
         DIST / "posts" / "cohort-retention-guide" / "index.html",
         DIST / "posts" / "rfm-segmentation-practical" / "index.html",

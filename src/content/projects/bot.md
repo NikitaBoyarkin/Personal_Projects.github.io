@@ -1,14 +1,17 @@
 ---
 title: Reporting Automation Telegram Bot
 description: A Telegram bot that automates weekly reporting and integrates with external APIs. Cuts time on routine tasks, ensures timely delivery of key metrics, and improves team communication.
-hero: images/auto.png
+hero: images/bot.svg
 impact:
-  - Cut report preparation time
-  - Ensured timely metric delivery
-  - Improved team communication
+  - Cut weekly report prep from 1–2h to automated cron
+  - KPI table + sparklines delivered on schedule
+  - Fallback notifications on source failures
+  - Single consolidated pipeline replacing fragmented sources
 tools:
   - Python
+  - aiogram / telegram-bot
   - SQL
+  - cron scheduler
   - Tableau
 github: https://github.com/NikitaBoyarkin/telegram_bot_public
 ---
@@ -29,24 +32,25 @@ github: https://github.com/NikitaBoyarkin/telegram_bot_public
 
 **Архитектура бота:**
 1. **Планировщик** — запуск по cron в заданное время.
-2. **Сбор данных** — SQL-запросы к витрине данных, агрегация ключевых KPI.
-3. **Формирование отчёта** — шаблон с таблицами, sparklines и сравнением с прошлой неделей.
+2. **Сбор данных** — SQL-запросы к витрине данных, агрегация ключевых KPI (DAU, ARPU, конверсия, retention).
+3. **Формирование отчёта** — шаблон с KPI-таблицей, sparklines и сравнением с прошлой неделей (дельта в % и pp).
 4. **Отправка** — Telegram Bot API в указанный чат или по команде `/report`.
-5. **Надёжность** — обработка ошибок, логирование, fallback-уведомления при сбоях источников.
+5. **Надёжность** — обработка ошибок, логирование, fallback-уведомления при сбоях источников (важно: silent-fall бота разрушает доверие к метрикам быстрее, чем растёт экономия времени).
 
-**Инструменты:** Python (aiogram/telegram-bot), SQL, Tableau для визуализации.
+**Инструменты:** Python (aiogram/telegram-bot), SQL, cron, Tableau для визуализации.
 
 ## Insight
 
 Ручная сборка отчёта оказалась не столько сложной, сколько фрагментированной: метрики приходилось дёргать из разных мест. После консолидации в одном пайплайне большая часть работы перешла на машину, а аналитик стал отвечать только за интерпретацию, а не за копирование цифр.
 
-Ключевой инсайт: стабильность доставки важнее красоты отчёта. Если бот падает silently, доверие к метрикам падает быстрее, чем растёт от экономии времени.
+Ключевой инсайт: стабильность доставки важнее красоты отчёта. Если бот падает silently, доверие к метрикам падает быстрее, чем растёт от экономии времени — поэтому fallback-уведомления при сбое источника встроены в архитектуру, а не добавлены «потом».
 
 ## Impact
 
-- **Сокращено время на подготовку отчётов** — ручная сборка заменена автоматической.
+- **Сокращено время на подготовку отчётов** — ручная сборка 1–2ч заменена автоматическим cron.
 - **Обеспечена своевременная доставка метрик** — отчёты приходят по расписанию независимо от загрузки аналитика.
-- **Улучшена командная коммуникация** — все видят одни и те же цифры в одном формате и в одном месте.
+- **Улучшена командная коммуникация** — все видят одни и те же цифры (KPI + sparklines + дельта) в одном формате и месте.
+- **Защита от silent-fail** — fallback-уведомления при сбоях источников сохраняют доверие к метрикам.
 
 ## Documentation
 
