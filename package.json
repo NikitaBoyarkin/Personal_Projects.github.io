@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
-    "og": "node scripts/generate-og.mjs"
+    "og": "node scripts/generate-og.mjs",
+    "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import '../styles/blog.css';
 import { withBase } from '../lib/path';
+import Analytics from '../components/Analytics.astro';
 
 interface Props {
   title: string;
@@ -87,6 +88,8 @@ const faviconUrl = withBase('favicon.svg');
         if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f0f11' : '#fafafa');
       })();
     </script>
+
+    <Analytics />
   </head>
 
   <body>
