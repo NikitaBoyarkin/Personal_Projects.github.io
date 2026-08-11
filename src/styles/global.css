@@ -47,13 +47,13 @@
 }
 
 [data-theme="light"] {
-  --background-primary: #fafafa;
+  --background-primary: #f4efca;
   --background-secondary: #ffffff;
   --background-tertiary: #f4f4f5;
   --text-normal: #18181b;
-  --text-muted: #71717a;
-  --text-accent: #c63d1f;
-  --text-accent-hover: #a8331a;
+  --text-muted: #52525b;
+  --text-accent: #a8331a;
+  --text-accent-hover: #8a2a16;
   --button-bg: #ff6643;
   --button-bg-hover: #e0532f;
   --interactive-normal: #f4f4f5;
