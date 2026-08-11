@@ -9,9 +9,10 @@ interface Props {
   impact?: string[];
   tools?: string[];
   github?: string;
+  linkPrefix?: string;
 }
 
-const { slug, title, description, image, impact, tools, github } = Astro.props;
+const { slug, title, description, image, impact, tools, github, linkPrefix = '' } = Astro.props;
 const impactText = impact?.join(', ');
 ---
 
@@ -33,7 +34,7 @@ const impactText = impact?.join(', ');
   {impactText && <p class="Impact">Impact: {impactText}</p>}
 
   <div class="project-actions">
-    <a class="button" href={withBase(`projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;">View Project</a>
+    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;">View Project</a>
     {
       github && (
         <a

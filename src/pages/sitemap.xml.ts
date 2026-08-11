@@ -18,9 +18,12 @@ export const GET: APIRoute = async ({ site }) => {
 
   const siteUrl = site.toString().replace(/\/$/, "");
 
-  const pages = ["", "writing/", "contact/"];
+  const pages = ["", "writing/", "contact/", "about/", "en/", "en/about/"];
 
   const projects = await getCollection("projects", (p) => !p.data.draft);
+  const projectsEn = await getCollection("projects-en", (p) => !p.data.draft);
+  const voltaParts = await getCollection("volta-parts", (p) => !p.data.draft);
+  const voltaPartsEn = await getCollection("volta-parts-en", (p) => !p.data.draft);
   const posts = await getCollection("posts", (p) => !p.data.draft);
 
   const routes = [
@@ -30,6 +33,18 @@ export const GET: APIRoute = async ({ site }) => {
     })),
     ...projects.map((p) => ({
       url: `${siteUrl}${withBase(`projects/${p.id.replace(/\.md$/, "")}/`)}`,
+      lastmod: undefined,
+    })),
+    ...projectsEn.map((p) => ({
+      url: `${siteUrl}${withBase(`en/projects/${p.id.replace(/\.md$/, "")}/`)}`,
+      lastmod: undefined,
+    })),
+    ...voltaParts.map((p) => ({
+      url: `${siteUrl}${withBase(`projects/volta/${p.data.part}/`)}`,
+      lastmod: undefined,
+    })),
+    ...voltaPartsEn.map((p) => ({
+      url: `${siteUrl}${withBase(`en/projects/volta/${p.data.part}/`)}`,
       lastmod: undefined,
     })),
     ...posts.map((p) => ({

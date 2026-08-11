@@ -1,10 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Base from '../../../layouts/Base.astro';
-import { withBase } from '../../../lib/path';
+import Base from '../../../../layouts/Base.astro';
+import { withBase } from '../../../../lib/path';
 
 export async function getStaticPaths() {
-  const parts = await getCollection('volta-parts', (p) => !p.data.draft);
+  const parts = await getCollection('volta-parts-en', (p) => !p.data.draft);
   return parts.map((part) => ({
     params: { part: part.data.part },
     props: { part, allParts: parts },
@@ -28,10 +28,10 @@ const partJsonLd = {
   isPartOf: {
     '@type': 'CreativeWork',
     name: 'Volta Neobank — Product Analytics',
-    url: `${siteUrl}${withBase('projects/volta/')}`,
+    url: `${siteUrl}${withBase('en/projects/volta/')}`,
   },
   author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
-  url: `${siteUrl}${withBase(`projects/volta/${slug}/`)}`,
+  url: `${siteUrl}${withBase(`en/projects/volta/${slug}/`)}`,
   keywords: part.data.tools?.join(', '),
 };
 ---
@@ -41,13 +41,13 @@ const partJsonLd = {
   description={part.data.description}
   ogType="article"
   activeNav="home"
-  canonical={withBase(`projects/volta/${slug}/`)}
-  lang="ru"
-  counterpartHref={withBase(`en/projects/volta/${slug}/`)}
+  canonical={withBase(`en/projects/volta/${slug}/`)}
+  lang="en"
+  counterpartHref={withBase(`projects/volta/${slug}/`)}
   jsonLd={partJsonLd}
 >
   <div class="container reveal">
-    <a class="back" href={withBase('projects/volta/')}>← Volta Neobank</a>
+    <a class="back" href={withBase('en/projects/volta/')}>← Volta Neobank</a>
 
     <h1>{part.data.title}</h1>
 
@@ -100,12 +100,12 @@ const partJsonLd = {
     </article>
 
     {
-      <section class="post-related reveal reveal-delay-2" aria-label="Другие подпроекты Volta">
-        <h2>Другие подпроекты Volta</h2>
+      <section class="post-related reveal reveal-delay-2" aria-label="Other Volta subprojects">
+        <h2>Other Volta subprojects</h2>
         <ul>
-          <li><a href={withBase('projects/volta/')}>Обзор Volta</a></li>
+          <li><a href={withBase('en/projects/volta/')}>Volta overview</a></li>
           {siblings.map((s) => (
-            <li><a href={withBase(`projects/volta/${s.data.part}/`)}>{s.data.title}</a></li>
+            <li><a href={withBase(`en/projects/volta/${s.data.part}/`)}>{s.data.title}</a></li>
           ))}
         </ul>
       </section>

@@ -1,13 +1,13 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import InnerTOC from '../../components/InnerTOC.astro';
-import { withBase } from '../../lib/path';
+import Base from '../../../layouts/Base.astro';
+import InnerTOC from '../../../components/InnerTOC.astro';
+import { withBase } from '../../../lib/path';
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects', (p) => !p.data.draft);
+  const projects = await getCollection('projects-en', (p) => !p.data.draft);
   const allPosts = await getCollection('posts', (p) => !p.data.draft);
-  const allParts = await getCollection('volta-parts', (p) => !p.data.draft);
+  const allParts = await getCollection('volta-parts-en', (p) => !p.data.draft);
   return projects.map((project) => ({
     params: { slug: project.id.replace(/\.md$/, '') },
     props: { project, allPosts, allProjects: projects, allParts },
@@ -18,11 +18,12 @@ const { project, allPosts, allProjects, allParts } = Astro.props;
 const { Content } = await render(project);
 const slug = project.id.replace(/\.md$/, '');
 
-// Резолвим related-пути вида /posts/<slug>/ и /projects/<slug>/ в { href, title }
+// Resolve related paths like /posts/<slug>/ and /projects/<slug>/ into { href, title }.
+// Posts stay RU-only (root); project links are EN-prefixed.
 const lookup = new Map<string, { kind: string; title: string }>();
 [...allPosts, ...allProjects].forEach((x) => {
   const s = x.id.replace(/\.md$/, '');
-  const kind = x.collection === 'projects' ? 'projects' : 'posts';
+  const kind = x.collection === 'projects-en' ? 'projects' : 'posts';
   lookup.set(s, { kind, title: x.data.title });
 });
 
@@ -30,14 +31,19 @@ const related = (project.data.related ?? [])
   .map((p) => {
     const s = p.replace(/^\//, '').replace(/\/$/, '').replace(/^(posts|projects)\//, '');
     const found = lookup.get(s);
-    return found ? { href: withBase(`${found.kind}/${s}/`), title: found.title } : null;
+    if (!found) return null;
+    const href =
+      found.kind === 'projects'
+        ? withBase(`en/projects/${s}/`)
+        : withBase(`posts/${s}/`);
+    return { href, title: found.title };
   })
   .filter((x): x is { href: string; title: string } => x !== null);
 
 const children = (project.data.children ?? [])
   .map((c) => {
     const found = allParts.find((p) => p.data.part === c);
-    return found ? { href: withBase(`projects/${slug}/${c}/`), title: found.data.title } : null;
+    return found ? { href: withBase(`en/projects/${slug}/${c}/`), title: found.data.title } : null;
   })
   .filter((x): x is { href: string; title: string } => x !== null);
 
@@ -48,7 +54,7 @@ const projectJsonLd = {
   name: project.data.title,
   description: project.data.description,
   author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
-  url: `${siteUrl}${withBase(`projects/${slug}/`)}`,
+  url: `${siteUrl}${withBase(`en/projects/${slug}/`)}`,
   keywords: project.data.tools?.join(', '),
 };
 ---
@@ -58,15 +64,15 @@ const projectJsonLd = {
   description={project.data.description}
   ogType="article"
   activeNav="home"
-  canonical={withBase(`projects/${slug}/`)}
-  lang="ru"
-  counterpartHref={withBase(`en/projects/${slug}/`)}
+  canonical={withBase(`en/projects/${slug}/`)}
+  lang="en"
+  counterpartHref={withBase(`projects/${slug}/`)}
   jsonLd={projectJsonLd}
 >
   <InnerTOC />
 
   <div class="container reveal">
-    <a class="back" href={withBase('/')}>← Back to portfolio</a>
+    <a class="back" href={withBase('en/')}>← Back to portfolio</a>
 
     {
       project.data.hero && (
@@ -131,8 +137,8 @@ const projectJsonLd = {
 
     {
       children.length > 0 && (
-        <section class="post-related reveal reveal-delay-1" aria-label="Подробные разборы">
-          <h2>Подробные разборы</h2>
+        <section class="post-related reveal reveal-delay-1" aria-label="Detailed breakdowns">
+          <h2>Detailed breakdowns</h2>
           <ul>
             {children.map((c) => (
               <li><a href={c.href}>{c.title}</a></li>
@@ -144,8 +150,8 @@ const projectJsonLd = {
 
     {
       related.length > 0 && (
-        <section class="post-related reveal reveal-delay-2" aria-label="Связанные материалы">
-          <h2>Смотрите также</h2>
+        <section class="post-related reveal reveal-delay-2" aria-label="See also">
+          <h2>See also</h2>
           <ul>
             {related.map((r) => (
               <li><a href={r.href}>{r.title}</a></li>

@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/blog.css';
 import { withBase } from '../lib/path';
 import Analytics from '../components/Analytics.astro';
+import LangSwitch from '../components/LangSwitch.astro';
 
 interface Props {
   title: string;
@@ -11,9 +12,10 @@ interface Props {
   ogType?: 'website' | 'article';
   ogImage?: string;
   canonical?: string;
-  activeNav?: 'writing' | 'contact' | 'home';
+  activeNav?: 'writing' | 'contact' | 'home' | 'about';
   jsonLd?: Record<string, unknown>;
-  lang?: string;
+  lang?: 'ru' | 'en';
+  counterpartHref?: string;
 }
 
 const {
@@ -25,13 +27,25 @@ const {
   canonical,
   activeNav = 'home',
   jsonLd,
-  lang = 'en',
+  lang = 'ru',
+  counterpartHref,
 } = Astro.props;
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
 const pageUrl = canonical ? `${siteUrl}${canonical}` : Astro.url.toString();
 const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${withBase(ogImage)}`;
 const faviconUrl = withBase('favicon.svg');
+
+// i18n: locale-aware nav hrefs + hreflang alternates.
+const isEn = lang === 'en';
+const homeHref = isEn ? withBase('en/') : withBase('/');
+const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
+const projectsHref = isEn ? withBase('en/#projects') : withBase('#projects');
+const writingHref = withBase('writing/'); // posts stay RU-only
+const contactHref = withBase('contact/'); // contact stays RU-only
+const counterpartUrl = counterpartHref ? `${siteUrl}${counterpartHref}` : null;
+const ruAltUrl = isEn ? counterpartUrl : pageUrl;
+const enAltUrl = isEn ? pageUrl : counterpartUrl;
 ---
 
 <!doctype html>
@@ -43,6 +57,10 @@ const faviconUrl = withBase('favicon.svg');
     <meta name="description" content={description} />
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     {canonical && <link rel="canonical" href={pageUrl} />}
+
+    {counterpartUrl && ruAltUrl && <link rel="alternate" hreflang="ru" href={ruAltUrl} />}
+    {counterpartUrl && enAltUrl && <link rel="alternate" hreflang="en" href={enAltUrl} />}
+    {counterpartUrl && ruAltUrl && <link rel="alternate" hreflang="x-default" href={ruAltUrl} />}
 
     <link rel="icon" type="image/svg+xml" href={faviconUrl} />
     <link rel="apple-touch-icon" href={faviconUrl} />
@@ -96,16 +114,19 @@ const faviconUrl = withBase('favicon.svg');
     <a href="#main" class="skip-link">Skip to content</a>
 
     <nav aria-label="Main navigation">
-      <a href={withBase('/')} class="nav-brand" aria-label="Portfolio home">
+      <a href={homeHref} class="nav-brand" aria-label="Portfolio home">
         <b>Portfolio</b>
       </a>
       <ul class="links">
-        <li><a href={withBase('writing/')} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
-        <li><a href={withBase('#projects')}>Projects</a></li>
-        <li><a href={withBase('contact/')} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a></li>
+        <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>About</a></li>
+        <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
+        <li><a href={projectsHref}>Projects</a></li>
+        <li><a href={contactHref} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a></li>
       </ul>
 
-      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" type="button" aria-pressed="true">
+      <div class="nav-aux">
+        {counterpartHref && <LangSwitch locale={lang} counterpartHref={counterpartHref} />}
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" type="button" aria-pressed="true">
         <svg class="theme-icon moon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
@@ -121,6 +142,7 @@ const faviconUrl = withBase('favicon.svg');
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </svg>
       </button>
+      </div>
     </nav>
 
     <main id="main">
@@ -218,5 +240,13 @@ const faviconUrl = withBase('favicon.svg');
     </script>
 
     <slot name="scripts" />
+
+    <style>
+      .nav-aux {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+    </style>
   </body>
 </html>

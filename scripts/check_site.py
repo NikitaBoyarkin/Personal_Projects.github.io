@@ -62,6 +62,7 @@ def check_required_pages() -> int:
     errors = 0
     required = [
         DIST / "index.html",
+        DIST / "about" / "index.html",
         DIST / "writing" / "index.html",
         DIST / "contact" / "index.html",
         DIST / "projects" / "rfm" / "index.html",
@@ -80,6 +81,20 @@ def check_required_pages() -> int:
         DIST / "posts" / "rfm-segmentation-practical" / "index.html",
         DIST / "posts" / "telegram-reporting-bot" / "index.html",
         DIST / "posts" / "data-analyst-portfolio-checklist" / "index.html",
+        # EN locale (prefixDefaultLocale: false → EN under /en/)
+        DIST / "en" / "index.html",
+        DIST / "en" / "about" / "index.html",
+        DIST / "en" / "projects" / "volta" / "index.html",
+        DIST / "en" / "projects" / "volta" / "funnel" / "index.html",
+        DIST / "en" / "projects" / "volta" / "ab" / "index.html",
+        DIST / "en" / "projects" / "volta" / "retention" / "index.html",
+        DIST / "en" / "projects" / "volta" / "segmentation" / "index.html",
+        DIST / "en" / "projects" / "rfm" / "index.html",
+        DIST / "en" / "projects" / "cohort" / "index.html",
+        DIST / "en" / "projects" / "bot" / "index.html",
+        DIST / "en" / "projects" / "sql" / "index.html",
+        DIST / "en" / "projects" / "garden" / "index.html",
+        DIST / "en" / "projects" / "site" / "index.html",
     ]
     print(f"Checking {len(required)} required page(s)...")
     for path in required:

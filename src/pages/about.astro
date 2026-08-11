@@ -1,0 +1,70 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/path';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Nikita Boyarkin',
+    jobTitle: 'Data Analyst / Product Analyst',
+    sameAs: [
+      'https://github.com/NikitaBoyarkin',
+      'https://www.linkedin.com/in/nikita-boyarkin',
+    ],
+  },
+};
+---
+
+<Base
+  title="About | Nikita Boyarkin"
+  description="About Nikita Boyarkin — Data Analyst / Product Analyst. Background, current focus, and tools."
+  canonical={withBase('about/')}
+  activeNav="about"
+  lang="ru"
+  counterpartHref={withBase('en/about/')}
+  jsonLd={jsonLd}
+>
+  <section class="container reveal">
+    <h1>Обо мне</h1>
+    <p style="color: var(--text-muted); font-size: 1.2rem; margin-top: -0.5rem;">Data Analyst / Product Analyst</p>
+
+    <h2>Опыт</h2>
+    <p>
+      3+ года превращаю сложные данные в действия. Работаю на стыке продукта, данных и экспериментов:
+      клиентская аналитика, A/B-тестирование, дизайн дашбордов, пайплайны данных, которые помогают командам
+      принимать решения быстрее.
+    </p>
+    <p>
+      Специализация — SQL, Python, визуализация и product-аналитика с воспроизводимой статистической
+      методологией (CUPED, AA-тесты, коррекция множественных сравнений, ship-gates).
+    </p>
+
+    <h2>Сейчас</h2>
+    <ul>
+      <li>Поддерживаю Obsidian knowledge base по product analytics — структурированный Zettelkasten с автоматизацией.</li>
+      <li>Экспериментирую с AI-assisted аналитическими workflow.</li>
+      <li>Пишу о практических data-техниках: A/B-тестирование, когортный анализ, RFM-сегментация.</li>
+      <li>Открыт к Data / Product Analyst ролям.</li>
+    </ul>
+    <!-- PENDING: уточнить текущую роль/фокус под рекрутера -->
+
+    <h2>Стек</h2>
+    <div class="skills">
+      <span class="skill-badge">SQL</span>
+      <span class="skill-badge">Python</span>
+      <span class="skill-badge">Visualization</span>
+      <span class="skill-badge">A/B Testing</span>
+    </div>
+
+    <h2>Ссылки</h2>
+    <p>
+      <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+      <a href={withBase('cv/')}>CV</a> ·
+      <a href={withBase('writing/')}>Writing</a> ·
+      <a href={withBase('contact/')}>Contact</a>
+    </p>
+  </section>
+</Base>

@@ -1,44 +1,50 @@
 import { defineCollection, z } from 'astro:content';
 
-const projects = defineCollection({
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    hero: z.string(),
-    impact: z.array(z.string()).default([]),
-    tools: z.array(z.string()).default([]),
-    github: z.string().url().optional(),
-    related: z.array(z.string()).default([]),
-    children: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-  }),
+const projectSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  hero: z.string(),
+  impact: z.array(z.string()).default([]),
+  tools: z.array(z.string()).default([]),
+  github: z.string().url().optional(),
+  related: z.array(z.string()).default([]),
+  children: z.array(z.string()).default([]),
+  draft: z.boolean().default(false),
 });
 
-const voltaParts = defineCollection({
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    part: z.string(),
-    order: z.number(),
-    impact: z.array(z.string()).default([]),
-    tools: z.array(z.string()).default([]),
-    github: z.string().url().optional(),
-    draft: z.boolean().default(false),
-  }),
+const voltaPartSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  part: z.string(),
+  order: z.number(),
+  impact: z.array(z.string()).default([]),
+  tools: z.array(z.string()).default([]),
+  github: z.string().url().optional(),
+  draft: z.boolean().default(false),
 });
 
-const posts = defineCollection({
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    category: z.string(),
-    tags: z.array(z.string()).default([]),
-    excerpt: z.string(),
-    image: z.string().optional(),
-    related: z.array(z.string()).default([]),
-    keywords: z.array(z.string()).default([]),
-    draft: z.boolean().default(false),
-  }),
+const postSchema = z.object({
+  title: z.string(),
+  date: z.coerce.date(),
+  category: z.string(),
+  tags: z.array(z.string()).default([]),
+  excerpt: z.string(),
+  image: z.string().optional(),
+  related: z.array(z.string()).default([]),
+  keywords: z.array(z.string()).default([]),
+  draft: z.boolean().default(false),
 });
 
-export const collections = { projects, posts, 'volta-parts': voltaParts };
+const projects = defineCollection({ schema: projectSchema });
+const projectsEn = defineCollection({ schema: projectSchema });
+const voltaParts = defineCollection({ schema: voltaPartSchema });
+const voltaPartsEn = defineCollection({ schema: voltaPartSchema });
+const posts = defineCollection({ schema: postSchema });
+
+export const collections = {
+  projects,
+  'projects-en': projectsEn,
+  'volta-parts': voltaParts,
+  'volta-parts-en': voltaPartsEn,
+  posts,
+};

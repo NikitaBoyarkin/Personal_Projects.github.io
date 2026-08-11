@@ -1,0 +1,45 @@
+---
+// Inline language switcher. Renders only when a counterpart URL is provided.
+// `counterpartHref` must already be base-path-aware (withBase'd) and point to
+// the same page in the OTHER locale.
+interface Props {
+  locale: 'ru' | 'en';
+  counterpartHref: string;
+}
+const { locale, counterpartHref } = Astro.props;
+const ruActive = locale === 'ru';
+---
+
+<span class="lang-switch" aria-label="Language switcher">
+  {ruActive ? <b aria-current="true">RU</b> : <a href={counterpartHref} hreflang="ru">RU</a>}
+  <span class="lang-switch-sep" aria-hidden="true">/</span>
+  {ruActive ? <a href={counterpartHref} hreflang="en">EN</a> : <b aria-current="true">EN</b>}
+</span>
+
+<style>
+  .lang-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    color: var(--text-muted);
+  }
+  .lang-switch a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.1rem 0.2rem;
+    border-radius: 4px;
+  }
+  .lang-switch a:hover {
+    color: var(--text-normal);
+    background: var(--background-secondary);
+  }
+  .lang-switch b {
+    color: var(--text-normal);
+    padding: 0.1rem 0.2rem;
+  }
+  .lang-switch-sep {
+    opacity: 0.5;
+  }
+</style>

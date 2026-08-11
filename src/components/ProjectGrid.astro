@@ -5,11 +5,14 @@ import ProjectFilter from './ProjectFilter.astro';
 
 interface Props {
   excludeSlug?: string;
+  collection?: 'projects' | 'projects-en';
+  linkPrefix?: string;
+  heading?: string;
 }
-const { excludeSlug } = Astro.props;
+const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects' } = Astro.props;
 
 const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
-const projects = (await getCollection('projects', (p) => !p.data.draft))
+const projects = (await getCollection(collection, (p) => !p.data.draft))
   .filter((p) => p.id.replace(/\.md$/, '') !== excludeSlug)
   .sort(
     (a, b) =>
@@ -18,7 +21,7 @@ const projects = (await getCollection('projects', (p) => !p.data.draft))
 ---
 
 <section id="projects" class="reveal reveal-delay-2">
-  <h2>Projects</h2>
+  <h2>{heading}</h2>
   <ProjectFilter />
   <div id="project-list">
     {
@@ -31,6 +34,7 @@ const projects = (await getCollection('projects', (p) => !p.data.draft))
           impact={project.data.impact}
           tools={project.data.tools}
           github={project.data.github}
+          linkPrefix={linkPrefix}
         />
       ))
     }

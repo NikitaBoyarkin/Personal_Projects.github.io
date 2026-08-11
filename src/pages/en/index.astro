@@ -1,16 +1,16 @@
 ---
-import Base from '../layouts/Base.astro';
-import ProjectGrid from '../components/ProjectGrid.astro';
-import IntroShader from '../components/IntroShader.astro';
+import Base from '../../layouts/Base.astro';
+import ProjectGrid from '../../components/ProjectGrid.astro';
+import IntroShader from '../../components/IntroShader.astro';
 import { getCollection } from 'astro:content';
-import BlogCard from '../components/BlogCard.astro';
-import { withBase } from '../lib/path';
+import BlogCard from '../../components/BlogCard.astro';
+import { withBase } from '../../lib/path';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
-const volta = (await getCollection('projects', (p) => !p.data.draft)).find(
+const volta = (await getCollection('projects-en', (p) => !p.data.draft)).find(
   (p) => p.id.replace(/\.md$/, '') === 'volta',
 );
 
@@ -29,12 +29,12 @@ const jsonLd = {
 
 <Base
   title="Nikita Boyarkin | Data Analyst / Product Analyst"
-  description="Портфолио Никиты Бояркина — Data Analyst / Product Analyst. Проекты по SQL, Python, A/B-тестированию, визуализации и клиентской аналитике."
+  description="Portfolio of Nikita Boyarkin — Data Analyst / Product Analyst. Projects in SQL, Python, A/B testing, visualization, and customer analytics."
   ogImage="/images/00_profile.jpg"
-  canonical={withBase('/')}
+  canonical={withBase('en/')}
   activeNav="home"
-  lang="ru"
-  counterpartHref={withBase('en/')}
+  lang="en"
+  counterpartHref={withBase('/')}
   jsonLd={jsonLd}
 >
   <!-- INTRO -->
@@ -52,16 +52,16 @@ const jsonLd = {
           <span class="skill-badge">A/B Testing</span>
         </div>
 
-        <p class="open-to">Открыт к Data / Product Analyst ролям.</p>
-        <p>Data Analyst с 3+ годами опыта превращаю сложные данные в действия.</p>
-        <p>Специализация — SQL, Python, визуализация и product-аналитика с воспроизводимой статистической методологией.</p>
+        <p class="open-to">Open to Data / Product Analyst roles.</p>
+        <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
+        <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
 
         <p class="cta-row">
-          <a class="button" href={withBase('cv/')} target="_blank" rel="noopener">Скачать CV</a>
+          <a class="button" href={withBase('cv/')} target="_blank" rel="noopener">Download CV</a>
           <span class="cta-links">
             <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
             <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-            <a href={withBase('writing/')}>Записи</a>
+            <a href={withBase('writing/')}>Writing</a>
           </span>
         </p>
       </div>
@@ -83,8 +83,8 @@ const jsonLd = {
 
   {
     volta && (
-      <section id="featured" class="reveal reveal-delay-1" aria-label="Избранный проект">
-        <h2>Избранный проект</h2>
+      <section id="featured" class="reveal reveal-delay-1" aria-label="Featured project">
+        <h2>Featured Project</h2>
         <article class="featured-project">
           {volta.data.hero && (
             <img
@@ -108,7 +108,7 @@ const jsonLd = {
               </ul>
             )}
             <div class="featured-actions">
-              <a class="button" href={withBase('projects/volta/')}>Смотреть проект</a>
+              <a class="button" href={withBase('en/projects/volta/')}>View Project</a>
               {volta.data.github && (
                 <a
                   class="button button-secondary"
@@ -126,7 +126,7 @@ const jsonLd = {
     )
   }
 
-  <ProjectGrid excludeSlug="volta" heading="Проекты" />
+  <ProjectGrid excludeSlug="volta" collection="projects-en" linkPrefix="en/" heading="Projects" />
 
   <style>
     .featured-project {
@@ -195,7 +195,7 @@ const jsonLd = {
 
   <!-- LATEST WRITING -->
   <section id="writing" class="reveal reveal-delay-1">
-    <h2>Свежие записи</h2>
+    <h2>Latest Writing</h2>
     <div class="blog-list">
       {
         posts.map((post) => (
@@ -210,20 +210,20 @@ const jsonLd = {
       }
     </div>
     <p style="margin-top: 1.5rem;">
-      <a href={withBase('writing/')}>Все записи →</a>
+      <a href={withBase('writing/')}>View all writing →</a>
     </p>
   </section>
 
   <!-- ABOUT -->
   <section id="about" class="reveal reveal-delay-3">
-    <h2>Обо мне</h2>
+    <h2>About Me</h2>
     <p>
-      Работаю на стыке продукта, данных и экспериментов: клиентская аналитика, A/B-тестирование,
-      дизайн дашбордов и пайплайны данных, которые помогают командам принимать решения быстрее.
+      I work at the intersection of product, data, and experimentation. My background spans customer analytics, A/B
+      testing, dashboard design, and building data pipelines that help teams make faster decisions.
     </p>
     <p>
-      Вне работы поддерживаю Obsidian knowledge base по product-аналитике, экспериментирую с
-      AI-assisted workflow и пишу о практических data-техниках.
+      Outside of work I maintain an Obsidian knowledge base on product analytics, experiment with AI-assisted workflows,
+      and write about practical data techniques.
     </p>
   </section>
 </Base>
