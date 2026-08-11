@@ -7,13 +7,14 @@ import { withBase } from '../../lib/path';
 export async function getStaticPaths() {
   const projects = await getCollection('projects', (p) => !p.data.draft);
   const allPosts = await getCollection('posts', (p) => !p.data.draft);
+  const allParts = await getCollection('volta-parts', (p) => !p.data.draft);
   return projects.map((project) => ({
     params: { slug: project.id.replace(/\.md$/, '') },
-    props: { project, allPosts, allProjects: projects },
+    props: { project, allPosts, allProjects: projects, allParts },
   }));
 }
 
-const { project, allPosts, allProjects } = Astro.props;
+const { project, allPosts, allProjects, allParts } = Astro.props;
 const { Content } = await render(project);
 const slug = project.id.replace(/\.md$/, '');
 
@@ -30,6 +31,13 @@ const related = (project.data.related ?? [])
     const s = p.replace(/^\//, '').replace(/\/$/, '').replace(/^(posts|projects)\//, '');
     const found = lookup.get(s);
     return found ? { href: withBase(`${found.kind}/${s}/`), title: found.title } : null;
+  })
+  .filter((x): x is { href: string; title: string } => x !== null);
+
+const children = (project.data.children ?? [])
+  .map((c) => {
+    const found = allParts.find((p) => p.data.part === c);
+    return found ? { href: withBase(`projects/${slug}/${c}/`), title: found.data.title } : null;
   })
   .filter((x): x is { href: string; title: string } => x !== null);
 
@@ -119,6 +127,19 @@ const projectJsonLd = {
     <article id="project-content">
       <Content />
     </article>
+
+    {
+      children.length > 0 && (
+        <section class="post-related reveal reveal-delay-1" aria-label="Подробные разборы">
+          <h2>Подробные разборы</h2>
+          <ul>
+            {children.map((c) => (
+              <li><a href={c.href}>{c.title}</a></li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
 
     {
       related.length > 0 && (

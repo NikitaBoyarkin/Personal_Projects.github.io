@@ -17,6 +17,11 @@ tools:
 github: https://github.com/NikitaBoyarkin/volta-banking
 related:
   - /posts/bayesian-ab-testing/
+children:
+  - funnel
+  - ab
+  - retention
+  - segmentation
 ---
 
 # Volta Neobank — Product Analytics

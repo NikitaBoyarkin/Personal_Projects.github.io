@@ -1,0 +1,113 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { withBase } from '../../../lib/path';
+
+export async function getStaticPaths() {
+  const parts = await getCollection('volta-parts', (p) => !p.data.draft);
+  return parts.map((part) => ({
+    params: { part: part.data.part },
+    props: { part, allParts: parts },
+  }));
+}
+
+const { part, allParts } = Astro.props;
+const { Content } = await render(part);
+const slug = part.data.part;
+
+const siblings = allParts
+  .filter((p) => p.data.part !== slug)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const partJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: part.data.title,
+  description: part.data.description,
+  isPartOf: {
+    '@type': 'CreativeWork',
+    name: 'Volta Neobank — Product Analytics',
+    url: `${siteUrl}${withBase('projects/volta/')}`,
+  },
+  author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
+  url: `${siteUrl}${withBase(`projects/volta/${slug}/`)}`,
+  keywords: part.data.tools?.join(', '),
+};
+---
+
+<Base
+  title={`${part.data.title} | Volta | Nikita Boyarkin`}
+  description={part.data.description}
+  ogType="article"
+  activeNav="home"
+  canonical={withBase(`projects/volta/${slug}/`)}
+  lang="ru"
+  jsonLd={partJsonLd}
+>
+  <div class="container reveal">
+    <a class="back" href={withBase('projects/volta/')}>← Volta Neobank</a>
+
+    <h1>{part.data.title}</h1>
+
+    <div class="project-meta">
+      {
+        part.data.tools && part.data.tools.length > 0 && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Stack</span>
+            <div class="project-tools project-tools-inline">
+              {part.data.tools.map((tool) => (
+                <span class="project-tool">{tool}</span>
+              ))}
+            </div>
+          </div>
+        )
+      }
+
+      {
+        part.data.impact && part.data.impact.length > 0 && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Impact</span>
+            <ul class="project-meta-list">
+              {part.data.impact.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      {
+        part.data.github && (
+          <div class="project-meta-group">
+            <span class="project-meta-label">Source</span>
+            <a
+              class="project-meta-link"
+              href={part.data.github}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View on GitHub →
+            </a>
+          </div>
+        )
+      }
+    </div>
+
+    <article id="project-content">
+      <Content />
+    </article>
+
+    {
+      <section class="post-related reveal reveal-delay-2" aria-label="Другие подпроекты Volta">
+        <h2>Другие подпроекты Volta</h2>
+        <ul>
+          <li><a href={withBase('projects/volta/')}>Обзор Volta</a></li>
+          {siblings.map((s) => (
+            <li><a href={withBase(`projects/volta/${s.data.part}/`)}>{s.data.title}</a></li>
+          ))}
+        </ul>
+      </section>
+    }
+  </div>
+</Base>

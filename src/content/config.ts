@@ -9,6 +9,20 @@ const projects = defineCollection({
     tools: z.array(z.string()).default([]),
     github: z.string().url().optional(),
     related: z.array(z.string()).default([]),
+    children: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+const voltaParts = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    part: z.string(),
+    order: z.number(),
+    impact: z.array(z.string()).default([]),
+    tools: z.array(z.string()).default([]),
+    github: z.string().url().optional(),
     draft: z.boolean().default(false),
   }),
 });
@@ -27,4 +41,4 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = { projects, posts };
+export const collections = { projects, posts, 'volta-parts': voltaParts };

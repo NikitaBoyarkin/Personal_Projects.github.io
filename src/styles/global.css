@@ -281,6 +281,7 @@ nav ul.links a[aria-current="page"] {
   margin-bottom: var(--space-16);
   padding: var(--space-12) 0;
   position: relative;
+  overflow: hidden;
 }
 
 #intro-shader {
