@@ -5,8 +5,8 @@
       <stop offset="1" stop-color="#18181b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#60a5fa"/>
-      <stop offset="1" stop-color="#2563eb"/>
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
     </linearGradient>
   </defs>
 
@@ -28,17 +28,17 @@
 
   <!-- header row accent -->
   <rect x="80" y="80" width="1040" height="60" fill="url(#accent)" opacity="0.18"/>
-  <line x1="80" y1="140" x2="1120" y2="140" stroke="#60a5fa" stroke-width="2.5"/>
+  <line x1="80" y1="140" x2="1120" y2="140" stroke="#ff8569" stroke-width="2.5"/>
 
   <!-- highlighted cells (a query result) -->
-  <rect x="80" y="200" width="240" height="60" fill="#2563eb" opacity="0.35"/>
-  <rect x="560" y="320" width="240" height="60" fill="#60a5fa" opacity="0.28"/>
-  <rect x="800" y="380" width="320" height="60" fill="#2563eb" opacity="0.22"/>
+  <rect x="80" y="200" width="240" height="60" fill="#ff6643" opacity="0.35"/>
+  <rect x="560" y="320" width="240" height="60" fill="#ff8569" opacity="0.28"/>
+  <rect x="800" y="380" width="320" height="60" fill="#ff6643" opacity="0.22"/>
 
   <!-- DuckDB duck-ish mark, top-right corner -->
   <g transform="translate(1010,470)" opacity="0.9">
     <ellipse cx="50" cy="30" rx="46" ry="22" fill="url(#accent)"/>
-    <circle cx="86" cy="20" r="14" fill="#60a5fa"/>
+    <circle cx="86" cy="20" r="14" fill="#ff8569"/>
     <circle cx="90" cy="18" r="2.5" fill="#0f0f11"/>
     <polygon points="100,20 118,24 100,30" fill="#fbbf24"/>
   </g>

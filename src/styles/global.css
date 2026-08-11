@@ -7,14 +7,14 @@
   --background-tertiary: #27272a;
   --text-normal: #e4e4e7;
   --text-muted: #a1a1aa;
-  --text-accent: #60a5fa;
-  --text-accent-hover: #93c5fd;
-  --button-bg: #2563eb;
-  --button-bg-hover: #1d4ed8;
+  --text-accent: #ff8569;
+  --text-accent-hover: #ffa68a;
+  --button-bg: #ff6643;
+  --button-bg-hover: #e0532f;
   --interactive-normal: #27272a;
   --interactive-hover: #3f3f46;
   --border-color: #3f3f46;
-  --border-active: #60a5fa;
+  --border-active: #ff8569;
   --code-background: #27272a;
   --blockquote-border: #3f3f46;
   --table-border: #3f3f46;
@@ -52,14 +52,14 @@
   --background-tertiary: #f4f4f5;
   --text-normal: #18181b;
   --text-muted: #71717a;
-  --text-accent: #2563eb;
-  --text-accent-hover: #1d4ed8;
-  --button-bg: #2563eb;
-  --button-bg-hover: #1d4ed8;
+  --text-accent: #c63d1f;
+  --text-accent-hover: #a8331a;
+  --button-bg: #ff6643;
+  --button-bg-hover: #e0532f;
   --interactive-normal: #f4f4f5;
   --interactive-hover: #e4e4e7;
   --border-color: #e4e4e7;
-  --border-active: #2563eb;
+  --border-active: #ff6643;
   --code-background: #f4f4f5;
   --blockquote-border: #e4e4e7;
   --table-border: #e4e4e7;
@@ -99,7 +99,7 @@ body {
   left: var(--space-4);
   z-index: 200;
   background: var(--text-accent);
-  color: white;
+  color: #1a1a1a;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--space-2);
   text-decoration: none;
@@ -361,7 +361,7 @@ nav ul.links a[aria-current="page"] {
   align-items: center;
   gap: var(--space-2);
   background: var(--button-bg);
-  color: #fff;
+  color: #1a1a1a;
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -460,7 +460,7 @@ nav ul.links a[aria-current="page"] {
 /* CTA button inside intro: beat .intro-content a link color (specificity) + drop the animated underline */
 .intro-content a.button,
 .intro-content a.button:hover {
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .intro-content a.button::after {
@@ -644,7 +644,7 @@ nav ul.links a[aria-current="page"] {
   align-items: center;
   gap: var(--space-2);
   background: var(--button-bg);
-  color: #fff;
+  color: #1a1a1a;
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -1192,7 +1192,7 @@ html {
 /* Selection color */
 ::selection {
   background: var(--text-accent);
-  color: white;
+  color: #1a1a1a;
 }
 
 /* Focus styles for accessibility */

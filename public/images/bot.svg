@@ -5,8 +5,8 @@
       <stop offset="1" stop-color="#18181b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#60a5fa"/>
-      <stop offset="1" stop-color="#2563eb"/>
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
     </linearGradient>
   </defs>
 
@@ -35,7 +35,7 @@
   <g>
     <rect x="80" y="300" width="420" height="120" rx="16" fill="#27272a"/>
     <polyline points="110,390 160,360 210,370 260,330 310,340 360,300 410,310 460,290"
-      fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      fill="none" stroke="#ff8569" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     <g fill="#3f3f46">
       <rect x="110" y="395" width="30" height="15"/>
       <rect x="160" y="365" width="30" height="15"/>
@@ -46,9 +46,9 @@
 
   <!-- cron clock, bottom-right -->
   <g transform="translate(960,410)" opacity="0.9">
-    <circle cx="60" cy="60" r="44" fill="none" stroke="#60a5fa" stroke-width="5"/>
-    <line x1="60" y1="60" x2="60" y2="30" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
-    <line x1="60" y1="60" x2="84" y2="60" stroke="#60a5fa" stroke-width="4" stroke-linecap="round"/>
-    <circle cx="60" cy="60" r="4" fill="#60a5fa"/>
+    <circle cx="60" cy="60" r="44" fill="none" stroke="#ff8569" stroke-width="5"/>
+    <line x1="60" y1="60" x2="60" y2="30" stroke="#ff8569" stroke-width="4" stroke-linecap="round"/>
+    <line x1="60" y1="60" x2="84" y2="60" stroke="#ff8569" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="60" cy="60" r="4" fill="#ff8569"/>
   </g>
 </svg>

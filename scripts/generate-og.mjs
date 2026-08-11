@@ -67,13 +67,13 @@ function buildSvg(title, category) {
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect x="0" y="0" width="1200" height="6" fill="#2563eb"/>
+  <rect x="0" y="0" width="1200" height="6" fill="#ff6643"/>
   <rect x="80" y="70" width="${catW}" height="40" rx="20" fill="#27272a"/>
   <text x="100" y="96" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="20" fill="#a1a1aa">${esc(cat)}</text>
   ${titleTspans}
-  <text x="80" y="555" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#60a5fa">Nikita Boyarkin</text>
+  <text x="80" y="555" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#ff8569">Nikita Boyarkin</text>
   <text x="80" y="588" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="20" fill="#71717a">Data / Product Analyst</text>
-  <rect x="80" y="525" width="120" height="3" fill="#2563eb"/>
+  <rect x="80" y="525" width="120" height="3" fill="#ff6643"/>
 </svg>`;
 }
 

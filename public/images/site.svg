@@ -5,8 +5,8 @@
       <stop offset="1" stop-color="#18181b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#60a5fa"/>
-      <stop offset="1" stop-color="#2563eb"/>
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
     </linearGradient>
   </defs>
 
@@ -22,16 +22,16 @@
 
     <g font-family="SF Mono, Monaco, monospace" font-size="20">
       <text x="112" y="170" fill="#71717a">---</text>
-      <text x="112" y="200" fill="#60a5fa">title:</text>
+      <text x="112" y="200" fill="#ff8569">title:</text>
       <text x="200" y="200" fill="#e4e4e7">Project</text>
-      <text x="112" y="230" fill="#60a5fa">hero:</text>
-      <text x="200" y="230" fill="#93c5fd">images/x.svg</text>
-      <text x="112" y="260" fill="#60a5fa">tools:</text>
+      <text x="112" y="230" fill="#ff8569">hero:</text>
+      <text x="200" y="230" fill="#ffa68a">images/x.svg</text>
+      <text x="112" y="260" fill="#ff8569">tools:</text>
       <text x="200" y="260" fill="#e4e4e7">[Astro, TS]</text>
       <text x="112" y="290" fill="#71717a">---</text>
       <text x="112" y="340" fill="#a1a1aa">&lt;Base</text>
-      <text x="112" y="370" fill="#60a5fa">  lang=</text>
-      <text x="240" y="370" fill="#93c5fd">"ru"</text>
+      <text x="112" y="370" fill="#ff8569">  lang=</text>
+      <text x="240" y="370" fill="#ffa68a">"ru"</text>
       <text x="112" y="400" fill="#a1a1aa">/&gt;</text>
     </g>
   </g>

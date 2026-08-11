@@ -5,8 +5,8 @@
       <stop offset="1" stop-color="#18181b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#60a5fa"/>
-      <stop offset="1" stop-color="#2563eb"/>
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
     </linearGradient>
   </defs>
 
@@ -37,21 +37,21 @@
     <line x1="675" y1="360" x2="675" y2="380" stroke="#a1a1aa" stroke-width="2"/>
     <line x1="765" y1="360" x2="765" y2="380" stroke="#a1a1aa" stroke-width="2"/>
     <text x="675" y="400" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#a1a1aa" text-anchor="middle">A</text>
-    <text x="765" y="400" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#60a5fa" text-anchor="middle">B</text>
+    <text x="765" y="400" font-family="SF Mono, Monaco, monospace" font-size="18" fill="#ff8569" text-anchor="middle">B</text>
   </g>
 
   <!-- Retention curve (right) -->
   <polyline points="850,470 910,360 970,300 1030,270 1090,255 1150,248"
-    fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    fill="none" stroke="#ff8569" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
   <polyline points="850,470 910,420 970,390 1030,372 1090,362 1150,358"
     fill="none" stroke="#3f3f46" stroke-width="3" stroke-dasharray="6 6" stroke-linecap="round"/>
 
   <!-- Segmentation cluster (bottom-right) -->
   <g>
-    <circle cx="880" cy="540" r="14" fill="#2563eb"/>
-    <circle cx="920" cy="525" r="11" fill="#60a5fa"/>
-    <circle cx="955" cy="545" r="9" fill="#93c5fd"/>
+    <circle cx="880" cy="540" r="14" fill="#ff6643"/>
+    <circle cx="920" cy="525" r="11" fill="#ff8569"/>
+    <circle cx="955" cy="545" r="9" fill="#ffa68a"/>
     <circle cx="990" cy="530" r="8" fill="#3f3f46"/>
-    <circle cx="1025" cy="548" r="7" fill="#60a5fa" opacity="0.6"/>
+    <circle cx="1025" cy="548" r="7" fill="#ff8569" opacity="0.6"/>
   </g>
 </svg>

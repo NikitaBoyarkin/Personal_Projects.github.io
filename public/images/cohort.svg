@@ -11,49 +11,49 @@
   <!-- triangular cohort heatmap: rows = cohorts, cols = periods, fading right & down -->
   <g>
     <!-- row 0 (oldest cohort, full row) -->
-    <rect x="160" y="80"  width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="80"  width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="80"  width="80" height="60" fill="#3b82f6" opacity="0.65"/>
-    <rect x="400" y="80"  width="80" height="60" fill="#2563eb" opacity="0.55"/>
-    <rect x="480" y="80"  width="80" height="60" fill="#2563eb" opacity="0.42"/>
-    <rect x="560" y="80"  width="80" height="60" fill="#1d4ed8" opacity="0.32"/>
-    <rect x="640" y="80"  width="80" height="60" fill="#1d4ed8" opacity="0.24"/>
-    <rect x="720" y="80"  width="80" height="60" fill="#1d4ed8" opacity="0.18"/>
+    <rect x="160" y="80"  width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="80"  width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="80"  width="80" height="60" fill="#ff6643" opacity="0.65"/>
+    <rect x="400" y="80"  width="80" height="60" fill="#ff6643" opacity="0.55"/>
+    <rect x="480" y="80"  width="80" height="60" fill="#ff6643" opacity="0.42"/>
+    <rect x="560" y="80"  width="80" height="60" fill="#e0532f" opacity="0.32"/>
+    <rect x="640" y="80"  width="80" height="60" fill="#e0532f" opacity="0.24"/>
+    <rect x="720" y="80"  width="80" height="60" fill="#e0532f" opacity="0.18"/>
     <!-- row 1 -->
-    <rect x="160" y="140" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="140" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="140" width="80" height="60" fill="#3b82f6" opacity="0.65"/>
-    <rect x="400" y="140" width="80" height="60" fill="#2563eb" opacity="0.55"/>
-    <rect x="480" y="140" width="80" height="60" fill="#2563eb" opacity="0.42"/>
-    <rect x="560" y="140" width="80" height="60" fill="#1d4ed8" opacity="0.32"/>
-    <rect x="640" y="140" width="80" height="60" fill="#1d4ed8" opacity="0.24"/>
+    <rect x="160" y="140" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="140" width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="140" width="80" height="60" fill="#ff6643" opacity="0.65"/>
+    <rect x="400" y="140" width="80" height="60" fill="#ff6643" opacity="0.55"/>
+    <rect x="480" y="140" width="80" height="60" fill="#ff6643" opacity="0.42"/>
+    <rect x="560" y="140" width="80" height="60" fill="#e0532f" opacity="0.32"/>
+    <rect x="640" y="140" width="80" height="60" fill="#e0532f" opacity="0.24"/>
     <!-- row 2 -->
-    <rect x="160" y="200" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="200" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="200" width="80" height="60" fill="#3b82f6" opacity="0.65"/>
-    <rect x="400" y="200" width="80" height="60" fill="#2563eb" opacity="0.55"/>
-    <rect x="480" y="200" width="80" height="60" fill="#2563eb" opacity="0.42"/>
-    <rect x="560" y="200" width="80" height="60" fill="#1d4ed8" opacity="0.32"/>
+    <rect x="160" y="200" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="200" width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="200" width="80" height="60" fill="#ff6643" opacity="0.65"/>
+    <rect x="400" y="200" width="80" height="60" fill="#ff6643" opacity="0.55"/>
+    <rect x="480" y="200" width="80" height="60" fill="#ff6643" opacity="0.42"/>
+    <rect x="560" y="200" width="80" height="60" fill="#e0532f" opacity="0.32"/>
     <!-- row 3 -->
-    <rect x="160" y="260" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="260" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="260" width="80" height="60" fill="#3b82f6" opacity="0.65"/>
-    <rect x="400" y="260" width="80" height="60" fill="#2563eb" opacity="0.55"/>
-    <rect x="480" y="260" width="80" height="60" fill="#2563eb" opacity="0.42"/>
+    <rect x="160" y="260" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="260" width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="260" width="80" height="60" fill="#ff6643" opacity="0.65"/>
+    <rect x="400" y="260" width="80" height="60" fill="#ff6643" opacity="0.55"/>
+    <rect x="480" y="260" width="80" height="60" fill="#ff6643" opacity="0.42"/>
     <!-- row 4 -->
-    <rect x="160" y="320" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="320" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="320" width="80" height="60" fill="#3b82f6" opacity="0.65"/>
-    <rect x="400" y="320" width="80" height="60" fill="#2563eb" opacity="0.55"/>
+    <rect x="160" y="320" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="320" width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="320" width="80" height="60" fill="#ff6643" opacity="0.65"/>
+    <rect x="400" y="320" width="80" height="60" fill="#ff6643" opacity="0.55"/>
     <!-- row 5 -->
-    <rect x="160" y="380" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="380" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
-    <rect x="320" y="380" width="80" height="60" fill="#3b82f6" opacity="0.65"/>
+    <rect x="160" y="380" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="380" width="80" height="60" fill="#ff6643" opacity="0.85"/>
+    <rect x="320" y="380" width="80" height="60" fill="#ff6643" opacity="0.65"/>
     <!-- row 6 -->
-    <rect x="160" y="440" width="80" height="60" fill="#60a5fa"/>
-    <rect x="240" y="440" width="80" height="60" fill="#3b82f6" opacity="0.85"/>
+    <rect x="160" y="440" width="80" height="60" fill="#ff8569"/>
+    <rect x="240" y="440" width="80" height="60" fill="#ff6643" opacity="0.85"/>
     <!-- row 7 (newest, only period 0) -->
-    <rect x="160" y="500" width="80" height="60" fill="#60a5fa"/>
+    <rect x="160" y="500" width="80" height="60" fill="#ff8569"/>
   </g>
 
   <!-- grid lines -->
@@ -72,5 +72,5 @@
 
   <!-- LTV curve overlay, right -->
   <polyline points="880,520 920,460 960,410 1000,370 1040,340 1080,318 1120,302"
-    fill="none" stroke="#60a5fa" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    fill="none" stroke="#ff8569" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

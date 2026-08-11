@@ -5,8 +5,8 @@
       <stop offset="1" stop-color="#18181b"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#60a5fa"/>
-      <stop offset="1" stop-color="#2563eb"/>
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
     </linearGradient>
   </defs>
 
@@ -35,9 +35,9 @@
 
   <!-- segment dots -->
   <g>
-    <circle cx="240" cy="95" r="6" fill="#93c5fd"/>
-    <circle cx="420" cy="175" r="5" fill="#60a5fa"/>
-    <circle cx="600" cy="225" r="5" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="240" cy="95" r="6" fill="#ffa68a"/>
+    <circle cx="420" cy="175" r="5" fill="#ff8569"/>
+    <circle cx="600" cy="225" r="5" fill="#ff8569" opacity="0.7"/>
     <circle cx="780" cy="295" r="4" fill="#a1a1aa"/>
     <circle cx="960" cy="355" r="4" fill="#3f3f46"/>
   </g>
