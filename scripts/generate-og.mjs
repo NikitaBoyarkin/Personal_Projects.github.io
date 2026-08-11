@@ -62,13 +62,13 @@ function buildSvg(title, category) {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f0f11"/>
-      <stop offset="1" stop-color="#18181b"/>
+      <stop offset="0" stop-color="#0f2a2b"/>
+      <stop offset="1" stop-color="#1a3435"/>
     </linearGradient>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
   <rect x="0" y="0" width="1200" height="6" fill="#ff6643"/>
-  <rect x="80" y="70" width="${catW}" height="40" rx="20" fill="#27272a"/>
+  <rect x="80" y="70" width="${catW}" height="40" rx="20" fill="#234044"/>
   <text x="100" y="96" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="20" fill="#a1a1aa">${esc(cat)}</text>
   ${titleTspans}
   <text x="80" y="555" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="28" font-weight="600" fill="#ff8569">Nikita Boyarkin</text>

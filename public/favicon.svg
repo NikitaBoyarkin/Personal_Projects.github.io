@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <style>
-    .bg { fill: #0f0f11; }
+    .bg { fill: #0f2a2b; }
     .fg { fill: #ff8569; }
     @media (prefers-color-scheme: light) {
       .bg { fill: #fafafa; }

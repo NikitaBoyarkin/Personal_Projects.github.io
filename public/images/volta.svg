@@ -1,8 +1,8 @@
 <svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Volta Neobank analytics: funnel, A/B test, retention, segmentation">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f0f11"/>
-      <stop offset="1" stop-color="#18181b"/>
+      <stop offset="0" stop-color="#0f2a2b"/>
+      <stop offset="1" stop-color="#1a3435"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ff8569"/>
@@ -13,7 +13,7 @@
   <rect width="1200" height="600" fill="url(#bg)"/>
 
   <!-- faint grid -->
-  <g stroke="#27272a" stroke-width="1">
+  <g stroke="#234044" stroke-width="1">
     <line x1="0" y1="150" x2="1200" y2="150"/>
     <line x1="0" y1="300" x2="1200" y2="300"/>
     <line x1="0" y1="450" x2="1200" y2="450"/>

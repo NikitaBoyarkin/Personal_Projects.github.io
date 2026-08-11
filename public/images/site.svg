@@ -1,8 +1,8 @@
 <svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Astro portfolio site: code window with component islands and content collections">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f0f11"/>
-      <stop offset="1" stop-color="#18181b"/>
+      <stop offset="0" stop-color="#0f2a2b"/>
+      <stop offset="1" stop-color="#1a3435"/>
     </linearGradient>
     <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#ff8569"/>
@@ -14,8 +14,8 @@
 
   <!-- code window -->
   <g>
-    <rect x="80" y="80" width="640" height="440" rx="14" fill="#18181b" stroke="#3f3f46" stroke-width="2"/>
-    <rect x="80" y="80" width="640" height="48" rx="14" fill="#27272a"/>
+    <rect x="80" y="80" width="640" height="440" rx="14" fill="#1a3435" stroke="#3f3f46" stroke-width="2"/>
+    <rect x="80" y="80" width="640" height="48" rx="14" fill="#234044"/>
     <circle cx="112" cy="104" r="8" fill="#ef4444"/>
     <circle cx="140" cy="104" r="8" fill="#fbbf24"/>
     <circle cx="168" cy="104" r="8" fill="#22c55e"/>
@@ -38,13 +38,13 @@
 
   <!-- island cards (rendered output) -->
   <g>
-    <rect x="780" y="80" width="340" height="120" rx="12" fill="#27272a" stroke="#3f3f46" stroke-width="2"/>
+    <rect x="780" y="80" width="340" height="120" rx="12" fill="#234044" stroke="#3f3f46" stroke-width="2"/>
     <rect x="780" y="80" width="340" height="8" fill="url(#accent)"/>
     <rect x="800" y="110" width="200" height="14" rx="4" fill="#e4e4e7"/>
     <rect x="800" y="138" width="280" height="10" rx="4" fill="#a1a1aa"/>
     <rect x="800" y="160" width="160" height="10" rx="4" fill="#a1a1aa"/>
 
-    <rect x="780" y="220" width="340" height="120" rx="12" fill="#27272a" stroke="#3f3f46" stroke-width="2"/>
+    <rect x="780" y="220" width="340" height="120" rx="12" fill="#234044" stroke="#3f3f46" stroke-width="2"/>
     <rect x="780" y="220" width="340" height="8" fill="url(#accent)" opacity="0.7"/>
     <rect x="800" y="250" width="180" height="14" rx="4" fill="#e4e4e7"/>
     <rect x="800" y="278" width="260" height="10" rx="4" fill="#a1a1aa"/>
@@ -53,7 +53,7 @@
     <!-- Astro logo-ish mark -->
     <g transform="translate(950,430)" opacity="0.95">
       <path d="M0,90 L40,0 L80,90 L60,90 L40,40 L20,90 Z" fill="url(#accent)"/>
-      <rect x="32" y="70" width="16" height="16" fill="#0f0f11"/>
+      <rect x="32" y="70" width="16" height="16" fill="#0f2a2b"/>
     </g>
   </g>
 </svg>

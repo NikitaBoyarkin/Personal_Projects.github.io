@@ -65,7 +65,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
     <link rel="icon" type="image/svg+xml" href={faviconUrl} />
     <link rel="apple-touch-icon" href={faviconUrl} />
     <link rel="alternate" type="application/rss+xml" title="Nikita Boyarkin — Writing" href={withBase('rss.xml')} />
-    <meta id="theme-color" name="theme-color" content="#0f0f11" />
+    <meta id="theme-color" name="theme-color" content="#0f2a2b" />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -103,7 +103,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
           // localStorage may be unavailable
         }
         html.setAttribute('data-theme', theme);
-        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f0f11' : '#f4efca');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f2a2b' : '#f4efca');
       })();
     </script>
 
@@ -172,7 +172,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
           html.setAttribute('data-theme', theme);
           if (moon) moon.style.display = theme === 'dark' ? 'block' : 'none';
           if (sun) sun.style.display = theme === 'dark' ? 'none' : 'block';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f0f11' : '#f4efca');
+          if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f2a2b' : '#f4efca');
           if (toggle) toggle.setAttribute('aria-pressed', String(theme === 'dark'));
         }
 
