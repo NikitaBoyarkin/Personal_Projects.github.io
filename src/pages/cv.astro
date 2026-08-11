@@ -12,14 +12,25 @@ const posts = (await getCollection('posts', (p) => !p.data.draft))
 const skills = [
   'SQL',
   'Python',
-  'Pandas',
-  'A/B Testing',
+  'Pandas / NumPy',
+  'DuckDB',
+  'PostgreSQL',
+  'ClickHouse',
+  'A/B Testing (CUPED, AA-test, Bonferroni)',
   'SciPy / Statsmodels',
+  'scikit-learn',
   'Cohort & Retention',
   'RFM Segmentation',
+  'LTV',
+  'SQL window functions',
   'Tableau',
+  'Superset',
   'Matplotlib / Seaborn',
-  'Dashboard Design',
+  'Docker',
+  'Airflow',
+  'Git',
+  'cron',
+  'GenAI / LLM APIs',
 ];
 
 // Absolute URL for the "Download CV" funnel and printed copy.
@@ -75,10 +86,11 @@ const year = new Date().getFullYear();
       <section class="cv-section">
         <h2>Profile</h2>
         <p>
-          Data Analyst with 3+ years of experience turning complex data into actionable business
-          insights. I work at the intersection of product, data, and experimentation — customer
-          analytics, A/B testing, dashboard design, and data pipelines that help teams make faster
-          decisions.
+          Data Analyst (Middle) with 4+ years of experience turning complex data into actionable
+          business insights. I work at the intersection of product, data, and experimentation —
+          customer analytics, A/B testing, segmentation, and reporting automation that help teams
+          move faster. Stack: SQL, Python, DuckDB, PostgreSQL, ClickHouse, Tableau, Superset,
+          Docker, Airflow.
         </p>
       </section>
 
@@ -121,19 +133,25 @@ const year = new Date().getFullYear();
         </ul>
       </section>
 
-      <!-- TODO: fill in real work history before sending to recruiters. -->
-      <section class="cv-section">
-        <h2>Experience</h2>
-        <p class="cv-placeholder">
-          Add roles here: title, company, period, and 2–3 bullet points quantifying impact
-          (metrics moved, experiments run, dashboards shipped).
-        </p>
-      </section>
-
-      <!-- TODO: fill in education. -->
       <section class="cv-section">
         <h2>Education</h2>
-        <p class="cv-placeholder">Add degree, institution, and year.</p>
+        <ul class="cv-edu">
+          <li>
+            <span class="cv-edu-degree">PhD, Work Psychology</span>
+            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-period">Sept 2022 – May 2025</span>
+          </li>
+          <li>
+            <span class="cv-edu-degree">MSc, Work Psychology</span>
+            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-period">Sept 2020 – May 2022</span>
+          </li>
+          <li>
+            <span class="cv-edu-degree">BSc, Business Informatics</span>
+            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-period">Sept 2016 – May 2020</span>
+          </li>
+        </ul>
       </section>
     </main>
 
@@ -207,6 +225,11 @@ const year = new Date().getFullYear();
       .cv-writing li { display: flex; gap: 0.8rem; padding: 0.2rem 0; font-size: 0.88rem; border-bottom: 1px dotted var(--line); }
       .cv-writing-date { color: var(--muted); font-variant-numeric: tabular-nums; flex: 0 0 5rem; }
       .cv-writing-title { color: var(--ink); }
+      .cv-edu { list-style: none; padding: 0; margin: 0; }
+      .cv-edu li { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; padding: 0.2rem 0; font-size: 0.88rem; border-bottom: 1px dotted var(--line); }
+      .cv-edu-degree { color: var(--ink); font-weight: 500; }
+      .cv-edu-school { color: var(--muted); }
+      .cv-edu-period { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; }
       .cv-placeholder { color: var(--muted); font-style: italic; font-size: 0.85rem; }
       .cv-foot { text-align: center; color: var(--muted); font-size: 0.78rem; margin: 1rem 0 2rem; }
 
