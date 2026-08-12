@@ -43,8 +43,8 @@ const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
 const projectsHref = isEn ? withBase('en/#projects') : withBase('#projects');
 const writingHref = withBase('writing/'); // posts stay RU-only
 const contactHref = withBase('contact/'); // contact stays RU-only
-const startHref = withBase('start/'); // onboarding (RU-only)
-const graphHref = withBase('graph/'); // knowledge graph (RU-only)
+const startHref = isEn ? withBase('en/start/') : withBase('start/');
+const graphHref = isEn ? withBase('en/graph/') : withBase('graph/');
 const counterpartUrl = counterpartHref ? `${siteUrl}${counterpartHref}` : null;
 const ruAltUrl = isEn ? counterpartUrl : pageUrl;
 const enAltUrl = isEn ? pageUrl : counterpartUrl;
@@ -122,7 +122,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
         <b>Portfolio</b>
       </a>
       <ul class="links">
-        <li><a href={startHref}>Start</a></li>
+        <li><a href={startHref}>Start here</a></li>
         <li><a href={projectsHref}>Projects</a></li>
         <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
         <li><a href={graphHref}>Graph</a></li>

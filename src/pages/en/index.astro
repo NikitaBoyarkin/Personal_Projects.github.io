@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import ProjectGrid from '../../components/ProjectGrid.astro';
 import IntroShader from '../../components/IntroShader.astro';
+import CollaborationFormats from '../../components/CollaborationFormats.astro';
 import { getCollection } from 'astro:content';
 import BlogCard from '../../components/BlogCard.astro';
 import { withBase } from '../../lib/path';
@@ -64,12 +65,12 @@ const jsonLd = {
         </p>
 
         <p class="cta-row">
-          <a class="button" href={withBase('start/')}>Start here</a>
+          <a class="button" href={withBase('en/start/')}>Start here</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
           <span class="cta-links">
             <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
             <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-            <a href={withBase('graph/')}>Graph</a>
+            <a href={withBase('en/graph/')}>Graph</a>
           </span>
         </p>
       </div>
@@ -135,6 +136,8 @@ const jsonLd = {
   }
 
   <ProjectGrid excludeSlug="volta" collection="projects-en" linkPrefix="en/" heading="Projects" />
+
+  <CollaborationFormats lang="en" />
 
   <!-- IN PROGRESS -->
   <section id="now-teaser" class="reveal reveal-delay-2" aria-label="Now">

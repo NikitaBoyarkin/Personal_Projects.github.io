@@ -1,0 +1,128 @@
+---
+import Base from '../../layouts/Base.astro';
+import { withBase } from '../../lib/path';
+
+const ROUTES = [
+  {
+    audience: 'Recruiter / hiring manager',
+    icon: '◆',
+    items: [
+      { label: 'CV (PDF)', href: withBase('cv/') },
+      { label: 'Flagship case — Volta Neobank', href: withBase('en/projects/volta/') },
+      { label: 'Collaboration formats', href: withBase('en/#collab') },
+      { label: 'Contact / Telegram', href: withBase('contact/') },
+    ],
+  },
+  {
+    audience: 'Analyst / peer',
+    icon: '◇',
+    items: [
+      { label: 'Guides (cohorts, RFM, statistics)', href: withBase('guides/') },
+      { label: 'Notes & decision logs', href: withBase('notes/') },
+      { label: 'Product analytics concept graph', href: withBase('en/graph/') },
+      { label: 'All projects', href: withBase('en/#projects') },
+    ],
+  },
+];
+---
+
+<Base
+  title="Start here | Nikita Boyarkin"
+  description="A route through the portfolio for recruiters and analysts — where to start reading."
+  canonical={withBase('en/start/')}
+  activeNav="home"
+  lang="en"
+>
+  <section class="container reveal">
+    <h1 class="page-title">Start here</h1>
+    <p style="color: var(--text-muted); margin-bottom: var(--space-10); max-width: 60ch;">
+      Two routes through the portfolio — pick who you are and follow the dots.
+    </p>
+
+    <div class="start-grid">
+      {
+        ROUTES.map((r) => (
+          <article class="start-card">
+            <span class="start-icon" aria-hidden="true">{r.icon}</span>
+            <h2>{r.audience}</h2>
+            <ol class="start-route">
+              {r.items.map((it) => (
+                <li><a href={it.href}>{it.label}</a></li>
+              ))}
+            </ol>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .start-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .start-card {
+    padding: var(--space-6);
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+  }
+  .start-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+    color: var(--text-accent);
+    font-size: 1.3rem;
+    margin-bottom: var(--space-3);
+  }
+  .start-card h2 {
+    color: var(--text-normal);
+    font-size: 1.15rem;
+    margin-bottom: var(--space-4);
+  }
+  .start-route {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .start-route li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2rem;
+  }
+  .start-route li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+    border-radius: 50%;
+  }
+  .start-route a {
+    color: var(--text-normal);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--border-color);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .start-route a:hover {
+    color: var(--text-accent);
+    border-color: var(--text-accent);
+  }
+</style>

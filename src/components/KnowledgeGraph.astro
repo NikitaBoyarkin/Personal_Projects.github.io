@@ -4,6 +4,15 @@
 // Starts when scrolled into view; honors prefers-reduced-motion (renders static radial).
 import { withBase } from '../lib/path';
 
+interface Props {
+  lang?: 'ru' | 'en';
+}
+const { lang = 'ru' } = Astro.props;
+const caption =
+  lang === 'en'
+    ? 'Concept graph of product analytics behind the portfolio projects. The discover → validate → measure → optimize loop.'
+    : 'Граф понятий product-аналитики, который стоит за проектами портфолио. Петля discover → validate → measure → optimize.';
+
 const GROUP_COLORS: Record<string, string> = {
   discover: 'var(--text-accent)',
   validate: '#5db8b0',
@@ -23,7 +32,7 @@ const groupList = Object.keys(GROUP_COLORS);
     }
   </div>
   <svg id="kg-svg" class="kg-svg" role="img" aria-label="Knowledge graph of product analytics concepts"></svg>
-  <p class="kg-caption">Граф понятий product-аналитики, который стоит за проектами портфолио. Петля discover → validate → measure → optimize.</p>
+  <p class="kg-caption">{caption}</p>
 </div>
 
 <script is:inline define:vars={{ GROUP_COLORS }}>
