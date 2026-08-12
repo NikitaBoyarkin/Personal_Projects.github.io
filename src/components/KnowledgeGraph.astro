@@ -229,8 +229,14 @@ const groupList = Object.keys(GROUP_COLORS);
   }
   .kg-label {
     fill: var(--text-normal);
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 600;
     font-family: var(--font-sans);
+    /* Halo so labels stay readable over crossing edges and node circles. */
+    paint-order: stroke;
+    stroke: var(--background-secondary);
+    stroke-width: 3.5px;
+    stroke-linejoin: round;
   }
   .kg-legend {
     display: flex;
