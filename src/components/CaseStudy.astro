@@ -1,0 +1,109 @@
+---
+// Renders an optional problem → approach → result case-study block on a project page.
+// Direct borrow of pimenov.ai's "Разборы" format, adapted for analytics projects.
+interface Metric {
+  label: string;
+  value: string;
+}
+interface Props {
+  problem: string;
+  approach: string;
+  result: string;
+  metrics?: Metric[];
+  heading?: string;
+}
+const { problem, approach, result, metrics = [], heading = 'Разбор кейса' } = Astro.props;
+---
+
+<section class="case-study reveal" aria-label="Case study">
+  <h2>{heading}</h2>
+
+  <div class="case-step">
+    <span class="case-label">Проблема</span>
+    <p>{problem}</p>
+  </div>
+  <div class="case-step">
+    <span class="case-label">Подход</span>
+    <p>{approach}</p>
+  </div>
+  <div class="case-step">
+    <span class="case-label">Результат</span>
+    <p>{result}</p>
+  </div>
+
+  {
+    metrics.length > 0 && (
+      <div class="case-metrics">
+        {metrics.map((m) => (
+          <div class="case-metric">
+            <span class="case-metric-value">{m.value}</span>
+            <span class="case-metric-label">{m.label}</span>
+          </div>
+        ))}
+      </div>
+    )
+  }
+</section>
+
+<style>
+  .case-study {
+    margin: var(--space-8) 0;
+    padding: var(--space-6);
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+  }
+  .case-study h2 {
+    color: var(--text-accent);
+    font-size: 1.4rem;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--border-color);
+  }
+  .case-step {
+    margin-bottom: var(--space-5);
+  }
+  .case-step:last-of-type {
+    margin-bottom: 0;
+  }
+  .case-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-2);
+  }
+  .case-step p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin: 0;
+  }
+  .case-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-color);
+  }
+  .case-metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .case-metric-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-normal);
+    letter-spacing: -0.02em;
+  }
+  .case-metric-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+</style>

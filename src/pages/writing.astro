@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import BlogCard from '../components/BlogCard.astro';
 import BlogFilter from '../components/BlogFilter.astro';
 import { getCollection } from 'astro:content';
+import { estimateReadTime } from '../lib/date';
+import { withBase } from '../lib/path';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
@@ -17,6 +19,12 @@ const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
 >
   <h1 class="page-title reveal">Writing</h1>
 
+  <p class="reveal" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Всё вместе выше. Можно читать по типу:
+    <a href={withBase('guides/')}>гайды</a> (evergreen-методология) ·
+    <a href={withBase('notes/')}>заметки</a> (decision-логи).
+  </p>
+
   <BlogFilter />
 
   <div class="blog-list reveal reveal-delay-2">
@@ -28,6 +36,7 @@ const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
           category={post.data.category}
           date={post.data.date}
           excerpt={post.data.excerpt}
+          readTime={estimateReadTime(post.body)}
         />
       ))
     }

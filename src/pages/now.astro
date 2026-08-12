@@ -1,0 +1,42 @@
+---
+import Base from '../layouts/Base.astro';
+import { formatDate } from '../lib/date';
+import { withBase } from '../lib/path';
+---
+
+<Base
+  title="Now | Nikita Boyarkin"
+  description="What Nikita Boyarkin is focused on right now."
+  canonical={withBase('now/')}
+  activeNav="contact"
+  lang="ru"
+>
+  <section class="now-section reveal">
+    <h1 class="now-title">Now</h1>
+    <p class="now-subtitle">What I'm focused on right now.</p>
+    <p class="now-subtitle now-updated">Last updated · {formatDate('2026-08-12')}</p>
+
+    <ul class="now-list">
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Preparing for BI / Data Analyst mid-level interviews — SQL, pandas, algorithms, mock rounds.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Maintaining an Obsidian knowledge base on product analytics — a structured Zettelkasten with automation.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Experimenting with AI-assisted analytics workflows on Claude Code + MCP.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Reading: <em>Designing Machine Learning Systems</em> by Chip Huyen.
+      </li>
+    </ul>
+
+    <p style="margin-top: var(--space-8);">
+      <a href={withBase('contact/')}>Связаться →</a>
+    </p>
+  </section>
+</Base>

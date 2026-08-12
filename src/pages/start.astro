@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/path';
+
+const ROUTES = [
+  {
+    audience: 'Рекрутер / нанимающий менеджер',
+    icon: '◆',
+    items: [
+      { label: 'CV (PDF)', href: withBase('cv/') },
+      { label: 'Флагманский кейс — Volta Neobank', href: withBase('projects/volta/') },
+      { label: 'Форматы сотрудничества', href: withBase('#collab') },
+      { label: 'Контакт / Telegram', href: withBase('contact/') },
+    ],
+  },
+  {
+    audience: 'Аналитик / коллега',
+    icon: '◇',
+    items: [
+      { label: 'Гайды (когорты, RFM, статистика)', href: withBase('guides/') },
+      { label: 'Заметки и decision-логи', href: withBase('notes/') },
+      { label: 'Граф понятий product-аналитики', href: withBase('graph/') },
+      { label: 'Все проекты', href: withBase('#projects') },
+    ],
+  },
+];
+---
+
+<Base
+  title="С чего начать | Nikita Boyarkin"
+  description="Маршрут по портфолио для рекрутеров и аналитиков — с чего начать чтение."
+  canonical={withBase('start/')}
+  activeNav="home"
+  lang="ru"
+>
+  <section class="container reveal">
+    <h1 class="page-title">С чего начать</h1>
+    <p style="color: var(--text-muted); margin-bottom: var(--space-10); max-width: 60ch;">
+      Два маршрута по портфолио — выберите, кто вы, и идите по пунктиру.
+    </p>
+
+    <div class="start-grid">
+      {
+        ROUTES.map((r) => (
+          <article class="start-card">
+            <span class="start-icon" aria-hidden="true">{r.icon}</span>
+            <h2>{r.audience}</h2>
+            <ol class="start-route">
+              {r.items.map((it) => (
+                <li><a href={it.href}>{it.label}</a></li>
+              ))}
+            </ol>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .start-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-6);
+  }
+  .start-card {
+    padding: var(--space-6);
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+  }
+  .start-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+    color: var(--text-accent);
+    font-size: 1.3rem;
+    margin-bottom: var(--space-3);
+  }
+  .start-card h2 {
+    color: var(--text-normal);
+    font-size: 1.15rem;
+    margin-bottom: var(--space-4);
+  }
+  .start-route {
+    list-style: none;
+    counter-reset: step;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .start-route li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2rem;
+  }
+  .start-route li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+    border-radius: 50%;
+  }
+  .start-route a {
+    color: var(--text-normal);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--border-color);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .start-route a:hover {
+    color: var(--text-accent);
+    border-color: var(--text-accent);
+  }
+</style>

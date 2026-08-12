@@ -14,6 +14,14 @@ export async function getStaticPaths() {
 const { post, allPosts } = Astro.props;
 const { Content } = await render(post);
 
+// Prev / next by date (newer = next).
+const sorted = [...allPosts].sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const idx = sorted.findIndex((p) => p.id === post.id);
+const newer = idx > 0 ? sorted[idx - 1] : null;
+const older = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
+const prev = older ? { href: withBase(`posts/${older.id.replace(/\.md$/, '')}/`), title: older.data.title } : null;
+const next = newer ? { href: withBase(`posts/${newer.id.replace(/\.md$/, '')}/`), title: newer.data.title } : null;
+
 // Резолвим related-пути вида /posts/<slug>/ и /projects/<slug>/ в { href, title }
 const allProjects = await getCollection('projects', (p) => !p.data.draft);
 const lookup = new Map<string, { kind: string; title: string }>();
@@ -41,6 +49,8 @@ const related = (post.data.related ?? [])
   related={related}
   keywords={post.data.keywords ?? []}
   slug={post.id.replace(/\.md$/, '')}
+  prev={prev}
+  next={next}
 >
   <Content />
 </Post>

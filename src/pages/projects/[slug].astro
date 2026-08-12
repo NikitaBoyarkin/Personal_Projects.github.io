@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import InnerTOC from '../../components/InnerTOC.astro';
+import CaseStudy from '../../components/CaseStudy.astro';
 import { withBase } from '../../lib/path';
 
 export async function getStaticPaths() {
@@ -17,6 +18,16 @@ export async function getStaticPaths() {
 const { project, allPosts, allProjects, allParts } = Astro.props;
 const { Content } = await render(project);
 const slug = project.id.replace(/\.md$/, '');
+const caseStudy = project.data.caseStudy;
+
+// Next / prev within the ordered project list (P3.11).
+const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
+const ordered = [...allProjects].sort(
+  (a, b) => ORDER.indexOf(a.id.replace(/\.md$/, '')) - ORDER.indexOf(b.id.replace(/\.md$/, '')),
+);
+const idx = ordered.findIndex((p) => p.id === project.id);
+const prev = idx > 0 ? ordered[idx - 1] : null;
+const next = idx >= 0 && idx < ordered.length - 1 ? ordered[idx + 1] : null;
 
 // Резолвим related-пути вида /posts/<slug>/ и /projects/<slug>/ в { href, title }
 const lookup = new Map<string, { kind: string; title: string }>();
@@ -128,6 +139,36 @@ const projectJsonLd = {
     <article id="project-content">
       <Content />
     </article>
+
+    {
+      caseStudy && (
+        <CaseStudy
+          problem={caseStudy.problem}
+          approach={caseStudy.approach}
+          result={caseStudy.result}
+          metrics={caseStudy.metrics}
+        />
+      )
+    }
+
+    {
+      (prev || next) && (
+        <nav class="prev-next" aria-label="Другие проекты">
+          {prev && (
+            <a class="pn-link pn-prev" href={withBase(`projects/${prev.id.replace(/\.md$/, '')}/`)}>
+              <span class="pn-dir">← Предыдущий</span>
+              <span class="pn-title">{prev.data.title}</span>
+            </a>
+          )}
+          {next && (
+            <a class="pn-link pn-next" href={withBase(`projects/${next.id.replace(/\.md$/, '')}/`)}>
+              <span class="pn-dir">Следующий →</span>
+              <span class="pn-title">{next.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
 
     {
       children.length > 0 && (

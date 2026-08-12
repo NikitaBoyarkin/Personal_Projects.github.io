@@ -8,14 +8,17 @@ interface Props {
   category: string;
   date: Date;
   excerpt: string;
+  readTime?: number;
 }
 
-const { slug, title, category, date, excerpt } = Astro.props;
+const { slug, title, category, date, excerpt, readTime } = Astro.props;
 ---
 
 <a href={withBase(`posts/${slug}/`)} class="blog-card" data-category={category}>
   <span class="blog-card-tag">{category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
   <div class="blog-card-title">{title}</div>
-  <div class="blog-card-meta">{formatDate(date)}</div>
+  <div class="blog-card-meta">
+    {formatDate(date)}{readTime && <> · {readTime} min</>}
+  </div>
   <div class="blog-card-excerpt">{excerpt}</div>
 </a>

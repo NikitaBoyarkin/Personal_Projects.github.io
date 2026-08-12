@@ -43,6 +43,8 @@ const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
 const projectsHref = isEn ? withBase('en/#projects') : withBase('#projects');
 const writingHref = withBase('writing/'); // posts stay RU-only
 const contactHref = withBase('contact/'); // contact stays RU-only
+const startHref = withBase('start/'); // onboarding (RU-only)
+const graphHref = withBase('graph/'); // knowledge graph (RU-only)
 const counterpartUrl = counterpartHref ? `${siteUrl}${counterpartHref}` : null;
 const ruAltUrl = isEn ? counterpartUrl : pageUrl;
 const enAltUrl = isEn ? pageUrl : counterpartUrl;
@@ -91,19 +93,21 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
 
     <script is:inline>
       // Prevent theme flash: apply saved or preferred theme before first paint.
+      // Three themes: dark (default), light, cyberpunk.
       (function () {
         const html = document.documentElement;
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        const THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         let theme = prefersDark ? 'dark' : 'light';
         try {
           const saved = localStorage.getItem('theme');
-          if (saved) theme = saved;
+          if (saved === 'dark' || saved === 'light' || saved === 'cyberpunk') theme = saved;
         } catch (e) {
           // localStorage may be unavailable
         }
         html.setAttribute('data-theme', theme);
-        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f2a2b' : '#f4efca');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
       })();
     </script>
 
@@ -118,15 +122,22 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
         <b>Portfolio</b>
       </a>
       <ul class="links">
-        <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>About</a></li>
-        <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
+        <li><a href={startHref}>Start</a></li>
         <li><a href={projectsHref}>Projects</a></li>
+        <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
+        <li><a href={graphHref}>Graph</a></li>
+        <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>About</a></li>
         <li><a href={contactHref} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a></li>
       </ul>
 
       <div class="nav-aux">
         {counterpartHref && <LangSwitch locale={lang} counterpartHref={counterpartHref} />}
-        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme" type="button" aria-pressed="true">
+        <a class="nav-telegram" href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>
+          </svg>
+        </a>
+        <button id="theme-toggle" class="theme-toggle" aria-label="Cycle theme (dark / light / cyberpunk)" type="button" aria-pressed="true" title="Theme: dark / light / cyberpunk">
         <svg class="theme-icon moon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
         </svg>
@@ -140,6 +151,9 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
           <line x1="21" y1="12" x2="23" y2="12" />
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+        <svg class="theme-icon cyber" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
         </svg>
       </button>
       </div>
@@ -159,21 +173,32 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
     </footer>
 
     <script is:inline>
-      // Theme toggle
+      // Theme toggle — cycles dark → light → cyberpunk → dark.
       (function () {
         const html = document.documentElement;
         const toggle = document.getElementById('theme-toggle');
-        const moon = toggle ? toggle.querySelector('.theme-icon.moon') : null;
-        const sun = toggle ? toggle.querySelector('.theme-icon.sun') : null;
+        const icons = toggle ? {
+          moon: toggle.querySelector('.theme-icon.moon'),
+          sun: toggle.querySelector('.theme-icon.sun'),
+          cyber: toggle.querySelector('.theme-icon.cyber'),
+        } : null;
 
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+        const THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
+        const ORDER = ['dark', 'light', 'cyberpunk'];
 
         function applyTheme(theme) {
           html.setAttribute('data-theme', theme);
-          if (moon) moon.style.display = theme === 'dark' ? 'block' : 'none';
-          if (sun) sun.style.display = theme === 'dark' ? 'none' : 'block';
-          if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f2a2b' : '#f4efca');
-          if (toggle) toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+          if (icons) {
+            icons.moon.style.display = theme === 'dark' ? 'block' : 'none';
+            icons.sun.style.display = theme === 'light' ? 'block' : 'none';
+            icons.cyber.style.display = theme === 'cyberpunk' ? 'block' : 'none';
+          }
+          if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+          if (toggle) {
+            toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+            toggle.setAttribute('aria-label', `Theme: ${theme}. Click to cycle.`);
+          }
         }
 
         function persistTheme(theme) {
@@ -190,8 +215,8 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
 
         if (toggle) {
           toggle.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme') || 'dark';
-            const next = current === 'dark' ? 'light' : 'dark';
+            const cur = html.getAttribute('data-theme') || 'dark';
+            const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
             applyTheme(next);
             persistTheme(next);
           });

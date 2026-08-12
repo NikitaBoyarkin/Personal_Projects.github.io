@@ -22,6 +22,19 @@ children:
   - ab
   - retention
   - segmentation
+caseStudy:
+  problem: "The neobank was losing users during onboarding, but it was unclear which step was critical and whether a fix would actually hold. Isolated analyses produced local numbers with no product-level connection."
+  approach: "Four projects wired into a single discover → validate → measure → optimize loop: funnel found the KYC bottleneck, an A/B test with CUPED + AA-test + Bonferroni validated a progress-bar fix under a three-condition ship-gate (significance ∧ lift≥MDE ∧ no SRM), retention confirmed the effect held, and segmentation translated it into revenue."
+  result: "The KYC fix delivered +6.24pp conversion and €716K/yr (48× ROI), the effect held in retention (+9.2pp M3, +€227K/yr LTV), and segmentation showed 12% of users drive 41% of revenue — migration is worth up to +€310K/yr. The reproducible methodology protects against shipping statistically-significant but business-insignificant changes."
+  metrics:
+    - label: "KYC conversion lift"
+      value: "+6.24pp"
+    - label: "Annual revenue"
+      value: "€716K/yr"
+    - label: "ROI"
+      value: "48×"
+    - label: "M3 retention"
+      value: "+9.2pp"
 ---
 
 # Volta Neobank — Product Analytics

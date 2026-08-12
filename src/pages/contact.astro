@@ -1,33 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
-import { formatDate } from '../lib/date';
+import { withBase } from '../lib/path';
 ---
 
-<Base title="Now & Contact | Nikita Boyarkin" description="What Nikita Boyarkin is focused on right now." activeNav="contact">
-  <section class="now-section reveal">
-    <h1 class="now-title">Now</h1>
-    <p class="now-subtitle">What I'm focused on right now.</p>
-    <p class="now-subtitle now-updated">Last updated · {formatDate('2026-08-01')}</p>
-
-    <ul class="now-list">
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Building an agentic data analysis pipeline using Claude Code and MCP servers
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Reading: <em>Designing Machine Learning Systems</em> by Chip Huyen
-      </li>
-    </ul>
-  </section>
-
-  <section class="contact-section reveal reveal-delay-1">
-    <h2 class="contact-title">Get in Touch</h2>
+<Base title="Contact | Nikita Boyarkin" description="Get in touch with Nikita Boyarkin — product analytics, A/B testing, collaboration." activeNav="contact" canonical={withBase('contact/')} lang="ru">
+  <section class="contact-section reveal">
+    <h1 class="contact-title">Связаться</h1>
     <p class="contact-text">
-      If you want to discuss product analytics, A/B testing, or just say hi — I'm always open to interesting
-      conversations.
+      Хотите обсудить product-аналитику, A/B-тестирование или формат сотрудничества — я открыт к разговорам.
+      Открыт к Data / Product Analyst ролям.
     </p>
     <a href="https://t.me/lofinibo" class="contact-email" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo</a>
+
+    <p style="margin-top: var(--space-6);">
+      <a href={withBase('start/')}>С чего начать →</a> ·
+      <a href={withBase('now/')}>Что сейчас в работе →</a>
+    </p>
 
     <div class="linkedin-badge">
       <div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="light" data-type="VERTICAL" data-vanity="nikita-boyarkin" data-version="v1">

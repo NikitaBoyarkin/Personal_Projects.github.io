@@ -1,0 +1,112 @@
+---
+// "How I can help" — concrete collaboration formats, adapted from pimenov.ai's "Работа со мной".
+// Job-seeker framing (engagement formats, not freelance tiers).
+import { withBase } from '../lib/path';
+
+const FORMATS = [
+  {
+    icon: '∑',
+    title: 'Аудит A/B-методологии',
+    desc: 'Ревью процесса экспериментов: SRM-проверки, коррекция множественных сравнений, CUPED, ship-gates. Найду, где вы катите статистически-значимые, но бизнес-незначимые изменения.',
+  },
+  {
+    icon: '◫',
+    title: 'Retention / когортный дашборд',
+    desc: 'Построение когортных кривых, LTV-декомпозиции и retention-дашборда на ваших данных. SQL + Python + BI-экспорт.',
+  },
+  {
+    icon: '⌥',
+    title: 'SQL-ревью и оптимизация',
+    desc: 'Разбор тяжёлых запросов, gaps-and-islands, оконные функции, migration на DuckDB/ClickHouse. Runnable-кейсы на синтетике.',
+  },
+  {
+    icon: '◎',
+    title: 'Сегментация и монетизация',
+    desc: 'RFM или KMeans-сегментация пользователей с per-segment стратегией и оценкой incremental revenue.',
+  },
+];
+---
+
+<section id="collab" class="collab reveal reveal-delay-2" aria-label="Форматы сотрудничества">
+  <h2>Как я могу помочь</h2>
+  <p class="collab-lead">
+    Конкретные форматы вовлечения — для команд, которым нужна не «аналитика вообще», а решённая задача.
+  </p>
+  <div class="collab-grid">
+    {
+      FORMATS.map((f) => (
+        <article class="collab-card">
+          <span class="collab-icon" aria-hidden="true">{f.icon}</span>
+          <h3>{f.title}</h3>
+          <p>{f.desc}</p>
+        </article>
+      ))
+    }
+  </div>
+  <p class="collab-cta">
+    <a class="button" href={withBase('contact/')}>Обсудить →</a>
+  </p>
+</section>
+
+<style>
+  .collab {
+    margin-bottom: var(--space-16);
+  }
+  .collab h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    text-align: center;
+    color: var(--text-normal);
+  }
+  .collab-lead {
+    text-align: center;
+    color: var(--text-muted);
+    max-width: 60ch;
+    margin: 0 auto var(--space-8);
+  }
+  .collab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-5);
+  }
+  .collab-card {
+    padding: var(--space-6);
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .collab-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--text-accent) 35%, transparent);
+    box-shadow: 0 12px 30px var(--shadow-color);
+  }
+  .collab-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+    color: var(--text-accent);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+  }
+  .collab-card h3 {
+    font-size: 1.1rem;
+    color: var(--text-normal);
+    margin-bottom: var(--space-2);
+  }
+  .collab-card p {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+  }
+  .collab-cta {
+    text-align: center;
+    margin-top: var(--space-8);
+  }
+</style>

@@ -5,6 +5,7 @@ import IntroShader from '../../components/IntroShader.astro';
 import { getCollection } from 'astro:content';
 import BlogCard from '../../components/BlogCard.astro';
 import { withBase } from '../../lib/path';
+import { estimateReadTime } from '../../lib/date';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -48,20 +49,27 @@ const jsonLd = {
         <div class="skills">
           <span class="skill-badge">SQL</span>
           <span class="skill-badge">Python</span>
-          <span class="skill-badge">Visualization</span>
           <span class="skill-badge">A/B Testing</span>
+          <span class="skill-badge">Retention</span>
+          <span class="skill-badge">Segmentation</span>
         </div>
 
         <p class="open-to">Open to Data / Product Analyst roles.</p>
-        <p>Data Analyst with 3+ years of experience turning complex data into actionable business insights.</p>
-        <p>Specialized in SQL, Python, and data visualization with a proven track record of delivering data-driven solutions.</p>
+        <p class="thesis">
+          I help product teams make decisions on data: A/B tests with reproducible methodology
+          (CUPED, AA-tests, Bonferroni, ship-gates), retention analytics, and SQL dashboards that don't lie.
+        </p>
+        <p>
+          4+ years at the intersection of product, data, and experimentation. Synthetic data, real methodology.
+        </p>
 
         <p class="cta-row">
-          <a class="button" href={withBase('cv/')} target="_blank" rel="noopener">Download CV</a>
+          <a class="button" href={withBase('start/')}>Start here</a>
+          <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
           <span class="cta-links">
             <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
             <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-            <a href={withBase('writing/')}>Writing</a>
+            <a href={withBase('graph/')}>Graph</a>
           </span>
         </p>
       </div>
@@ -127,6 +135,28 @@ const jsonLd = {
   }
 
   <ProjectGrid excludeSlug="volta" collection="projects-en" linkPrefix="en/" heading="Projects" />
+
+  <!-- IN PROGRESS -->
+  <section id="now-teaser" class="reveal reveal-delay-2" aria-label="Now">
+    <h2>Now</h2>
+    <ul class="now-list">
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Preparing for BI / Data Analyst mid-level interviews: SQL, pandas, algorithms, mocks.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Maintaining an Obsidian knowledge base on product analytics — a structured Zettelkasten with automation.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Experimenting with AI-assisted analytics workflows on Claude Code + MCP.
+      </li>
+    </ul>
+    <p class="now-teaser-cta">
+      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo →</a>
+    </p>
+  </section>
 
   <style>
     .featured-project {
@@ -205,6 +235,7 @@ const jsonLd = {
             category={post.data.category}
             date={post.data.date}
             excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body)}
           />
         ))
       }
@@ -224,6 +255,9 @@ const jsonLd = {
     <p>
       Outside of work I maintain an Obsidian knowledge base on product analytics, experiment with AI-assisted workflows,
       and write about practical data techniques.
+    </p>
+    <p>
+      <a href={withBase('en/about/')}>More →</a>
     </p>
   </section>
 </Base>

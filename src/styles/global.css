@@ -1201,3 +1201,133 @@ button:focus-visible {
   outline: 2px solid var(--text-accent);
   outline-offset: 2px;
 }
+
+/* ============================================================
+   Additions: cyberpunk theme + new sections (hero thesis,
+   in-progress teaser, prev/next nav, generic secondary button)
+   ============================================================ */
+
+/* Cyberpunk theme — neon-on-near-black, green/magenta accents */
+[data-theme="cyberpunk"] {
+  --background-primary: #0a0a12;
+  --background-secondary: #11111d;
+  --background-tertiary: #1a1a2e;
+  --text-normal: #e6f1ff;
+  --text-muted: #8a8aa8;
+  --text-accent: #00ff9c;
+  --text-accent-hover: #5cffc0;
+  --button-bg: #ff2bd6;
+  --button-bg-hover: #ff5ce0;
+  --interactive-normal: #1a1a2e;
+  --interactive-hover: #232342;
+  --border-color: #2a2a4a;
+  --border-active: #00ff9c;
+  --code-background: #1a1a2e;
+  --blockquote-border: #2a2a4a;
+  --table-border: #2a2a4a;
+  --table-header-background: #1a1a2e;
+  --shadow-color: rgba(0, 255, 156, 0.15);
+}
+
+/* Generic secondary button (used in intro CTAs, not just .project) */
+.button.button-secondary {
+  background: transparent;
+  color: var(--text-accent);
+  border: 1px solid var(--text-accent);
+}
+.button.button-secondary:hover {
+  background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+  color: var(--text-accent-hover);
+}
+
+/* Hero thesis — the sharp positioning claim */
+.intro-content .thesis {
+  font-size: 1.15rem;
+  color: var(--text-normal);
+  line-height: 1.65;
+  max-width: 52ch;
+  font-weight: 500;
+}
+
+/* In-progress teaser (homepage) */
+#now-teaser {
+  margin-bottom: var(--space-16);
+  padding: var(--space-6) var(--space-5);
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+#now-teaser h2 {
+  color: var(--text-accent);
+  font-size: 1.6rem;
+  margin-bottom: var(--space-4);
+}
+.now-teaser-cta {
+  margin-top: var(--space-4);
+}
+.now-teaser-cta a {
+  color: var(--text-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* Prev / next navigation (project + post pages) */
+.prev-next {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin: var(--space-10) 0;
+}
+.pn-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: var(--space-4) var(--space-5);
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-normal);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pn-link:hover {
+  border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
+  transform: translateY(-2px);
+}
+.pn-next {
+  text-align: right;
+}
+.pn-dir {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.pn-title {
+  font-weight: 600;
+  color: var(--text-accent);
+}
+@media (max-width: 600px) {
+  .prev-next {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Telegram link in nav-aux */
+.nav-telegram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-accent);
+  text-decoration: none;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.nav-telegram:hover {
+  transform: rotate(8deg) scale(1.1);
+  border-color: var(--text-accent);
+}

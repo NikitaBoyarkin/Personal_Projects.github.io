@@ -22,6 +22,19 @@ children:
   - ab
   - retention
   - segmentation
+caseStudy:
+  problem: "Необанк терял пользователей на онбординге, но было непонятно, какой шаг критический и лечит ли его фикс. Изолированные анализы давали локальные числа без продуктовой связи."
+  approach: "Четыре проекта одной петлёй discover → validate → measure → optimize: funnel нашёл KYC-бутылочное горло, A/B с CUPED + AA-test + Bonferroni валидировал progress-bar фикс под ship-gate из трёх условий (значимость ∧ lift≥MDE ∧ no SRM), retention подтвердил удержание эффекта, сегментация перевела эффект в деньги."
+  result: "Фикс KYC дал +6.24pp конверсии и €716K/yr (48× ROI), эффект удержался в retention (+9.2pp M3, +€227K/yr LTV), а сегментация показала, что 12% пользователей дают 41% выручки — миграция стоит до +€310K/yr. Воспроизводимая методология защищает от rollout'а статистически-значимых, но бизнес-незначимых изменений."
+  metrics:
+    - label: "KYC conversion lift"
+      value: "+6.24pp"
+    - label: "Annual revenue"
+      value: "€716K/yr"
+    - label: "ROI"
+      value: "48×"
+    - label: "M3 retention"
+      value: "+9.2pp"
 ---
 
 # Volta Neobank — Product Analytics

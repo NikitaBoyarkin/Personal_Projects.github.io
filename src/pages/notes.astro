@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/path';
+import { estimateReadTime } from '../lib/date';
+
+// Short notes + decision logs.
+const posts = (await getCollection('posts', (p) => !p.data.draft && ['note', 'decision-log'].includes(p.data.category))).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Base
+  title="Заметки | Nikita Boyarkin"
+  description="Короткие заметки и decision-логи: почему перешли на Bayesian A/B, автоматизация отчётов, чек-листы."
+  canonical={withBase('notes/')}
+  activeNav="writing"
+  lang="ru"
+>
+  <h1 class="page-title reveal">Заметки</h1>
+  <p class="reveal" style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 60ch;">
+    Decision-логи и короткие заметки — почему приняли решение и что из этого вышло.
+  </p>
+
+  <div class="blog-list reveal reveal-delay-1">
+    {
+      posts.length === 0 ? (
+        <p style="color: var(--text-muted);">Пока нет заметок.</p>
+      ) : (
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body)}
+          />
+        ))
+      )
+    }
+  </div>
+
+  <p style="margin-top: var(--space-8);">
+    <a href={withBase('guides/')}>Методологические гайды →</a> · <a href={withBase('writing/')}>Всё writing →</a>
+  </p>
+</Base>

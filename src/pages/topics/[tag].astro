@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/path';
+import { estimateReadTime } from '../../lib/date';
+
+const TOPIC_MATCH: Record<string, { label: string; tags: string[] }> = {
+  'ab-testing': { label: 'A/B-тестирование', tags: ['ab-testing', 'bayesian', 'statistics'] },
+  retention: { label: 'Retention / когорты', tags: ['retention', 'cohort-analysis'] },
+  segmentation: { label: 'Сегментация', tags: ['rfm', 'segmentation', 'customer-analytics'] },
+  sql: { label: 'SQL', tags: ['sql'] },
+  python: { label: 'Python', tags: ['python', 'pandas'] },
+  automation: { label: 'Автоматизация', tags: ['automation', 'telegram', 'reporting'] },
+  career: { label: 'Карьера', tags: ['career', 'portfolio', 'data-analyst'] },
+};
+
+export async function getStaticPaths() {
+  // Keys kept in sync with TOPIC_MATCH below (getStaticPaths cannot reference
+  // module-level consts, so the list is duplicated here).
+  return ['ab-testing', 'retention', 'segmentation', 'sql', 'python', 'automation', 'career'].map(
+    (key) => ({ params: { tag: key } }),
+  );
+}
+
+const { tag } = Astro.params;
+const topic = TOPIC_MATCH[tag!];
+if (!topic) {
+  return Astro.redirect(withBase('topics/'));
+}
+const matchSet = new Set(topic.tags);
+
+const posts = (await getCollection('posts', (p) => !p.data.draft))
+  .filter((p) => (p.data.tags ?? []).some((t) => matchSet.has(t)))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// Projects matched by tag keywords appearing in slug/title/tools/description.
+const needle = tag!.replace('-', ' ');
+const projects = (await getCollection('projects', (p) => !p.data.draft))
+  .filter((p) => {
+    const slug = p.id.replace(/\.md$/, '');
+    const hay = `${slug} ${p.data.title} ${(p.data.tools ?? []).join(' ')} ${p.data.description}`.toLowerCase();
+    return topic.tags.some((t) => hay.includes(t.replace('-', ' '))) || hay.includes(needle);
+  });
+---
+
+<Base
+  title={`${topic.label} | Nikita Boyarkin`}
+  description={`Материалы по теме «${topic.label}»: записи и проекты.`}
+  canonical={withBase(`topics/${tag}/`)}
+  activeNav="home"
+  lang="ru"
+>
+  <section class="container reveal">
+    <a class="back" href={withBase('topics/')}>← Все темы</a>
+    <h1 class="page-title">{topic.label}</h1>
+    <p style="color: var(--text-muted); margin-bottom: var(--space-8);">
+      {posts.length} записей · {projects.length} проектов
+    </p>
+
+    {
+      projects.length > 0 && (
+        <>
+          <h2 class="topic-section-title">Проекты</h2>
+          <div id="project-list" style="margin-bottom: var(--space-12);">
+            {projects.map((project) => (
+              <ProjectCard
+                slug={project.id.replace(/\.md$/, '')}
+                title={project.data.title}
+                description={project.data.description}
+                image={project.data.hero}
+                impact={project.data.impact}
+                tools={project.data.tools}
+                github={project.data.github}
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    {
+      posts.length > 0 && (
+        <>
+          <h2 class="topic-section-title">Записи</h2>
+          <div class="blog-list">
+            {posts.map((post) => (
+              <BlogCard
+                slug={post.id.replace(/\.md$/, '')}
+                title={post.data.title}
+                category={post.data.category}
+                date={post.data.date}
+                excerpt={post.data.excerpt}
+                readTime={estimateReadTime(post.body)}
+              />
+            ))}
+          </div>
+        </>
+      )
+    }
+
+    {
+      posts.length === 0 && projects.length === 0 && (
+        <p style="color: var(--text-muted);">Пока нет материалов по этой теме.</p>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  .topic-section-title {
+    color: var(--text-accent);
+    font-size: 1.3rem;
+    margin-bottom: var(--space-5);
+    padding-bottom: var(--space-2);
+    border-bottom: 2px solid var(--border-color);
+  }
+</style>

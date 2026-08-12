@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import BlogCard from '../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/path';
+import { estimateReadTime } from '../lib/date';
+
+// Evergreen guides + frameworks.
+const posts = (await getCollection('posts', (p) => !p.data.draft && ['guide', 'framework'].includes(p.data.category))).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Base
+  title="Гайды | Nikita Boyarkin"
+  description="Evergreen-гайды по product-аналитике: когортный анализ, RFM-сегментация, SQL, статистика."
+  canonical={withBase('guides/')}
+  activeNav="writing"
+  lang="ru"
+>
+  <h1 class="page-title reveal">Гайды</h1>
+  <p class="reveal" style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 60ch;">
+    Методологические руководства — то, что остаётся актуальным: когортный анализ, RFM, статистика экспериментов.
+  </p>
+
+  <div class="blog-list reveal reveal-delay-1">
+    {
+      posts.length === 0 ? (
+        <p style="color: var(--text-muted);">Пока нет гайдов.</p>
+      ) : (
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body)}
+          />
+        ))
+      )
+    }
+  </div>
+
+  <p style="margin-top: var(--space-8);">
+    <a href={withBase('notes/')}>Заметки и decision-логи →</a> · <a href={withBase('writing/')}>Всё writing →</a>
+  </p>
+</Base>

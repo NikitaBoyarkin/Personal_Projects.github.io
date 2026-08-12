@@ -1,0 +1,133 @@
+---
+// Topic map with post/project counts — a compact analog of pimenov.ai's topic map.
+// Counts are computed from the posts + projects collections at build time.
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/path';
+
+interface Topic {
+  key: string;
+  label: string;
+  match: (tag: string) => boolean;
+}
+
+const TOPICS: Topic[] = [
+  { key: 'ab-testing', label: 'A/B-тестирование', match: (t) => t === 'ab-testing' || t === 'bayesian' || t === 'statistics' },
+  { key: 'retention', label: 'Retention / когорты', match: (t) => t === 'retention' || t === 'cohort-analysis' },
+  { key: 'segmentation', label: 'Сегментация', match: (t) => t === 'rfm' || t === 'segmentation' || t === 'customer-analytics' },
+  { key: 'sql', label: 'SQL', match: (t) => t === 'sql' },
+  { key: 'python', label: 'Python', match: (t) => t === 'python' || t === 'pandas' },
+  { key: 'automation', label: 'Автоматизация', match: (t) => t === 'automation' || t === 'telegram' || t === 'reporting' },
+  { key: 'career', label: 'Карьера', match: (t) => t === 'career' || t === 'portfolio' || t === 'data-analyst' },
+];
+
+const posts = await getCollection('posts', (p) => !p.data.draft);
+const projects = await getCollection('projects', (p) => !p.data.draft);
+
+// Count posts by topic via tag matching.
+const postCounts = new Map<string, number>(TOPICS.map((t) => [t.key, 0]));
+for (const post of posts) {
+  for (const tag of post.data.tags ?? []) {
+    for (const topic of TOPICS) {
+      if (topic.match(tag)) postCounts.set(topic.key, (postCounts.get(topic.key) ?? 0) + 1);
+    }
+  }
+}
+
+// Approximate project contribution: 1 per project whose tools/title/slug touch the topic.
+const projectCounts = new Map<string, number>(TOPICS.map((t) => [t.key, 0]));
+const projectSignals = projects.map((p) => ({
+  slug: p.id.replace(/\.md$/, ''),
+  title: p.data.title.toLowerCase(),
+  tools: (p.data.tools ?? []).join(' ').toLowerCase(),
+  desc: p.data.description.toLowerCase(),
+}));
+for (const topic of TOPICS) {
+  const needle = topic.key.replace('-', ' ');
+  const hits = projectSignals.filter(
+    (p) => p.slug.includes(needle) || p.title.includes(needle) || p.tools.includes(needle) || p.desc.includes(needle),
+  );
+  projectCounts.set(topic.key, hits.length);
+}
+
+const rows = TOPICS.map((t) => ({
+  key: t.key,
+  label: t.label,
+  href: withBase(`topics/${t.key}/`),
+  count: (postCounts.get(t.key) ?? 0) + (projectCounts.get(t.key) ?? 0),
+}))
+  .filter((r) => r.count > 0)
+  .sort((a, b) => b.count - a.count);
+---
+
+<section id="topics" class="topic-map reveal reveal-delay-2" aria-label="Темы">
+  <h2>Темы</h2>
+  <div class="topic-grid">
+    {
+      rows.map((r) => (
+        <a class="topic-card" href={r.href}>
+          <span class="topic-label">{r.label}</span>
+          <span class="topic-count">{r.count}</span>
+        </a>
+      ))
+    }
+  </div>
+  <p class="topic-foot">
+    <a href={withBase('topics/')}>Все темы →</a>
+  </p>
+</section>
+
+<style>
+  .topic-map {
+    margin-bottom: var(--space-16);
+  }
+  .topic-map h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-6);
+    text-align: center;
+    color: var(--text-normal);
+  }
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-3);
+  }
+  .topic-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-normal);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .topic-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
+    box-shadow: 0 8px 20px var(--shadow-color);
+  }
+  .topic-label {
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  .topic-count {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+    padding: 0.1rem 0.5rem;
+    border-radius: var(--radius-full);
+  }
+  .topic-foot {
+    margin-top: var(--space-4);
+    text-align: center;
+  }
+  .topic-foot a {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>

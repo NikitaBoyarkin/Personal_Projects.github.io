@@ -1,0 +1,252 @@
+---
+// Dependency-free force-directed knowledge graph island.
+// Reads /graph.json (base-path aware via data-src) and renders an SVG simulation.
+// Starts when scrolled into view; honors prefers-reduced-motion (renders static radial).
+import { withBase } from '../lib/path';
+
+const GROUP_COLORS: Record<string, string> = {
+  discover: 'var(--text-accent)',
+  validate: '#5db8b0',
+  measure: '#c9a24a',
+  optimize: '#9d7bd8',
+  tooling: 'var(--text-muted)',
+};
+const groupList = Object.keys(GROUP_COLORS);
+---
+
+<div id="kg-root" class="kg-root" data-src={withBase('graph.json')}>
+  <div class="kg-legend">
+    {
+      groupList.map((g) => (
+        <span class="kg-legend-item"><i style={`background:${GROUP_COLORS[g]}`}></i>{g}</span>
+      ))
+    }
+  </div>
+  <svg id="kg-svg" class="kg-svg" role="img" aria-label="Knowledge graph of product analytics concepts"></svg>
+  <p class="kg-caption">Граф понятий product-аналитики, который стоит за проектами портфолио. Петля discover → validate → measure → optimize.</p>
+</div>
+
+<script is:inline define:vars={{ GROUP_COLORS }}>
+  (function () {
+    const root = document.getElementById('kg-root');
+    if (!root) return;
+    const svg = document.getElementById('kg-svg');
+    const src = root.dataset.src;
+    if (!svg || !src) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const colorFor = (g) => GROUP_COLORS[g] || 'var(--text-muted)';
+
+    function renderStatic(data) {
+      // Radial layout by group.
+      const groups = {};
+      data.nodes.forEach((n) => { (groups[n.group] = groups[n.group] || []).push(n); });
+      const W = svg.clientWidth || 600;
+      const H = 420;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const cx = W / 2, cy = H / 2;
+      const groupKeys = Object.keys(groups);
+      const radius = Math.min(W, H) * 0.38;
+      const ns = 'http://www.w3.org/2000/svg';
+      const pos = {};
+      groupKeys.forEach((gk, gi) => {
+        const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
+        const gx = cx + Math.cos(ga) * radius;
+        const gy = cy + Math.sin(ga) * radius;
+        groups[gk].forEach((n, ni) => {
+          const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
+          const r = 34 + ni * 12;
+          pos[n.id] = { x: gx + Math.cos(a) * r, y: gy + Math.sin(a) * r };
+        });
+      });
+      data.links.forEach((l) => {
+        const a = pos[l.source], b = pos[l.target];
+        if (!a || !b) return;
+        const line = document.createElementNS(ns, 'line');
+        line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
+        line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
+        line.setAttribute('class', 'kg-edge');
+        svg.appendChild(line);
+      });
+      data.nodes.forEach((n) => {
+        const p = pos[n.id]; if (!p) return;
+        const g = document.createElementNS(ns, 'g');
+        g.setAttribute('transform', `translate(${p.x},${p.y})`);
+        const c = document.createElementNS(ns, 'circle');
+        c.setAttribute('r', 6); c.setAttribute('fill', colorFor(n.group));
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x', 10); t.setAttribute('y', 4); t.setAttribute('class', 'kg-label');
+        t.textContent = n.label;
+        g.appendChild(c); g.appendChild(t);
+        svg.appendChild(g);
+      });
+    }
+
+    function renderForce(data) {
+      const W = svg.clientWidth || 600;
+      const H = 460;
+      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      const ns = 'http://www.w3.org/2000/svg';
+      const nodes = data.nodes.map((n) => ({ ...n, x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0 }));
+      const idx = new Map(nodes.map((n) => [n.id, n]));
+      const links = data.links.map((l) => ({ source: idx.get(l.source), target: idx.get(l.target) })).filter((l) => l.source && l.target);
+
+      // Edge layer
+      const edgeLayer = document.createElementNS(ns, 'g');
+      svg.appendChild(edgeLayer);
+      const edges = links.map(() => {
+        const line = document.createElementNS(ns, 'line');
+        line.setAttribute('class', 'kg-edge');
+        edgeLayer.appendChild(line);
+        return line;
+      });
+
+      // Node layer
+      const nodeLayer = document.createElementNS(ns, 'g');
+      svg.appendChild(nodeLayer);
+      const nodeEls = nodes.map((n) => {
+        const g = document.createElementNS(ns, 'g');
+        const c = document.createElementNS(ns, 'circle');
+        c.setAttribute('r', 6); c.setAttribute('fill', colorFor(n.group));
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x', 10); t.setAttribute('y', 4); t.setAttribute('class', 'kg-label');
+        t.textContent = n.label;
+        g.appendChild(c); g.appendChild(t);
+        g.style.cursor = 'grab';
+        nodeLayer.appendChild(g);
+        return g;
+      });
+
+      const k = 0.6;
+      let dragging = null;
+      svg.addEventListener('mousedown', (e) => {
+        const target = nodeEls.find((el) => el.contains(e.target));
+        if (target) { dragging = nodes[nodeEls.indexOf(target)]; dragging.fx = dragging.x; dragging.fy = dragging.y; target.style.cursor = 'grabbing'; }
+      });
+      svg.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const rect = svg.getBoundingClientRect();
+        dragging.fx = (e.clientX - rect.left) * (W / rect.width);
+        dragging.fy = (e.clientY - rect.top) * (H / rect.height);
+      });
+      window.addEventListener('mouseup', () => {
+        if (dragging) { const el = nodeEls[nodes.indexOf(dragging)]; if (el) el.style.cursor = 'grab'; dragging.fx = null; dragging.fy = null; dragging = null; }
+      });
+
+      function tick() {
+        // charge
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i], b = nodes[j];
+            let dx = a.x - b.x, dy = a.y - b.y;
+            let d2 = dx * dx + dy * dy || 1;
+            let d = Math.sqrt(d2);
+            const f = 1400 / d2;
+            a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+            b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
+          }
+        }
+        // link spring
+        links.forEach((l) => {
+          const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          const f = (d - 70) * 0.04;
+          const fx = (dx / d) * f, fy = (dy / d) * f;
+          l.source.vx += fx; l.source.vy += fy;
+          l.target.vx -= fx; l.target.vy -= fy;
+        });
+        // center gravity + integrate
+        nodes.forEach((n) => {
+          if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
+          n.vx += (W / 2 - n.x) * 0.005;
+          n.vy += (H / 2 - n.y) * 0.005;
+          n.vx *= 0.85; n.vy *= 0.85;
+          n.x += n.vx; n.y += n.vy;
+          n.x = Math.max(60, Math.min(W - 60, n.x));
+          n.y = Math.max(20, Math.min(H - 20, n.y));
+        });
+        // render
+        links.forEach((l, i) => {
+          edges[i].setAttribute('x1', l.source.x); edges[i].setAttribute('y1', l.source.y);
+          edges[i].setAttribute('x2', l.target.x); edges[i].setAttribute('y2', l.target.y);
+        });
+        nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
+      }
+
+      let running = true;
+      let frames = 0;
+      function loop() {
+        if (!running) return;
+        tick();
+        frames++;
+        if (frames > 600) { running = false; }
+        requestAnimationFrame(loop);
+      }
+      loop();
+      svg.addEventListener('dblclick', () => { frames = 0; running = true; loop(); });
+    }
+
+    function load() {
+      fetch(src)
+        .then((r) => r.json())
+        .then((data) => { reduced ? renderStatic(data) : renderForce(data); })
+        .catch(() => { svg.textContent = 'graph unavailable'; });
+    }
+
+    // Start when visible (lazy).
+    if (reduced) { load(); return; }
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); load(); }
+    }, { threshold: 0.15 });
+    io.observe(root);
+  })();
+</script>
+
+<style>
+  .kg-root {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+  }
+  .kg-svg {
+    width: 100%;
+    height: 460px;
+    display: block;
+  }
+  .kg-edge {
+    stroke: color-mix(in srgb, var(--text-muted) 40%, transparent);
+    stroke-width: 1;
+  }
+  .kg-label {
+    fill: var(--text-normal);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .kg-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+    text-transform: capitalize;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .kg-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .kg-legend-item i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .kg-caption {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin-top: var(--space-3);
+    text-align: center;
+  }
+</style>

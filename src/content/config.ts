@@ -9,6 +9,14 @@ const projectSchema = z.object({
   github: z.string().url().optional(),
   related: z.array(z.string()).default([]),
   children: z.array(z.string()).default([]),
+  caseStudy: z
+    .object({
+      problem: z.string(),
+      approach: z.string(),
+      result: z.string(),
+      metrics: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    })
+    .optional(),
   draft: z.boolean().default(false),
 });
 

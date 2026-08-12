@@ -2,9 +2,12 @@
 import Base from '../layouts/Base.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
 import IntroShader from '../components/IntroShader.astro';
+import TopicMap from '../components/TopicMap.astro';
+import CollaborationFormats from '../components/CollaborationFormats.astro';
 import { getCollection } from 'astro:content';
 import BlogCard from '../components/BlogCard.astro';
 import { withBase } from '../lib/path';
+import { estimateReadTime } from '../lib/date';
 
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -48,20 +51,28 @@ const jsonLd = {
         <div class="skills">
           <span class="skill-badge">SQL</span>
           <span class="skill-badge">Python</span>
-          <span class="skill-badge">Visualization</span>
           <span class="skill-badge">A/B Testing</span>
+          <span class="skill-badge">Retention</span>
+          <span class="skill-badge">Segmentation</span>
         </div>
 
         <p class="open-to">Открыт к Data / Product Analyst ролям.</p>
-        <p>Data Analyst с 3+ годами опыта превращаю сложные данные в действия.</p>
-        <p>Специализация — SQL, Python, визуализация и product-аналитика с воспроизводимой статистической методологией.</p>
+        <p class="thesis">
+          Помогаю продуктовым командам принимать решения на данных: A/B-тесты с воспроизводимой
+          методологией (CUPED, AA-тесты, Bonferroni, ship-gates), retention-аналитика и SQL-дашборды,
+          которые не врут.
+        </p>
+        <p>
+          4+ года на стыке продукта, данных и экспериментов. Petrograd — синтетика, методология — боевая.
+        </p>
 
         <p class="cta-row">
-          <a class="button" href={withBase('cv/')} target="_blank" rel="noopener">Скачать CV</a>
+          <a class="button" href={withBase('start/')}>С чего начать</a>
+          <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
           <span class="cta-links">
             <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
             <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-            <a href={withBase('writing/')}>Записи</a>
+            <a href={withBase('graph/')}>Граф</a>
           </span>
         </p>
       </div>
@@ -126,7 +137,33 @@ const jsonLd = {
     )
   }
 
+  <TopicMap />
+
   <ProjectGrid excludeSlug="volta" heading="Проекты" />
+
+  <CollaborationFormats />
+
+  <!-- IN PROGRESS -->
+  <section id="now-teaser" class="reveal reveal-delay-2" aria-label="Сейчас в работе">
+    <h2>Сейчас в работе</h2>
+    <ul class="now-list">
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Готовлюсь к BI / Data Analyst middle-интервью: SQL, pandas, алгоритмы, моки.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Развиваю Obsidian knowledge base по product-аналитике — структурированный Zettelkasten с автоматизацией.
+      </li>
+      <li class="now-item">
+        <span class="now-dot"></span>
+        Экспериментирую с AI-assisted аналитическими workflow на Claude Code + MCP.
+      </li>
+    </ul>
+    <p class="now-teaser-cta">
+      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo →</a>
+    </p>
+  </section>
 
   <style>
     .featured-project {
@@ -205,6 +242,7 @@ const jsonLd = {
             category={post.data.category}
             date={post.data.date}
             excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body)}
           />
         ))
       }
@@ -224,6 +262,9 @@ const jsonLd = {
     <p>
       Вне работы поддерживаю Obsidian knowledge base по product-аналитике, экспериментирую с
       AI-assisted workflow и пишу о практических data-техниках.
+    </p>
+    <p>
+      <a href={withBase('about/')}>Подробнее →</a>
     </p>
   </section>
 </Base>
