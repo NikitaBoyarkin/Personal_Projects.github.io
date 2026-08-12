@@ -457,9 +457,11 @@ nav ul.links a[aria-current="page"] {
   width: 100%;
 }
 
-/* CTA button inside intro: beat .intro-content a link color (specificity) + drop the animated underline */
-.intro-content a.button,
-.intro-content a.button:hover {
+/* CTA button inside intro: beat .intro-content a link color (specificity) + drop the animated underline.
+   Only primary buttons get dark text (they sit on a bright --button-bg). Secondary buttons keep their
+   accent color via .button.button-secondary, which would otherwise be overridden here too. */
+.intro-content a.button:not(.button-secondary),
+.intro-content a.button:not(.button-secondary):hover {
   color: #1a1a1a;
 }
 
