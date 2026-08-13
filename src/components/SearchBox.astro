@@ -1,18 +1,45 @@
 ---
-// Site-wide search island. Inline (bundled) script — no framework, no client
-// directive. The index URL is stamped server-side via withBase so the client
-// never touches import.meta.env. Styles live in global.css (.search-*).
+// Site-wide search island. Bundled (type-checked) script — no framework, no
+// client directive. The index URL, i18n strings and topic suggestions are
+// stamped server-side via data attributes so the client never touches
+// import.meta.env. Styles live in global.css (.search-*).
 import { withBase } from "../lib/path";
+import { TOPICS } from "../lib/topics";
+
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
 
 const indexUrl = withBase("search-index.json");
+const topicLinks = TOPICS.map((t) => ({ l: t.label, h: withBase(`topics/${t.key}/`) }));
+
+const i18n = {
+  placeholder: isEn ? "Search projects & writing…" : "Поиск по проектам и записям…",
+  hint: isEn ? "↑↓ navigate · Enter open · Esc close" : "↑↓ навигация · Enter перейти · Esc закрыть",
+  all: isEn ? "All" : "Все",
+  projects: isEn ? "Projects" : "Проекты",
+  posts: isEn ? "Posts" : "Записи",
+  empty: isEn ? "Nothing found" : "Ничего не найдено",
+  topicsLabel: isEn ? "Browse topics:" : "Смотрите темы:",
+  toggleLabel: isEn ? "Open search" : "Открыть поиск",
+  facetsLabel: isEn ? "Filter by type" : "Фильтр по типу",
+  resultsLabel: isEn ? "Search results" : "Результаты поиска",
+};
 ---
 
-<div class="search" data-index-url={indexUrl}>
+<div
+  class="search"
+  data-index-url={indexUrl}
+  data-topics={JSON.stringify(topicLinks)}
+  data-i18n={JSON.stringify(i18n)}
+>
   <button
     id="search-toggle"
     class="search-toggle"
     type="button"
-    aria-label="Открыть поиск"
+    aria-label={i18n.toggleLabel}
     aria-expanded="false"
     aria-controls="search-panel"
   >
@@ -27,15 +54,20 @@ const indexUrl = withBase("search-index.json");
       id="search-input"
       class="search-input"
       type="search"
-      placeholder="Поиск по проектам и записям…"
+      placeholder={i18n.placeholder}
       autocomplete="off"
       role="combobox"
       aria-expanded="false"
       aria-controls="search-results"
       aria-autocomplete="list"
     />
-    <ul id="search-results" class="search-results" role="listbox" aria-label="Результаты поиска"></ul>
-    <p class="search-hint">↑↓ навигация · Enter перейти · Esc закрыть</p>
+    <div class="search-facets" role="group" aria-label={i18n.facetsLabel}>
+      <button class="search-facet is-active" data-facet="all" type="button">{i18n.all}</button>
+      <button class="search-facet" data-facet="project" type="button">{i18n.projects}</button>
+      <button class="search-facet" data-facet="post" type="button">{i18n.posts}</button>
+    </div>
+    <ul id="search-results" class="search-results" role="listbox" aria-label={i18n.resultsLabel}></ul>
+    <p class="search-hint">{i18n.hint}</p>
   </div>
 </div>
 
@@ -46,11 +78,26 @@ const indexUrl = withBase("search-index.json");
     const root = document.querySelector<HTMLElement>(".search");
     if (!root) return;
     const indexUrl = root.dataset.indexUrl!;
+    const topics: { l: string; h: string }[] = JSON.parse(root.dataset.topics || "[]");
+    type I18n = {
+      placeholder: string;
+      hint: string;
+      all: string;
+      projects: string;
+      posts: string;
+      empty: string;
+      topicsLabel: string;
+      toggleLabel: string;
+      facetsLabel: string;
+      resultsLabel: string;
+    };
+    const t: I18n = JSON.parse(root.dataset.i18n || "{}");
     const toggleEl = document.getElementById("search-toggle");
     const panelEl = document.getElementById("search-panel");
     const inputEl = document.getElementById("search-input") as HTMLInputElement | null;
     const resultsElEl = document.getElementById("search-results");
-    if (!toggleEl || !panelEl || !inputEl || !resultsElEl) return;
+    const facetEls = root.querySelectorAll<HTMLButtonElement>(".search-facet");
+    if (!toggleEl || !panelEl || !inputEl || !resultsElEl || !indexUrl) return;
     // Reassign to const so TS keeps the non-null narrowing inside closures.
     const toggle = toggleEl;
     const panel = panelEl;
@@ -58,7 +105,10 @@ const indexUrl = withBase("search-index.json");
     const resultsEl = resultsElEl;
 
     const lang = document.documentElement.lang === "en" ? "en" : "ru";
-    let index: Array<{
+    const typeLabel = (tp: string) =>
+      lang === "en" ? (tp === "post" ? "Post" : "Project") : (tp === "post" ? "Запись" : "Проект");
+
+    type Entry = {
       type: string;
       locale: string;
       title: string;
@@ -66,13 +116,16 @@ const indexUrl = withBase("search-index.json");
       tags?: string[];
       tools?: string[];
       href: string;
-    }> | null = null;
+      date?: string;
+    };
+    let index: Entry[] | null = null;
     let activeIndex = -1;
+    let facet = "all";
 
     async function getIndex() {
       if (!index) {
         const res = await fetch(indexUrl);
-        index = await res.json();
+        index = (await res.json()) as Entry[];
       }
       return index;
     }
@@ -90,12 +143,30 @@ const indexUrl = withBase("search-index.json");
       resultsEl.innerHTML = "";
       input.setAttribute("aria-expanded", "false");
       activeIndex = -1;
+      setFacet("all");
     }
 
-    function score(
-      entry: { title: string; desc: string; tags?: string[]; tools?: string[] },
-      tokens: string[],
-    ): number {
+    function setFacet(next: string) {
+      facet = next;
+      facetEls.forEach((b) => b.classList.toggle("is-active", b.dataset.facet === next));
+    }
+
+    function escapeHtml(s: string): string {
+      return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function highlight(text: string, tokens: string[]): string {
+      const esc = escapeHtml(text);
+      const toks = tokens.filter(Boolean);
+      if (!toks.length) return esc;
+      const re = new RegExp(
+        "(" + toks.map((tk) => tk.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")",
+        "gi",
+      );
+      return esc.replace(re, "<mark>$1</mark>");
+    }
+
+    function score(entry: Entry, tokens: string[]): number {
       const hay = (
         entry.title +
         " " +
@@ -109,17 +180,39 @@ const indexUrl = withBase("search-index.json");
       for (const tk of tokens) {
         if (!hay.includes(tk)) return -1;
         s += entry.title.toLowerCase().includes(tk) ? 3 : 0;
-        s += (entry.tags ?? []).some((t) => t.toLowerCase() === tk) ? 2 : 0;
+        s += (entry.tags ?? []).some((tag) => tag.toLowerCase() === tk) ? 2 : 0;
         s += 1;
       }
       return s;
     }
 
-    function render(rows: Array<{ href: string; type: string; title: string; desc: string }>) {
+    function render(rows: Entry[], tokens: string[]) {
       resultsEl.innerHTML = "";
       if (!rows.length) {
-        resultsEl.innerHTML = '<li class="search-empty">Ничего не найдено</li>';
+        const li = document.createElement("li");
+        li.className = "search-empty";
+        const label = document.createElement("span");
+        label.textContent = t.empty;
+        li.appendChild(label);
+        if (topics.length) {
+          const wrap = document.createElement("div");
+          wrap.className = "search-topics";
+          const cap = document.createElement("span");
+          cap.className = "search-topics-label";
+          cap.textContent = t.topicsLabel;
+          wrap.appendChild(cap);
+          topics.forEach((tp) => {
+            const a = document.createElement("a");
+            a.href = tp.h;
+            a.className = "search-topic-chip";
+            a.textContent = tp.l;
+            wrap.appendChild(a);
+          });
+          li.appendChild(wrap);
+        }
+        resultsEl.appendChild(li);
         input.setAttribute("aria-expanded", "false");
+        activeIndex = -1;
         return;
       }
       input.setAttribute("aria-expanded", "true");
@@ -135,11 +228,11 @@ const indexUrl = withBase("search-index.json");
 
         const type = document.createElement("span");
         type.className = "search-result-type";
-        type.textContent = r.type === "post" ? "Запись" : "Проект";
+        type.textContent = typeLabel(r.type);
 
         const title = document.createElement("span");
         title.className = "search-result-title";
-        title.textContent = r.title;
+        title.innerHTML = highlight(r.title, tokens);
 
         a.appendChild(type);
         a.appendChild(title);
@@ -147,7 +240,7 @@ const indexUrl = withBase("search-index.json");
         if (r.desc) {
           const d = document.createElement("span");
           d.className = "search-result-desc";
-          d.textContent = r.desc;
+          d.innerHTML = highlight(r.desc, tokens);
           a.appendChild(d);
         }
 
@@ -158,27 +251,47 @@ const indexUrl = withBase("search-index.json");
     }
 
     let debounce: ReturnType<typeof setTimeout> | undefined;
-    input.addEventListener("input", () => {
-      clearTimeout(debounce);
+    async function runSearch() {
+      const idx = await getIndex();
+      if (!idx) return;
       const q = input.value.trim().toLowerCase();
+      const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
+      let rows: Entry[];
       if (!q) {
-        resultsEl.innerHTML = "";
-        input.setAttribute("aria-expanded", "false");
-        return;
-      }
-      debounce = setTimeout(async () => {
-        const idx = await getIndex();
-        if (!idx) return;
-        const tokens = q.split(/\s+/).filter(Boolean);
-        const rows = idx
-          .filter((e) => e.locale === lang)
+        // No query + active facet → browse recent items of that type.
+        if (facet === "all") {
+          resultsEl.innerHTML = "";
+          input.setAttribute("aria-expanded", "false");
+          activeIndex = -1;
+          return;
+        }
+        rows = idx
+          .filter((e) => e.locale === lang && e.type === facet)
+          .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
+          .slice(0, 8);
+      } else {
+        rows = idx
+          .filter((e) => e.locale === lang && (facet === "all" || e.type === facet))
           .map((e) => ({ e, s: score(e, tokens) }))
           .filter((x) => x.s >= 0)
           .sort((a, b) => b.s - a.s)
           .slice(0, 8)
           .map((x) => x.e);
-        render(rows);
-      }, 120);
+      }
+      render(rows, tokens);
+    }
+
+    input.addEventListener("input", () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(runSearch, 120);
+    });
+
+    facetEls.forEach((b) => {
+      b.addEventListener("click", () => {
+        setFacet(b.dataset.facet || "all");
+        runSearch();
+        input.focus();
+      });
     });
 
     function move(delta: number) {
