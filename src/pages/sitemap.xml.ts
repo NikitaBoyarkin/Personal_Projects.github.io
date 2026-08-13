@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { withBase } from "../lib/path";
+import { TOPICS } from "../lib/topics";
 
 function escapeXml(value: string): string {
   return value
@@ -18,7 +19,25 @@ export const GET: APIRoute = async ({ site }) => {
 
   const siteUrl = site.toString().replace(/\/$/, "");
 
-  const pages = ["", "writing/", "contact/", "about/", "en/", "en/about/"];
+  const pages = [
+    "",
+    "start/",
+    "writing/",
+    "contact/",
+    "about/",
+    "graph/",
+    "topics/",
+    "cv/",
+    "en/",
+    "en/about/",
+    "en/start/",
+    "en/graph/",
+  ];
+
+  const topicRoutes = TOPICS.map((t) => ({
+    url: `${siteUrl}${withBase(`topics/${t.key}/`)}`,
+    lastmod: undefined,
+  }));
 
   const projects = await getCollection("projects", (p) => !p.data.draft);
   const projectsEn = await getCollection("projects-en", (p) => !p.data.draft);
@@ -31,6 +50,7 @@ export const GET: APIRoute = async ({ site }) => {
       url: `${siteUrl}${withBase(path)}`,
       lastmod: undefined,
     })),
+    ...topicRoutes,
     ...projects.map((p) => ({
       url: `${siteUrl}${withBase(`projects/${p.id.replace(/\.md$/, "")}/`)}`,
       lastmod: undefined,

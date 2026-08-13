@@ -1,0 +1,25 @@
+# Nikita Boyarkin — Data Analyst / Product Analyst Portfolio
+
+> Portfolio of Nikita Boyarkin: SQL, Python, A/B testing, retention, segmentation. Project case studies with reproducible methodology (CUPED, AA-tests, ship-gates) and a skill taxonomy. RU (default) + EN.
+
+## Core pages
+- [Home (RU)](https://nikitaboyarkin.github.io/Personal_Projects.github.io/): intro, featured project (Volta neobank analytics), skill taxonomy, materials strip.
+- [Home (EN)](https://nikitaboyarkin.github.io/Personal_Projects.github.io/en/): English mirror.
+- [Writing](https://nikitaboyarkin.github.io/Personal_Projects.github.io/writing/): articles on SQL, A/B testing, segmentation, automation.
+- [Skill taxonomy](https://nikitaboyarkin.github.io/Personal_Projects.github.io/topics/): Junior/Middle/Senior topics with case studies per topic.
+
+## Featured project
+- [Volta Banking analytics](https://nikitaboyarkin.github.io/Personal_Projects.github.io/projects/volta/): neobank funnel, A/B test, retention, segmentation — 4 modules.
+
+## Other projects
+- [RFM segmentation](https://nikitaboyarkin.github.io/Personal_Projects.github.io/projects/rfm/): customer RFM segmentation.
+- [Cohort analysis](https://nikitaboyarkin.github.io/Personal_Projects.github.io/projects/cohort/): retention cohorts.
+- [Telegram reporting bot](https://nikitaboyarkin.github.io/Personal_Projects.github.io/projects/bot/): automated reporting.
+- [SQL reference](https://nikitaboyarkin.github.io/Personal_Projects.github.io/projects/sql/): SQL patterns.
+
+## About / contact
+- [About](https://nikitaboyarkin.github.io/Personal_Projects.github.io/about/): background and focus.
+- [CV](https://nikitaboyarkin.github.io/Personal_Projects.github.io/cv/): full CV.
+- GitHub: https://github.com/NikitaBoyarkin
+- LinkedIn: https://www.linkedin.com/in/nikita-boyarkin
+- Telegram: https://t.me/lofinibo
