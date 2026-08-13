@@ -144,6 +144,8 @@ const i18n = {
       input.setAttribute("aria-expanded", "false");
       activeIndex = -1;
       setFacet("all");
+      // Return focus to the trigger so keyboard users aren't dropped to <body>.
+      toggle.focus();
     }
 
     function setFacet(next: string) {

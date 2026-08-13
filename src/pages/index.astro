@@ -73,15 +73,18 @@ const jsonLd = {
       </div>
       <div class="intro-photo">
         <div class="photo-placeholder">
-          <img
-            src={withBase('images/00_profile.jpg')}
-            alt="Nikita Boyarkin"
-            class="profile-image"
-            width="800"
-            height="792"
-            loading="eager"
-            fetchpriority="high"
-          />
+          <picture>
+            <source type="image/webp" srcset={withBase('images/00_profile.webp')} />
+            <img
+              src={withBase('images/00_profile.jpg')}
+              alt="Nikita Boyarkin"
+              class="profile-image"
+              width="800"
+              height="792"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </picture>
         </div>
       </div>
     </div>
