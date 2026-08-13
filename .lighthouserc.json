@@ -5,7 +5,9 @@
       "startServerReadyPattern": "localhost",
       "url": [
         "http://localhost:4321/Personal_Projects.github.io/",
+        "http://localhost:4321/Personal_Projects.github.io/en/",
         "http://localhost:4321/Personal_Projects.github.io/writing/",
+        "http://localhost:4321/Personal_Projects.github.io/topics/",
         "http://localhost:4321/Personal_Projects.github.io/projects/volta/"
       ],
       "numberOfRuns": 1,
