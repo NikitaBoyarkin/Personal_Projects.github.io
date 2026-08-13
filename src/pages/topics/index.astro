@@ -65,24 +65,6 @@ const LEVEL_BLURBS: Record<TopicLevel, string> = {
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--space-3);
   }
-  .topic-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-    background: var(--background-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    text-decoration: none;
-    color: var(--text-normal);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .topic-card:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
-    box-shadow: 0 8px 20px var(--shadow-color);
-  }
   .topic-card-inner {
     display: flex;
     flex-direction: column;
