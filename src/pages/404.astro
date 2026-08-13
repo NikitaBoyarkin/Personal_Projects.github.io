@@ -27,7 +27,7 @@ const index = [...projects, ...posts];
     <h1 style="font-size: clamp(3rem, 2rem + 8vw, 6rem); margin: 0; line-height: 1; letter-spacing: -0.03em;">
       404
     </h1>
-    <p style="font-size: 1.2rem; color: var(--text-muted); margin: 1rem 0 2rem;">
+    <p id="nf-sub" style="font-size: 1.2rem; color: var(--text-muted); margin: 1rem 0 2rem;">
       Страница не найдена. Поищите проект или статью:
     </p>
     <input
@@ -43,9 +43,9 @@ const index = [...projects, ...posts];
       style="list-style: none; padding: 0; margin: 1.5rem auto 0; max-width: 600px; text-align: left;"
     ></ul>
     <p style="margin-top: 2.5rem;">
-      <a class="button" href={withBase('/')}>← На главную</a>
+      <a id="nf-home" class="button" href={withBase('/')}>← На главную</a>
       &nbsp;·&nbsp;
-      <a href={withBase('writing/')} style="color: var(--text-accent);">Все записи</a>
+      <a id="nf-writing" href={withBase('writing/')} style="color: var(--text-accent);">Все записи</a>
     </p>
   </section>
 
@@ -62,4 +62,23 @@ const index = [...projects, ...posts];
   input.addEventListener('input',function(){render(input.value);});
   render('');
 })();`} />
+
+  <script is:inline>
+    // Lang-aware copy: if the missing page lived under /en/, swap RU strings to EN.
+    (function () {
+      if (location.pathname.indexOf('/en/') < 0) return;
+      document.documentElement.lang = 'en';
+      var sub = document.getElementById('nf-sub');
+      if (sub) sub.textContent = 'Page not found. Search for a project or article:';
+      var input = document.getElementById('search404');
+      if (input) {
+        input.placeholder = 'Search…';
+        input.setAttribute('aria-label', 'Search projects and articles');
+      }
+      var home = document.getElementById('nf-home');
+      if (home) home.textContent = '← Home';
+      var writing = document.getElementById('nf-writing');
+      if (writing) writing.textContent = 'All writing';
+    })();
+  </script>
 </Base>

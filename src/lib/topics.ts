@@ -1,5 +1,5 @@
-// Single source of truth for the skill taxonomy. Shared by TopicMap.astro and
-// topics/index.astro so the two no longer keep their own copies in sync.
+// Single source of truth for the skill taxonomy. Shared by TopicMap.astro,
+// topics/index.astro and topics/[tag].astro so none keep their own copies.
 import { withBase } from "./path";
 
 export type TopicLevel = "junior" | "middle" | "senior" | "meta";
@@ -9,59 +9,59 @@ export interface Topic {
   label: string;
   level: TopicLevel;
   blurb: string;
+  /** Canonical tag spellings for this topic — used for post matching and as
+   *  keywords when scanning project slug/title/tools/description. */
+  tags: string[];
+  /** True iff the tag belongs to this topic. Derived from `tags`. */
   match: (tag: string) => boolean;
 }
 
+function topic(
+  key: string,
+  label: string,
+  level: TopicLevel,
+  blurb: string,
+  tags: string[],
+): Topic {
+  return { key, label, level, blurb, tags, match: (t) => tags.includes(t) };
+}
+
 export const TOPICS: Topic[] = [
-  {
-    key: "sql",
-    label: "SQL",
-    level: "junior",
-    blurb: "Запросы, оконные функции, агрегации — фундамент аналитика.",
-    match: (t) => t === "sql",
-  },
-  {
-    key: "python",
-    label: "Python",
-    level: "junior",
-    blurb: "pandas, NumPy, воспроизводимые пайплайны данных.",
-    match: (t) => t === "python" || t === "pandas",
-  },
-  {
-    key: "ab-testing",
-    label: "A/B-тестирование",
-    level: "middle",
-    blurb: "Методология экспериментов: CUPED, AA-тесты, байесовский вывод.",
-    match: (t) => t === "ab-testing" || t === "bayesian" || t === "statistics",
-  },
-  {
-    key: "retention",
-    label: "Retention / когорты",
-    level: "middle",
-    blurb: "Когортный анализ, кривые retention, отток.",
-    match: (t) => t === "retention" || t === "cohort-analysis",
-  },
-  {
-    key: "segmentation",
-    label: "Сегментация",
-    level: "middle",
-    blurb: "RFM, поведенческие и денежные сегменты клиентов.",
-    match: (t) => t === "rfm" || t === "segmentation" || t === "customer-analytics",
-  },
-  {
-    key: "automation",
-    label: "Автоматизация",
-    level: "middle",
-    blurb: "Telegram-боты, отчётность, оркестрация пайплайнов.",
-    match: (t) => t === "automation" || t === "telegram" || t === "reporting",
-  },
-  {
-    key: "career",
-    label: "Карьера",
-    level: "meta",
-    blurb: "Портфолио, интервью, развитие data-аналитика.",
-    match: (t) => t === "career" || t === "portfolio" || t === "data-analyst",
-  },
+  topic("sql", "SQL", "junior", "Запросы, оконные функции, агрегации — фундамент аналитика.", ["sql"]),
+  topic("python", "Python", "junior", "pandas, NumPy, воспроизводимые пайплайны данных.", [
+    "python",
+    "pandas",
+  ]),
+  topic(
+    "ab-testing",
+    "A/B-тестирование",
+    "middle",
+    "Методология экспериментов: CUPED, AA-тесты, байесовский вывод.",
+    ["ab-testing", "bayesian", "statistics"],
+  ),
+  topic("retention", "Retention / когорты", "middle", "Когортный анализ, кривые retention, отток.", [
+    "retention",
+    "cohort-analysis",
+  ]),
+  topic(
+    "segmentation",
+    "Сегментация",
+    "middle",
+    "RFM, поведенческие и денежные сегменты клиентов.",
+    ["rfm", "segmentation", "customer-analytics"],
+  ),
+  topic(
+    "automation",
+    "Автоматизация",
+    "middle",
+    "Telegram-боты, отчётность, оркестрация пайплайнов.",
+    ["automation", "telegram", "reporting"],
+  ),
+  topic("career", "Карьера", "meta", "Портфолио, интервью, развитие data-аналитика.", [
+    "career",
+    "portfolio",
+    "data-analyst",
+  ]),
 ];
 
 export interface TopicRow {

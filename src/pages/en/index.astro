@@ -3,14 +3,9 @@ import Base from '../../layouts/Base.astro';
 import ProjectGrid from '../../components/ProjectGrid.astro';
 import IntroShader from '../../components/IntroShader.astro';
 import CollaborationFormats from '../../components/CollaborationFormats.astro';
+import MaterialStrip from '../../components/MaterialStrip.astro';
 import { getCollection } from 'astro:content';
-import BlogCard from '../../components/BlogCard.astro';
 import { withBase } from '../../lib/path';
-import { estimateReadTime } from '../../lib/date';
-
-const posts = (await getCollection('posts', (p) => !p.data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3);
 
 const volta = (await getCollection('projects-en', (p) => !p.data.draft)).find(
   (p) => p.id.replace(/\.md$/, '') === 'volta',
@@ -226,27 +221,7 @@ const jsonLd = {
     }
   </style>
 
-  <!-- LATEST WRITING -->
-  <section id="writing" class="reveal reveal-delay-1">
-    <h2>Latest Writing</h2>
-    <div class="blog-list">
-      {
-        posts.map((post) => (
-          <BlogCard
-            slug={post.id.replace(/\.md$/, '')}
-            title={post.data.title}
-            category={post.data.category}
-            date={post.data.date}
-            excerpt={post.data.excerpt}
-            readTime={estimateReadTime(post.body)}
-          />
-        ))
-      }
-    </div>
-    <p style="margin-top: 1.5rem;">
-      <a href={withBase('writing/')}>View all writing →</a>
-    </p>
-  </section>
+  <MaterialStrip lang="en" />
 
   <!-- ABOUT -->
   <section id="about" class="reveal reveal-delay-3">

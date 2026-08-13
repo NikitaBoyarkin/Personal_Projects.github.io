@@ -5,38 +5,26 @@ import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
 import { estimateReadTime } from '../../lib/date';
+import { TOPICS } from '../../lib/topics';
 
-const TOPIC_MATCH: Record<string, { label: string; tags: string[] }> = {
-  'ab-testing': { label: 'A/B-тестирование', tags: ['ab-testing', 'bayesian', 'statistics'] },
-  retention: { label: 'Retention / когорты', tags: ['retention', 'cohort-analysis'] },
-  segmentation: { label: 'Сегментация', tags: ['rfm', 'segmentation', 'customer-analytics'] },
-  sql: { label: 'SQL', tags: ['sql'] },
-  python: { label: 'Python', tags: ['python', 'pandas'] },
-  automation: { label: 'Автоматизация', tags: ['automation', 'telegram', 'reporting'] },
-  career: { label: 'Карьера', tags: ['career', 'portfolio', 'data-analyst'] },
-};
-
+// Topic definitions + the route list both come from src/lib/topics.ts — no
+// more duplicated TOPIC_MATCH / key list in this file.
 export async function getStaticPaths() {
-  // Keys kept in sync with TOPIC_MATCH below (getStaticPaths cannot reference
-  // module-level consts, so the list is duplicated here).
-  return ['ab-testing', 'retention', 'segmentation', 'sql', 'python', 'automation', 'career'].map(
-    (key) => ({ params: { tag: key } }),
-  );
+  return TOPICS.map((t) => ({ params: { tag: t.key } }));
 }
 
 const { tag } = Astro.params;
-const topic = TOPIC_MATCH[tag!];
+const topic = TOPICS.find((t) => t.key === tag);
 if (!topic) {
   return Astro.redirect(withBase('topics/'));
 }
-const matchSet = new Set(topic.tags);
 
 const posts = (await getCollection('posts', (p) => !p.data.draft))
-  .filter((p) => (p.data.tags ?? []).some((t) => matchSet.has(t)))
+  .filter((p) => (p.data.tags ?? []).some((t) => topic.match(t)))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-// Projects matched by tag keywords appearing in slug/title/tools/description.
-const needle = tag!.replace('-', ' ');
+// Projects matched by topic tags appearing in slug/title/tools/description.
+const needle = topic.key.replace('-', ' ');
 const projects = (await getCollection('projects', (p) => !p.data.draft))
   .filter((p) => {
     const slug = p.id.replace(/\.md$/, '');

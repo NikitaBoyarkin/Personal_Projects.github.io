@@ -2,26 +2,40 @@
 // "New materials" strip — horizontal scroll-snap of thumbnail cards (latest
 // posts + the featured Volta project), inspired by podbiratel's material
 // strip. Replaces the text-only blog list on the homepage.
+// `lang="en"` pulls the EN project collection + EN labels; posts stay RU (no
+// EN posts yet) — matches the pre-existing EN-home behaviour.
 import { getCollection } from "astro:content";
 import { withBase } from "../lib/path";
 import { formatDate } from "../lib/date";
+
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+const projectCollection = isEn ? "projects-en" : "projects";
+const linkPrefix = isEn ? "en/" : "";
+const heading = isEn ? "Fresh materials" : "Свежие материалы";
+const projectBadge = isEn ? "Project" : "Проект";
+const footLabel = isEn ? "All writing" : "Все записи";
 
 const posts = (await getCollection("posts", (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
 
-const projects = await getCollection("projects", (p) => !p.data.draft);
+const projects = await getCollection(projectCollection, (p) => !p.data.draft);
 const volta = projects.find((p) => p.id.replace(/\.md$/, "") === "volta");
 
 const slugOf = (id: string) => id.replace(/\.md$/, "");
 ---
 
-<section id="materials" class="reveal reveal-delay-1" aria-label="Свежие материалы">
-  <h2>Свежие материалы</h2>
+<section id="materials" class="reveal reveal-delay-1" aria-label={heading}>
+  <h2>{heading}</h2>
   <div class="material-strip">
     {
       volta && (
-        <a class="strip-card strip-card-featured" href={withBase("projects/volta/")}>
+        <a class="strip-card strip-card-featured" href={withBase(`${linkPrefix}projects/volta/`)}>
           {volta.data.hero && (
             <img
               src={withBase(volta.data.hero)}
@@ -32,7 +46,7 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
             />
           )}
           <div class="strip-card-body">
-            <span class="strip-badge strip-badge-project">Проект</span>
+            <span class="strip-badge strip-badge-project">{projectBadge}</span>
             <span class="strip-title">{volta.data.title}</span>
             <span class="strip-meta">{volta.data.description.slice(0, 72)}…</span>
           </div>
@@ -63,6 +77,6 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
     }
   </div>
   <p class="strip-foot">
-    <a href={withBase("writing/")}>Все записи →</a>
+    <a href={withBase("writing/")}>{footLabel} →</a>
   </p>
 </section>
