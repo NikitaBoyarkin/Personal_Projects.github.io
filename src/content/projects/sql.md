@@ -14,6 +14,19 @@ tools:
   - pandas / NumPy
   - pytest
 github: https://github.com/NikitaBoyarkin/sql-analytics-case-study
+caseStudy:
+  problem: "Аналитику нужно показать владение SQL на продуктовых задачах, но продакшен-данных нет, а учебные задачи не демонстрируют системное мышление. Как доказать, что SQL — рабочий инструмент, а не набор заученных синтаксисов?"
+  approach: "10 end-to-end кейсов на синтетическом датасете (seed=42, ~183k событий, 20k signups): каждый кейс — один самодостаточный .sql файл с вопросом и подходом в leading-комментарии. DuckDB — одна команда строит данные и базу, без сервера и кредов. Regression-тесты с детерминированными инвариантами защищают SQL от регрессий при изменении генератора."
+  result: "10 кейсов от funnel до revenue attribution, каждый покрывает конкретный оконный паттерн (gaps-and-islands, partitioned Top-N, range-join для stickiness). Кейсы самопроверяемы: pytest подтверждает, что SQL продолжает давать ожидаемые метрики после любого изменения данных."
+  metrics:
+    - label: "SQL-кейсов"
+      value: "10"
+    - label: "Событий в датасете"
+      value: "~183k"
+    - label: "Signups"
+      value: "20k"
+    - label: "Команда для запуска"
+      value: "1"
 ---
 
 # SQL Analytics Case Study
