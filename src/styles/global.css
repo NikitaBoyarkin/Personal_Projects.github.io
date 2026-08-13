@@ -378,6 +378,13 @@ nav ul.links a[aria-current="page"] {
   box-shadow: 0 8px 20px color-mix(in srgb, var(--text-accent) 25%, transparent);
 }
 
+/* Nav CTA — compact button for the persistent nav action (PostHog-style) */
+.nav-cta {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.85rem;
+  border-radius: var(--radius-md);
+}
+
 .cta-row {
   display: flex;
   flex-wrap: wrap;
@@ -533,6 +540,65 @@ nav ul.links a[aria-current="page"] {
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+}
+
+/* Hero tagline — transformation line (PostHog-style: outcome, not role) */
+.intro-content .tagline {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-accent);
+  margin-bottom: var(--space-2);
+  letter-spacing: -0.01em;
+}
+
+/* Proof strip — concrete metrics right after hero */
+#proof {
+  margin-bottom: var(--space-16);
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--background-secondary) 50%, transparent);
+}
+
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.proof-item {
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.proof-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-2);
+}
+
+.proof-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .proof-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .proof-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Projects Section */
