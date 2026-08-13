@@ -4,6 +4,7 @@ import '../styles/blog.css';
 import { withBase } from '../lib/path';
 import Analytics from '../components/Analytics.astro';
 import LangSwitch from '../components/LangSwitch.astro';
+import SearchBox from '../components/SearchBox.astro';
 
 interface Props {
   title: string;
@@ -132,6 +133,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
 
       <div class="nav-aux">
         {counterpartHref && <LangSwitch locale={lang} counterpartHref={counterpartHref} />}
+        <SearchBox />
         <a class="nav-telegram" href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
           <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>

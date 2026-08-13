@@ -1,62 +1,13 @@
 ---
 // Topic map with post/project counts — a compact analog of pimenov.ai's topic map.
-// Counts are computed from the posts + projects collections at build time.
-import { getCollection } from 'astro:content';
+// Counts + topic definitions live in src/lib/topics.ts (single source of truth).
 import { withBase } from '../lib/path';
-
-interface Topic {
-  key: string;
-  label: string;
-  match: (tag: string) => boolean;
-}
-
-const TOPICS: Topic[] = [
-  { key: 'ab-testing', label: 'A/B-тестирование', match: (t) => t === 'ab-testing' || t === 'bayesian' || t === 'statistics' },
-  { key: 'retention', label: 'Retention / когорты', match: (t) => t === 'retention' || t === 'cohort-analysis' },
-  { key: 'segmentation', label: 'Сегментация', match: (t) => t === 'rfm' || t === 'segmentation' || t === 'customer-analytics' },
-  { key: 'sql', label: 'SQL', match: (t) => t === 'sql' },
-  { key: 'python', label: 'Python', match: (t) => t === 'python' || t === 'pandas' },
-  { key: 'automation', label: 'Автоматизация', match: (t) => t === 'automation' || t === 'telegram' || t === 'reporting' },
-  { key: 'career', label: 'Карьера', match: (t) => t === 'career' || t === 'portfolio' || t === 'data-analyst' },
-];
+import { getCollection } from 'astro:content';
+import { computeTopicRows } from '../lib/topics';
 
 const posts = await getCollection('posts', (p) => !p.data.draft);
 const projects = await getCollection('projects', (p) => !p.data.draft);
-
-// Count posts by topic via tag matching.
-const postCounts = new Map<string, number>(TOPICS.map((t) => [t.key, 0]));
-for (const post of posts) {
-  for (const tag of post.data.tags ?? []) {
-    for (const topic of TOPICS) {
-      if (topic.match(tag)) postCounts.set(topic.key, (postCounts.get(topic.key) ?? 0) + 1);
-    }
-  }
-}
-
-// Approximate project contribution: 1 per project whose tools/title/slug touch the topic.
-const projectCounts = new Map<string, number>(TOPICS.map((t) => [t.key, 0]));
-const projectSignals = projects.map((p) => ({
-  slug: p.id.replace(/\.md$/, ''),
-  title: p.data.title.toLowerCase(),
-  tools: (p.data.tools ?? []).join(' ').toLowerCase(),
-  desc: p.data.description.toLowerCase(),
-}));
-for (const topic of TOPICS) {
-  const needle = topic.key.replace('-', ' ');
-  const hits = projectSignals.filter(
-    (p) => p.slug.includes(needle) || p.title.includes(needle) || p.tools.includes(needle) || p.desc.includes(needle),
-  );
-  projectCounts.set(topic.key, hits.length);
-}
-
-const rows = TOPICS.map((t) => ({
-  key: t.key,
-  label: t.label,
-  href: withBase(`topics/${t.key}/`),
-  count: (postCounts.get(t.key) ?? 0) + (projectCounts.get(t.key) ?? 0),
-}))
-  .filter((r) => r.count > 0)
-  .sort((a, b) => b.count - a.count);
+const rows = computeTopicRows(posts, projects);
 ---
 
 <section id="topics" class="topic-map reveal reveal-delay-2" aria-label="Темы">

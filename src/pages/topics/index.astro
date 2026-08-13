@@ -1,52 +1,25 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
-
-// Same topic definitions as TopicMap component — kept in sync manually.
-const TOPICS = [
-  { key: 'ab-testing', label: 'A/B-тестирование', match: (t: string) => t === 'ab-testing' || t === 'bayesian' || t === 'statistics' },
-  { key: 'retention', label: 'Retention / когорты', match: (t: string) => t === 'retention' || t === 'cohort-analysis' },
-  { key: 'segmentation', label: 'Сегментация', match: (t: string) => t === 'rfm' || t === 'segmentation' || t === 'customer-analytics' },
-  { key: 'sql', label: 'SQL', match: (t: string) => t === 'sql' },
-  { key: 'python', label: 'Python', match: (t: string) => t === 'python' || t === 'pandas' },
-  { key: 'automation', label: 'Автоматизация', match: (t: string) => t === 'automation' || t === 'telegram' || t === 'reporting' },
-  { key: 'career', label: 'Карьера', match: (t: string) => t === 'career' || t === 'portfolio' || t === 'data-analyst' },
-];
+import { getCollection } from 'astro:content';
+import {
+  computeTopicRows,
+  groupRowsByLevel,
+  LEVEL_LABELS,
+  type TopicLevel,
+} from '../../lib/topics';
 
 const posts = await getCollection('posts', (p) => !p.data.draft);
 const projects = await getCollection('projects', (p) => !p.data.draft);
+const rows = computeTopicRows(posts, projects);
+const groups = groupRowsByLevel(rows);
 
-const counts = new Map<string, number>(TOPICS.map((t) => [t.key, 0]));
-for (const post of posts) {
-  for (const tag of post.data.tags ?? []) {
-    for (const topic of TOPICS) {
-      if (topic.match(tag)) counts.set(topic.key, (counts.get(topic.key) ?? 0) + 1);
-    }
-  }
-}
-const projectSignals = projects.map((p) => ({
-  slug: p.id.replace(/\.md$/, ''),
-  title: p.data.title.toLowerCase(),
-  tools: (p.data.tools ?? []).join(' ').toLowerCase(),
-  desc: p.data.description.toLowerCase(),
-}));
-for (const topic of TOPICS) {
-  const needle = topic.key.replace('-', ' ');
-  const hits = projectSignals.filter(
-    (p) => p.slug.includes(needle) || p.title.includes(needle) || p.tools.includes(needle) || p.desc.includes(needle),
-  );
-  counts.set(topic.key, (counts.get(topic.key) ?? 0) + hits.length);
-}
-
-const rows = TOPICS.map((t) => ({
-  key: t.key,
-  label: t.label,
-  href: withBase(`topics/${t.key}/`),
-  count: counts.get(t.key) ?? 0,
-}))
-  .filter((r) => r.count > 0)
-  .sort((a, b) => b.count - a.count);
+const LEVEL_BLURBS: Record<TopicLevel, string> = {
+  junior: 'Базовый инструментарий аналитика.',
+  middle: 'Продуктовая методология и прикладная аналитика.',
+  senior: 'Продвинутые методы и системная ответственность.',
+  meta: 'Карьера и развитие.',
+};
 ---
 
 <Base
@@ -59,32 +32,45 @@ const rows = TOPICS.map((t) => ({
   <section class="container reveal">
     <h1 class="page-title">Темы</h1>
     <p style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 60ch;">
-      Карта тем, которые покрывают проекты и записи портфолио. Счётчик — число материалов по теме.
+      Карта тем, которые покрывают проекты и записи портфолио. Сгруппированы по уровню владения;
+      счётчик — число материалов по теме.
     </p>
-    <div class="topic-grid">
-      {
-        rows.map((r) => (
-          <a class="topic-card" href={r.href}>
-            <span class="topic-label">{r.label}</span>
-            <span class="topic-count">{r.count}</span>
-          </a>
-        ))
-      }
-    </div>
+    {
+      groups.map((g) => (
+        <div class="level-group">
+          <div class="level-heading">
+            <span class="level-name">{LEVEL_LABELS[g.level]}</span>
+            <span class="level-blurb">{LEVEL_BLURBS[g.level]}</span>
+          </div>
+          <div class="topic-grid">
+            {g.rows.map((r) => (
+              <a class="topic-card" href={r.href}>
+                <span class="topic-card-inner">
+                  <span class="topic-label">{r.label}</span>
+                  <span class="topic-blurb">{r.blurb}</span>
+                </span>
+                <span class="topic-count">{r.count}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))
+    }
   </section>
 </Base>
 
 <style>
   .topic-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--space-3);
   }
   .topic-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-5);
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
     background: var(--background-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -97,8 +83,20 @@ const rows = TOPICS.map((t) => ({
     border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
     box-shadow: 0 8px 20px var(--shadow-color);
   }
-  .topic-label { font-weight: 500; }
+  .topic-card-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .topic-label {
+    font-weight: 500;
+  }
+  .topic-blurb {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
   .topic-count {
+    flex-shrink: 0;
     font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-accent);

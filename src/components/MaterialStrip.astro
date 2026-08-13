@@ -1,0 +1,68 @@
+---
+// "New materials" strip — horizontal scroll-snap of thumbnail cards (latest
+// posts + the featured Volta project), inspired by podbiratel's material
+// strip. Replaces the text-only blog list on the homepage.
+import { getCollection } from "astro:content";
+import { withBase } from "../lib/path";
+import { formatDate } from "../lib/date";
+
+const posts = (await getCollection("posts", (p) => !p.data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
+
+const projects = await getCollection("projects", (p) => !p.data.draft);
+const volta = projects.find((p) => p.id.replace(/\.md$/, "") === "volta");
+
+const slugOf = (id: string) => id.replace(/\.md$/, "");
+---
+
+<section id="materials" class="reveal reveal-delay-1" aria-label="Свежие материалы">
+  <h2>Свежие материалы</h2>
+  <div class="material-strip">
+    {
+      volta && (
+        <a class="strip-card strip-card-featured" href={withBase("projects/volta/")}>
+          {volta.data.hero && (
+            <img
+              src={withBase(volta.data.hero)}
+              alt={volta.data.title}
+              width="600"
+              height="200"
+              loading="lazy"
+            />
+          )}
+          <div class="strip-card-body">
+            <span class="strip-badge strip-badge-project">Проект</span>
+            <span class="strip-title">{volta.data.title}</span>
+            <span class="strip-meta">{volta.data.description.slice(0, 72)}…</span>
+          </div>
+        </a>
+      )
+    }
+    {
+      posts.map((post) => (
+        <a class="strip-card" href={withBase(`posts/${slugOf(post.id)}/`)}>
+          {post.data.image && (
+            <img
+              src={withBase(post.data.image)}
+              alt={post.data.title}
+              width="600"
+              height="200"
+              loading="lazy"
+            />
+          )}
+          <div class="strip-card-body">
+            <span class="strip-badge strip-badge-post">
+              {post.data.category.replace("-", " ")}
+            </span>
+            <span class="strip-title">{post.data.title}</span>
+            <span class="strip-meta">{formatDate(post.data.date)}</span>
+          </div>
+        </a>
+      ))
+    }
+  </div>
+  <p class="strip-foot">
+    <a href={withBase("writing/")}>Все записи →</a>
+  </p>
+</section>

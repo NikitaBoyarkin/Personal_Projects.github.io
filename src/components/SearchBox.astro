@@ -1,0 +1,232 @@
+---
+// Site-wide search island. Inline (bundled) script — no framework, no client
+// directive. The index URL is stamped server-side via withBase so the client
+// never touches import.meta.env. Styles live in global.css (.search-*).
+import { withBase } from "../lib/path";
+
+const indexUrl = withBase("search-index.json");
+---
+
+<div class="search" data-index-url={indexUrl}>
+  <button
+    id="search-toggle"
+    class="search-toggle"
+    type="button"
+    aria-label="Открыть поиск"
+    aria-expanded="false"
+    aria-controls="search-panel"
+  >
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  </button>
+
+  <div id="search-panel" class="search-panel" hidden>
+    <input
+      id="search-input"
+      class="search-input"
+      type="search"
+      placeholder="Поиск по проектам и записям…"
+      autocomplete="off"
+      role="combobox"
+      aria-expanded="false"
+      aria-controls="search-results"
+      aria-autocomplete="list"
+    />
+    <ul id="search-results" class="search-results" role="listbox" aria-label="Результаты поиска"></ul>
+    <p class="search-hint">↑↓ навигация · Enter перейти · Esc закрыть</p>
+  </div>
+</div>
+
+<script>
+  // Wrap in init() — ES module top-level `return` is illegal, so all early
+  // bail-outs live inside a function.
+  function init() {
+    const root = document.querySelector<HTMLElement>(".search");
+    if (!root) return;
+    const indexUrl = root.dataset.indexUrl!;
+    const toggleEl = document.getElementById("search-toggle");
+    const panelEl = document.getElementById("search-panel");
+    const inputEl = document.getElementById("search-input") as HTMLInputElement | null;
+    const resultsElEl = document.getElementById("search-results");
+    if (!toggleEl || !panelEl || !inputEl || !resultsElEl) return;
+    // Reassign to const so TS keeps the non-null narrowing inside closures.
+    const toggle = toggleEl;
+    const panel = panelEl;
+    const input = inputEl;
+    const resultsEl = resultsElEl;
+
+    const lang = document.documentElement.lang === "en" ? "en" : "ru";
+    let index: Array<{
+      type: string;
+      locale: string;
+      title: string;
+      desc: string;
+      tags?: string[];
+      tools?: string[];
+      href: string;
+    }> | null = null;
+    let activeIndex = -1;
+
+    async function getIndex() {
+      if (!index) {
+        const res = await fetch(indexUrl);
+        index = await res.json();
+      }
+      return index;
+    }
+
+    function open() {
+      panel.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+      input.focus();
+    }
+
+    function close() {
+      panel.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+      input.value = "";
+      resultsEl.innerHTML = "";
+      input.setAttribute("aria-expanded", "false");
+      activeIndex = -1;
+    }
+
+    function score(
+      entry: { title: string; desc: string; tags?: string[]; tools?: string[] },
+      tokens: string[],
+    ): number {
+      const hay = (
+        entry.title +
+        " " +
+        entry.desc +
+        " " +
+        (entry.tags ?? []).join(" ") +
+        " " +
+        (entry.tools ?? []).join(" ")
+      ).toLowerCase();
+      let s = 0;
+      for (const tk of tokens) {
+        if (!hay.includes(tk)) return -1;
+        s += entry.title.toLowerCase().includes(tk) ? 3 : 0;
+        s += (entry.tags ?? []).some((t) => t.toLowerCase() === tk) ? 2 : 0;
+        s += 1;
+      }
+      return s;
+    }
+
+    function render(rows: Array<{ href: string; type: string; title: string; desc: string }>) {
+      resultsEl.innerHTML = "";
+      if (!rows.length) {
+        resultsEl.innerHTML = '<li class="search-empty">Ничего не найдено</li>';
+        input.setAttribute("aria-expanded", "false");
+        return;
+      }
+      input.setAttribute("aria-expanded", "true");
+      rows.forEach((r, i) => {
+        const li = document.createElement("li");
+        li.className = "search-result";
+        li.setAttribute("role", "option");
+        li.dataset.idx = String(i);
+
+        const a = document.createElement("a");
+        a.href = r.href;
+        a.tabIndex = -1;
+
+        const type = document.createElement("span");
+        type.className = "search-result-type";
+        type.textContent = r.type === "post" ? "Запись" : "Проект";
+
+        const title = document.createElement("span");
+        title.className = "search-result-title";
+        title.textContent = r.title;
+
+        a.appendChild(type);
+        a.appendChild(title);
+
+        if (r.desc) {
+          const d = document.createElement("span");
+          d.className = "search-result-desc";
+          d.textContent = r.desc;
+          a.appendChild(d);
+        }
+
+        li.appendChild(a);
+        resultsEl.appendChild(li);
+      });
+      activeIndex = -1;
+    }
+
+    let debounce: ReturnType<typeof setTimeout> | undefined;
+    input.addEventListener("input", () => {
+      clearTimeout(debounce);
+      const q = input.value.trim().toLowerCase();
+      if (!q) {
+        resultsEl.innerHTML = "";
+        input.setAttribute("aria-expanded", "false");
+        return;
+      }
+      debounce = setTimeout(async () => {
+        const idx = await getIndex();
+        if (!idx) return;
+        const tokens = q.split(/\s+/).filter(Boolean);
+        const rows = idx
+          .filter((e) => e.locale === lang)
+          .map((e) => ({ e, s: score(e, tokens) }))
+          .filter((x) => x.s >= 0)
+          .sort((a, b) => b.s - a.s)
+          .slice(0, 8)
+          .map((x) => x.e);
+        render(rows);
+      }, 120);
+    });
+
+    function move(delta: number) {
+      const items = resultsEl.querySelectorAll<HTMLElement>(".search-result");
+      if (!items.length) return;
+      activeIndex = (activeIndex + delta + items.length) % items.length;
+      items.forEach((it, i) => it.classList.toggle("active", i === activeIndex));
+      items[activeIndex].scrollIntoView({ block: "nearest" });
+    }
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        move(1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        move(-1);
+      } else if (e.key === "Enter") {
+        const items = resultsEl.querySelectorAll<HTMLElement>(".search-result");
+        if (activeIndex >= 0 && items[activeIndex]) {
+          const a = items[activeIndex].querySelector("a");
+          if (a) {
+            e.preventDefault();
+            window.location.href = a.href;
+          }
+        }
+      } else if (e.key === "Escape") {
+        close();
+      }
+    });
+
+    toggle.addEventListener("click", () => {
+      panel.hidden ? open() : close();
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!root.contains(e.target as Node)) close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const el = document.activeElement;
+      const typing = el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA");
+      if (e.key === "/" && !typing) {
+        e.preventDefault();
+        open();
+      }
+    });
+  }
+
+  init();
+</script>
