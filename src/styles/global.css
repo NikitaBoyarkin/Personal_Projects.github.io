@@ -755,6 +755,22 @@ nav ul.links a[aria-current="page"] {
   color: var(--text-accent-hover);
 }
 
+/* Live demo button — distinct from GitHub: filled accent-tint, shows the working artifact */
+.project .button-demo {
+  background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+  color: var(--text-accent);
+  border: 1px solid color-mix(in srgb, var(--text-accent) 40%, transparent);
+}
+
+.project .button-demo::after {
+  content: none;
+}
+
+.project .button-demo:hover {
+  background: color-mix(in srgb, var(--text-accent) 22%, transparent);
+  border-color: color-mix(in srgb, var(--text-accent) 60%, transparent);
+}
+
 .project-tools {
   display: flex;
   flex-wrap: wrap;
@@ -776,6 +792,7 @@ nav ul.links a[aria-current="page"] {
 
 .project-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin-top: auto;
 }

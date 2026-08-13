@@ -15,6 +15,7 @@ tools:
   - Matplotlib / Seaborn
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
+demo: demos/bayesian/index.html
 related:
   - /posts/bayesian-ab-testing/
 children:

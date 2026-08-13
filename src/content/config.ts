@@ -7,6 +7,7 @@ const projectSchema = z.object({
   impact: z.array(z.string()).default([]),
   tools: z.array(z.string()).default([]),
   github: z.string().url().optional(),
+  demo: z.string().optional(),
   related: z.array(z.string()).default([]),
   children: z.array(z.string()).default([]),
   caseStudy: z
