@@ -15,7 +15,8 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
     "@paper-design/shaders": "^0.0.78",
-    "astro": "^5.0.0"
+    "astro": "^5.0.0",
+    "posthog-js": "^1.417.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
