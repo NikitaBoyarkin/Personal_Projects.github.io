@@ -35,7 +35,7 @@ const impactText = impact?.join(', ');
   {impactText && <p class="Impact">Impact: {impactText}</p>}
 
   <div class="project-actions">
-    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;">View Project</a>
+    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>View Project</a>
     {
       demo && (
         <a
@@ -44,6 +44,7 @@ const impactText = impact?.join(', ');
           target="_blank"
           rel="noopener noreferrer"
           style="flex: 1 1 auto; justify-content: center;"
+          data-analytics={`project_demo_${slug}`}
         >
           Live demo
         </a>
@@ -57,6 +58,7 @@ const impactText = impact?.join(', ');
           target="_blank"
           rel="noopener noreferrer"
           style="flex: 1 1 auto; justify-content: center;"
+          data-analytics={`project_github_${slug}`}
         >
           GitHub
         </a>

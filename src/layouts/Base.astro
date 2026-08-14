@@ -135,7 +135,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
         {counterpartHref && <LangSwitch locale={lang} counterpartHref={counterpartHref} />}
         <SearchBox lang={lang} />
         <a class="button nav-cta" href={contactHref}>{isEn ? 'Contact' : 'Написать'}</a>
-        <a class="nav-telegram" href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+        <a class="nav-telegram" href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" aria-label="Telegram" data-analytics="telegram_header">
           <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>
           </svg>
@@ -167,11 +167,11 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
     </main>
 
     <footer id="contact">
-      <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-      <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
-      <a href="https://t.me/lofinibo">Telegram</a> ·
-      <a href={withBase('cv/')}>CV</a> ·
-      <a href={withBase('writing/')}>Writing</a>
+      <a href="https://github.com/NikitaBoyarkin" data-analytics="github_footer">GitHub</a> ·
+      <a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_footer">LinkedIn</a> ·
+      <a href="https://t.me/lofinibo" data-analytics="telegram_footer">Telegram</a> ·
+      <a href={withBase('cv/')} data-analytics="cv_footer">CV</a> ·
+      <a href={withBase('writing/')} data-analytics="writing_footer">Writing</a>
       <p>© {new Date().getFullYear()} Nikita Boyarkin</p>
     </footer>
 
@@ -222,6 +222,9 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
             const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
             applyTheme(next);
             persistTheme(next);
+            if (window.posthog) {
+              try { window.posthog.capture('theme_change', { theme: next }); } catch (e) { /* ignore */ }
+            }
           });
         }
 
