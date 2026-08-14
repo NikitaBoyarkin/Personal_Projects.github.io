@@ -11,7 +11,7 @@ interface Props {
 }
 const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects' } = Astro.props;
 
-const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
+const ORDER = ['volta', 'supabase', 'posthog', 'streamlit', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
 const projects = (await getCollection(collection, (p) => !p.data.draft))
   .filter((p) => p.id.replace(/\.md$/, '') !== excludeSlug)
   .sort(
