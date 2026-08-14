@@ -219,6 +219,7 @@ nav.scrolled {
 
 nav ul.links {
   display: flex;
+  flex-wrap: wrap;
   list-style: none;
   gap: 1.5rem;
 }
@@ -1131,6 +1132,18 @@ footer p {
     gap: 1rem;
   }
 
+  nav ul.links {
+    gap: 1rem;
+  }
+
+  /* Responsive tables: scroll horizontally instead of overflowing */
+  main table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
   #about {
     padding: 1.5rem;
   }
@@ -1167,6 +1180,10 @@ footer p {
   #theme-toggle {
     width: 28px;
     height: 28px;
+  }
+
+  nav ul.links {
+    gap: 0.75rem;
   }
 }
 
