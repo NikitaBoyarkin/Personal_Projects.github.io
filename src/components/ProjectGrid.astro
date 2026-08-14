@@ -35,6 +35,7 @@ const projects = (await getCollection(collection, (p) => !p.data.draft))
           tools={project.data.tools}
           github={project.data.github}
           demo={project.data.demo}
+          private={project.data.private}
           linkPrefix={linkPrefix}
         />
       ))

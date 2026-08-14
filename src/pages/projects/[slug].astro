@@ -131,6 +131,9 @@ const projectJsonLd = {
             >
               View on GitHub →
             </a>
+            {project.data.private && (
+              <span class="repo-private-note" style="display:block;font-size:.85rem;color:var(--text-normal);opacity:.75;margin-top:.25rem;">Repo is private — available on request</span>
+            )}
           </div>
         )
       }

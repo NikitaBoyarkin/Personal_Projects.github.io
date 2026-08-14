@@ -19,6 +19,7 @@ const projectSchema = z.object({
     })
     .optional(),
   draft: z.boolean().default(false),
+  private: z.boolean().default(false),
 });
 
 const voltaPartSchema = z.object({

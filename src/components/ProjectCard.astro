@@ -10,10 +10,11 @@ interface Props {
   tools?: string[];
   github?: string;
   demo?: string;
+  private?: boolean;
   linkPrefix?: string;
 }
 
-const { slug, title, description, image, impact, tools, github, demo, linkPrefix = '' } = Astro.props;
+const { slug, title, description, image, impact, tools, github, demo, private: isPrivate = false, linkPrefix = '' } = Astro.props;
 const impactText = impact?.join(', ');
 ---
 
@@ -65,4 +66,6 @@ const impactText = impact?.join(', ');
       )
     }
   </div>
+
+  {isPrivate && <p class="repo-private-note" style="font-size:.8rem;color:var(--text-normal);opacity:.75;margin:.5rem 0 0;">Repo is private — available on request</p>}
 </article>

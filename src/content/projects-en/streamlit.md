@@ -13,6 +13,7 @@ tools:
   - Streamlit
   - pandas / NumPy
 github: https://github.com/NikitaBoyarkin/streamlit-app
+private: true
 related:
   - /en/projects/supabase/
 caseStudy:
