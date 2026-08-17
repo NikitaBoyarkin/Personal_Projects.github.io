@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <style>
-    .bg { fill: #0f2a2b; }
-    .fg { fill: #ff8569; }
+    .cell { fill: #0f2a2b; }
+    .mono { fill: #ff8569; }
     @media (prefers-color-scheme: light) {
-      .bg { fill: #fafafa; }
-      .fg { fill: #ff6643; }
+      .cell { fill: #f4efca; }
+      .mono { fill: #a8331a; }
     }
   </style>
-  <rect class="bg" width="100" height="100" rx="20"/>
-  <text class="fg" x="50" y="68" font-family="Inter, system-ui, sans-serif" font-size="52" font-weight="700" text-anchor="middle">N</text>
+  <path class="cell" d="M96 50 73 89.8 27 89.8 4 50 27 10.2 73 10.2Z"/>
+  <text class="mono" x="50" y="61" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.5" text-anchor="middle">NB</text>
 </svg>

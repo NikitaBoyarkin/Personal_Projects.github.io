@@ -179,6 +179,22 @@ nav.scrolled {
   font-weight: 600;
 }
 
+.nav-logo {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.nav-logo .cell {
+  fill: var(--background-secondary);
+  stroke: var(--text-accent);
+  stroke-width: 3;
+}
+
+.nav-logo .mono {
+  fill: var(--text-accent);
+}
+
 /* Theme Toggle Button in Nav */
 #theme-toggle {
   background: var(--background-secondary);
