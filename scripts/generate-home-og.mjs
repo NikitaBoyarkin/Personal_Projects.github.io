@@ -50,8 +50,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" v
     <polygon points="1000,480 1043,505 1043,555 1000,580 957,555 957,505" opacity="0.3"/>
   </g>
 
-  <!-- hexagon logo (matches nav logo geometry) -->
-  <g transform="translate(80,60)">
+  <!-- hexagon logo (matches nav logo geometry, scaled 1.6x) -->
+  <g transform="translate(80,40) scale(1.6)">
     <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="#ff8569" stroke-width="4"/>
     <text x="50" y="61" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#e4e4e7" text-anchor="middle">NB</text>
   </g>
