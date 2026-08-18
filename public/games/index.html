@@ -6,21 +6,45 @@
 <title>Arcade — Nikita Boyarkin</title>
 <meta name="description" content="Playable browser mini-games about analytics and classic arcade fun. Works on phone (swipe / drag / tap) and desktop.">
 <meta name="robots" content="index, follow">
+<meta id="theme-color" name="theme-color" content="#0f2a2b">
+<script>
+  // Prevent theme flash: apply saved (or system) theme before first paint.
+  // Shares the 'theme' key with the main portfolio so both stay in sync.
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('theme'); } catch (e) {}
+    var THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = prefersDark ? 'dark' : 'light';
+    if (saved === 'dark' || saved === 'light' || saved === 'cyberpunk') theme = saved;
+    document.documentElement.setAttribute('data-theme', theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+  })();
+</script>
 <style>
-  :root{--bg:#0a0a12;--surface:#15151e;--surface2:#12121c;--accent:#00ff9c;--accent2:#7dffc4;--text:#f4f4f5;--muted:#9E9E9E;--border:#262a38}
+  :root{--bg:#0f2a2b;--surface:#1a3435;--surface2:#234044;--accent:#ff8569;--accent2:#ffa68a;--text:#e4e4e7;--muted:#a1a1aa;--border:#3f3f46}
+  [data-theme="light"]{--bg:#f4efca;--surface:#ffffff;--surface2:#f4f4f5;--accent:#a8331a;--accent2:#8a2a16;--text:#18181b;--muted:#52525b;--border:#e4e4e7}
+  [data-theme="cyberpunk"]{--bg:#0a0a12;--surface:#11111d;--surface2:#1a1a2e;--accent:#00ff9c;--accent2:#5cffc0;--text:#e6f1ff;--muted:#8a8aa8;--border:#2a2a4a}
   *{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:'Fira Code','SF Mono',ui-monospace,Menlo,Consolas,monospace;line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Fira Code','SF Mono',ui-monospace,Menlo,Consolas,monospace;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;transition:background-color .25s ease,color .25s ease,border-color .25s ease}
   a{color:var(--accent);text-decoration:none}
-  header{padding:40px 20px 8px;text-align:center}
+  header{position:relative;padding:40px 20px 8px;text-align:center}
   .home{display:inline-block;font-size:13px;color:var(--muted);margin-bottom:18px;border:1px solid var(--border);padding:6px 12px;border-radius:8px;background:var(--surface)}
   .home:hover{color:var(--accent);border-color:var(--accent)}
+  .theme-toggle{position:absolute;top:16px;right:16px;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);cursor:pointer;transition:color .2s ease,border-color .2s ease,background-color .2s ease}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+  .theme-toggle svg{width:18px;height:18px;display:none}
+  [data-theme="dark"] .theme-toggle .icon-moon{display:block}
+  [data-theme="light"] .theme-toggle .icon-sun{display:block}
+  [data-theme="cyberpunk"] .theme-toggle .icon-cyber{display:block}
   h1{margin:0;font-size:clamp(28px,6vw,44px);letter-spacing:2px;font-weight:700}
   h1 .t{color:var(--accent)}
   .lede{max-width:620px;margin:14px auto 0;color:var(--muted);font-size:14px}
   main.grid{max-width:1080px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;width:100%}
-  .card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;color:var(--text);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
-  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 24px rgba(0,255,156,.08)}
+  .card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;color:var(--text);transition:transform .15s ease,border-color .2s ease,box-shadow .2s ease}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 24px color-mix(in srgb,var(--accent) 20%,transparent)}
   .card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
   .thumb{background:var(--surface2);aspect-ratio:400/440;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border)}
   .thumb img{width:100%;height:100%;object-fit:contain;display:block}
@@ -28,16 +52,25 @@
   .card h2{margin:0 0 6px;font-size:17px;letter-spacing:.5px}
   .ctrl{margin:0 0 2px;color:var(--accent2);font-size:12px}
   .goal{margin:0 0 12px;color:var(--muted);font-size:12px}
-  .play{display:inline-block;font-size:13px;font-weight:700;color:var(--bg);background:var(--accent);padding:7px 14px;border-radius:8px}
+  .play{display:inline-block;font-size:13px;font-weight:700;color:#1a1a1a;background:var(--accent);padding:7px 14px;border-radius:8px}
   .card:hover .play{background:var(--accent2)}
   footer{margin-top:auto;padding:26px 20px 34px;text-align:center;color:var(--muted);font-size:12px}
   footer a{color:var(--accent2)}
+  footer .socials{display:flex;justify-content:center;gap:14px;margin-bottom:16px}
+  footer .socials a{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);transition:color .2s ease,border-color .2s ease,transform .15s ease,background-color .2s ease}
+  footer .socials a:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
+  footer .socials svg{width:18px;height:18px}
   @media (max-width:520px){header{padding:28px 16px 6px}main.grid{padding:0 16px;gap:14px}}
 </style>
 </head>
 <body>
   <header>
     <a class="home" href="../" aria-label="Back to portfolio">← Portfolio</a>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme: dark. Click to cycle." aria-pressed="true" title="Theme: dark / light / cyberpunk">
+      <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="icon-cyber" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    </button>
     <h1><span class="t">⌘</span> Arcade</h1>
     <p class="lede">Tiny browser mini-games — some about analytics, some just for fun. Play inline, on phone (swipe / drag / tap) or desktop (keyboard / mouse).</p>
   </header>
@@ -89,7 +122,62 @@
     </a>
   </main>
   <footer>
-    Games run client-side as self-contained SVG. <a href="../">Back to portfolio</a> · <a href="https://github.com/NikitaBoyarkin/NikitaBoyarkin">Source</a>
+    <div class="socials">
+      <a href="https://github.com/NikitaBoyarkin" aria-label="GitHub" target="_blank" rel="noopener noreferrer">
+        <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+      <a href="https://www.linkedin.com/in/nikita-boyarkin" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+      </a>
+      <a href="https://t.me/lofinibo" aria-label="Telegram" target="_blank" rel="noopener noreferrer">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/></svg>
+      </a>
+    </div>
+    <p>Games run client-side as self-contained SVG. <a href="../">Back to portfolio</a> · <a href="https://github.com/NikitaBoyarkin/NikitaBoyarkin">Source</a></p>
   </footer>
+  <script>
+    // Theme toggle — cycles dark → light → cyberpunk → dark, same as the main portfolio.
+    (function () {
+      var html = document.documentElement;
+      var toggle = document.getElementById('theme-toggle');
+      var themeColorMeta = document.getElementById('theme-color');
+      var THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
+      var ORDER = ['dark', 'light', 'cyberpunk'];
+
+      function applyTheme(theme) {
+        html.setAttribute('data-theme', theme);
+        if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
+        if (toggle) {
+          toggle.setAttribute('aria-pressed', String(theme === 'dark'));
+          toggle.setAttribute('aria-label', 'Theme: ' + theme + '. Click to cycle.');
+        }
+      }
+
+      function persistTheme(theme) {
+        try { localStorage.setItem('theme', theme); } catch (e) {}
+      }
+
+      // Sync icon with already-applied theme
+      applyTheme(html.getAttribute('data-theme') || 'dark');
+
+      if (toggle) {
+        toggle.addEventListener('click', function () {
+          var cur = html.getAttribute('data-theme') || 'dark';
+          var next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+          applyTheme(next);
+          persistTheme(next);
+        });
+      }
+
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        try {
+          if (localStorage.getItem('theme')) return;
+        } catch (err) {
+          return;
+        }
+        applyTheme(e.matches ? 'dark' : 'light');
+      });
+    })();
+  </script>
 </body>
 </html>
