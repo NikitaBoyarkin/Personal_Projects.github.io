@@ -7,6 +7,7 @@
 import { getCollection } from "astro:content";
 import { withBase } from "../lib/path";
 import { formatDate } from "../lib/date";
+import { categoryLabel } from "../lib/categories";
 
 interface Props {
   lang?: "ru" | "en";
@@ -67,7 +68,7 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
           )}
           <div class="strip-card-body">
             <span class="strip-badge strip-badge-post">
-              {post.data.category.replace("-", " ")}
+              {categoryLabel(post.data.category, lang)}
             </span>
             <span class="strip-title">{post.data.title}</span>
             <span class="strip-meta">{formatDate(post.data.date)}</span>

@@ -1,6 +1,11 @@
 ---
+interface Props {
+  lang?: 'ru' | 'en';
+}
+const { lang = 'ru' } = Astro.props;
+const allLabel = lang === 'en' ? 'All' : 'Все';
 const tools = [
-  { key: 'all', label: 'All' },
+  { key: 'all', label: allLabel },
   { key: 'python', label: 'Python' },
   { key: 'sql', label: 'SQL' },
   { key: 'tableau', label: 'Tableau' },

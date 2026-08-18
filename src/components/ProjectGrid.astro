@@ -10,6 +10,7 @@ interface Props {
   heading?: string;
 }
 const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects' } = Astro.props;
+const lang: 'ru' | 'en' = linkPrefix.startsWith('en/') ? 'en' : 'ru';
 
 const ORDER = ['volta', 'supabase', 'posthog', 'streamlit', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
 const projects = (await getCollection(collection, (p) => !p.data.draft))
@@ -22,7 +23,7 @@ const projects = (await getCollection(collection, (p) => !p.data.draft))
 
 <section id="projects" class="reveal reveal-delay-2">
   <h2>{heading}</h2>
-  <ProjectFilter />
+  <ProjectFilter lang={lang} />
   <div id="project-list">
     {
       projects.map((project) => (
@@ -37,6 +38,7 @@ const projects = (await getCollection(collection, (p) => !p.data.draft))
           demo={project.data.demo}
           private={project.data.private}
           linkPrefix={linkPrefix}
+          lang={lang}
         />
       ))
     }

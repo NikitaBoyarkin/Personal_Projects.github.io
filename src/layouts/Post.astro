@@ -49,13 +49,13 @@ const articleJsonLd = {
   lang="ru"
   jsonLd={articleJsonLd}
 >
-  <InnerTOC selector="#post-content" />
+  <InnerTOC selector="#post-content" lang="ru" />
 
   <article class="post-content">
     <header class="post-header reveal">
       <span class="post-tag">{categoryDisplay}</span>
       <h1 class="post-title">{title}</h1>
-      <div class="post-meta">{formatDate(date)} · {readTime} min read · Nikita Boyarkin</div>
+      <div class="post-meta">{formatDate(date)} · {readTime} мин чтения · Nikita Boyarkin</div>
     </header>
 
     <div class="post-body" id="post-content">
@@ -90,6 +90,6 @@ const articleJsonLd = {
       </nav>
     )}
 
-    <a href={withBase('writing/')} class="post-back">← Back to Writing</a>
+    <a href={withBase('writing/')} class="post-back">← К статьям</a>
   </article>
 </Base>

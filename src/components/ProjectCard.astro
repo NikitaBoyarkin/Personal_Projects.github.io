@@ -12,10 +12,18 @@ interface Props {
   demo?: string;
   private?: boolean;
   linkPrefix?: string;
+  lang?: 'ru' | 'en';
 }
 
-const { slug, title, description, image, impact, tools, github, demo, private: isPrivate = false, linkPrefix = '' } = Astro.props;
+const { slug, title, description, image, impact, tools, github, demo, private: isPrivate = false, linkPrefix = '', lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
 const impactText = impact?.join(', ');
+const i18n = {
+  impact: isEn ? 'Impact' : 'Эффект',
+  view: isEn ? 'View Project' : 'Открыть проект',
+  demo: isEn ? 'Live demo' : 'Демо',
+  privateNote: isEn ? 'Repo is private — available on request' : 'Репозиторий приватный — доступ по запросу',
+};
 ---
 
 <article class="project reveal" data-tools={(tools ?? []).join(',').toLowerCase()}>
@@ -33,10 +41,10 @@ const impactText = impact?.join(', ');
     )
   }
 
-  {impactText && <p class="Impact">Impact: {impactText}</p>}
+  {impactText && <p class="Impact">{i18n.impact}: {impactText}</p>}
 
   <div class="project-actions">
-    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>View Project</a>
+    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>{i18n.view}</a>
     {
       demo && (
         <a
@@ -47,7 +55,7 @@ const impactText = impact?.join(', ');
           style="flex: 1 1 auto; justify-content: center;"
           data-analytics={`project_demo_${slug}`}
         >
-          Live demo
+          {i18n.demo}
         </a>
       )
     }
@@ -67,5 +75,5 @@ const impactText = impact?.join(', ');
     }
   </div>
 
-  {isPrivate && <p class="repo-private-note" style="font-size:.8rem;color:var(--text-normal);opacity:.75;margin:.5rem 0 0;">Repo is private — available on request</p>}
+  {isPrivate && <p class="repo-private-note" style="font-size:.8rem;color:var(--text-normal);opacity:.75;margin:.5rem 0 0;">{i18n.privateNote}</p>}
 </article>

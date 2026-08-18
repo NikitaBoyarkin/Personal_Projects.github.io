@@ -11,23 +11,31 @@ interface Props {
   result: string;
   metrics?: Metric[];
   heading?: string;
+  lang?: 'ru' | 'en';
 }
-const { problem, approach, result, metrics = [], heading = 'Разбор кейса' } = Astro.props;
+const { problem, approach, result, metrics = [], lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
+const heading = Astro.props.heading ?? (isEn ? 'Case study' : 'Разбор кейса');
+const labels = {
+  problem: isEn ? 'Problem' : 'Проблема',
+  approach: isEn ? 'Approach' : 'Подход',
+  result: isEn ? 'Result' : 'Результат',
+};
 ---
 
 <section class="case-study reveal" aria-label="Case study">
   <h2>{heading}</h2>
 
   <div class="case-step">
-    <span class="case-label">Проблема</span>
+    <span class="case-label">{labels.problem}</span>
     <p>{problem}</p>
   </div>
   <div class="case-step">
-    <span class="case-label">Подход</span>
+    <span class="case-label">{labels.approach}</span>
     <p>{approach}</p>
   </div>
   <div class="case-step">
-    <span class="case-label">Результат</span>
+    <span class="case-label">{labels.result}</span>
     <p>{result}</p>
   </div>
 

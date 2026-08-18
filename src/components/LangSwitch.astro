@@ -8,9 +8,10 @@ interface Props {
 }
 const { locale, counterpartHref } = Astro.props;
 const ruActive = locale === 'ru';
+const ariaLabel = ruActive ? 'Переключатель языка' : 'Language switcher';
 ---
 
-<span class="lang-switch" aria-label="Language switcher">
+<span class="lang-switch" aria-label={ariaLabel}>
   {ruActive ? <b aria-current="true">RU</b> : <a href={counterpartHref} hreflang="ru" data-analytics="lang_switch_ru">RU</a>}
   <span class="lang-switch-sep" aria-hidden="true">/</span>
   {ruActive ? <a href={counterpartHref} hreflang="en" data-analytics="lang_switch_en">EN</a> : <b aria-current="true">EN</b>}

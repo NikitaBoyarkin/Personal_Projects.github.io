@@ -80,7 +80,7 @@ const projectJsonLd = {
   counterpartHref={withBase(`projects/${slug}/`)}
   jsonLd={projectJsonLd}
 >
-  <InnerTOC />
+  <InnerTOC lang="en" />
 
   <div class="container reveal">
     <a class="back" href={withBase('en/')}>← Back to portfolio</a>
@@ -157,6 +157,7 @@ const projectJsonLd = {
           result={caseStudy.result}
           metrics={caseStudy.metrics}
           heading="Case study"
+          lang="en"
         />
       )
     }

@@ -8,10 +8,14 @@ interface Props {
   lang?: 'ru' | 'en';
 }
 const { lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
 const caption =
-  lang === 'en'
+  isEn
     ? 'Concept graph of product analytics behind the portfolio projects. The discover → validate → measure → optimize loop.'
     : 'Граф понятий product-аналитики, который стоит за проектами портфолио. Петля discover → validate → measure → optimize.';
+const ariaLabel = isEn
+  ? 'Knowledge graph of product analytics concepts'
+  : 'Граф понятий продуктовой аналитики';
 
 const GROUP_COLORS: Record<string, string> = {
   discover: 'var(--text-accent)',
@@ -31,7 +35,7 @@ const groupList = Object.keys(GROUP_COLORS);
       ))
     }
   </div>
-  <svg id="kg-svg" class="kg-svg" role="img" aria-label="Knowledge graph of product analytics concepts"></svg>
+  <svg id="kg-svg" class="kg-svg" role="img" aria-label={ariaLabel}></svg>
   <p class="kg-caption">{caption}</p>
 </div>
 
@@ -199,7 +203,10 @@ const groupList = Object.keys(GROUP_COLORS);
       fetch(src)
         .then((r) => r.json())
         .then((data) => { reduced ? renderStatic(data) : renderForce(data); })
-        .catch(() => { svg.textContent = 'graph unavailable'; });
+        .catch(() => {
+          const isEn = document.documentElement.lang === 'en';
+          svg.textContent = isEn ? 'Graph unavailable' : 'Граф недоступен';
+        });
     }
 
     // Start when visible (lazy).

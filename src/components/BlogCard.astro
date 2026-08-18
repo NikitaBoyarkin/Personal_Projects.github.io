@@ -1,6 +1,7 @@
 ---
 import { withBase } from '../lib/path';
 import { formatDate } from '../lib/date';
+import { categoryLabel } from '../lib/categories';
 
 interface Props {
   slug: string;
@@ -9,16 +10,18 @@ interface Props {
   date: Date;
   excerpt: string;
   readTime?: number;
+  lang?: 'ru' | 'en';
 }
 
-const { slug, title, category, date, excerpt, readTime } = Astro.props;
+const { slug, title, category, date, excerpt, readTime, lang = 'ru' } = Astro.props;
+const minLabel = lang === 'en' ? 'min' : 'мин';
 ---
 
 <a href={withBase(`posts/${slug}/`)} class="blog-card" data-category={category}>
-  <span class="blog-card-tag">{category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</span>
+  <span class="blog-card-tag">{categoryLabel(category, lang)}</span>
   <div class="blog-card-title">{title}</div>
   <div class="blog-card-meta">
-    {formatDate(date)}{readTime && <> · {readTime} min</>}
+    {formatDate(date)}{readTime && ` · ${readTime} ${minLabel}`}
   </div>
   <div class="blog-card-excerpt">{excerpt}</div>
 </a>

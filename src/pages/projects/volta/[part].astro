@@ -55,7 +55,7 @@ const partJsonLd = {
       {
         part.data.tools && part.data.tools.length > 0 && (
           <div class="project-meta-group">
-            <span class="project-meta-label">Stack</span>
+            <span class="project-meta-label">Стек</span>
             <div class="project-tools project-tools-inline">
               {part.data.tools.map((tool) => (
                 <span class="project-tool">{tool}</span>
@@ -68,7 +68,7 @@ const partJsonLd = {
       {
         part.data.impact && part.data.impact.length > 0 && (
           <div class="project-meta-group">
-            <span class="project-meta-label">Impact</span>
+            <span class="project-meta-label">Эффект</span>
             <ul class="project-meta-list">
               {part.data.impact.map((item) => (
                 <li>{item}</li>
@@ -81,14 +81,14 @@ const partJsonLd = {
       {
         part.data.github && (
           <div class="project-meta-group">
-            <span class="project-meta-label">Source</span>
+            <span class="project-meta-label">Исходники</span>
             <a
               class="project-meta-link"
               href={part.data.github}
               target="_blank"
               rel="noopener noreferrer"
             >
-              View on GitHub →
+              Смотреть на GitHub →
             </a>
           </div>
         )

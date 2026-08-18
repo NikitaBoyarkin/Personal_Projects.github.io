@@ -1,11 +1,16 @@
 ---
-const categories = [
-  { key: 'all', label: 'All' },
-  { key: 'decision-log', label: 'Decision Logs' },
-  { key: 'framework', label: 'Frameworks' },
-  { key: 'guide', label: 'Guides' },
-  { key: 'note', label: 'Notes' },
-];
+import { categoryLabel } from '../lib/categories';
+
+interface Props {
+  lang?: 'ru' | 'en';
+}
+const { lang = 'ru' } = Astro.props;
+const allLabel = lang === 'en' ? 'All' : 'Все';
+const categoryKeys = ['all', 'decision-log', 'framework', 'guide', 'note'];
+const categories = categoryKeys.map((key) => ({
+  key,
+  label: key === 'all' ? allLabel : categoryLabel(key, lang),
+}));
 ---
 
 <div class="filter-row reveal reveal-delay-1">
