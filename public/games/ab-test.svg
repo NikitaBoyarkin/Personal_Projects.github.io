@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
+  <rect width="400" height="440" fill="#0a0a12"/>
+  <text x="200" y="28" text-anchor="middle" fill="#00ff9c" font-size="16" font-weight="bold" letter-spacing="3">A/B TEST</text>
+  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">p = 1.000 · n = 0 / arm</text>
+
+  <text x="40" y="92" fill="#7dffc4" font-size="11" font-weight="bold">TREATMENT A</text>
+  <rect x="40" y="100" width="320" height="20" fill="#12121c" rx="4"/>
+  <rect id="barA" x="40" y="100" width="0" height="20" fill="#00ff9c" rx="4"/>
+  <text id="valA" x="360" y="115" text-anchor="end" fill="#f4f4f5" font-size="12">0.0%</text>
+
+  <text x="40" y="162" fill="#9db4e8" font-size="11" font-weight="bold">CONTROL B</text>
+  <rect x="40" y="170" width="320" height="20" fill="#12121c" rx="4"/>
+  <rect id="barB" x="40" y="170" width="0" height="20" fill="#4169E1" rx="4"/>
+  <text id="valB" x="360" y="185" text-anchor="end" fill="#f4f4f5" font-size="12">0.0%</text>
+
+  <line x1="60" y1="224" x2="340" y2="224" stroke="#333a47" stroke-width="1"/>
+  <text x="200" y="246" text-anchor="middle" fill="#888" font-size="11">p-value</text>
+  <text id="pval" x="200" y="282" text-anchor="middle" fill="#f4f4f5" font-size="32" font-weight="bold">1.000</text>
+
+  <rect id="btn" x="80" y="316" width="240" height="46" rx="8" fill="#00ff9c"/>
+  <text id="btnLabel" x="200" y="345" text-anchor="middle" fill="#0a0a12" font-size="13" font-weight="bold">COLLECT DATA</text>
+  <text x="200" y="408" text-anchor="middle" fill="#666" font-size="10">tap / click anywhere to run the experiment</text>
+  <script type="text/javascript"><![CDATA[
+    (function () {
+      var state = {nA:0, xA:0, nB:0, xB:0, sig:false};
+      var barA = document.getElementById('barA'), barB = document.getElementById('barB');
+      var valA = document.getElementById('valA'), valB = document.getElementById('valB');
+      var pval = document.getElementById('pval'), btnLabel = document.getElementById('btnLabel');
+      var btn = document.getElementById('btn');
+
+      function normcdf(x) {
+        var t = 1 / (1 + 0.2316419 * Math.abs(x));
+        var d = 0.3989422804014327 * Math.exp(-x*x/2);
+        var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
+        return x > 0 ? 1 - p : p;
+      }
+
+      function update() {
+        var nA = state.nA, nB = state.nB, xA = state.xA, xB = state.xB;
+        var pA = nA ? xA/nA : 0, pB = nB ? xB/nB : 0;
+        var p = 1;
+        if (nA + nB > 0) {
+          var pp = (xA + xB) / (nA + nB);
+          var se = Math.sqrt(pp * (1 - pp) * (1/nA + 1/nB));
+          if (se > 0) {
+            var z = (pA - pB) / se;
+            p = 2 * (1 - normcdf(Math.abs(z)));
+          }
+        }
+        p = Math.max(0, Math.min(1, p));
+        barA.setAttribute('width', Math.round(pA / 0.4 * 320));
+        barB.setAttribute('width', Math.round(pB / 0.4 * 320));
+        valA.textContent = (pA * 100).toFixed(1) + '%';
+        valB.textContent = (pB * 100).toFixed(1) + '%';
+        if (p < 0.05) {
+          pval.textContent = '< 0.05';
+          pval.setAttribute('fill', '#00ff9c');
+          if (!state.sig) {
+            state.sig = true;
+            btnLabel.textContent = 'RESET';
+          }
+        } else {
+          pval.textContent = p.toFixed(3);
+          pval.setAttribute('fill', '#f4f4f5');
+        }
+        var n = document.getElementById('status');
+        n.textContent = 'p = ' + (p < 0.05 ? '< 0.05' : p.toFixed(3)) + ' · n = ' + Math.round(nA) + ' / arm';
+      }
+
+      function collect() {
+        if (state.sig) { reset(); return; }
+        for (var i = 0; i < 150; i++) { if (Math.random() < 0.34) state.xA++; }
+        for (var j = 0; j < 150; j++) { if (Math.random() < 0.30) state.xB++; }
+        state.nA += 150; state.nB += 150;
+        update();
+      }
+
+      function reset() {
+        state = {nA:0, xA:0, nB:0, xB:0, sig:false};
+        btnLabel.textContent = 'COLLECT DATA';
+        update();
+      }
+
+      document.addEventListener('click', collect);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === ' ' || e.key === 'Enter') collect();
+      });
+
+      update();
+    })();
+  ]]></script>
+</svg>

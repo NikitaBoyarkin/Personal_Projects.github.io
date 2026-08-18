@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arcade — Nikita Boyarkin</title>
+<meta name="description" content="Playable browser mini-games about analytics and classic arcade fun. Works on phone (swipe / drag / tap) and desktop.">
+<meta name="robots" content="index, follow">
+<style>
+  :root{--bg:#0a0a12;--surface:#15151e;--surface2:#12121c;--accent:#00ff9c;--accent2:#7dffc4;--text:#f4f4f5;--muted:#9E9E9E;--border:#262a38}
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Fira Code','SF Mono',ui-monospace,Menlo,Consolas,monospace;line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
+  a{color:var(--accent);text-decoration:none}
+  header{padding:40px 20px 8px;text-align:center}
+  .home{display:inline-block;font-size:13px;color:var(--muted);margin-bottom:18px;border:1px solid var(--border);padding:6px 12px;border-radius:8px;background:var(--surface)}
+  .home:hover{color:var(--accent);border-color:var(--accent)}
+  h1{margin:0;font-size:clamp(28px,6vw,44px);letter-spacing:2px;font-weight:700}
+  h1 .t{color:var(--accent)}
+  .lede{max-width:620px;margin:14px auto 0;color:var(--muted);font-size:14px}
+  main.grid{max-width:1080px;margin:28px auto;padding:0 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;width:100%}
+  .card{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;color:var(--text);transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 8px 24px rgba(0,255,156,.08)}
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .thumb{background:var(--surface2);aspect-ratio:400/440;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border)}
+  .thumb img{width:100%;height:100%;object-fit:contain;display:block}
+  .card-body{padding:14px 16px 18px}
+  .card h2{margin:0 0 6px;font-size:17px;letter-spacing:.5px}
+  .ctrl{margin:0 0 2px;color:var(--accent2);font-size:12px}
+  .goal{margin:0 0 12px;color:var(--muted);font-size:12px}
+  .play{display:inline-block;font-size:13px;font-weight:700;color:var(--bg);background:var(--accent);padding:7px 14px;border-radius:8px}
+  .card:hover .play{background:var(--accent2)}
+  footer{margin-top:auto;padding:26px 20px 34px;text-align:center;color:var(--muted);font-size:12px}
+  footer a{color:var(--accent2)}
+  @media (max-width:520px){header{padding:28px 16px 6px}main.grid{padding:0 16px;gap:14px}}
+</style>
+</head>
+<body>
+  <header>
+    <a class="home" href="../" aria-label="Back to portfolio">← Portfolio</a>
+    <h1><span class="t">⌘</span> Arcade</h1>
+    <p class="lede">Tiny browser mini-games — some about analytics, some just for fun. Play inline, on phone (swipe / drag / tap) or desktop (keyboard / mouse).</p>
+  </header>
+  <main class="grid">
+    <a class="card" href="snake.svg" aria-label="Play Snake">
+      <div class="thumb"><img src="snake.svg" alt="Snake preview" loading="lazy" width="400" height="440" /></div>
+      <div class="card-body">
+        <h2>🐍 Snake</h2>
+        <p class="ctrl">Swipe / arrows</p>
+        <p class="goal">Eat, grow, don’t crash</p>
+        <span class="play">Play →</span>
+      </div>
+    </a>
+    <a class="card" href="ab-test.svg" aria-label="Play A/B Test">
+      <div class="thumb"><img src="ab-test.svg" alt="A/B Test preview" loading="lazy" width="400" height="440" /></div>
+      <div class="card-body">
+        <h2>🧪 A/B Test</h2>
+        <p class="ctrl">Tap / click</p>
+        <p class="goal">Collect data until p &lt; 0.05</p>
+        <span class="play">Play →</span>
+      </div>
+    </a>
+    <a class="card" href="pong.svg" aria-label="Play Pong">
+      <div class="thumb"><img src="pong.svg" alt="Pong preview" loading="lazy" width="400" height="440" /></div>
+      <div class="card-body">
+        <h2>🏓 Pong</h2>
+        <p class="ctrl">Drag / W·S</p>
+        <p class="goal">Beat the CPU — first to 11</p>
+        <span class="play">Play →</span>
+      </div>
+    </a>
+    <a class="card" href="2048.svg" aria-label="Play 2048">
+      <div class="thumb"><img src="2048.svg" alt="2048 preview" loading="lazy" width="400" height="440" /></div>
+      <div class="card-body">
+        <h2>🔢 2048</h2>
+        <p class="ctrl">Swipe / arrows</p>
+        <p class="goal">Merge tiles to reach 2048</p>
+        <span class="play">Play →</span>
+      </div>
+    </a>
+    <a class="card" href="funnel-drop.svg" aria-label="Play Funnel Drop">
+      <div class="thumb"><img src="funnel-drop.svg" alt="Funnel Drop preview" loading="lazy" width="400" height="440" /></div>
+      <div class="card-body">
+        <h2>🔻 Funnel Drop</h2>
+        <p class="ctrl">Drag / ←·→</p>
+        <p class="goal">Catch falling users to convert</p>
+        <span class="play">Play →</span>
+      </div>
+    </a>
+  </main>
+  <footer>
+    Games run client-side as self-contained SVG. <a href="../">Back to portfolio</a> · <a href="https://github.com/NikitaBoyarkin/NikitaBoyarkin">Source</a>
+  </footer>
+</body>
+</html>
