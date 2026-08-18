@@ -46,6 +46,7 @@ const writingHref = withBase('writing/'); // posts stay RU-only
 const contactHref = withBase('contact/'); // contact stays RU-only
 const startHref = isEn ? withBase('en/start/') : withBase('start/');
 const graphHref = isEn ? withBase('en/graph/') : withBase('graph/');
+const gamesHref = withBase('games/'); // static page in public/, no EN route
 const counterpartUrl = counterpartHref ? `${siteUrl}${counterpartHref}` : null;
 const ruAltUrl = isEn ? counterpartUrl : pageUrl;
 const enAltUrl = isEn ? pageUrl : counterpartUrl;
@@ -131,6 +132,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
         <li><a href={projectsHref}>Projects</a></li>
         <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>Writing</a></li>
         <li><a href={graphHref}>Graph</a></li>
+        <li><a href={gamesHref}>{isEn ? 'Games' : 'Игры'}</a></li>
         <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>About</a></li>
         <li><a href={contactHref} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>Contact</a></li>
       </ul>
