@@ -12,7 +12,7 @@ interface Props {
 const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects' } = Astro.props;
 const lang: 'ru' | 'en' = linkPrefix.startsWith('en/') ? 'en' : 'ru';
 
-const ORDER = ['volta', 'supabase', 'posthog', 'streamlit', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
+const ORDER = ['volta', 'supabase', 'posthog', 'streamlit', 'sql', 'rfm', 'cohort', 'bot', 'scrolly', 'garden', 'site'];
 const projects = (await getCollection(collection, (p) => !p.data.draft))
   .filter((p) => p.id.replace(/\.md$/, '') !== excludeSlug)
   .sort(

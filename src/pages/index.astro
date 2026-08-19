@@ -8,9 +8,8 @@ import MaterialStrip from '../components/MaterialStrip.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
 
-const volta = (await getCollection('projects', (p) => !p.data.draft)).find(
-  (p) => p.id.replace(/\.md$/, '') === 'volta',
-);
+const allProjects = await getCollection('projects', (p) => !p.data.draft);
+const volta = allProjects.find((p) => p.id.replace(/\.md$/, '') === 'volta');
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -95,7 +94,7 @@ const jsonLd = {
   <section id="proof" class="reveal" aria-label="Ключевые метрики">
     <div class="proof-grid">
       <div class="proof-item">
-        <div class="proof-value">10</div>
+        <div class="proof-value">{allProjects.length}</div>
         <div class="proof-label">проектов в портфолио</div>
       </div>
       <div class="proof-item">

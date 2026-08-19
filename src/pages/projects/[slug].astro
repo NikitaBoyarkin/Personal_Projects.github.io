@@ -21,7 +21,7 @@ const slug = project.id.replace(/\.md$/, '');
 const caseStudy = project.data.caseStudy;
 
 // Next / prev within the ordered project list (P3.11).
-const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'garden', 'site'];
+const ORDER = ['volta', 'sql', 'rfm', 'cohort', 'bot', 'scrolly', 'garden', 'site'];
 const ordered = [...allProjects].sort(
   (a, b) => ORDER.indexOf(a.id.replace(/\.md$/, '')) - ORDER.indexOf(b.id.replace(/\.md$/, '')),
 );
