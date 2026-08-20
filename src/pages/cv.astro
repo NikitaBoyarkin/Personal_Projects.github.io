@@ -50,21 +50,17 @@ const year = new Date().getFullYear();
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      rel="preload"
-      as="style"
+      rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      onload="this.onload=null;this.rel='stylesheet'"
     />
-    <noscript
-      ><link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-    /></noscript>
   </head>
   <body>
     <div class="cv-toolbar no-print">
       <a href={withBase('/')} class="cv-back">← Back to portfolio</a>
-      <button type="button" class="cv-print" onclick="window.print()">Print / Save as PDF</button>
+      <span class="cv-toolbar-actions">
+        <a href={withBase('CV-Nikita-Boyarkin.pdf')} class="cv-print" data-analytics="cv_download_pdf">Download PDF</a>
+        <button type="button" class="cv-print" onclick="window.print()">Print</button>
+      </span>
     </div>
 
     <main class="cv">
@@ -182,6 +178,11 @@ const year = new Date().getFullYear();
         padding: 1rem 1.5rem;
         display: flex;
         justify-content: space-between;
+        align-items: center;
+      }
+      .cv-toolbar-actions {
+        display: flex;
+        gap: 0.5rem;
         align-items: center;
       }
       .cv-back { color: var(--accent); text-decoration: none; font-weight: 500; }

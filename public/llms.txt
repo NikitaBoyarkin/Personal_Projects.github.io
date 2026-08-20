@@ -20,6 +20,7 @@
 ## About / contact
 - [About](https://nikitaboyarkin.github.io/Personal_Projects.github.io/about/): background and focus.
 - [CV](https://nikitaboyarkin.github.io/Personal_Projects.github.io/cv/): full CV.
+- [CV (PDF)](https://nikitaboyarkin.github.io/Personal_Projects.github.io/CV-Nikita-Boyarkin.pdf): printable one-page CV.
 - GitHub: https://github.com/NikitaBoyarkin
 - LinkedIn: https://www.linkedin.com/in/nikita-boyarkin
 - Telegram: https://t.me/lofinibo

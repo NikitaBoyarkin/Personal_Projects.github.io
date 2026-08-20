@@ -130,7 +130,6 @@ const groupList = Object.keys(GROUP_COLORS);
         return g;
       });
 
-      const k = 0.6;
       let dragging = null;
       svg.addEventListener('mousedown', (e) => {
         const target = nodeEls.find((el) => el.contains(e.target));

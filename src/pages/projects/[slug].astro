@@ -81,9 +81,18 @@ const faqJsonLd =
         })),
       }
     : null;
-const pageJsonLd = faqJsonLd
-  ? { '@context': 'https://schema.org', '@graph': [projectJsonLd, faqJsonLd] }
-  : { '@context': 'https://schema.org', ...projectJsonLd };
+const breadcrumbJsonLd = {
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}${withBase('/')}` },
+    { '@type': 'ListItem', position: 2, name: 'Projects', item: `${siteUrl}${withBase('/')}#projects` },
+    { '@type': 'ListItem', position: 3, name: project.data.title, item: pageUrl },
+  ],
+};
+const pageJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': faqJsonLd ? [projectJsonLd, faqJsonLd, breadcrumbJsonLd] : [projectJsonLd, breadcrumbJsonLd],
+};
 ---
 
 <Base

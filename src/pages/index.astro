@@ -13,15 +13,31 @@ import { withBase } from '../lib/path';
 const allProjects = await getCollection('projects', (p) => !p.data.draft);
 const volta = allProjects.find((p) => p.id.replace(/\.md$/, '') === 'volta');
 
+const siteUrl = 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/';
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Nikita Boyarkin',
-  url: 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/',
-  jobTitle: 'Data Analyst / Product Analyst',
-  sameAs: [
-    'https://github.com/NikitaBoyarkin',
-    'https://www.linkedin.com/in/nikita-boyarkin',
+  '@graph': [
+    {
+      '@type': 'Person',
+      name: 'Nikita Boyarkin',
+      url: siteUrl,
+      jobTitle: 'Data Analyst / Product Analyst',
+      sameAs: [
+        'https://github.com/NikitaBoyarkin',
+        'https://www.linkedin.com/in/nikita-boyarkin',
+      ],
+    },
+    {
+      '@type': 'ItemList',
+      name: 'Projects',
+      numberOfItems: allProjects.length,
+      itemListElement: allProjects.map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: p.data.title,
+        url: `${siteUrl}${withBase(`projects/${p.id.replace(/\.md$/, '')}/`)}`,
+      })),
+    },
   ],
 };
 ---

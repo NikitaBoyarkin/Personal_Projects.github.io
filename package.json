@@ -11,7 +11,8 @@
     "astro": "astro",
     "check": "astro check",
     "og": "node scripts/generate-og.mjs",
-    "og:home": "node scripts/generate-home-og.mjs"
+    "og:home": "node scripts/generate-home-og.mjs",
+    "cv:pdf": "node scripts/generate-cv-pdf.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

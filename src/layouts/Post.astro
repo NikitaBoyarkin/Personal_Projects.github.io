@@ -25,7 +25,7 @@ const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toU
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
 const articleJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': 'BlogPosting',
   headline: title,
   description: excerpt,
   datePublished: date.toISOString(),
@@ -36,6 +36,16 @@ const articleJsonLd = {
   publisher: { '@type': 'Person', name: 'Nikita Boyarkin' },
   mainEntityOfPage: `${siteUrl}${withBase(`posts/${slug}/`)}`,
 };
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}${withBase('/')}` },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: `${siteUrl}${withBase('writing/')}` },
+    { '@type': 'ListItem', position: 3, name: title, item: `${siteUrl}${withBase(`posts/${slug}/`)}` },
+  ],
+};
+const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articleJsonLd, breadcrumbJsonLd] };
 ---
 
 <Base
@@ -47,7 +57,7 @@ const articleJsonLd = {
   activeNav="writing"
   canonical={withBase(`posts/${slug}/`)}
   lang="ru"
-  jsonLd={articleJsonLd}
+  jsonLd={articleJsonLdGraph}
 >
   <InnerTOC selector="#post-content" lang="ru" />
 

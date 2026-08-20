@@ -107,8 +107,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" /></noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
 
     <script is:inline>
       // Prevent theme flash: apply saved or preferred theme before first paint.
@@ -194,6 +193,7 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
       <a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_footer">LinkedIn</a> ·
       <a href="https://t.me/lofinibo" data-analytics="telegram_footer">Telegram</a> ·
       <a href={withBase('cv/')} data-analytics="cv_footer">{t.footerCv}</a> ·
+      <a href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_pdf_footer">PDF</a> ·
       <a href={withBase('writing/')} data-analytics="writing_footer">{t.footerWriting}</a>
       <p>© {new Date().getFullYear()} Nikita Boyarkin</p>
     </footer>
