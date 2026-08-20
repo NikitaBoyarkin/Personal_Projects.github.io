@@ -10,6 +10,8 @@ const projectSchema = z.object({
   demo: z.string().optional(),
   related: z.array(z.string()).default([]),
   children: z.array(z.string()).default([]),
+  date: z.coerce.date().optional(),
+  faq: z.array(z.object({ question: z.string(), answer: z.string() })).default([]),
   caseStudy: z
     .object({
       problem: z.string(),

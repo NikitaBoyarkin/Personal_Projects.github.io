@@ -15,6 +15,16 @@ tools:
   - Matplotlib / Seaborn
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
+date: 2026-08-11
+faq:
+  - question: "Где отток в онбординге?"
+    answer: "KYC — критическое узкое место: наибольший относительный отток (56.6% step conversion)."
+  - question: "Лечит ли progress bar проблему KYC?"
+    answer: "Да: +6.24pp lift (p<0.0001), 95% CI [+4.26%, +8.16%], превышает MDE +5pp → ship."
+  - question: "Продержался ли эффект?"
+    answer: "Да: +9.2pp M3 retention, +€227K/yr incremental LTV."
+  - question: "Кто пользователи, как монетизировать?"
+    answer: "4 сегмента (Power 12% / Growth 24% / Casual 32% / Dormant 32%) с per-segment стратегией; миграция до +€310K/yr."
 demo: demos/bayesian/index.html
 related:
   - /posts/bayesian-ab-testing/

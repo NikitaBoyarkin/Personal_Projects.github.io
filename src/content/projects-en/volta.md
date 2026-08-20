@@ -15,6 +15,16 @@ tools:
   - Matplotlib / Seaborn
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
+date: 2026-08-11
+faq:
+  - question: "Where is the onboarding drop-off?"
+    answer: "KYC is the critical bottleneck: the largest relative drop-off (56.6% step conversion)."
+  - question: "Does the progress bar fix the KYC problem?"
+    answer: "Yes: +6.24pp lift (p<0.0001), 95% CI [+4.26%, +8.16%], above the +5pp MDE → ship."
+  - question: "Did the effect hold?"
+    answer: "Yes: +9.2pp M3 retention, +€227K/yr incremental LTV."
+  - question: "Who are the users, how to monetize?"
+    answer: "4 segments (Power 12% / Growth 24% / Casual 32% / Dormant 32%) with per-segment strategy; migration worth up to +€310K/yr."
 related:
   - /posts/bayesian-ab-testing/
 children:

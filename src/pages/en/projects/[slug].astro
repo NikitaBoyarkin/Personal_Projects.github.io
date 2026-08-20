@@ -59,15 +59,37 @@ const children = (project.data.children ?? [])
   .filter((x): x is { href: string; title: string } => x !== null);
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const pageUrl = `${siteUrl}${withBase(`en/projects/${slug}/`)}`;
 const projectJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'CreativeWork',
-  name: project.data.title,
+  '@type': 'Article',
+  headline: project.data.title,
   description: project.data.description,
+  ...(project.data.date
+    ? {
+        datePublished: project.data.date.toISOString(),
+        dateModified: project.data.date.toISOString(),
+      }
+    : {}),
   author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
-  url: `${siteUrl}${withBase(`en/projects/${slug}/`)}`,
+  publisher: { '@type': 'Person', name: 'Nikita Boyarkin' },
+  mainEntityOfPage: pageUrl,
+  url: pageUrl,
   keywords: project.data.tools?.join(', '),
 };
+const faqJsonLd =
+  project.data.faq.length > 0
+    ? {
+        '@type': 'FAQPage',
+        mainEntity: project.data.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.question,
+          acceptedAnswer: { '@type': 'Answer', text: f.answer },
+        })),
+      }
+    : null;
+const pageJsonLd = faqJsonLd
+  ? { '@context': 'https://schema.org', '@graph': [projectJsonLd, faqJsonLd] }
+  : { '@context': 'https://schema.org', ...projectJsonLd };
 ---
 
 <Base
@@ -78,7 +100,7 @@ const projectJsonLd = {
   canonical={withBase(`en/projects/${slug}/`)}
   lang="en"
   counterpartHref={withBase(`projects/${slug}/`)}
-  jsonLd={projectJsonLd}
+  jsonLd={pageJsonLd}
 >
   <InnerTOC lang="en" />
 
