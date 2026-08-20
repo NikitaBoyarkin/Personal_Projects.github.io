@@ -3,6 +3,8 @@ import Base from '../layouts/Base.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
 import IntroShader from '../components/IntroShader.astro';
 import TopicMap from '../components/TopicMap.astro';
+import Manifesto from '../components/Manifesto.astro';
+import ProjectTimeline from '../components/ProjectTimeline.astro';
 import CollaborationFormats from '../components/CollaborationFormats.astro';
 import MaterialStrip from '../components/MaterialStrip.astro';
 import { getCollection } from 'astro:content';
@@ -167,9 +169,13 @@ const jsonLd = {
     )
   }
 
+  <Manifesto />
+
   <TopicMap />
 
   <ProjectGrid excludeSlug="volta" heading="Проекты" />
+
+  <ProjectTimeline />
 
   <!-- GAMES ARCADE -->
   <section id="arcade" class="reveal" aria-label="Игры">
