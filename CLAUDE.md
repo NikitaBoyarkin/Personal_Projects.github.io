@@ -146,6 +146,16 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 1. Create `src/content/posts/<slug>.md` with the required frontmatter; `category` must be one of `decision-log`, `framework`, `guide`, `note`.
 2. Run `npm run build` and `make check`.
 
+## CV Source of Truth
+
+The CV in this portfolio is **not** authored here — it lives in a separate rendercv project at `/Users/nikitaboarkin/Desktop/00 ide/00 portfolio/cv/` (source: `Boyarkin_Nikita_Product_Analyst_CV.yaml`). To update the CV section:
+
+1. Re-render there: `rendercv render Boyarkin_Nikita_Product_Analyst_CV.yaml`.
+2. Copy the generated PDF → `public/CV-Nikita-Boyarkin.pdf` (the "Download PDF" link).
+3. Update the hardcoded data blocks (`profile`, `projects`, `skillGroups`) in `src/pages/cv.astro` to match the YAML. Keep that comment ("Source of truth: rendercv") pointing at the cv project.
+
+Do not hand-edit the CV page content independent of the rendercv YAML — the YAML is the canonical source.
+
 ## Internal Links
 
 Always use the `withBase()` helper from `src/lib/path.ts` for internal links and image paths so the `base` path is applied correctly:

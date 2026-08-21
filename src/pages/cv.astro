@@ -2,35 +2,67 @@
 import { withBase } from '../lib/path';
 import { getCollection } from 'astro:content';
 
-const projects = (await getCollection('projects', (p) => !p.data.draft)).sort((a, b) =>
-  a.data.title.localeCompare(b.data.title)
-);
 const posts = (await getCollection('posts', (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 6);
 
-const skills = [
-  'SQL',
-  'Python',
-  'Pandas / NumPy',
-  'DuckDB',
-  'PostgreSQL',
-  'ClickHouse',
-  'A/B Testing (CUPED, AA-test, Bonferroni)',
-  'SciPy / Statsmodels',
-  'scikit-learn',
-  'Cohort & Retention',
-  'RFM Segmentation',
-  'LTV',
-  'SQL window functions',
-  'Tableau',
-  'Superset',
-  'Matplotlib / Seaborn',
-  'Docker',
-  'Airflow',
-  'Git',
-  'cron',
-  'GenAI / LLM APIs',
+// Source of truth: rendercv — /Users/nikitaboarkin/Desktop/00 ide/00 portfolio/cv
+// (Boyarkin_Nikita_Product_Analyst_CV.yaml). Keep in sync with that file.
+const profile = [
+  'Аналитик данных с 4+ годами опыта в аналитике и исследованиях. Специализируюсь на A/B-тестах, сегментации клиентов и автоматизации отчетности. Грейд: Middle.',
+  'Стек: SQL, Python, DuckDB, PostgreSQL, ClickHouse, Tableau, Superset, Docker, Airflow.',
+];
+
+const projects = [
+  {
+    title: 'Volta Neobank — Product Analytics',
+    period: 'Apr 2025 – present',
+    summary:
+      'Сквозной кейс аналитики необанка: воронка, A/B-тест, удержание, сегментация (синтетические данные).',
+    highlights: [
+      'Провёл A/B-тест KYC для нового процесса верификации → увеличил конверсию на 6.24 п.п., что обеспечило дополнительно €716K дохода в год.',
+      'Разработал стратегию удержания → увеличил retention на 9.2 п.п. к 3-му месяцу, что принесло дополнительно €227K LTV.',
+      'Использовал KMeans для сегментации пользователей на 4 группы → 12% пользователей генерируют 41% выручки, что дало возможность оптимизировать маркетинговые усилия; предложенный сценарий миграции может увеличить доход на €310K/год.',
+    ],
+    github: 'https://github.com/NikitaBoyarkin/volta-banking',
+  },
+  {
+    title: 'RFM Analysis of Bank Clients',
+    period: 'Jan 2025 – Mar 2025',
+    summary:
+      'Провёл RFM-сегментацию клиентов → выделил 20% high-value клиентов, генерирующих 60% выручки, что позволило оптимизировать стратегии удержания.',
+    highlights: [
+      'Перевёл фокус с массовых рассылок на сегментированные сценарии удержания и реактивации.',
+    ],
+    github: 'https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients',
+  },
+  {
+    title: 'SQL Analytics Case Study',
+    period: 'Feb 2025',
+    summary:
+      'Создал 10 SQL-кейсов для анализа воронки, удержания, DAU/MAU, LTV и атрибуции выручки → улучшил качество данных для отчетности на 30%.',
+    highlights: [
+      'Запуск без сервера (DuckDB); каждый кейс с автоматической проверкой результата.',
+    ],
+    github: 'https://github.com/NikitaBoyarkin/sql-analytics-case-study',
+  },
+  {
+    title: 'Reporting Automation Telegram Bot',
+    period: 'Mar 2025',
+    summary:
+      'Разработал Telegram-бота для автоматизации еженедельного отчета → сократил время на сбор данных с 2 часов до 5 минут, что увеличило эффективность команды.',
+    highlights: [],
+    github: 'https://github.com/NikitaBoyarkin/telegram_bot_public',
+  },
+];
+
+const skillGroups = [
+  { label: 'Data', details: 'Python, SQL, Pandas, NumPy, DuckDB, PostgreSQL, ClickHouse' },
+  { label: 'Statistics', details: 'SciPy, Statsmodels, scikit-learn; A/B testing (CUPED, AA-test, Bonferroni)' },
+  { label: 'Visualization', details: 'Tableau, Superset, Matplotlib, Seaborn' },
+  { label: 'Infrastructure', details: 'Docker, Airflow, Git, cron' },
+  { label: 'Methods', details: 'Funnel, Cohort & Retention, RFM, LTV, SQL window functions' },
+  { label: 'AI tooling', details: 'GenAI, LLM APIs' },
 ];
 
 // Absolute URL for the "Download CV" funnel and printed copy.
@@ -39,12 +71,12 @@ const year = new Date().getFullYear();
 ---
 
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="ru" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Nikita Boyarkin — CV</title>
-    <meta name="description" content="CV of Nikita Boyarkin — Data Analyst / Product Analyst." />
+    <title>Boyarkin Nikita — CV</title>
+    <meta name="description" content="CV of Boyarkin Nikita — Data / Product Analyst." />
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -65,8 +97,8 @@ const year = new Date().getFullYear();
 
     <main class="cv">
       <header class="cv-header">
-        <h1>Nikita Boyarkin</h1>
-        <p class="cv-role">Data Analyst / Product Analyst</p>
+        <h1>Boyarkin Nikita</h1>
+        <p class="cv-role">Data / Product Analyst</p>
         <p class="cv-contact">
           <a href="https://t.me/lofinibo">Telegram · @lofinibo</a>
           <span aria-hidden="true">·</span>
@@ -76,41 +108,40 @@ const year = new Date().getFullYear();
           <span aria-hidden="true">·</span>
           <a href={siteUrl}>{siteUrl.replace(/^https?:\/\//, '')}</a>
         </p>
-        <p class="cv-open">Open to Data / Product Analyst roles.</p>
+        <p class="cv-open">Открыт к ролям Data / Product Analyst.</p>
       </header>
 
       <section class="cv-section">
-        <h2>Profile</h2>
-        <p>
-          Data Analyst (Middle) with 4+ years of experience turning complex data into actionable
-          business insights. I work at the intersection of product, data, and experimentation —
-          customer analytics, A/B testing, segmentation, and reporting automation that help teams
-          move faster. Stack: SQL, Python, DuckDB, PostgreSQL, ClickHouse, Tableau, Superset,
-          Docker, Airflow.
-        </p>
-      </section>
-
-      <section class="cv-section">
-        <h2>Skills</h2>
-        <ul class="cv-skills">
-          {skills.map((s) => <li>{s}</li>)}
+        <h2>Summary</h2>
+        <ul class="cv-profile">
+          {profile.map((b) => <li>{b}</li>)}
         </ul>
       </section>
 
       <section class="cv-section">
-        <h2>Selected Projects</h2>
+        <h2>Skills</h2>
+        <ul class="cv-skill-groups">
+          {skillGroups.map((g) => (
+            <li><strong>{g.label}:</strong> {g.details}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section class="cv-section">
+        <h2>Projects</h2>
         {projects.map((p) => (
           <article class="cv-project">
             <h3>
-              {p.data.title}
-              {p.data.github && (
-                <a class="cv-source" href={p.data.github} target="_blank" rel="noopener noreferrer">source →</a>
+              {p.title}
+              <span class="cv-period">{p.period}</span>
+              {p.github && (
+                <a class="cv-source" href={p.github} target="_blank" rel="noopener noreferrer">source →</a>
               )}
             </h3>
-            <p class="cv-stack">{p.data.tools.join(' · ')}</p>
-            {p.data.impact.length > 0 && (
+            <p class="cv-stack">{p.summary}</p>
+            {p.highlights.length > 0 && (
               <ul class="cv-impact">
-                {p.data.impact.map((i) => <li>{i}</li>)}
+                {p.highlights.map((h) => <li>{h}</li>)}
               </ul>
             )}
           </article>
@@ -118,7 +149,7 @@ const year = new Date().getFullYear();
       </section>
 
       <section class="cv-section">
-        <h2>Writing</h2>
+        <h2>Статьи</h2>
         <ul class="cv-writing">
           {posts.map((post) => (
             <li>
@@ -130,28 +161,28 @@ const year = new Date().getFullYear();
       </section>
 
       <section class="cv-section">
-        <h2>Education</h2>
+        <h2>Образование</h2>
         <ul class="cv-edu">
           <li>
-            <span class="cv-edu-degree">PhD, Work Psychology</span>
-            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-degree">PhD, Психология труда</span>
+            <span class="cv-edu-school">UMC, Москва</span>
             <span class="cv-edu-period">Sept 2022 – May 2025</span>
           </li>
           <li>
-            <span class="cv-edu-degree">MSc, Work Psychology</span>
-            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-degree">MSc, Психология труда</span>
+            <span class="cv-edu-school">UMC, Москва</span>
             <span class="cv-edu-period">Sept 2020 – May 2022</span>
           </li>
           <li>
-            <span class="cv-edu-degree">BSc, Business Informatics</span>
-            <span class="cv-edu-school">UMC, Moscow</span>
+            <span class="cv-edu-degree">BSc, Бизнес информатика</span>
+            <span class="cv-edu-school">UMC, Москва</span>
             <span class="cv-edu-period">Sept 2016 – May 2020</span>
           </li>
         </ul>
       </section>
     </main>
 
-    <p class="cv-foot no-print">Tip: use “Print / Save as PDF” for a one-page copy. © {year} Nikita Boyarkin.</p>
+    <p class="cv-foot no-print">Совет: используйте «Печать / Сохранить как PDF» для одностраничной копии. © {year} Boyarkin Nikita.</p>
 
     <style>
       :root {
@@ -213,11 +244,15 @@ const year = new Date().getFullYear();
       .cv-section { margin-top: 1.3rem; }
       .cv-section h2 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 0.25rem; margin: 0 0 0.6rem; }
       .cv-section p { margin: 0 0 0.4rem; color: var(--ink); }
-      .cv-skills { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
-      .cv-skills li { background: #f4f4f5; border: 1px solid var(--line); border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.78rem; color: var(--muted); }
+      .cv-profile { list-style: none; padding: 0; margin: 0; }
+      .cv-profile li { padding: 0.2rem 0; font-size: 0.9rem; color: var(--ink); }
+      .cv-skill-groups { list-style: none; padding: 0; margin: 0; }
+      .cv-skill-groups li { padding: 0.2rem 0; font-size: 0.88rem; color: var(--ink); }
+      .cv-skill-groups strong { color: var(--ink); }
       .cv-project { margin-bottom: 0.7rem; }
-      .cv-project h3 { margin: 0 0 0.1rem; font-size: 1rem; }
-      .cv-source { margin-left: 0.5rem; font-size: 0.75rem; font-weight: 400; color: var(--accent); text-decoration: none; }
+      .cv-project h3 { margin: 0 0 0.1rem; font-size: 1rem; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.4rem; }
+      .cv-period { font-size: 0.75rem; font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+      .cv-source { margin-left: 0.2rem; font-size: 0.75rem; font-weight: 400; color: var(--accent); text-decoration: none; }
       .cv-source:hover { text-decoration: underline; }
       .cv-stack { margin: 0 0 0.3rem; font-size: 0.8rem; color: var(--muted); font-style: italic; }
       .cv-impact { margin: 0; padding-left: 1.1rem; color: var(--ink); font-size: 0.85rem; }
