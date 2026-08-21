@@ -1,5 +1,6 @@
 ---
 import { withBase } from '../lib/path';
+import ArrowMorph from './ArrowMorph.astro';
 
 interface Props {
   slug: string;
@@ -44,7 +45,7 @@ const i18n = {
   {impactText && <p class="Impact">{i18n.impact}: {impactText}</p>}
 
   <div class="project-actions">
-    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>{i18n.view}</a>
+    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>{i18n.view} <ArrowMorph /></a>
     {
       demo && (
         <a
@@ -55,7 +56,7 @@ const i18n = {
           style="flex: 1 1 auto; justify-content: center;"
           data-analytics={`project_demo_${slug}`}
         >
-          {i18n.demo}
+          {i18n.demo} <ArrowMorph />
         </a>
       )
     }
@@ -69,7 +70,7 @@ const i18n = {
           style="flex: 1 1 auto; justify-content: center;"
           data-analytics={`project_github_${slug}`}
         >
-          GitHub
+          GitHub <ArrowMorph />
         </a>
       )
     }

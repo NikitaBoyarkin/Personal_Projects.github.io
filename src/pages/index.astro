@@ -9,10 +9,7 @@ import CollaborationFormats from '../components/CollaborationFormats.astro';
 import MaterialStrip from '../components/MaterialStrip.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
-import MorphIcon from 'morphicons/astro';
-
-const ARROW_RIGHT = 'M5 12h14M12 5l7 7-7 7';
-const ARROW_UP_RIGHT = 'M7 17 17 7M7 7h10v10';
+import ArrowMorph from '../components/ArrowMorph.astro';
 
 const allProjects = await getCollection('projects', (p) => !p.data.draft);
 const volta = allProjects.find((p) => p.id.replace(/\.md$/, '') === 'volta');
@@ -206,7 +203,7 @@ const jsonLd = {
       свайпы, drag, тап.
     </p>
     <p>
-      <a class="button" href={withBase('games/')}>Играть <MorphIcon data-arrow data-from-d={ARROW_RIGHT} data-to-d={ARROW_UP_RIGHT} icon={ARROW_RIGHT} spring="snappy" reducedMotion="user" size={16} /></a>
+      <a class="button" href={withBase('games/')}>Играть <ArrowMorph /></a>
     </p>
   </section>
 
@@ -230,7 +227,7 @@ const jsonLd = {
       </li>
     </ul>
     <p class="now-teaser-cta">
-      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo <MorphIcon data-arrow data-from-d={ARROW_RIGHT} data-to-d={ARROW_UP_RIGHT} icon={ARROW_RIGHT} spring="snappy" reducedMotion="user" size={16} /></a>
+      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo <ArrowMorph /></a>
     </p>
   </section>
 
@@ -248,26 +245,7 @@ const jsonLd = {
       AI-assisted workflow и пишу о практических data-техниках.
     </p>
     <p>
-      <a href={withBase('about/')}>Подробнее <MorphIcon data-arrow data-from-d={ARROW_RIGHT} data-to-d={ARROW_UP_RIGHT} icon={ARROW_RIGHT} spring="snappy" reducedMotion="user" size={16} /></a>
+      <a href={withBase('about/')}>Подробнее <ArrowMorph /></a>
     </p>
   </section>
 </Base>
-
-<script>
-  import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
-
-  // CTA arrows: morph → to ↗ on hover/focus (element is already defined
-  // site-wide by the Base layout; this call is an idempotent guarantee).
-  defineMorphIcon();
-  document.querySelectorAll<MorphIconElement>("morph-icon[data-arrow]").forEach((icon) => {
-    const anchor = icon.closest("a");
-    if (!anchor) return;
-    const from = icon.dataset.fromD!;
-    const to = icon.dataset.toD!;
-    const swap = (target: string) => icon.morphTo(target);
-    anchor.addEventListener("mouseenter", () => swap(to));
-    anchor.addEventListener("mouseleave", () => swap(from));
-    anchor.addEventListener("focus", () => swap(to));
-    anchor.addEventListener("blur", () => swap(from));
-  });
-</script>

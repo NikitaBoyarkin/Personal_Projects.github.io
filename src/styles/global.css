@@ -225,6 +225,32 @@ nav.scrolled {
   transform: scale(0.95);
 }
 
+/* Mobile nav toggle (hidden on desktop; hamburger ↔ ✕ via morphicons) */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-accent);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.nav-toggle:hover {
+  background: var(--interactive-hover);
+  border-color: var(--text-accent);
+}
+
+.nav-toggle:active {
+  transform: scale(0.95);
+}
+
 nav ul.links {
   display: flex;
   flex-wrap: wrap;
@@ -734,19 +760,10 @@ nav ul.links a[aria-current="page"] {
   overflow: hidden;
 }
 
-.project .button::after {
-  content: "→";
-  transition: transform 0.25s ease;
-}
-
 .project .button:hover {
   background: var(--button-bg-hover);
   transform: translateY(-2px);
   box-shadow: 0 8px 20px color-mix(in srgb, var(--text-accent) 25%, transparent);
-}
-
-.project .button:hover::after {
-  transform: translateX(3px);
 }
 
 .project .button-secondary {
@@ -1140,8 +1157,23 @@ footer p {
     gap: 1rem;
   }
 
+  /* Mobile menu: links collapse behind the hamburger toggle */
+  .nav-toggle {
+    display: inline-flex;
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-5);
+  }
+
   nav ul.links {
-    gap: 1rem;
+    display: none;
+  }
+
+  nav ul.links.open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 
   /* Responsive tables: scroll horizontally instead of overflowing */

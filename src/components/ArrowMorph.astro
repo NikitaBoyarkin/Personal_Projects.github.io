@@ -1,0 +1,40 @@
+---
+// Reusable morphing arrow: → at rest, morphs to ↗ on hover/focus.
+// The wiring script is bundled once per page and covers every
+// <morph-icon data-arrow> rendered anywhere (index CTA links, project-card
+// buttons) — a data-wired marker keeps it idempotent across instances.
+import MorphIcon from 'morphicons/astro';
+
+interface Props {
+  from?: string;
+  to?: string;
+  size?: number;
+}
+
+const {
+  from = 'M5 12h14M12 5l7 7-7 7',
+  to = 'M7 17 17 7M7 7h10v10',
+  size = 16,
+} = Astro.props;
+---
+
+<MorphIcon data-arrow data-from-d={from} data-to-d={to} icon={from} spring="snappy" reducedMotion="user" size={size} />
+
+<script>
+  import { defineMorphIcon, type MorphIconElement } from 'morphicons/element';
+
+  defineMorphIcon();
+  document.querySelectorAll<MorphIconElement>('morph-icon[data-arrow]').forEach((icon) => {
+    if (icon.dataset.wired) return;
+    icon.dataset.wired = '1';
+    const anchor = icon.closest('a');
+    if (!anchor) return;
+    const from = icon.dataset.fromD!;
+    const to = icon.dataset.toD!;
+    const swap = (target: string) => icon.morphTo(target);
+    anchor.addEventListener('mouseenter', () => swap(to));
+    anchor.addEventListener('mouseleave', () => swap(from));
+    anchor.addEventListener('focus', () => swap(to));
+    anchor.addEventListener('blur', () => swap(from));
+  });
+</script>
