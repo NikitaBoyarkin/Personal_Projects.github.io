@@ -35,10 +35,7 @@
   .home:hover{color:var(--accent);border-color:var(--accent)}
   .theme-toggle{position:absolute;top:16px;right:16px;display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--muted);cursor:pointer;transition:color .2s ease,border-color .2s ease,background-color .2s ease}
   .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
-  .theme-toggle svg{width:18px;height:18px;display:none}
-  [data-theme="dark"] .theme-toggle .icon-moon{display:block}
-  [data-theme="light"] .theme-toggle .icon-sun{display:block}
-  [data-theme="cyberpunk"] .theme-toggle .icon-cyber{display:block}
+  .theme-toggle morph-icon{display:contents}
   h1{margin:0;font-size:clamp(28px,6vw,44px);letter-spacing:2px;font-weight:700}
   h1 .t{color:var(--accent)}
   .lede{max-width:620px;margin:14px auto 0;color:var(--muted);font-size:14px}
@@ -66,10 +63,10 @@
 <body>
   <header>
     <a class="home" href="../" aria-label="Back to portfolio">← Portfolio</a>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme: dark. Click to cycle." aria-pressed="true" title="Theme: dark / light / cyberpunk">
-      <svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <svg class="icon-cyber" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme: dark. Click to cycle." aria-pressed="true" title="Theme: dark / light / cyberpunk" data-icon-dark="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-icon-light="M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" data-icon-cyber="M13 2 3 14 12 14 11 22 21 10 12 10 13 2z">
+      <morph-icon icon="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" spring="snappy" reduced-motion="user" size="18" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </morph-icon>
     </button>
     <h1><span class="t">⌘</span> Arcade</h1>
     <p class="lede">Tiny browser mini-games — some about analytics, some just for fun. Play inline, on phone (swipe / drag / tap) or desktop (keyboard / mouse).</p>
@@ -143,9 +140,17 @@
       var themeColorMeta = document.getElementById('theme-color');
       var THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
       var ORDER = ['dark', 'light', 'cyberpunk'];
+      var ICON_PATHS = {};
+      if (toggle) {
+        ICON_PATHS.dark = toggle.dataset.iconDark;
+        ICON_PATHS.light = toggle.dataset.iconLight;
+        ICON_PATHS.cyberpunk = toggle.dataset.iconCyber;
+      }
 
       function applyTheme(theme) {
         html.setAttribute('data-theme', theme);
+        var themeIcon = document.getElementById('theme-icon');
+        if (themeIcon && ICON_PATHS[theme]) themeIcon.icon = ICON_PATHS[theme];
         if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
         if (toggle) {
           toggle.setAttribute('aria-pressed', String(theme === 'dark'));
@@ -178,6 +183,10 @@
         applyTheme(e.matches ? 'dark' : 'light');
       });
     })();
+  </script>
+  <script type="module">
+    import { defineMorphIcon } from "../vendor/morphicons/element.js";
+    defineMorphIcon();
   </script>
 </body>
 </html>
