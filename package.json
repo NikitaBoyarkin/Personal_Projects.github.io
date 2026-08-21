@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
     "@paper-design/shaders": "^0.0.78",
     "astro": "^5.0.0",
     "posthog-js": "^1.417.1"

@@ -29,5 +29,44 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
       autocapture: true,
       session_recording: { maskAllInputs: true },
     });
+
+    const base = import.meta.env.BASE_URL || '/';
+    const norm = base.replace(/\/$/, '');
+
+    function pathUnderBase(): string {
+      const p = window.location.pathname;
+      if (p.startsWith(norm + '/')) return p.slice(norm.length);
+      if (p === norm) return '/';
+      return p;
+    }
+
+    // Content page-view events (in addition to autocapture $pageview).
+    const path = pathUnderBase();
+    const projectMatch = path.match(/^\/(?:en\/)?projects\/([^/]+)\/?$/);
+    if (projectMatch) {
+      posthog.capture('project_viewed', {
+        slug: projectMatch[1],
+        locale: path.startsWith('/en/') ? 'en' : 'ru',
+      });
+    }
+    const postMatch = path.match(/^\/posts\/([^/]+)\/?$/);
+    if (postMatch) {
+      posthog.capture('post_read', {
+        slug: postMatch[1],
+        locale: 'ru',
+      });
+    }
+
+    // Delegated click capture for language switch.
+    document.addEventListener('click', (e) => {
+      const t = (e.target as Element | null)?.closest('[data-analytics^="lang_switch_"]');
+      if (!t) return;
+      const kind = t.getAttribute('data-analytics') || '';
+      const target = kind.replace('lang_switch_', '');
+      posthog.capture('lang_switched', {
+        from: window.location.pathname.startsWith(norm + '/en/') ? 'en' : 'ru',
+        to: target,
+      });
+    });
   </script>
 )}
