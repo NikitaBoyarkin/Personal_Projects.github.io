@@ -5,6 +5,7 @@ import { withBase } from '../lib/path';
 import Analytics from '../components/Analytics.astro';
 import LangSwitch from '../components/LangSwitch.astro';
 import SearchBox from '../components/SearchBox.astro';
+import MorphIcon from 'morphicons/astro';
 
 interface Props {
   title: string;
@@ -67,6 +68,13 @@ const t = {
 const counterpartUrl = counterpartHref ? `${siteUrl}${counterpartHref}` : null;
 const ruAltUrl = isEn ? counterpartUrl : pageUrl;
 const enAltUrl = isEn ? pageUrl : counterpartUrl;
+
+// Theme-toggle icons (lucide-style stroke paths, 24×24). Moved to plain
+// `d` strings so morphicons can animate between them without a lucide dep.
+const THEME_MOON = 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z';
+const THEME_SUN =
+  'M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42';
+const THEME_CYBER = 'M13 2 3 14 12 14 11 22 21 10 12 10 13 2z';
 ---
 
 <!doctype html>
@@ -162,25 +170,9 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
             <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>
           </svg>
         </a>
-        <button id="theme-toggle" class="theme-toggle" aria-label={`${t.themeLabel}dark${t.themeCycle}`} data-theme-label={t.themeLabel} data-theme-cycle={t.themeCycle} type="button" aria-pressed="true" title={t.themeTitle}>
-        <svg class="theme-icon moon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-        </svg>
-        <svg class="theme-icon sun" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="3" />
-          <line x1="12" y1="21" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="3" y2="12" />
-          <line x1="21" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-        </svg>
-        <svg class="theme-icon cyber" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
-      </button>
+        <button id="theme-toggle" class="theme-toggle" aria-label={`${t.themeLabel}dark${t.themeCycle}`} data-theme-label={t.themeLabel} data-theme-cycle={t.themeCycle} type="button" aria-pressed="true" title={t.themeTitle} data-icon-dark={THEME_MOON} data-icon-light={THEME_SUN} data-icon-cyber={THEME_CYBER}>
+          <MorphIcon id="theme-icon" icon={THEME_MOON} spring="snappy" reducedMotion="user" size={18} />
+        </button>
       </div>
     </nav>
 
@@ -203,11 +195,12 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
       (function () {
         const html = document.documentElement;
         const toggle = document.getElementById('theme-toggle');
-        const icons = toggle ? {
-          moon: toggle.querySelector('.theme-icon.moon'),
-          sun: toggle.querySelector('.theme-icon.sun'),
-          cyber: toggle.querySelector('.theme-icon.cyber'),
-        } : null;
+
+        const ICON_PATHS = {
+          dark: toggle?.dataset.iconDark,
+          light: toggle?.dataset.iconLight,
+          cyberpunk: toggle?.dataset.iconCyber,
+        };
 
         const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         const THEME_COLORS = { dark: '#0f2a2b', light: '#f4efca', cyberpunk: '#0a0a12' };
@@ -215,11 +208,8 @@ const enAltUrl = isEn ? pageUrl : counterpartUrl;
 
         function applyTheme(theme) {
           html.setAttribute('data-theme', theme);
-          if (icons) {
-            icons.moon.style.display = theme === 'dark' ? 'block' : 'none';
-            icons.sun.style.display = theme === 'light' ? 'block' : 'none';
-            icons.cyber.style.display = theme === 'cyberpunk' ? 'block' : 'none';
-          }
+          const themeIcon = document.getElementById('theme-icon');
+          if (themeIcon && ICON_PATHS[theme]) themeIcon.icon = ICON_PATHS[theme];
           if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
           if (toggle) {
             toggle.setAttribute('aria-pressed', String(theme === 'dark'));

@@ -215,14 +215,6 @@ nav.scrolled {
   line-height: 1;
 }
 
-#theme-toggle .theme-icon {
-  display: none;
-}
-
-#theme-toggle .theme-icon:first-child {
-  display: block;
-}
-
 #theme-toggle:hover {
   background: var(--interactive-hover);
   transform: rotate(15deg) scale(1.1);

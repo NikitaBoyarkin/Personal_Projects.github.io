@@ -5,6 +5,7 @@
 // import.meta.env. Styles live in global.css (.search-*).
 import { withBase } from "../lib/path";
 import { TOPICS } from "../lib/topics";
+import MorphIcon from "morphicons/astro";
 
 interface Props {
   lang?: "ru" | "en";
@@ -27,6 +28,11 @@ const i18n = {
   facetsLabel: isEn ? "Filter by type" : "Фильтр по типу",
   resultsLabel: isEn ? "Search results" : "Результаты поиска",
 };
+
+// Search toggle icons (stroke, 24×24): magnifier ↔ close. Raw `d` strings so
+// the bundled script can morph between them without a lucide dependency.
+const SEARCH_D = "M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14M21 21l-4.35-4.35";
+const X_D = "M6 6l12 12M6 18L18 6";
 ---
 
 <div
@@ -34,6 +40,8 @@ const i18n = {
   data-index-url={indexUrl}
   data-topics={JSON.stringify(topicLinks)}
   data-i18n={JSON.stringify(i18n)}
+  data-icon-search={SEARCH_D}
+  data-icon-close={X_D}
 >
   <button
     id="search-toggle"
@@ -44,10 +52,7 @@ const i18n = {
     aria-expanded="false"
     aria-controls="search-panel"
   >
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="7" />
-      <line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
+    <MorphIcon id="search-icon" icon={SEARCH_D} spring="snappy" reducedMotion="user" size={16} />
   </button>
 
   <div id="search-panel" class="search-panel" hidden>
@@ -73,11 +78,28 @@ const i18n = {
 </div>
 
 <script>
+  import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
+
+  // Same stroke paths as the SSR render (see frontmatter). Morphing the
+  // toggle magnifier ↔ close is a pure animation on the custom element.
+  defineMorphIcon();
+  let searchIcon: MorphIconElement | null = null;
+  async function morphSearch(to: string) {
+    if (!searchIcon) {
+      await customElements.whenDefined("morph-icon");
+      searchIcon = document.getElementById("search-icon") as MorphIconElement | null;
+      if (!searchIcon) return;
+    }
+    searchIcon.morphTo(to);
+  }
+
   // Wrap in init() — ES module top-level `return` is illegal, so all early
   // bail-outs live inside a function.
   function init() {
     const root = document.querySelector<HTMLElement>(".search");
     if (!root) return;
+    const searchD = root.dataset.iconSearch!;
+    const closeD = root.dataset.iconClose!;
     const indexUrl = root.dataset.indexUrl!;
     const topics: { l: string; h: string }[] = JSON.parse(root.dataset.topics || "[]");
     type I18n = {
@@ -135,6 +157,7 @@ const i18n = {
       panel.hidden = false;
       toggle.setAttribute("aria-expanded", "true");
       input.focus();
+      morphSearch(closeD);
     }
 
     function close() {
@@ -147,6 +170,7 @@ const i18n = {
       setFacet("all");
       // Return focus to the trigger so keyboard users aren't dropped to <body>.
       toggle.focus();
+      morphSearch(searchD);
     }
 
     function setFacet(next: string) {
