@@ -12,7 +12,10 @@
   } from '@paper-design/shaders';
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!prefersReduced) {
+  // Skip the canvas on small coarse-pointer screens (mobile) — saves battery/CPU
+  // and keeps LCP clean; the background is decorative either way.
+  const isMobile = window.matchMedia('(max-width: 768px) and (pointer: coarse)').matches;
+  if (!prefersReduced && !isMobile) {
     const start = () => {
       const container = document.getElementById('intro-shader');
       if (!container) return;

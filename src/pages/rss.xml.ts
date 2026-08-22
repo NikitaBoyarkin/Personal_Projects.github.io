@@ -21,6 +21,6 @@ export async function GET(context: APIContext) {
       link: `${BASE}/posts/${post.id.replace(/\.md$/, "")}/`,
       categories: [post.data.category, ...post.data.tags],
     })),
-    customData: `<language>en-us</language>`,
+    customData: `<language>en-us</language><lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`,
   });
 }

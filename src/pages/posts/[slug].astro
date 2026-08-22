@@ -33,11 +33,15 @@ const lookup = new Map<string, { kind: string; title: string }>();
 
 const related = (post.data.related ?? [])
   .map((p) => {
+    if (/^https?:\/\//i.test(p)) {
+      const host = new URL(p).hostname.replace(/^www\./, '');
+      return { href: p, title: host, external: true };
+    }
     const slug = p.replace(/^\//, '').replace(/\/$/, '').replace(/^(posts|projects)\//, '');
     const found = lookup.get(slug);
-    return found ? { href: withBase(`${found.kind}/${slug}/`), title: found.title } : null;
+    return found ? { href: withBase(`${found.kind}/${slug}/`), title: found.title, external: false } : null;
   })
-  .filter((x): x is { href: string; title: string } => x !== null);
+  .filter((x): x is { href: string; title: string; external: boolean } => x !== null);
 ---
 
 <Post

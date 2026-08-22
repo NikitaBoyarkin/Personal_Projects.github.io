@@ -1,5 +1,41 @@
 /* project-style.css - Obsidian-inspired theme with dark/light toggle */
 
+/* Inter variable font — self-hosted (no render-blocking Google Fonts CSS).
+   Four optimized subsets cover the site's RU + EN text. Paths are
+   base-relative (GitHub Pages subpath); keep in sync if `base` changes. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Personal_Projects.github.io/fonts/inter-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Personal_Projects.github.io/fonts/inter-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Personal_Projects.github.io/fonts/inter-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Personal_Projects.github.io/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   /* Obsidian dark theme colors (default) — dark teal */
   --background-primary: #0f2a2b;
@@ -2014,5 +2050,247 @@ button:focus-visible {
     flex: 1 1 0;
     min-width: 0;
     max-width: none;
+  }
+}
+
+/* ============================================================
+   Homepage kanban board — Профиль | Проекты | Сейчас в работе.
+   Three outer columns on one snap-scroll row (the kanbannotebook
+   reference): narrow sticky columns flank the wide projects column.
+   ============================================================ */
+
+#page-board {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1900px, calc(100vw - 2 * var(--space-5)));
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-3);
+  scrollbar-width: none;
+}
+#page-board::-webkit-scrollbar {
+  display: none;
+}
+
+#page-board .kanban-column {
+  flex: 0 0 85vw;
+  min-width: 85vw;
+  max-width: 85vw;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  #page-board .kanban-column {
+    flex: 0 0 60vw;
+    min-width: 60vw;
+    max-width: 60vw;
+  }
+}
+
+@media (min-width: 1100px) {
+  #page-board {
+    overflow-x: visible;
+  }
+  #page-board .kanban-column {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+    scroll-snap-align: none;
+  }
+  #page-board .kanban-column-sticky {
+    flex: 0 0 320px;
+    min-width: 320px;
+    max-width: 320px;
+  }
+}
+
+/* Embedded 4-track board inside the Проекты column: no break-out, fills width. */
+#project-list.kanban-board.embedded {
+  position: static;
+  left: auto;
+  transform: none;
+  width: auto;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: visible;
+  scroll-snap-type: none;
+  padding-bottom: 0;
+  gap: var(--space-4);
+}
+#project-list.kanban-board.embedded .kanban-column {
+  scroll-snap-align: none;
+}
+
+@media (max-width: 1099px) {
+  #project-list.kanban-board.embedded {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #project-list.kanban-board.embedded .kanban-column {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  #project-list.kanban-board.embedded {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+  #project-list.kanban-board.embedded .kanban-column {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+.kanban-project-body {
+  display: block;
+  padding-top: 0;
+}
+
+/* Board cards — sticky-note cards inside the Profile / Now columns. */
+.board-card {
+  background: var(--background-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+.board-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--text-accent) 30%, transparent);
+  box-shadow: 0 8px 20px var(--shadow-color);
+}
+
+.board-card-photo {
+  padding: 0;
+  overflow: hidden;
+}
+.board-card-photo img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+}
+
+.board-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-normal);
+  margin-bottom: var(--space-3);
+  letter-spacing: -0.01em;
+}
+
+.board-card-text {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
+}
+
+.board-card-experience {
+  margin-bottom: var(--space-3);
+}
+
+.board-card-open-to {
+  color: var(--text-accent) !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-3);
+}
+
+.board-card-link {
+  color: var(--text-accent);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+.board-card-link:hover {
+  color: var(--text-accent-hover);
+  text-decoration: underline;
+}
+
+.board-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.board-chip {
+  background: color-mix(in srgb, var(--text-accent) 8%, transparent);
+  color: var(--text-accent);
+  border: 1px solid color-mix(in srgb, var(--text-accent) 20%, transparent);
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.board-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.board-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-accent);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.board-metric-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.board-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.board-links a {
+  color: var(--text-accent);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+.board-links a:hover {
+  color: var(--text-accent-hover);
+  text-decoration: underline;
+}
+
+/* Slim homepage hero (photo + long text moved into the kanban Profile column). */
+.intro-container-slim {
+  display: block;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+.intro-container-slim .intro-content {
+  text-align: center;
+}
+.intro-container-slim .intro-content h1 {
+  font-size: 3rem;
+}
+.intro-container-slim .cta-row {
+  justify-content: center;
+}
+#intro:has(.intro-container-slim) {
+  padding: var(--space-8) 0;
+  margin-bottom: var(--space-8);
+}
+
+@media (max-width: 480px) {
+  .intro-container-slim .intro-content h1 {
+    font-size: 2rem;
   }
 }

@@ -1,9 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
-import ProjectBoard from '../components/ProjectBoard.astro';
+import HomeBoard from '../components/HomeBoard.astro';
 import IntroShader from '../components/IntroShader.astro';
-import TopicMap from '../components/TopicMap.astro';
 import Manifesto from '../components/Manifesto.astro';
+import TopicMap from '../components/TopicMap.astro';
 import ProjectTimeline from '../components/ProjectTimeline.astro';
 import CollaborationFormats from '../components/CollaborationFormats.astro';
 import MaterialStrip from '../components/MaterialStrip.astro';
@@ -12,7 +12,6 @@ import { withBase } from '../lib/path';
 import ArrowMorph from '../components/ArrowMorph.astro';
 
 const allProjects = await getCollection('projects', (p) => !p.data.draft);
-const volta = allProjects.find((p) => p.id.replace(/\.md$/, '') === 'volta');
 
 const siteUrl = 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/';
 const jsonLd = {
@@ -53,32 +52,14 @@ const jsonLd = {
   counterpartHref={withBase('en/')}
   jsonLd={jsonLd}
 >
-  <!-- INTRO -->
+  <!-- HERO -->
   <section id="intro" class="reveal">
     <IntroShader />
-    <div class="intro-container">
+    <div class="intro-container intro-container-slim">
       <div class="intro-content">
         <h1>Nikita Boyarkin</h1>
         <p class="tagline">Данные → решения. От гипотезы до ship-gate.</p>
         <div class="subtitle">Data Analyst / Product Analyst</div>
-
-        <div class="skills">
-          <span class="skill-badge">SQL</span>
-          <span class="skill-badge">Python</span>
-          <span class="skill-badge">A/B Testing</span>
-          <span class="skill-badge">Retention</span>
-          <span class="skill-badge">Segmentation</span>
-        </div>
-
-        <p class="open-to">Открыт к Data / Product Analyst ролям.</p>
-        <p class="thesis">
-          Помогаю продуктовым командам принимать решения на данных: A/B-тесты с воспроизводимой
-          методологией (CUPED, AA-тесты, Bonferroni, ship-gates), retention-аналитика и SQL-дашборды,
-          которые не врут.
-        </p>
-        <p>
-          4+ года на стыке продукта, данных и экспериментов. Petrograd — синтетика, методология — боевая.
-        </p>
 
         <p class="cta-row">
           <a class="button" href={withBase('start/')}>С чего начать</a>
@@ -90,107 +71,15 @@ const jsonLd = {
           </span>
         </p>
       </div>
-      <div class="intro-photo">
-        <div class="photo-placeholder">
-          <picture>
-            <source type="image/webp" srcset={withBase('images/00_profile.webp')} />
-            <img
-              src={withBase('images/00_profile.jpg')}
-              alt="Nikita Boyarkin"
-              class="profile-image"
-              width="800"
-              height="792"
-              loading="eager"
-              fetchpriority="high"
-            />
-          </picture>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- PROOF STRIP -->
-  <section id="proof" class="reveal" aria-label="Ключевые метрики">
-    <div class="proof-grid">
-      <div class="proof-item">
-        <div class="proof-value">{allProjects.length}</div>
-        <div class="proof-label">проектов в портфолио</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">10</div>
-        <div class="proof-label">SQL-кейсов на DuckDB</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">+6.24pp</div>
-        <div class="proof-label">KYC-конверсия</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">€716K/yr</div>
-        <div class="proof-label">годовой эффект фикса</div>
-      </div>
-    </div>
-  </section>
-
-  {
-    volta && (
-      <section id="featured" class="reveal reveal-delay-1" aria-label="Избранный проект">
-        <h2>Избранный проект</h2>
-        <article class="featured-project">
-          {volta.data.hero && (
-            <img
-              class="featured-image"
-              src={withBase(volta.data.hero)}
-              alt={volta.data.title}
-              width="1200"
-              height="600"
-              loading="eager"
-              fetchpriority="high"
-            />
-          )}
-          <div class="featured-body">
-            <h3>{volta.data.title}</h3>
-            <p>{volta.data.description}</p>
-            {volta.data.impact && volta.data.impact.length > 0 && (
-              <ul class="featured-impact">
-                {volta.data.impact.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            )}
-            <div class="featured-actions">
-              <a class="button" href={withBase('projects/volta/')}>Смотреть проект</a>
-              {volta.data.github && (
-                <a
-                  class="button button-secondary"
-                  href={volta.data.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
-              )}
-              {volta.data.demo && (
-                <a
-                  class="button button-demo"
-                  href={withBase(volta.data.demo)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Демо
-                </a>
-              )}
-            </div>
-          </div>
-        </article>
-      </section>
-    )
-  }
+  <!-- KANBAN BOARD: Профиль | Проекты | Сейчас в работе -->
+  <HomeBoard lang="ru" />
 
   <Manifesto />
 
   <TopicMap />
-
-  <ProjectBoard heading="Проекты" />
 
   <ProjectTimeline />
 
@@ -209,43 +98,5 @@ const jsonLd = {
 
   <CollaborationFormats />
 
-  <!-- IN PROGRESS -->
-  <section id="now-teaser" class="reveal reveal-delay-2" aria-label="Сейчас в работе">
-    <h2>Сейчас в работе</h2>
-    <ul class="now-list">
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Готовлюсь к BI / Data Analyst и Product Analyst middle-интервью: SQL, pandas, алгоритмы, моки.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Развиваю Obsidian knowledge base по product-аналитике — структурированный Zettelkasten с автоматизацией.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Экспериментирую с AI-assisted аналитическими workflow на Claude Code + MCP.
-      </li>
-    </ul>
-    <p class="now-teaser-cta">
-      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo <ArrowMorph /></a>
-    </p>
-  </section>
-
   <MaterialStrip />
-
-  <!-- ABOUT -->
-  <section id="about" class="reveal reveal-delay-3">
-    <h2>Обо мне</h2>
-    <p>
-      Работаю на стыке продукта, данных и экспериментов: клиентская аналитика, A/B-тестирование,
-      дизайн дашбордов и пайплайны данных — чтобы команды принимали решения быстрее.
-    </p>
-    <p>
-      Вне работы поддерживаю Obsidian knowledge base по product-аналитике, экспериментирую с
-      AI-assisted workflow и пишу о практических data-техниках.
-    </p>
-    <p>
-      <a href={withBase('about/')}>Подробнее <ArrowMorph /></a>
-    </p>
-  </section>
 </Base>

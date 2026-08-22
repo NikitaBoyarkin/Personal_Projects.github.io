@@ -13,7 +13,7 @@ interface Props {
   excerpt: string;
   slug: string;
   image?: string;
-  related?: { href: string; title: string }[];
+  related?: { href: string; title: string; external?: boolean }[];
   keywords?: string[];
   prev?: { href: string; title: string } | null;
   next?: { href: string; title: string } | null;
@@ -84,7 +84,15 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
         <h2>Смотрите также</h2>
         <ul>
           {related.map((r) => (
-            <li><a href={r.href}>{r.title}</a></li>
+            <li>
+              <a
+                href={r.href}
+                {...(r.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {r.title}
+                {r.external && ' ↗'}
+              </a>
+            </li>
           ))}
         </ul>
       </section>

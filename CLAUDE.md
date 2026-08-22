@@ -43,7 +43,8 @@ make check
 ├── tsconfig.json
 ├── public/                   # static assets copied as-is to dist/
 │   ├── images/               # profile photo + project hero SVGs (one per project)
-│   └── og/                   # generated OG images
+│   ├── og/                   # generated OG images
+│   └── fonts/                # self-hosted Inter variable font (subsets; see @font-face in global.css)
 ├── src/
 │   ├── content/              # Markdown content collections (schema in config.ts)
 │   │   ├── config.ts         # Zod schemas: projects, projects-en, volta-parts, volta-parts-en, posts
@@ -57,6 +58,7 @@ make check
 │   │   └── Post.astro        # blog post wrapper
 │   ├── components/
 │   │   ├── ProjectCard.astro / ProjectBoard.astro / ProjectFilter.astro
+│   │   ├── HomeBoard.astro    # homepage 3-column kanban: Профиль | Проекты | Сейчас в работе (embeds ProjectBoard)
 │   │   ├── BlogCard.astro / BlogFilter.astro
 │   │   ├── CaseStudy.astro   # problem/approach/result/metrics block for projects
 │   │   ├── InnerTOC.astro    # client-side TOC + scrollspy
@@ -126,11 +128,12 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 |---|---|
 | `title` | Post title |
 | `date` | Publication date (`YYYY-MM-DD`) |
+| `updated` | Optional last-edit date — shown as «обновлено» badge on cards, used as JSON-LD `dateModified` |
 | `category` | Must match `BlogFilter.astro` taxonomy — `decision-log`, `framework`, `guide`, `note` (enforced by `portfolio-category-guard.js`) |
 | `tags` | Array of tags |
 | `excerpt` | Short description for cards and meta tags |
 | `image` | Optional cover image |
-| `related` / `keywords` | Optional arrays |
+| `related` / `keywords` | Optional arrays; `related` may contain `/posts/<slug>/`, `/projects/<slug>/` or absolute URLs (external) |
 | `draft` | If `true`, omitted from the build |
 
 ## Adding Content

@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProjectBoard from '../../components/ProjectBoard.astro';
+import HomeBoard from '../../components/HomeBoard.astro';
 import IntroShader from '../../components/IntroShader.astro';
 import Manifesto from '../../components/Manifesto.astro';
 import ProjectTimeline from '../../components/ProjectTimeline.astro';
@@ -10,7 +10,6 @@ import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
 
 const allProjects = await getCollection('projects-en', (p) => !p.data.draft);
-const volta = allProjects.find((p) => p.id.replace(/\.md$/, '') === 'volta');
 
 const siteUrl = 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/';
 const jsonLd = {
@@ -51,31 +50,14 @@ const jsonLd = {
   counterpartHref={withBase('/')}
   jsonLd={jsonLd}
 >
-  <!-- INTRO -->
+  <!-- HERO -->
   <section id="intro" class="reveal">
     <IntroShader />
-    <div class="intro-container">
+    <div class="intro-container intro-container-slim">
       <div class="intro-content">
         <h1>Nikita Boyarkin</h1>
         <p class="tagline">Data → decisions. From hypothesis to ship-gate.</p>
         <div class="subtitle">Data Analyst / Product Analyst</div>
-
-        <div class="skills">
-          <span class="skill-badge">SQL</span>
-          <span class="skill-badge">Python</span>
-          <span class="skill-badge">A/B Testing</span>
-          <span class="skill-badge">Retention</span>
-          <span class="skill-badge">Segmentation</span>
-        </div>
-
-        <p class="open-to">Open to Data / Product Analyst roles.</p>
-        <p class="thesis">
-          I help product teams make decisions on data: A/B tests with reproducible methodology
-          (CUPED, AA-tests, Bonferroni, ship-gates), retention analytics, and SQL dashboards that don't lie.
-        </p>
-        <p>
-          4+ years at the intersection of product, data, and experimentation. Synthetic data, real methodology.
-        </p>
 
         <p class="cta-row">
           <a class="button" href={withBase('en/start/')}>Start here</a>
@@ -87,95 +69,13 @@ const jsonLd = {
           </span>
         </p>
       </div>
-      <div class="intro-photo">
-        <div class="photo-placeholder">
-          <picture>
-            <source type="image/webp" srcset={withBase('images/00_profile.webp')} />
-            <img
-              src={withBase('images/00_profile.jpg')}
-              alt="Nikita Boyarkin"
-              class="profile-image"
-              width="800"
-              height="792"
-              loading="eager"
-              fetchpriority="high"
-            />
-          </picture>
-        </div>
-      </div>
     </div>
   </section>
 
-  <!-- PROOF STRIP -->
-  <section id="proof" class="reveal" aria-label="Key metrics">
-    <div class="proof-grid">
-      <div class="proof-item">
-        <div class="proof-value">{allProjects.length}</div>
-        <div class="proof-label">projects in portfolio</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">10</div>
-        <div class="proof-label">SQL cases on DuckDB</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">+6.24pp</div>
-        <div class="proof-label">KYC conversion</div>
-      </div>
-      <div class="proof-item">
-        <div class="proof-value">€716K/yr</div>
-        <div class="proof-label">annual fix impact</div>
-      </div>
-    </div>
-  </section>
-
-  {
-    volta && (
-      <section id="featured" class="reveal reveal-delay-1" aria-label="Featured project">
-        <h2>Featured Project</h2>
-        <article class="featured-project">
-          {volta.data.hero && (
-            <img
-              class="featured-image"
-              src={withBase(volta.data.hero)}
-              alt={volta.data.title}
-              width="1200"
-              height="600"
-              loading="eager"
-              fetchpriority="high"
-            />
-          )}
-          <div class="featured-body">
-            <h3>{volta.data.title}</h3>
-            <p>{volta.data.description}</p>
-            {volta.data.impact && volta.data.impact.length > 0 && (
-              <ul class="featured-impact">
-                {volta.data.impact.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            )}
-            <div class="featured-actions">
-              <a class="button" href={withBase('en/projects/volta/')}>View Project</a>
-              {volta.data.github && (
-                <a
-                  class="button button-secondary"
-                  href={volta.data.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
-              )}
-            </div>
-          </div>
-        </article>
-      </section>
-    )
-  }
+  <!-- KANBAN BOARD: Profile | Projects | Now -->
+  <HomeBoard lang="en" />
 
   <Manifesto lang="en" />
-
-  <ProjectBoard collection="projects-en" linkPrefix="en/" heading="Projects" />
 
   <ProjectTimeline lang="en" />
 
@@ -188,49 +88,11 @@ const jsonLd = {
       swipe, drag, tap.
     </p>
     <p>
-      <a class="button" href={withBase('games/')}>Play →</a>
+      <a class="button" href={withBase('games/')}>Play</a>
     </p>
   </section>
 
   <CollaborationFormats lang="en" />
 
-  <!-- IN PROGRESS -->
-  <section id="now-teaser" class="reveal reveal-delay-2" aria-label="Now">
-    <h2>Now</h2>
-    <ul class="now-list">
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Preparing for BI / Data Analyst and Product Analyst mid-level interviews: SQL, pandas, algorithms, mocks.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Maintaining an Obsidian knowledge base on product analytics — a structured Zettelkasten with automation.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Experimenting with AI-assisted analytics workflows on Claude Code + MCP.
-      </li>
-    </ul>
-    <p class="now-teaser-cta">
-      <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo →</a>
-    </p>
-  </section>
-
   <MaterialStrip lang="en" />
-
-  <!-- ABOUT -->
-  <section id="about" class="reveal reveal-delay-3">
-    <h2>About Me</h2>
-    <p>
-      I work at the intersection of product, data, and experimentation. My background spans customer analytics, A/B
-      testing, dashboard design, and building data pipelines that help teams make faster decisions.
-    </p>
-    <p>
-      Outside of work I maintain an Obsidian knowledge base on product analytics, experiment with AI-assisted workflows,
-      and write about practical data techniques.
-    </p>
-    <p>
-      <a href={withBase('en/about/')}>More →</a>
-    </p>
-  </section>
 </Base>

@@ -8,8 +8,11 @@ interface Props {
   collection?: 'projects' | 'projects-en';
   linkPrefix?: string;
   heading?: string;
+  /** Render the 4 tracks without the outer <section>/<h2>/<ProjectFilter>,
+   *  for embedding inside a kanban column on the homepage board. */
+  embedded?: boolean;
 }
-const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects' } = Astro.props;
+const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects', embedded = false } = Astro.props;
 const lang: 'ru' | 'en' = linkPrefix.startsWith('en/') ? 'en' : 'ru';
 
 const ORDER = ['volta', 'ab', 'supabase', 'posthog', 'streamlit', 'sales-calls', 'sql', 'rfm', 'cohort', 'bot', 'scrolly', 'garden', 'site'];
@@ -42,38 +45,74 @@ const byTrack = TRACKS.map((track) => ({
 })).filter((track) => track.projects.length > 0);
 ---
 
-<section id="projects" class="reveal reveal-delay-2">
-  <h2>{heading}</h2>
-  <ProjectFilter lang={lang} />
-  <div id="project-list" class="kanban-board">
-    {
-      byTrack.map((track) => (
-        <div class="kanban-column" data-track={track.key}>
-          <div class="kanban-column-header">
-            <span class="kanban-column-title">{track.label}</span>
-            <span class="kanban-column-count">{track.projects.length}</span>
+{
+  embedded ? (
+    <div id="project-list" class="kanban-board embedded">
+      {
+        byTrack.map((track) => (
+          <div class="kanban-column" data-track={track.key}>
+            <div class="kanban-column-header">
+              <span class="kanban-column-title">{track.label}</span>
+              <span class="kanban-column-count">{track.projects.length}</span>
+            </div>
+            <div class="kanban-column-body">
+              {
+                track.projects.map((project) => (
+                  <ProjectCard
+                    slug={project.id.replace(/\.md$/, '')}
+                    title={project.data.title}
+                    description={project.data.description}
+                    image={project.data.hero}
+                    impact={project.data.impact}
+                    tools={project.data.tools}
+                    github={project.data.github}
+                    demo={project.data.demo}
+                    private={project.data.private}
+                    linkPrefix={linkPrefix}
+                    lang={lang}
+                  />
+                ))
+              }
+            </div>
           </div>
-          <div class="kanban-column-body">
-            {
-              track.projects.map((project) => (
-                <ProjectCard
-                  slug={project.id.replace(/\.md$/, '')}
-                  title={project.data.title}
-                  description={project.data.description}
-                  image={project.data.hero}
-                  impact={project.data.impact}
-                  tools={project.data.tools}
-                  github={project.data.github}
-                  demo={project.data.demo}
-                  private={project.data.private}
-                  linkPrefix={linkPrefix}
-                  lang={lang}
-                />
-              ))
-            }
-          </div>
-        </div>
-      ))
-    }
-  </div>
-</section>
+        ))
+      }
+    </div>
+  ) : (
+    <section id="projects" class="reveal reveal-delay-2">
+      <h2>{heading}</h2>
+      <ProjectFilter lang={lang} />
+      <div id="project-list" class="kanban-board">
+        {
+          byTrack.map((track) => (
+            <div class="kanban-column" data-track={track.key}>
+              <div class="kanban-column-header">
+                <span class="kanban-column-title">{track.label}</span>
+                <span class="kanban-column-count">{track.projects.length}</span>
+              </div>
+              <div class="kanban-column-body">
+                {
+                  track.projects.map((project) => (
+                    <ProjectCard
+                      slug={project.id.replace(/\.md$/, '')}
+                      title={project.data.title}
+                      description={project.data.description}
+                      image={project.data.hero}
+                      impact={project.data.impact}
+                      tools={project.data.tools}
+                      github={project.data.github}
+                      demo={project.data.demo}
+                      private={project.data.private}
+                      linkPrefix={linkPrefix}
+                      lang={lang}
+                    />
+                  ))
+                }
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  )
+}
