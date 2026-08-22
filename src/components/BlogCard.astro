@@ -10,12 +10,18 @@ interface Props {
   date: Date;
   excerpt: string;
   image?: string;
+  updated?: Date;
   readTime?: number;
   lang?: 'ru' | 'en';
 }
 
-const { slug, title, category, date, excerpt, image, readTime, lang = 'ru' } = Astro.props;
+const { slug, title, category, date, excerpt, image, updated, readTime, lang = 'ru' } = Astro.props;
 const minLabel = lang === 'en' ? 'min' : 'мин';
+const updatedText = updated
+  ? lang === 'en'
+    ? `updated ${formatDate(updated)}`
+    : `обновлено ${formatDate(updated)}`
+  : null;
 ---
 
 <a href={withBase(`posts/${slug}/`)} class="blog-card" data-category={category}>
@@ -37,6 +43,13 @@ const minLabel = lang === 'en' ? 'min' : 'мин';
     <div class="blog-card-meta">
       {formatDate(date)}{readTime ? ` · ${readTime} ${minLabel}` : ''}
     </div>
+    {
+      updatedText && (
+        <span class="blog-card-updated" aria-label={updatedText}>
+          {updatedText}
+        </span>
+      )
+    }
     <div class="blog-card-excerpt">{excerpt}</div>
   </div>
 </a>

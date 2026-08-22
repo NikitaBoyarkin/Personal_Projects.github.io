@@ -130,6 +130,19 @@
   margin-bottom: var(--space-2);
 }
 
+.blog-card-updated {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-accent);
+  background: color-mix(in srgb, var(--text-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-accent) 20%, transparent);
+  border-radius: var(--radius-full);
+  padding: 0.15rem 0.55rem;
+  margin-bottom: var(--space-2);
+}
+
 .blog-card-excerpt {
   font-size: 0.92rem;
   color: var(--text-muted);

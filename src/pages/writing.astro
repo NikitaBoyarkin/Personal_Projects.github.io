@@ -36,6 +36,7 @@ const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
           category={post.data.category}
           date={post.data.date}
           image={post.data.image}
+          updated={post.data.updated}
           excerpt={post.data.excerpt}
           readTime={estimateReadTime(post.body)}
         />
