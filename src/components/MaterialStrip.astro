@@ -16,12 +16,14 @@ const { lang = "ru" } = Astro.props;
 const isEn = lang === "en";
 
 const projectCollection = isEn ? "projects-en" : "projects";
+const postCollection = isEn ? "posts-en" : "posts";
 const linkPrefix = isEn ? "en/" : "";
+const postLinkPrefix = isEn ? "en/" : "";
 const heading = isEn ? "Fresh materials" : "Свежие материалы";
 const projectBadge = isEn ? "Project" : "Проект";
 const footLabel = isEn ? "All writing" : "Все записи";
 
-const posts = (await getCollection("posts", (p) => !p.data.draft))
+const posts = (await getCollection(postCollection, (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 5);
 
@@ -56,7 +58,7 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
     }
     {
       posts.map((post) => (
-        <a class="strip-card" href={withBase(`posts/${slugOf(post.id)}/`)}>
+        <a class="strip-card" href={withBase(`${postLinkPrefix}posts/${slugOf(post.id)}/`)}>
           {post.data.image && (
             <img
               src={withBase(post.data.image)}
@@ -78,6 +80,6 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
     }
   </div>
   <p class="strip-foot">
-    <a href={withBase("writing/")}>{footLabel} →</a>
+    <a href={withBase(`${isEn ? 'en/' : ''}writing/`)}>{footLabel} →</a>
   </p>
 </section>

@@ -16,24 +16,26 @@ import { withBase } from '../lib/path';
     <p class="now-subtitle">Чем я сейчас занимаюсь.</p>
     <p class="now-subtitle now-updated">Обновлено · {formatDate('2026-08-12')}</p>
 
-    <ul class="now-list">
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Готовлюсь к BI / Data Analyst и Product Analyst middle-интервью: SQL, pandas, алгоритмы, моки.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Поддерживаю Obsidian knowledge base по product analytics — структурированный Zettelkasten с автоматизацией.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Экспериментирую с AI-assisted аналитическими workflow на Claude Code + MCP.
-      </li>
-      <li class="now-item">
-        <span class="now-dot"></span>
-        Читаю: <em>Designing Machine Learning Systems</em> Чипы Нгуен.
-      </li>
-    </ul>
+    <div class="board-card">
+      <ul class="now-list">
+        <li class="now-item">
+          <span class="now-dot"></span>
+          Готовлюсь к BI / Data Analyst и Product Analyst middle-интервью: SQL, pandas, алгоритмы, моки.
+        </li>
+        <li class="now-item">
+          <span class="now-dot"></span>
+          Поддерживаю Obsidian knowledge base по product analytics — структурированный Zettelkasten с автоматизацией.
+        </li>
+        <li class="now-item">
+          <span class="now-dot"></span>
+          Экспериментирую с AI-assisted аналитическими workflow на Claude Code + MCP.
+        </li>
+        <li class="now-item">
+          <span class="now-dot"></span>
+          Читаю: <em>Designing Machine Learning Systems</em> Чипы Нгуен.
+        </li>
+      </ul>
+    </div>
 
     <p style="margin-top: var(--space-8);">
       <a href={withBase('contact/')}>Связаться →</a>

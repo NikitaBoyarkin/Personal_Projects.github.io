@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import BlogFilter from '../../components/BlogFilter.astro';
+import { getCollection } from 'astro:content';
+import { estimateReadTime } from '../../lib/date';
+import { withBase } from '../../lib/path';
+
+const posts = (await getCollection('posts-en', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<Base
+  title="Writing | Nikita Boyarkin"
+  description="Articles on product analytics, A/B testing, and working with data by Nikita Boyarkin."
+  canonical={withBase('en/writing/')}
+  activeNav="writing"
+  lang="en"
+  counterpartHref={withBase('writing/')}
+>
+  <h1 class="page-title reveal">Writing</h1>
+
+  <p class="reveal" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Articles in English (the Russian archive has more). Filter by type:
+    <a href={withBase('writing/')}>all posts (RU)</a>.
+  </p>
+
+  <BlogFilter lang="en" />
+
+  <div class="blog-list reveal reveal-delay-2">
+    {
+      posts.length === 0 ? (
+        <p style="color: var(--text-muted);">No English posts yet.</p>
+      ) : (
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            image={post.data.image}
+            updated={post.data.updated}
+            excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body)}
+            lang="en"
+          />
+        ))
+      )
+    }
+  </div>
+</Base>

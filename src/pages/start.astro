@@ -69,6 +69,28 @@ const ROUTES = [
     background: var(--background-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
+    position: relative;
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .start-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--text-accent), var(--text-accent-hover));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  .start-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--text-accent) 30%, transparent);
+    box-shadow: 0 12px 28px var(--shadow-color);
+  }
+  .start-card:hover::before {
+    opacity: 1;
   }
   .start-icon {
     display: inline-flex;

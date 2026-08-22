@@ -68,7 +68,13 @@ const contactHref = withBase('contact/');
 ---
 
 <section id="board" class="reveal reveal-delay-1" aria-label={t.projects}>
-  <div id="page-board">
+  <h2 class="visually-hidden">{t.projects}</h2>
+  <div
+    id="page-board"
+    tabindex="0"
+    role="region"
+    aria-label={isEn ? 'Portfolio board: Profile, Projects, In progress' : 'Доска портфолио: Профиль, Проекты, Сейчас в работе'}
+  >
     <!-- Профиль -->
     <div class="kanban-column kanban-column-sticky">
       <div class="kanban-column-header">
@@ -83,7 +89,8 @@ const contactHref = withBase('contact/');
               alt="Nikita Boyarkin"
               width="800"
               height="792"
-              loading="lazy"
+              loading="eager"
+              fetchpriority="high"
             />
           </picture>
         </div>

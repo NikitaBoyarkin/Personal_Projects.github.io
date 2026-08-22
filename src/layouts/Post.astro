@@ -17,15 +17,23 @@ interface Props {
   keywords?: string[];
   prev?: { href: string; title: string } | null;
   next?: { href: string; title: string } | null;
+  lang?: 'ru' | 'en';
+  counterpartHref?: string;
 }
 
-const { title, date, updated, category, excerpt, slug, image, related = [], keywords = [], prev = null, next = null } = Astro.props;
+const { title, date, updated, category, excerpt, slug, image, related = [], keywords = [], prev = null, next = null, lang = 'ru', counterpartHref } = Astro.props;
 const rendered = await Astro.slots.render('default');
 const readTime = estimateReadTime(rendered.replace(/<[^>]*>/g, ' '));
-const categoryDisplay = categoryLabel(category, 'ru');
+const categoryDisplay = categoryLabel(category, lang);
 const dateModified = updated?.toISOString() ?? date.toISOString();
+const minLabel = lang === 'en' ? 'min read' : 'мин чтения';
+const backLabel = lang === 'en' ? '← All writing' : '← К статьям';
+const relatedLabel = lang === 'en' ? 'See also' : 'Смотрите также';
+const prevLabel = lang === 'en' ? '← Previous' : '← Предыдущая';
+const nextLabel = lang === 'en' ? 'Next →' : 'Следующая →';
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const langPrefix = lang === 'en' ? 'en/' : '';
 const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -37,15 +45,15 @@ const articleJsonLd = {
   image: image ? `${siteUrl}${withBase(image)}` : undefined,
   author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
   publisher: { '@type': 'Person', name: 'Nikita Boyarkin' },
-  mainEntityOfPage: `${siteUrl}${withBase(`posts/${slug}/`)}`,
+  mainEntityOfPage: `${siteUrl}${withBase(`${langPrefix}posts/${slug}/`)}`,
 };
 const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}${withBase('/')}` },
-    { '@type': 'ListItem', position: 2, name: 'Writing', item: `${siteUrl}${withBase('writing/')}` },
-    { '@type': 'ListItem', position: 3, name: title, item: `${siteUrl}${withBase(`posts/${slug}/`)}` },
+    { '@type': 'ListItem', position: 2, name: 'Writing', item: `${siteUrl}${withBase(`${langPrefix}writing/`)}` },
+    { '@type': 'ListItem', position: 3, name: title, item: `${siteUrl}${withBase(`${langPrefix}posts/${slug}/`)}` },
   ],
 };
 const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articleJsonLd, breadcrumbJsonLd] };
@@ -58,11 +66,14 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
   ogImage={image}
   ogType="article"
   activeNav="writing"
-  canonical={withBase(`posts/${slug}/`)}
-  lang="ru"
+  canonical={withBase(`${langPrefix}posts/${slug}/`)}
+  lang={lang}
+  counterpartHref={counterpartHref}
   jsonLd={articleJsonLdGraph}
 >
-  <InnerTOC selector="#post-content" lang="ru" />
+  <InnerTOC selector="#post-content" lang={lang} />
+
+  <div id="reading-progress" aria-hidden="true"></div>
 
   <article class="post-content">
     <header class="post-header reveal">
@@ -70,8 +81,8 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
       <h1 class="post-title">{title}</h1>
       <div class="post-meta">
         {formatDate(date)}
-        {updated ? ` · обновлено ${formatDate(updated)}` : ''}
-        {' · '}{readTime} мин чтения · Nikita Boyarkin
+        {updated ? ` · ${lang === 'en' ? 'updated' : 'обновлено'} ${formatDate(updated)}` : ''}
+        {' · '}{readTime} {minLabel} · Nikita Boyarkin
       </div>
     </header>
 
@@ -80,8 +91,8 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
     </div>
 
     {related.length > 0 && (
-      <section class="post-related reveal reveal-delay-2" aria-label="Связанные материалы">
-        <h2>Смотрите также</h2>
+      <section class="post-related reveal reveal-delay-2" aria-label={relatedLabel}>
+        <h2>{relatedLabel}</h2>
         <ul>
           {related.map((r) => (
             <li>
@@ -102,19 +113,34 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
       <nav class="prev-next" aria-label="Другие записи">
         {prev && (
           <a class="pn-link pn-prev" href={prev.href}>
-            <span class="pn-dir">← Предыдущая</span>
+            <span class="pn-dir">{prevLabel}</span>
             <span class="pn-title">{prev.title}</span>
           </a>
         )}
         {next && (
           <a class="pn-link pn-next" href={next.href}>
-            <span class="pn-dir">Следующая →</span>
+            <span class="pn-dir">{nextLabel}</span>
             <span class="pn-title">{next.title}</span>
           </a>
         )}
       </nav>
     )}
 
-    <a href={withBase('writing/')} class="post-back">← К статьям</a>
+    <a href={withBase(`${lang === 'en' ? 'en/' : ''}writing/`)} class="post-back">{backLabel}</a>
   </article>
+
+  <script is:inline>
+    // Reading progress bar (decorative, aria-hidden).
+    (function () {
+      const bar = document.getElementById('reading-progress');
+      if (!bar) return;
+      const onScroll = () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = h > 0 ? `${(window.scrollY / h) * 100}%` : '0%';
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      onScroll();
+    })();
+  </script>
 </Base>

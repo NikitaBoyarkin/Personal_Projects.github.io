@@ -150,7 +150,28 @@
   max-width: 65ch;
 }
 
+/* Page intro paragraphs with inline links — links must be accent, not UA blue. */
+.page-intro a {
+  color: var(--text-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.page-intro a:hover {
+  color: var(--text-accent-hover);
+}
+
 /* Post page */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--text-accent);
+  z-index: 200;
+  pointer-events: none;
+}
+
 .post-header {
   margin-bottom: var(--space-10);
   max-width: 65ch;

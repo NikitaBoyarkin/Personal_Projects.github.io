@@ -54,6 +54,7 @@ const projectsEn = defineCollection({ schema: projectSchema });
 const voltaParts = defineCollection({ schema: voltaPartSchema });
 const voltaPartsEn = defineCollection({ schema: voltaPartSchema });
 const posts = defineCollection({ schema: postSchema });
+const postsEn = defineCollection({ schema: postSchema });
 
 export const collections = {
   projects,
@@ -61,4 +62,5 @@ export const collections = {
   'volta-parts': voltaParts,
   'volta-parts-en': voltaPartsEn,
   posts,
+  'posts-en': postsEn,
 };

@@ -10,6 +10,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "test": "vitest run",
     "og": "node scripts/generate-og.mjs",
     "og:home": "node scripts/generate-home-og.mjs",
     "cv:pdf": "node scripts/generate-cv-pdf.mjs"
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
   }
 }

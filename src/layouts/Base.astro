@@ -43,8 +43,8 @@ const isEn = lang === 'en';
 const homeHref = isEn ? withBase('en/') : withBase('/');
 const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
 const projectsHref = isEn ? withBase('en/#projects') : withBase('#projects');
-const writingHref = withBase('writing/'); // posts stay RU-only
-const contactHref = withBase('contact/'); // contact stays RU-only
+const writingHref = isEn ? withBase('en/writing/') : withBase('writing/');
+const contactHref = isEn ? withBase('en/contact/') : withBase('contact/');
 const startHref = isEn ? withBase('en/start/') : withBase('start/');
 const graphHref = isEn ? withBase('en/graph/') : withBase('graph/');
 const gamesHref = withBase('games/'); // static page in public/, no EN route
@@ -142,7 +142,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
     <a href="#main" class="skip-link">{t.skip}</a>
 
     <nav aria-label={isEn ? 'Main navigation' : 'Основная навигация'}>
-      <a href={homeHref} class="nav-brand" aria-label={isEn ? 'Portfolio home' : 'Главная портфолио'}>
+      <a href={homeHref} class="nav-brand">
         <svg class="nav-logo" aria-hidden="true" viewBox="0 0 100 100" width="28" height="28">
           <path class="cell" d="M96 50 73 89.8 27 89.8 4 50 27 10.2 73 10.2Z"/>
           <text class="mono" x="50" y="61" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.5" text-anchor="middle">NB</text>
@@ -188,7 +188,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
       <a href="https://t.me/lofinibo" data-analytics="telegram_footer">Telegram</a> ·
       <a href={withBase('cv/')} data-analytics="cv_footer">{t.footerCv}</a> ·
       <a href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_pdf_footer">PDF</a> ·
-      <a href={withBase('writing/')} data-analytics="writing_footer">{t.footerWriting}</a>
+      <a href={writingHref} data-analytics="writing_footer">{t.footerWriting}</a>
       <p>© {new Date().getFullYear()} Nikita Boyarkin</p>
     </footer>
 

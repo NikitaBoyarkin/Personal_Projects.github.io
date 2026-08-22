@@ -24,6 +24,7 @@ class LinkExtractor(HTMLParser):
         self.page = page
         self.links: list[tuple[str, int]] = []
         self.srcs: list[tuple[str, int]] = []
+        self.ids: set[str] = set()
 
     def error(self, message):
         pass
@@ -35,6 +36,8 @@ class LinkExtractor(HTMLParser):
             self.links.append((attr["href"], line))
         if "src" in attr:
             self.srcs.append((attr["src"], line))
+        if "id" in attr:
+            self.ids.add(attr["id"])
 
 
 def is_internal(url: str) -> bool:
@@ -81,6 +84,10 @@ def check_required_pages() -> int:
         DIST / "posts" / "rfm-segmentation-practical" / "index.html",
         DIST / "posts" / "telegram-reporting-bot" / "index.html",
         DIST / "posts" / "data-analyst-portfolio-checklist" / "index.html",
+        DIST / "posts" / "ab-calibration-simulation" / "index.html",
+        DIST / "posts" / "cohort-triangles-retention" / "index.html",
+        DIST / "posts" / "sql-window-functions" / "index.html",
+        DIST / "posts" / "volta-neobank-case-study" / "index.html",
         # EN locale (prefixDefaultLocale: false → EN under /en/)
         DIST / "en" / "index.html",
         DIST / "en" / "about" / "index.html",
@@ -110,6 +117,10 @@ def check_internal_links() -> int:
     errors = 0
     html_files = list(DIST.rglob("*.html"))
     print(f"Checking internal links in {len(html_files)} HTML file(s)...")
+
+    # First pass: collect every page's element ids (for in-page anchor checks).
+    page_ids: dict[Path, set[str]] = {}
+    extractors: dict[Path, LinkExtractor] = {}
     for page in html_files:
         text = page.read_text(encoding="utf-8")
         extractor = LinkExtractor(page)
@@ -119,19 +130,36 @@ def check_internal_links() -> int:
             print(f"  ERROR parsing {page.relative_to(DIST)}: {e}")
             errors += 1
             continue
+        extractors[page] = extractor
+        page_ids[page] = extractor.ids
 
+    for page, extractor in extractors.items():
         for url, line in extractor.links + extractor.srcs:
             if not is_internal(url):
                 continue
             # Skip CSS/JS assets handled by Astro bundler
             if url.startswith("/_astro/"):
                 continue
-            target = resolve_relative(page, url)
+            fragment = None
+            path_part = url
+            if "#" in url:
+                path_part, fragment = url.split("#", 1)
+            target = resolve_relative(page, path_part)
+            if target.is_dir():
+                target = target / "index.html"
             if not target.exists():
                 print(
                     f"  ERROR {page.relative_to(DIST)}:{line} broken link: {url} -> {target.relative_to(ROOT)}"
                 )
                 errors += 1
+                continue
+            if fragment:
+                target_ids = page_ids.get(target, set())
+                if fragment and fragment not in target_ids:
+                    print(
+                        f"  ERROR {page.relative_to(DIST)}:{line} broken anchor: {url} (no id=\"{fragment}\" in {target.relative_to(DIST)})"
+                    )
+                    errors += 1
     return errors
 
 
