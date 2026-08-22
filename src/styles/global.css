@@ -2166,6 +2166,143 @@ button:focus-visible {
   padding-top: 0;
 }
 
+/* ============================================================
+   Project spotlight — single full-width project card inside the
+   Проекты column, switched by category tabs with prev/next cycling.
+   Scoped overrides undo the compact .kanban-column card look so the
+   one visible card renders as a large featured card.
+   ============================================================ */
+
+.spotlight-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.spotlight-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spotlight-tab:hover {
+  border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
+}
+
+.spotlight-tab.active {
+  background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--text-accent) 45%, transparent);
+  color: var(--text-accent);
+}
+
+.spotlight-tab-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-muted);
+  background: var(--background-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 2px 6px;
+}
+
+.spotlight-tab.active .spotlight-tab-count {
+  color: var(--text-accent);
+  border-color: color-mix(in srgb, var(--text-accent) 30%, transparent);
+}
+
+.spotlight-slide[hidden] {
+  display: none;
+}
+
+/* Featured card: undo the compact kanban-column project styles. */
+.spotlight-slide .project {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+}
+
+.spotlight-slide .project img {
+  height: 200px;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+}
+
+.spotlight-slide .project h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--space-3);
+}
+
+.spotlight-slide .project p {
+  font-size: 0.95rem;
+  margin-bottom: var(--space-4);
+}
+
+.spotlight-slide .project .Impact {
+  font-size: 0.875rem;
+  margin-bottom: var(--space-5);
+}
+
+.spotlight-slide .project-tool {
+  font-size: 0.8rem;
+}
+
+.spotlight-slide .project .project-grip {
+  display: none;
+}
+
+.spotlight-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.spotlight-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--background-secondary);
+  color: var(--text-normal);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.spotlight-nav-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--text-accent) 45%, transparent);
+  color: var(--text-accent);
+  transform: translateY(-2px);
+}
+
+.spotlight-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.spotlight-progress {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
 /* Board cards — sticky-note cards inside the Profile / Now columns. */
 .board-card {
   background: var(--background-secondary);

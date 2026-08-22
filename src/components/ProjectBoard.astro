@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import ProjectCard from './ProjectCard.astro';
 import ProjectFilter from './ProjectFilter.astro';
+import { PROJECT_ORDER, projectTracks } from '../lib/projects';
 
 interface Props {
   excludeSlug?: string;
@@ -15,28 +16,13 @@ interface Props {
 const { excludeSlug, collection = 'projects', linkPrefix = '', heading = 'Projects', embedded = false } = Astro.props;
 const lang: 'ru' | 'en' = linkPrefix.startsWith('en/') ? 'en' : 'ru';
 
-const ORDER = ['volta', 'ab', 'supabase', 'posthog', 'streamlit', 'sales-calls', 'sql', 'rfm', 'cohort', 'bot', 'scrolly', 'garden', 'site'];
-
-const TRACKS: { key: string; label: string }[] =
-  lang === 'en'
-    ? [
-        { key: 'experiments', label: 'Experiments' },
-        { key: 'analytics', label: 'Analytics' },
-        { key: 'product', label: 'Product' },
-        { key: 'engineering', label: 'Engineering' },
-      ]
-    : [
-        { key: 'experiments', label: 'Эксперименты' },
-        { key: 'analytics', label: 'Аналитика' },
-        { key: 'product', label: 'Продукт' },
-        { key: 'engineering', label: 'Инженерия' },
-      ];
+const TRACKS = projectTracks(lang);
 
 const projects = (await getCollection(collection, (p) => !p.data.draft))
   .filter((p) => p.id.replace(/\.md$/, '') !== excludeSlug)
   .sort(
     (a, b) =>
-      ORDER.indexOf(a.id.replace(/\.md$/, '')) - ORDER.indexOf(b.id.replace(/\.md$/, '')),
+      PROJECT_ORDER.indexOf(a.id.replace(/\.md$/, '')) - PROJECT_ORDER.indexOf(b.id.replace(/\.md$/, '')),
   );
 
 const byTrack = TRACKS.map((track) => ({

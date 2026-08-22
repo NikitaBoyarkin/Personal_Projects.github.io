@@ -61,8 +61,8 @@ make check
 │   │   ├── Base.astro        # nav, footer, fonts, meta, theme, PostHog, lang/counterpartHref
 │   │   └── Post.astro        # blog post wrapper
 │   ├── components/
-│   │   ├── ProjectCard.astro / ProjectBoard.astro / ProjectFilter.astro
-│   │   ├── HomeBoard.astro    # homepage 3-column kanban: Профиль | Проекты | Сейчас в работе (embeds ProjectBoard)
+│   │   ├── ProjectCard.astro / ProjectBoard.astro / ProjectFilter.astro / ProjectSpotlight.astro
+│   │   ├── HomeBoard.astro    # homepage 3-column kanban: Профиль | Проекты | Сейчас в работе (embeds ProjectSpotlight)
 │   │   ├── BlogCard.astro / BlogFilter.astro
 │   │   ├── CaseStudy.astro   # problem/approach/result/metrics block for projects
 │   │   ├── InnerTOC.astro    # client-side TOC + scrollspy
@@ -147,7 +147,7 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 1. Create `src/content/projects/<id>.md` **and** `src/content/projects-en/<id>.md` (keep RU and EN in sync).
 2. Set `track` to the kanban column (`experiments` | `analytics` | `product` | `engineering`) — defaults to `analytics` if omitted.
 3. Add the hero image to `public/images/` (the `hero` field is required).
-4. Add the slug to the `ORDER` array in `src/components/ProjectBoard.astro` so it sorts as intended (unlisted slugs sort first).
+4. Add the slug to the `PROJECT_ORDER` array in `src/lib/projects.ts` so it sorts as intended (unlisted slugs sort first).
 5. Run `npm run build` and `make check`.
 
 ### Add a blog post

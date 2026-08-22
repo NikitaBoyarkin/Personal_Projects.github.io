@@ -1,5 +1,5 @@
 ---
-import ProjectBoard from './ProjectBoard.astro';
+import ProjectSpotlight from './ProjectSpotlight.astro';
 import ArrowMorph from './ArrowMorph.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
@@ -23,7 +23,6 @@ const t = {
   projects: isEn ? 'Projects' : 'Проекты',
   now: isEn ? 'In progress' : 'Сейчас в работе',
   more: isEn ? 'More →' : 'Подробнее →',
-  email: 'lofinibo@gmail.com',
   telegram: '@lofinibo',
   github: 'github.com/NikitaBoyarkin',
   linkedin: 'linkedin.com/in/nikita-boyarkin',
@@ -125,7 +124,6 @@ const contactHref = withBase('contact/');
         <div class="board-card">
           <h3 class="board-card-title">{t.contact}</h3>
           <ul class="board-links">
-            <li><a href={`mailto:${t.email}`}>{t.email}</a></li>
             <li><a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">{t.telegram}</a></li>
             <li><a href="https://github.com/NikitaBoyarkin" target="_blank" rel="noopener noreferrer">{t.github}</a></li>
             <li><a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer">{t.linkedin}</a></li>
@@ -142,7 +140,7 @@ const contactHref = withBase('contact/');
         <span class="kanban-column-count">{allProjects.length}</span>
       </div>
       <div class="kanban-column-body kanban-project-body">
-        <ProjectBoard embedded collection={projectCollection} linkPrefix={linkPrefix} />
+        <ProjectSpotlight collection={projectCollection} linkPrefix={linkPrefix} />
       </div>
     </div>
 
