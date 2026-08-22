@@ -38,7 +38,7 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 - **Referral** конвертирует на **+11.7pp** лучше paid social.
 - **iOS** обгоняет Android на каждом шаге: **13.6% vs 11.7%** end-to-end.
 
-KYC — критическое узкое место. Этот вывод feed'ит следующий проект — A/B-тест progress bar для KYC.
+KYC — критическое узкое место. Этот вывод передаёт эстафету следующему проекту — A/B-тесту progress bar для KYC.
 
 ## Impact
 
