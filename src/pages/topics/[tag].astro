@@ -4,7 +4,6 @@ import BlogCard from '../../components/BlogCard.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
-import { estimateReadTime } from '../../lib/date';
 import { TOPICS } from '../../lib/topics';
 
 // Topic definitions + the route list both come from src/lib/topics.ts — no
@@ -74,13 +73,13 @@ const projects = (await getCollection('projects', (p) => !p.data.draft))
           <h2 class="topic-section-title">Записи</h2>
           <div class="blog-list">
             {posts.map((post) => (
-              <BlogCard
+<BlogCard
                 slug={post.id.replace(/\.md$/, '')}
                 title={post.data.title}
                 category={post.data.category}
                 date={post.data.date}
+                image={post.data.image}
                 excerpt={post.data.excerpt}
-                readTime={estimateReadTime(post.body)}
               />
             ))}
           </div>

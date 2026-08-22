@@ -1,6 +1,7 @@
 ---
 title: Product Analytics + A/B on Supabase
 description: Full-stack product analytics platform — a Streamlit dashboard reading live Supabase Postgres through Row Level Security, plus an Edge Function ingest API and a concluded A/B experiment with SQL-computed conversion and a chi-square significance test.
+track: product
 hero: images/supabase.svg
 impact:
   - "Full-stack: Streamlit UI + Supabase Postgres + Edge Function ingest (API-key auth)"

@@ -1,6 +1,7 @@
 ---
 title: A/B Testing Methodology Toolkit
 description: Calibration-driven A/B testing methods, validated by simulation — SRM, CUPED, delta-method ratio metrics, alpha-spending boundaries, always-valid p-values (mSPRT), bootstrap CIs, HTE, multiple-comparison correction, novelty/primacy and switchback designs. Every module ships with an A/A null check and a power/coverage calibration.
+track: experiments
 hero: images/ab.svg
 impact:
   - "15 modules, each calibrated by simulation: Type I error ≈ α, power curves"

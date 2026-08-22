@@ -8,6 +8,7 @@ const projectSchema = z.object({
   tools: z.array(z.string()).default([]),
   github: z.string().url().optional(),
   demo: z.string().optional(),
+  track: z.enum(['experiments', 'analytics', 'product', 'engineering']).default('analytics'),
   related: z.array(z.string()).default([]),
   children: z.array(z.string()).default([]),
   date: z.coerce.date().optional(),
@@ -38,6 +39,7 @@ const voltaPartSchema = z.object({
 const postSchema = z.object({
   title: z.string(),
   date: z.coerce.date(),
+  updated: z.coerce.date().optional(),
   category: z.string(),
   tags: z.array(z.string()).default([]),
   excerpt: z.string(),

@@ -3,10 +3,12 @@ import Base from './Base.astro';
 import InnerTOC from '../components/InnerTOC.astro';
 import { formatDate, estimateReadTime } from '../lib/date';
 import { withBase } from '../lib/path';
+import { categoryLabel } from '../lib/categories';
 
 interface Props {
   title: string;
   date: Date;
+  updated?: Date;
   category: string;
   excerpt: string;
   slug: string;
@@ -17,10 +19,11 @@ interface Props {
   next?: { href: string; title: string } | null;
 }
 
-const { title, date, category, excerpt, slug, image, related = [], keywords = [], prev = null, next = null } = Astro.props;
+const { title, date, updated, category, excerpt, slug, image, related = [], keywords = [], prev = null, next = null } = Astro.props;
 const rendered = await Astro.slots.render('default');
 const readTime = estimateReadTime(rendered.replace(/<[^>]*>/g, ' '));
-const categoryDisplay = category.replace('-', ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+const categoryDisplay = categoryLabel(category, 'ru');
+const dateModified = updated?.toISOString() ?? date.toISOString();
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
 const articleJsonLd = {
@@ -29,7 +32,7 @@ const articleJsonLd = {
   headline: title,
   description: excerpt,
   datePublished: date.toISOString(),
-  dateModified: date.toISOString(),
+  dateModified: dateModified,
   articleSection: category,
   image: image ? `${siteUrl}${withBase(image)}` : undefined,
   author: { '@type': 'Person', name: 'Nikita Boyarkin', url: `${siteUrl}${withBase('/')}` },
@@ -65,7 +68,11 @@ const articleJsonLdGraph = { '@context': 'https://schema.org', '@graph': [articl
     <header class="post-header reveal">
       <span class="post-tag">{categoryDisplay}</span>
       <h1 class="post-title">{title}</h1>
-      <div class="post-meta">{formatDate(date)} · {readTime} мин чтения · Nikita Boyarkin</div>
+      <div class="post-meta">
+        {formatDate(date)}
+        {updated ? ` · обновлено ${formatDate(updated)}` : ''}
+        {' · '}{readTime} мин чтения · Nikita Boyarkin
+      </div>
     </header>
 
     <div class="post-body" id="post-content">

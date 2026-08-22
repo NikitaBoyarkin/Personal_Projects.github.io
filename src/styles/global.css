@@ -1849,3 +1849,170 @@ button:focus-visible {
     right: -20px;
   }
 }
+
+/* ============================================================
+   Kanban board — projects section as a kanban board.
+   Layout inspired by kanbannotebook.vercel.app: full-width board
+   (breaks out of the 1000px body), columns snap-scroll on mobile
+   and sit side-by-side on desktop. Reuses existing theme tokens
+   only, so the contrast-gate stays green.
+   ============================================================ */
+
+/* Board container: centered on the viewport, up to 1400px wide.
+   The body is max-width 1000px, so we break out via left:50% +
+   translateX(-50%) (body is position:relative and centered). */
+#project-list.kanban-board {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(1400px, calc(100vw - 2 * var(--space-5)));
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-3);
+  scrollbar-width: none;
+}
+#project-list.kanban-board::-webkit-scrollbar {
+  display: none;
+}
+
+/* Column — mobile: full-width snap panel; desktop: equal share. */
+.kanban-column {
+  flex: 0 0 85vw;
+  min-width: 85vw;
+  max-width: 85vw;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--background-secondary) 60%, transparent);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--text-accent);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  scroll-snap-align: start;
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-1) var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+}
+
+.kanban-column-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--text-normal);
+}
+
+.kanban-column-title::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-accent);
+  flex-shrink: 0;
+}
+
+.kanban-column-count {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-accent);
+  background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-accent) 30%, transparent);
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.55rem;
+  white-space: nowrap;
+}
+
+.kanban-column-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+}
+
+/* Cards as compact sticky notes (scoped to the board; topic pages
+   keep the base grid-card look via the shared .project class). */
+.kanban-column .project {
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+}
+
+.kanban-column .project:hover {
+  transform: translateY(-3px);
+}
+
+.kanban-column .project img {
+  height: 110px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.kanban-column .project h3 {
+  font-size: 1.05rem;
+  margin-bottom: var(--space-2);
+}
+
+.kanban-column .project p {
+  font-size: 0.875rem;
+  margin-bottom: var(--space-3);
+}
+
+.kanban-column .project .Impact {
+  font-size: 0.78rem;
+  margin-bottom: var(--space-3);
+}
+
+.kanban-column .project-tool {
+  font-size: 0.72rem;
+}
+
+/* Grip handle — hidden outside the board, subtle three dots inside. */
+.project-grip {
+  display: none;
+}
+.kanban-column .project .project-grip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-2);
+  opacity: 0.55;
+  border-bottom: 1px dashed color-mix(in srgb, var(--border-color) 60%, transparent);
+}
+.project-grip span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+/* Desktop: columns share the row, no inner scroll. */
+@media (min-width: 640px) {
+  .kanban-column {
+    flex: 0 0 55vw;
+    min-width: 55vw;
+    max-width: 55vw;
+  }
+}
+
+@media (min-width: 1100px) {
+  #project-list.kanban-board {
+    overflow-x: visible;
+  }
+  .kanban-column {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
+  }
+}

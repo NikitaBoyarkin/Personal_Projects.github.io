@@ -1,6 +1,7 @@
 ---
 title: Volta Neobank — Product Analytics
 description: End-to-end neobank analytics narrative — funnel, A/B test, retention, segmentation. Four sequential projects on synthetic fintech data with reproducible seeded pipelines and ship-gated statistical methodology.
+track: experiments
 hero: images/volta.svg
 impact:
   - +6.24pp KYC conversion (Z=6.35, p<0.0001), €716K/yr (48× ROI)

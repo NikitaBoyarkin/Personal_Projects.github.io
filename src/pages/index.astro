@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import ProjectGrid from '../components/ProjectGrid.astro';
+import ProjectBoard from '../components/ProjectBoard.astro';
 import IntroShader from '../components/IntroShader.astro';
 import TopicMap from '../components/TopicMap.astro';
 import Manifesto from '../components/Manifesto.astro';
@@ -190,7 +190,7 @@ const jsonLd = {
 
   <TopicMap />
 
-  <ProjectGrid excludeSlug="volta" heading="Проекты" />
+  <ProjectBoard heading="Проекты" />
 
   <ProjectTimeline />
 

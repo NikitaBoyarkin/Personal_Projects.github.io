@@ -1,6 +1,7 @@
 ---
 title: Scrolly English Speaking
 description: "A scrollytelling guide for improving spoken English in workplace conversations (A2–B1) — built on Astro 6 with an MDX narrative and D3 visualizations. Content and visuals are decoupled: MDX holds the text, data modules hold section structure and viz props."
+track: engineering
 hero: images/scrolly.svg
 impact:
   - Scrollytelling narrative on Astro 6 + MDX, D3 visualizations (workflow, bars, calendar, checklist)

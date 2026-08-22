@@ -1,6 +1,7 @@
 ---
 title: TaskFlow — PostHog Product Analytics Pipeline
 description: End-to-end portfolio project — instrument a SaaS product with PostHog, generate realistic traffic, and analyze the events into a funnel, cohort retention, an A/B test, revenue/LTV, and time-to-convert, all in Python.
+track: product
 hero: images/posthog.svg
 impact:
   - Typed event catalog (single source of truth) + PostHog capture/identify/group with PII scrubbing

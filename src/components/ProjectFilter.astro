@@ -44,6 +44,14 @@ const tools = [
       const techs = (el.dataset.tools || '').toLowerCase();
       el.style.display = filter === 'all' || techs.includes(filter) ? '' : 'none';
     });
+    // Kanban mode: hide columns that end up with no visible cards.
+    document.querySelectorAll('#project-list.kanban-board .kanban-column').forEach((col) => {
+      const colEl = col as HTMLElement;
+      const hasVisible = Array.from(colEl.querySelectorAll('.project')).some(
+        (c) => (c as HTMLElement).style.display !== 'none',
+      );
+      colEl.style.display = hasVisible ? '' : 'none';
+    });
   }
 
   filterTags.forEach((tag) => {

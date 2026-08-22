@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import ProjectGrid from '../../components/ProjectGrid.astro';
+import ProjectBoard from '../../components/ProjectBoard.astro';
 import IntroShader from '../../components/IntroShader.astro';
 import Manifesto from '../../components/Manifesto.astro';
 import ProjectTimeline from '../../components/ProjectTimeline.astro';
@@ -175,7 +175,7 @@ const jsonLd = {
 
   <Manifesto lang="en" />
 
-  <ProjectGrid excludeSlug="volta" collection="projects-en" linkPrefix="en/" heading="Projects" />
+  <ProjectBoard collection="projects-en" linkPrefix="en/" heading="Projects" />
 
   <ProjectTimeline lang="en" />
 

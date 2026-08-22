@@ -1,6 +1,7 @@
 ---
 title: Digital Garden
 description: A personal digital garden and Zettelkasten published as a website with Quartz v4 — linked notes, backlinks, graph view, and atomic evergreen notes instead of chronological blog posts.
+track: engineering
 hero: images/garden.svg
 impact:
   - Linked-notes Zettelkasten with backlinks + graph view

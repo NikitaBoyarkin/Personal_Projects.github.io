@@ -1,6 +1,7 @@
 ---
 title: This Portfolio Site
 description: The portfolio you are looking at — built with Astro v5, TypeScript, and Markdown content collections. Static output, dark/light theme, RSS, sitemap, JSON-LD, and a base-path-aware URL helper for GitHub Pages.
+track: engineering
 hero: images/site.svg
 impact:
   - Astro v5 + TypeScript + Markdown content collections

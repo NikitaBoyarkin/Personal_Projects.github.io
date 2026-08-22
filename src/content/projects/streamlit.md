@@ -1,6 +1,7 @@
 ---
 title: Product Analytics Dashboard (Streamlit)
 description: A self-contained product analytics dashboard on a synthetic SaaS dataset (8,000 users). Covers the AARRR funnel, cohort retention, revenue, and user segmentation.
+track: product
 hero: images/streamlit.svg
 impact:
   - 8,000 synthetic users, Jan 2024 – Jun 2025, deterministic seed = 42

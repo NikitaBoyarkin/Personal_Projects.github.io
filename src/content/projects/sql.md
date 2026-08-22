@@ -1,6 +1,7 @@
 ---
 title: SQL Analytics Case Study
 description: Ten end-to-end SQL case studies on a synthetic product dataset (~183k events), runnable on DuckDB with one command. Funnel, N-day retention, DAU/MAU stickiness, LTV, gaps-and-islands streaks, A/B conversion, and revenue attribution.
+track: analytics
 hero: images/sql.svg
 impact:
   - 10 self-contained SQL cases (funnel → attribution)

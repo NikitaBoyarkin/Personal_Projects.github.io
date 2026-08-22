@@ -56,7 +56,7 @@ make check
 │   │   ├── Base.astro        # nav, footer, fonts, meta, theme, PostHog, lang/counterpartHref
 │   │   └── Post.astro        # blog post wrapper
 │   ├── components/
-│   │   ├── ProjectCard.astro / ProjectGrid.astro / ProjectFilter.astro
+│   │   ├── ProjectCard.astro / ProjectBoard.astro / ProjectFilter.astro
 │   │   ├── BlogCard.astro / BlogFilter.astro
 │   │   ├── CaseStudy.astro   # problem/approach/result/metrics block for projects
 │   │   ├── InnerTOC.astro    # client-side TOC + scrollspy
@@ -106,6 +106,7 @@ Each project is a Markdown file with frontmatter:
 | `title` | Project title (also page `<title>`) |
 | `description` | Short summary used on the project card and meta tags |
 | `hero` | Path to hero image relative to `public/` (e.g. `images/volta.svg`) |
+| `track` | Kanban board column: `experiments` \| `analytics` \| `product` \| `engineering` (default `analytics`) |
 | `impact` | Array of bullet points rendered as card subtitle and CV bullets |
 | `tools` | Array of tools/technologies |
 | `github` | URL to the project repository (optional) |
@@ -137,9 +138,10 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 ### Add a project
 
 1. Create `src/content/projects/<id>.md` **and** `src/content/projects-en/<id>.md` (keep RU and EN in sync).
-2. Add the hero image to `public/images/` (the `hero` field is required).
-3. Add the slug to the `ORDER` array in `src/components/ProjectGrid.astro` so it sorts as intended (unlisted slugs sort first).
-4. Run `npm run build` and `make check`.
+2. Set `track` to the kanban column (`experiments` | `analytics` | `product` | `engineering`) — defaults to `analytics` if omitted.
+3. Add the hero image to `public/images/` (the `hero` field is required).
+4. Add the slug to the `ORDER` array in `src/components/ProjectBoard.astro` so it sorts as intended (unlisted slugs sort first).
+5. Run `npm run build` and `make check`.
 
 ### Add a blog post
 

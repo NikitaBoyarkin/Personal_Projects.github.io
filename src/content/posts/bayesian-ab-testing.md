@@ -10,7 +10,7 @@ tags:
   - article
 excerpt: "Frequentist p-values плодили культуру peeking: 34 из 127 экспериментов показывали значимость, а потом разворачивались. Как Bayesian inference поменял workflow."
 related:
-  - /projects/abtest/
+  - /projects/ab/
   - /posts/rfm-segmentation-practical/
   - /posts/cohort-retention-guide/
   - /posts/telegram-reporting-bot/

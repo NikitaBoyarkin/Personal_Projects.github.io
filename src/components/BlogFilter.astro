@@ -41,7 +41,7 @@ const categories = categoryKeys.map((key) => ({
     cards.forEach((card) => {
       const el = card as HTMLElement;
       el.style.display =
-        filter === 'all' || el.dataset.category === filter ? 'block' : 'none';
+        filter === 'all' || el.dataset.category === filter ? '' : 'none';
     });
   }
 

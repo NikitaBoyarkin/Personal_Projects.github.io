@@ -1,6 +1,7 @@
 ---
 title: Sales Calls Analytics Dashboard
 description: Streamlit dashboard for AI sales-call analytics — a 4-step funnel (greeting → offer → meeting → qualification), step-1 leak breakdown by type, weighted contact loss, client reactions, engagement by hour and day, bot-quality defects, and drill-down into drop-off transcripts.
+track: analytics
 hero: images/sales-calls.svg
 impact:
   - "16,891 synthetic calls, deterministic labeling (script markers)"
