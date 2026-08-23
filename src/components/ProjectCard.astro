@@ -14,9 +14,11 @@ interface Props {
   private?: boolean;
   linkPrefix?: string;
   lang?: 'ru' | 'en';
+  /** Enable HTML5 drag on the card (kanban board reorder). */
+  draggable?: boolean;
 }
 
-const { slug, title, description, image, impact, tools, github, demo, private: isPrivate = false, linkPrefix = '', lang = 'ru' } = Astro.props;
+const { slug, title, description, image, impact, tools, github, demo, private: isPrivate = false, linkPrefix = '', lang = 'ru', draggable = false } = Astro.props;
 const isEn = lang === 'en';
 const impactText = impact?.join(', ');
 const i18n = {
@@ -27,7 +29,7 @@ const i18n = {
 };
 ---
 
-<article class="project reveal" data-tools={(tools ?? []).join(',').toLowerCase()} data-slug={slug}>
+<article class="project reveal" data-tools={(tools ?? []).join(',').toLowerCase()} data-slug={slug} draggable={draggable ? 'true' : undefined}>
   <span class="project-grip" aria-hidden="true"><span></span><span></span><span></span></span>
   {image && <img src={withBase(image)} alt={title} loading="lazy" width="600" height="200" />}
   <h3>{title}</h3>

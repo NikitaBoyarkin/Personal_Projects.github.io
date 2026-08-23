@@ -56,6 +56,7 @@ const byTrack = TRACKS.map((track) => ({
                     private={project.data.private}
                     linkPrefix={linkPrefix}
                     lang={lang}
+                    draggable
                   />
                 ))
               }
@@ -103,6 +104,7 @@ const byTrack = TRACKS.map((track) => ({
                       private={project.data.private}
                       linkPrefix={linkPrefix}
                       lang={lang}
+                      draggable
                     />
                   ))
                 }
@@ -256,7 +258,15 @@ const byTrack = TRACKS.map((track) => ({
       ) {
         const body = colBody(target.closest<HTMLElement>('.kanban-column') as HTMLElement);
         if (body) {
-          body.insertBefore(dragEl, target);
+          const rect = target.getBoundingClientRect();
+          const after = e.clientY > rect.top + rect.height / 2;
+          if (after) {
+            const next = target.nextElementSibling as HTMLElement | null;
+            if (next) body.insertBefore(dragEl, next);
+            else body.appendChild(dragEl);
+          } else {
+            body.insertBefore(dragEl, target);
+          }
           writeOrder(currentOrder());
           showHint(hintEl?.dataset.saved || 'Saved');
         }
