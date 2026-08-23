@@ -127,6 +127,69 @@ describe('buildGraph', () => {
     expect(g.links.some((l) => l.source === 'post:x' && l.target === 'topic:retention')).toBe(true);
   });
 
+  it('assigns url and weight/type to nodes and edges', () => {
+    const g = buildGraph({
+      projects: [
+        project('volta', { children: ['funnel'] }),
+        project('ab', { related: ['/projects/volta/'] }),
+      ],
+      posts: [],
+      parts: [{ id: 'funnel.md', data: { title: 'Funnel' } }],
+      topics: TOPICS,
+    });
+    const volta = g.nodes.find((n) => n.id === 'p:volta');
+    expect(volta?.url).toBe('projects/volta/');
+    expect(g.nodes.find((n) => n.id === 'vp:funnel')?.url).toBe('projects/volta/funnel/');
+    const abEdge = g.links.find(
+      (l) => [l.source, l.target].sort().join('|') === 'p:ab|p:volta',
+    );
+    expect(abEdge?.weight).toBe(1);
+    expect(abEdge?.type).toBe('related');
+    const childEdge = g.links.find(
+      (l) => [l.source, l.target].sort().join('|') === 'p:volta|vp:funnel',
+    );
+    expect(childEdge?.type).toBe('children');
+  });
+
+  it('adds locale prefix to urls in en mode', () => {
+    const g = buildGraph({
+      projects: [project('volta')],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+      lang: 'en',
+    });
+    expect(g.nodes.find((n) => n.id === 'p:volta')?.url).toBe('en/projects/volta/');
+  });
+
+  it('does not create python/sql project→topic edges from tools signal', () => {
+    // Project advertises Python in tools but not in slug/title/desc.
+    const g = buildGraph({
+      projects: [project('foo', { tools: ['Python'], title: 'Foo', description: 'bar' })],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+    });
+    expect(g.links.some((l) => l.source === 'p:foo' && l.target === 'topic:python')).toBe(false);
+  });
+
+  it('adds project↔project edge when two projects share ≥2 topics', () => {
+    const g = buildGraph({
+      projects: [
+        project('a', { description: 'retention cohort segmentation' }),
+        project('b', { description: 'retention segmentation funnel' }),
+      ],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+    });
+    const edge = g.links.find((l) => [l.source, l.target].sort().join('|') === 'p:a|p:b');
+    expect(edge).toBeDefined();
+    expect(edge?.type).toBe('shared');
+    expect(edge?.weight).toBeGreaterThan(0);
+    expect(edge?.weight).toBeLessThanOrEqual(1);
+  });
+
   it('does not create dangling edges to missing nodes', () => {
     const g = buildGraph({
       projects: [project('a', { related: ['/projects/missing/', '/posts/ghost/'] })],

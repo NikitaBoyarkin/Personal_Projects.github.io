@@ -1,7 +1,11 @@
 // Knowledge-graph builder for /graph.json and /graph-en.json.
 // Nodes = projects (group by track), posts (group by category), volta parts and
-// topics. Edges = related links, volta children, post↔topic (tag match) and
-// project↔topic (signal match, mirroring computeTopicRows).
+// topics. Edges = related links, volta children, post↔topic (tag match),
+// project↔topic (signal match) and project↔project via shared topics.
+//
+// Every node carries a `url` (relative, locale-prefixed) so the client can
+// navigate from the graph. Every edge carries a `weight` (strength) and a
+// `type` so the force layout can pull strong links closer and style them.
 //
 // Decoupled from astro:content via minimal structural interfaces so it stays
 // portable and testable (same pattern as lib/topics.ts).
@@ -11,11 +15,18 @@ export interface GraphNode {
   id: string;
   label: string;
   group: string;
+  /** Relative page URL (no base, locale-prefixed), e.g. `projects/volta/`. */
+  url: string;
 }
+
+export type LinkType = "related" | "children" | "topic" | "shared";
 
 export interface GraphLink {
   source: string;
   target: string;
+  /** Edge strength 0..1. Drives ideal spring length in the layout. */
+  weight: number;
+  type: LinkType;
 }
 
 export interface GraphData {
@@ -75,6 +86,14 @@ export function parseRelatedPath(
   return { type: m[1] === "projects" ? "project" : "post", slug: m[2] };
 }
 
+/** Topics that must not get project edges via the `tools` signal — tool names
+ *  (Python, SQL) appear in nearly every project and would turn these nodes
+ *  into black holes. They are still matched by post tags. */
+const TOOL_TOPICS = new Set(["python", "sql"]);
+
+/** Project↔project edge weight when two projects share `n` topics. */
+const sharedTopicWeight = (n: number) => Math.min(1, 0.4 + 0.15 * n);
+
 export function buildGraph(opts: {
   projects: ProjectLike[];
   posts: PostLike[];
@@ -95,42 +114,69 @@ export function buildGraph(opts: {
     }
   };
 
-  const addLink = (a: string, b: string) => {
+  const addLink = (
+    a: string,
+    b: string,
+    weight: number,
+    type: LinkType,
+  ) => {
     if (a === b || !nodeById.has(a) || !nodeById.has(b)) return;
     const key = [a, b].sort().join("\u0000");
     if (linkKey.has(key)) return;
     linkKey.add(key);
-    links.push({ source: a, target: b });
+    links.push({ source: a, target: b, weight, type });
   };
+
+  const localePrefix = lang === "en" ? "en/" : "";
 
   // Node pass.
   for (const p of projects) {
     const slug = slugOf(p.id);
-    addNode({ id: `p:${slug}`, label: p.data.title, group: p.data.track || "analytics" });
+    addNode({
+      id: `p:${slug}`,
+      label: p.data.title,
+      group: p.data.track || "analytics",
+      url: `${localePrefix}projects/${slug}/`,
+    });
   }
   for (const post of posts) {
     const slug = slugOf(post.id);
-    addNode({ id: `post:${slug}`, label: post.data.title, group: post.data.category || "note" });
+    addNode({
+      id: `post:${slug}`,
+      label: post.data.title,
+      group: post.data.category || "note",
+      url: `${localePrefix}posts/${slug}/`,
+    });
   }
   for (const part of parts) {
     const slug = slugOf(part.id);
-    addNode({ id: `vp:${slug}`, label: part.data.title, group: "experiments" });
+    addNode({
+      id: `vp:${slug}`,
+      label: part.data.title,
+      group: "experiments",
+      url: `${localePrefix}projects/volta/${slug}/`,
+    });
   }
   for (const t of topics) {
-    addNode({ id: `topic:${t.key}`, label: lang === "en" ? t.key : t.label, group: "topic" });
+    addNode({
+      id: `topic:${t.key}`,
+      label: lang === "en" ? t.key : t.label,
+      group: "topic",
+      url: `${localePrefix}topics/${t.key}/`,
+    });
   }
 
-  // Related links (project↔project, project↔post, post↔post).
+  // Related links (project↔project, project↔post, post↔post) — strongest.
   for (const p of projects) {
     const from = `p:${slugOf(p.id)}`;
     for (const rel of p.data.related ?? []) {
       const parsed = parseRelatedPath(rel);
       if (!parsed) continue;
       const to = parsed.type === "project" ? `p:${parsed.slug}` : `post:${parsed.slug}`;
-      addLink(from, to);
+      addLink(from, to, 1, "related");
     }
     for (const child of p.data.children ?? []) {
-      addLink(from, `vp:${child}`);
+      addLink(from, `vp:${child}`, 1, "children");
     }
   }
   for (const post of posts) {
@@ -139,7 +185,7 @@ export function buildGraph(opts: {
       const parsed = parseRelatedPath(rel);
       if (!parsed) continue;
       const to = parsed.type === "project" ? `p:${parsed.slug}` : `post:${parsed.slug}`;
-      addLink(from, to);
+      addLink(from, to, 1, "related");
     }
   }
 
@@ -147,22 +193,43 @@ export function buildGraph(opts: {
   for (const post of posts) {
     const from = `post:${slugOf(post.id)}`;
     for (const t of topics) {
-      if ((post.data.tags ?? []).some((tag) => t.match(tag))) addLink(from, `topic:${t.key}`);
+      if ((post.data.tags ?? []).some((tag) => t.match(tag))) {
+        addLink(from, `topic:${t.key}`, 0.6, "topic");
+      }
     }
   }
 
-  // project↔topic by signal match (slug/title/tools/desc contains topic key).
+  // project↔topic by signal match (slug/title/desc contains topic key).
+  // `tools` is excluded for TOOL_TOPICS so python/sql don't become hubs.
+  const projectTopics = new Map<string, Set<string>>();
   for (const p of projects) {
     const slug = slugOf(p.id);
-    const signals = [
-      slug,
-      p.data.title.toLowerCase(),
-      (p.data.tools ?? []).join(" ").toLowerCase(),
-      (p.data.description ?? "").toLowerCase(),
-    ];
+    const matched = new Set<string>();
+    const signals = [slug, p.data.title.toLowerCase(), (p.data.description ?? "").toLowerCase()];
     for (const t of topics) {
       const needle = t.key.replace("-", " ");
-      if (signals.some((s) => s.includes(needle))) addLink(`p:${slug}`, `topic:${t.key}`);
+      const useTools = !TOOL_TOPICS.has(t.key);
+      const hay = useTools ? [...signals, (p.data.tools ?? []).join(" ").toLowerCase()] : signals;
+      if (hay.some((s) => s.includes(needle))) {
+        addLink(`p:${slug}`, `topic:${t.key}`, 0.3, "topic");
+        matched.add(t.key);
+      }
+    }
+    projectTopics.set(slug, matched);
+  }
+
+  // project↔project via shared topics (≥2 common topics → direct edge).
+  const projectSlugs = projects.map((p) => slugOf(p.id));
+  for (let i = 0; i < projectSlugs.length; i++) {
+    for (let j = i + 1; j < projectSlugs.length; j++) {
+      const a = projectSlugs[i];
+      const b = projectSlugs[j];
+      const shared = new Set(
+        [...(projectTopics.get(a) ?? [])].filter((t) => projectTopics.get(b)?.has(t)),
+      );
+      if (shared.size >= 2) {
+        addLink(`p:${a}`, `p:${b}`, sharedTopicWeight(shared.size), "shared");
+      }
     }
   }
 

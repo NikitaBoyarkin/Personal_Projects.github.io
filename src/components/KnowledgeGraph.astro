@@ -2,6 +2,8 @@
 // Dependency-free force-directed knowledge graph island.
 // Reads graph.json / graph-en.json (base-path aware via data-src) and renders
 // an SVG simulation. Fullscreen toggle + wheel/pinch zoom + drag pan/zoom.
+// Nodes are clickable (navigate to their page); hover highlights neighbors.
+// Edge weight (0..1) drives spring length; edge type drives line style.
 // Starts when scrolled into view; honors prefers-reduced-motion (static radial).
 import { withBase } from '../lib/path';
 import { GRAPH_GROUP_COLORS } from '../lib/graph';
@@ -25,6 +27,7 @@ const t = {
   reset: isEn ? 'Reset zoom and position' : 'Сбросить масштаб и положение',
   fullscreen: isEn ? 'Fullscreen' : 'Во весь экран',
   fullscreenExit: isEn ? 'Exit fullscreen' : 'Выйти из полноэкранного режима',
+  open: isEn ? 'Open page' : 'Открыть страницу',
 };
 const groupList = Object.keys(GRAPH_GROUP_COLORS);
 ---
@@ -46,6 +49,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     </div>
   </div>
   <svg id="kg-svg" class="kg-svg" role="img" aria-label={ariaLabel}></svg>
+  <div id="kg-tooltip" class="kg-tooltip" hidden></div>
   <p class="kg-caption">{caption}</p>
 </div>
 
@@ -59,22 +63,28 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   if (!rootEl || !svgEl || !src) throw new Error('kg-root / kg-svg not found');
   const root = rootEl as HTMLElement;
   const svg = svgEl as unknown as SVGSVGElement;
+  const tooltip = document.getElementById('kg-tooltip') as HTMLDivElement | null;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const colorFor = (g: string) => GRAPH_GROUP_COLORS[g] || 'var(--text-muted)';
   const NS = 'http://www.w3.org/2000/svg';
   const el = (name: string) => document.createElementNS(NS, name);
+  // Base path derived from the data URL (e.g. /Personal_Projects.github.io/graph.json).
+  const base = src.slice(0, src.lastIndexOf('/')) + '/';
 
   let world = { w: 600, h: 460 };
   let vp = { x: 0, y: 0, k: 1 };
   let nodes: any[] = [];
   let nodeEls: SVGGElement[] = [];
-  let links: { source: any; target: any }[] = [];
+  let links: { source: any; target: any; weight: number; type: string }[] = [];
   let edges: SVGLineElement[] = [];
   let running = false;
   let frames = 0;
   let restart: (() => void) | null = null;
   let dragging: any = null;
+  let dragStart: { x: number; y: number } | null = null;
+  let moved = false;
+  let hoveredId: string | null = null;
   let panning: { startX: number; startY: number; vpX: number; vpY: number } | null = null;
   let pinch: { startDist: number; vp0: typeof vp; mid0: { x: number; y: number } } | null = null;
   const pointers = new Map<number, { x: number; y: number }>();
@@ -97,6 +107,19 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     return { x: pt.x, y: pt.y };
   }
 
+  const EDGE_STYLE: Record<string, string> = {
+    related: '',
+    children: '',
+    topic: '6 4',
+    shared: '2 3',
+  };
+  const EDGE_OPACITY: Record<string, number> = {
+    related: 0.55,
+    children: 0.7,
+    topic: 0.35,
+    shared: 0.25,
+  };
+
   function rebuild(data: any) {
     svg.replaceChildren();
     world = { w: svg.clientWidth || 600, h: 460 };
@@ -110,7 +133,12 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     }));
     const idx = new Map(nodes.map((n) => [n.id, n]));
     links = data.links
-      .map((l: any) => ({ source: idx.get(l.source), target: idx.get(l.target) }))
+      .map((l: any) => ({
+        source: idx.get(l.source),
+        target: idx.get(l.target),
+        weight: typeof l.weight === 'number' ? l.weight : 1,
+        type: l.type || 'related',
+      }))
       .filter((l: any) => l.source && l.target);
 
     const edgeLayer = el('g');
@@ -126,6 +154,10 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     svg.appendChild(nodeLayer);
     nodeEls = nodes.map((n) => {
       const g = el('g');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'link');
+      g.setAttribute('aria-label', n.label);
+      g.style.cursor = 'pointer';
       const c = el('circle');
       c.setAttribute('r', '6');
       c.setAttribute('fill', colorFor(n.group));
@@ -136,12 +168,51 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       txt.textContent = n.label;
       g.appendChild(c);
       g.appendChild(txt);
-      g.style.cursor = 'grab';
       nodeLayer.appendChild(g);
       return g as SVGGElement;
     });
 
     resetViewport();
+  }
+
+  // --- Hover: highlight neighbors + tooltip ---
+  const adjacency = new Map<string, Set<string>>();
+
+  function clearHighlight() {
+    hoveredId = null;
+    if (tooltip) tooltip.hidden = true;
+    nodes.forEach((n, i) => nodeEls[i].style.opacity = '');
+    edges.forEach((e) => (e.style.opacity = ''));
+  }
+
+  function highlight(id: string) {
+    const neighbors = adjacency.get(id) || new Set<string>();
+    neighbors.add(id);
+    nodes.forEach((n, i) => {
+      nodeEls[i].style.opacity = neighbors.has(n.id) ? '1' : '0.12';
+    });
+    edges.forEach((e, i) => {
+      const l = links[i];
+      const on = l.source.id === id || l.target.id === id;
+      e.style.opacity = on ? String(Math.min(1, (l.weight || 1) * 0.9 + 0.2)) : '0.05';
+    });
+  }
+
+  function showTooltip(n: any, clientX: number, clientY: number) {
+    if (!tooltip) return;
+    tooltip.hidden = false;
+    tooltip.textContent = n.label;
+    const pad = 8;
+    tooltip.style.left = `${clientX + pad}px`;
+    tooltip.style.top = `${clientY + pad}px`;
+  }
+
+  function nodeById(id: string) {
+    return nodes.find((n) => n.id === id);
+  }
+
+  function navigateTo(n: any) {
+    if (n?.url) window.location.href = `${base}${n.url}`;
   }
 
   function renderStatic(data: any) {
@@ -198,7 +269,9 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       links.forEach((l) => {
         const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        const f = (d - 70) * 0.04;
+        // Stronger edges pull closer: ideal length shrinks with weight.
+        const ideal = 60 + 80 * (1 - (l.weight || 1));
+        const f = (d - ideal) * 0.04 * (0.5 + 0.5 * (l.weight || 1));
         const fx = (dx / d) * f, fy = (dy / d) * f;
         l.source.vx += fx; l.source.vy += fy;
         l.target.vx -= fx; l.target.vy -= fy;
@@ -242,7 +315,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     restart();
   });
 
-  // --- Pointer handling: node drag, canvas pan, pinch zoom ---
+  // --- Pointer handling: node drag (click = navigate), canvas pan, pinch ---
   function handlePointerDown(e: PointerEvent) {
     svg.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -266,6 +339,8 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       const n = nodes[nodeEls.indexOf(target)];
       const p = toWorld(e.clientX, e.clientY);
       dragging = n;
+      dragStart = { x: p.x, y: p.y };
+      moved = false;
       n.fx = p.x;
       n.fy = p.y;
       target.style.cursor = 'grabbing';
@@ -290,6 +365,9 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
 
     if (dragging) {
       const p = toWorld(e.clientX, e.clientY);
+      const dx = p.x - (dragStart?.x ?? p.x);
+      const dy = p.y - (dragStart?.y ?? p.y);
+      if (dx * dx + dy * dy > 9) moved = true;
       dragging.fx = p.x;
       dragging.fy = p.y;
       return;
@@ -309,11 +387,15 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     if (pointers.size < 2) pinch = null;
     if (dragging) {
       const n = dragging;
+      const wasClick = !moved;
       n.fx = null;
       n.fy = null;
       const g = nodeEls[nodes.indexOf(n)];
-      if (g) g.style.cursor = 'grab';
+      if (g) g.style.cursor = 'pointer';
       dragging = null;
+      dragStart = null;
+      if (wasClick) navigateTo(n);
+      return;
     }
     if (panning) {
       panning = null;
@@ -325,6 +407,38 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   svg.addEventListener('pointermove', handlePointerMove);
   svg.addEventListener('pointerup', handlePointerUp);
   svg.addEventListener('pointercancel', handlePointerUp);
+
+  // Hover: highlight neighbors and show a tooltip.
+  svg.addEventListener('pointerover', (e) => {
+    const target = nodeEls.find((g) => g.contains(e.target as Node));
+    if (!target) {
+      clearHighlight();
+      return;
+    }
+    const n = nodes[nodeEls.indexOf(target)];
+    hoveredId = n.id;
+    highlight(n.id);
+    showTooltip(n, e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointermove', (e) => {
+    if (!hoveredId) return;
+    const n = nodeById(hoveredId);
+    if (n && tooltip && !tooltip.hidden) showTooltip(n, e.clientX, e.clientY);
+  });
+  svg.addEventListener('pointerout', (e) => {
+    const stillIn = (e.relatedTarget as Node | null) && svg.contains(e.relatedTarget as Node);
+    if (!stillIn) clearHighlight();
+  });
+
+  // Keyboard: Enter/Space on a focused node navigates.
+  nodeEls.forEach((g, i) => {
+    g.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        navigateTo(nodes[i]);
+      }
+    });
+  });
 
   // Wheel zoom around the cursor.
   svg.addEventListener(
@@ -366,7 +480,6 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       fsBtn.setAttribute('aria-label', isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!);
       fsBtn.title = isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!;
     }
-    // The SVG grew/shrunk; re-center the viewport so nothing disappears.
     requestAnimationFrame(resetViewport);
   }
 
@@ -376,6 +489,14 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     fetch(url)
       .then((r) => r.json())
       .then((data) => {
+        // Build adjacency once before rendering.
+        adjacency.clear();
+        for (const l of data.links) {
+          if (!adjacency.has(l.source)) adjacency.set(l.source, new Set());
+          if (!adjacency.has(l.target)) adjacency.set(l.target, new Set());
+          adjacency.get(l.source)!.add(l.target);
+          adjacency.get(l.target)!.add(l.source);
+        }
         reduced ? renderStatic(data) : renderForce(data);
       })
       .catch(() => {
@@ -471,6 +592,13 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     stroke: var(--background-secondary);
     stroke-width: 3.5px;
     stroke-linejoin: round;
+    pointer-events: none;
+  }
+  .kg-root :is(g[tabindex]) {
+    outline: none;
+  }
+  .kg-root :is(g[tabindex]:focus) text {
+    fill: var(--text-accent);
   }
   .kg-legend {
     display: flex;
@@ -490,6 +618,20 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     height: 10px;
     border-radius: 50%;
     display: inline-block;
+  }
+  .kg-tooltip {
+    position: fixed;
+    z-index: 1100;
+    max-width: 280px;
+    padding: 0.4rem 0.6rem;
+    background: var(--background-primary);
+    color: var(--text-normal);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
   }
   .kg-caption {
     color: var(--text-muted);
