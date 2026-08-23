@@ -112,6 +112,8 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   function applyViewport() {
     const vb = viewBoxOf(vp, world);
     svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+    // Hide labels when zoomed far out so the graph reads as a cloud of dots.
+    root.classList.toggle('kg-zoom-out', vp.k < 0.62);
   }
 
   function resetViewport() {
@@ -278,6 +280,15 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   function renderForce(data: any) {
     rebuild(data);
 
+    // Scale simulation constants with node count so the layout stays sparse
+    // and readable whether the graph has 10 or 200 nodes.
+    const N = Math.max(1, nodes.length);
+    const charge = 2200 * Math.sqrt(N);          // repulsion grows with N
+    const gravity = 0.004 + 0.001 * Math.sqrt(N); // pull-to-center grows mildly
+    const damp = 0.86;
+    const maxFrames = Math.max(700, N * 25);      // more nodes → more ticks to settle
+    const margin = Math.min(80, 60 + N * 0.5);
+
     function tick() {
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
@@ -285,7 +296,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
           let dx = a.x - b.x, dy = a.y - b.y;
           let d2 = dx * dx + dy * dy || 1;
           let d = Math.sqrt(d2);
-          const f = 1400 / d2;
+          const f = charge / d2;
           a.vx += (dx / d) * f; a.vy += (dy / d) * f;
           b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
         }
@@ -302,12 +313,12 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       });
       nodes.forEach((n) => {
         if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
-        n.vx += (world.w / 2 - n.x) * 0.005;
-        n.vy += (world.h / 2 - n.y) * 0.005;
-        n.vx *= 0.85; n.vy *= 0.85;
+        n.vx += (world.w / 2 - n.x) * gravity;
+        n.vy += (world.h / 2 - n.y) * gravity;
+        n.vx *= damp; n.vy *= damp;
         n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(60, Math.min(world.w - 60, n.x));
-        n.y = Math.max(20, Math.min(world.h - 20, n.y));
+        n.x = Math.max(margin, Math.min(world.w - margin, n.x));
+        n.y = Math.max(margin, Math.min(world.h - margin, n.y));
       });
       links.forEach((l, i) => {
         edges[i].setAttribute('x1', String(l.source.x));
@@ -322,7 +333,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       if (!running) return;
       tick();
       frames++;
-      if (frames > 600) running = false;
+      if (frames > maxFrames) running = false;
       requestAnimationFrame(loop);
     }
 
@@ -726,6 +737,10 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     stroke-width: 3.5px;
     stroke-linejoin: round;
     pointer-events: none;
+    transition: opacity 120ms ease;
+  }
+  .kg-zoom-out .kg-label {
+    opacity: 0;
   }
   .kg-root :is(g[tabindex]) {
     outline: none;
