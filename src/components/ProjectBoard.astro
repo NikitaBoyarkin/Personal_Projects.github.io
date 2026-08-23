@@ -68,6 +68,18 @@ const byTrack = TRACKS.map((track) => ({
     <section id="projects" class="reveal reveal-delay-2">
       <h2>{heading}</h2>
       <ProjectFilter lang={lang} />
+      <div class="filter-row project-board-tools reveal reveal-delay-1">
+        <button class="filter-tag" id="board-shuffle" data-analytics="projects_shuffle" type="button">
+          {lang === 'en' ? 'Shuffle' : 'Перемешать'}
+        </button>
+        <button class="filter-tag" id="board-reset" data-analytics="projects_reset" type="button">
+          {lang === 'en' ? 'Reset order' : 'Сбросить порядок'}
+        </button>
+        <span id="board-hint" class="board-hint" role="status" aria-live="polite"
+          data-saved={lang === 'en' ? 'Order saved' : 'Порядок сохранён'}
+          data-shuffled={lang === 'en' ? 'Shuffled' : 'Перемешано'}
+          data-reset={lang === 'en' ? 'Reset to default' : 'Порядок сброшен'}></span>
+      </div>
       <div id="project-list" class="kanban-board">
         {
           byTrack.map((track) => (
@@ -102,3 +114,187 @@ const byTrack = TRACKS.map((track) => ({
     </section>
   )
 }
+
+<script>
+  // Drag & drop + shuffle for the kanban project board.
+  // Per-language order persisted in localStorage; DOM-only, no rebuild needed.
+  const board = document.getElementById('project-list');
+  if (board) {
+    const root: HTMLElement = board;
+    const storageKey = 'project-order-' + (document.documentElement.lang || 'ru');
+    const hintEl = document.getElementById('board-hint');
+    const shuffleBtn = document.getElementById('board-shuffle');
+    const resetBtn = document.getElementById('board-reset');
+    let hintTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const colProjects = (col: HTMLElement): HTMLElement[] =>
+      Array.from(col.querySelectorAll<HTMLElement>(':scope > .kanban-column-body > .project'));
+    const colKey = (col: HTMLElement): string => col.dataset.track || '';
+    const colBody = (col: HTMLElement): HTMLElement | null =>
+      col.querySelector<HTMLElement>('.kanban-column-body');
+
+    function readOrder(): Record<string, string[]> {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' ? (parsed as Record<string, string[]>) : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function writeOrder(order: Record<string, string[]>): void {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(order));
+      } catch {
+        /* storage unavailable */
+      }
+    }
+
+    function currentOrder(): Record<string, string[]> {
+      const order: Record<string, string[]> = {};
+      root.querySelectorAll<HTMLElement>('.kanban-column').forEach((col) => {
+        order[colKey(col)] = colProjects(col).map((c) => c.dataset.slug || '').filter(Boolean);
+      });
+      return order;
+    }
+
+    function reorderColumnTo(col: HTMLElement, slugs: string[]): void {
+      const body = colBody(col);
+      if (!body) return;
+      const bySlug = new Map<string, HTMLElement>();
+      colProjects(col).forEach((c) => bySlug.set(c.dataset.slug || '', c));
+      const frag = document.createDocumentFragment();
+      slugs.forEach((slug) => {
+        const el = bySlug.get(slug);
+        if (el) frag.appendChild(el);
+      });
+      // Cards not listed in `slugs` (e.g. new project not yet in saved order) keep their DOM order.
+      colProjects(col).forEach((c) => {
+        if (!slugs.includes(c.dataset.slug || '')) frag.appendChild(c);
+      });
+      body.appendChild(frag);
+    }
+
+    // Capture the Astro-rendered (canonical) order BEFORE applying any saved order,
+    // so "Reset" can restore it without a page reload.
+    const canonicalOrder = currentOrder();
+    const savedOrder = readOrder();
+    root.querySelectorAll<HTMLElement>('.kanban-column').forEach((col) => {
+      const slugs = savedOrder[colKey(col)];
+      if (slugs && slugs.length) reorderColumnTo(col, slugs);
+    });
+
+    function showHint(msg: string): void {
+      if (!hintEl) return;
+      hintEl.textContent = msg;
+      hintEl.style.opacity = '1';
+      if (hintTimer) clearTimeout(hintTimer);
+      hintTimer = setTimeout(() => {
+        hintEl.style.opacity = '0';
+      }, 1600);
+    }
+
+    // --- Drag & drop (desktop): reorder cards within a column ---
+    let dragEl: HTMLElement | null = null;
+    let dragKey = '';
+
+    function clearDrag(): void {
+      if (dragEl) dragEl.classList.remove('dragging');
+      root.querySelectorAll('.project.drag-over').forEach((c) => c.classList.remove('drag-over'));
+      dragEl = null;
+      dragKey = '';
+    }
+
+    root.addEventListener('dragstart', (e) => {
+      const card = (e.target as HTMLElement).closest<HTMLElement>('.project');
+      if (!card || !root.contains(card)) return;
+      // Don't hijack clicks on links/buttons.
+      if ((e.target as HTMLElement).closest('a, button')) {
+        e.preventDefault();
+        return;
+      }
+      dragEl = card;
+      dragKey = card.closest<HTMLElement>('.kanban-column')?.dataset.track || '';
+      try {
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', dragKey);
+        }
+      } catch {
+        /* dataTransfer unavailable */
+      }
+      card.classList.add('dragging');
+    });
+
+    root.addEventListener('dragover', (e) => {
+      if (!dragEl) return;
+      e.preventDefault();
+      const card = (e.target as HTMLElement).closest<HTMLElement>('.project');
+      if (
+        card &&
+        card !== dragEl &&
+        card.closest<HTMLElement>('.kanban-column')?.dataset.track === dragKey
+      ) {
+        card.classList.add('drag-over');
+      }
+    });
+
+    root.addEventListener('dragleave', (e) => {
+      (e.target as HTMLElement).closest<HTMLElement>('.project')?.classList.remove('drag-over');
+    });
+
+    root.addEventListener('drop', (e) => {
+      if (!dragEl) return;
+      e.preventDefault();
+      const target = (e.target as HTMLElement).closest<HTMLElement>('.project');
+      if (
+        target &&
+        target !== dragEl &&
+        target.closest<HTMLElement>('.kanban-column')?.dataset.track === dragKey
+      ) {
+        const body = colBody(target.closest<HTMLElement>('.kanban-column') as HTMLElement);
+        if (body) {
+          body.insertBefore(dragEl, target);
+          writeOrder(currentOrder());
+          showHint(hintEl?.dataset.saved || 'Saved');
+        }
+      }
+      clearDrag();
+    });
+
+    root.addEventListener('dragend', clearDrag);
+
+    // --- Shuffle: randomize within every column ---
+    shuffleBtn?.addEventListener('click', () => {
+      root.querySelectorAll<HTMLElement>('.kanban-column').forEach((col) => {
+        const items = colProjects(col);
+        for (let i = items.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [items[i], items[j]] = [items[j], items[i]];
+        }
+        const body = colBody(col);
+        if (!body) return;
+        const frag = document.createDocumentFragment();
+        items.forEach((el) => frag.appendChild(el));
+        body.appendChild(frag);
+      });
+      writeOrder(currentOrder());
+      showHint(hintEl?.dataset.shuffled || 'Shuffled');
+    });
+
+    // --- Reset: restore the canonical PROJECT_ORDER ---
+    resetBtn?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem(storageKey);
+      } catch {
+        /* ignore */
+      }
+      root.querySelectorAll<HTMLElement>('.kanban-column').forEach((col) => {
+        reorderColumnTo(col, canonicalOrder[colKey(col)] || []);
+      });
+      showHint(hintEl?.dataset.reset || 'Reset');
+    });
+  }
+</script>

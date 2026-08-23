@@ -2443,3 +2443,37 @@ button:focus-visible {
     font-size: 2rem;
   }
 }
+
+/* ============================================================
+   Project board — drag & drop reorder + shuffle tools
+   ============================================================ */
+.project-board-tools {
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.board-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.project.drag-over {
+  outline: 2px dashed var(--text-accent);
+  outline-offset: 3px;
+}
+
+.kanban-column .project .project-grip {
+  cursor: grab;
+}
+.kanban-column .project .project-grip:active {
+  cursor: grabbing;
+}

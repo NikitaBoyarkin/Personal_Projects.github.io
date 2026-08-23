@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectBoard from '../../components/ProjectBoard.astro';
+import { withBase } from '../../lib/path';
+---
+
+<Base
+  title="Проекты | Nikita Boyarkin"
+  description="Каталог проектов по продуктовой аналитике: A/B-тесты, retention, дашборды. Карточки можно переставлять и перемешивать."
+  activeNav="projects"
+  lang="ru"
+  counterpartHref={withBase('en/projects/')}
+>
+  <h1 class="page-title reveal">Проекты</h1>
+
+  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Каталог проектов по категориям. Тяни карточку за три точки, чтобы изменить порядок, или нажми «Перемешать».
+    Порядок сохраняется локально в браузере.
+  </p>
+
+  <ProjectBoard heading="Каталог проектов" />
+</Base>

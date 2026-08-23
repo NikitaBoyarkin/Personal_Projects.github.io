@@ -14,7 +14,7 @@ interface Props {
   ogType?: 'website' | 'article';
   ogImage?: string;
   canonical?: string;
-  activeNav?: 'writing' | 'contact' | 'home' | 'about';
+  activeNav?: 'writing' | 'contact' | 'home' | 'about' | 'projects';
   jsonLd?: Record<string, unknown>;
   lang?: 'ru' | 'en';
   counterpartHref?: string;
@@ -42,7 +42,7 @@ const faviconUrl = withBase('favicon.svg');
 const isEn = lang === 'en';
 const homeHref = isEn ? withBase('en/') : withBase('/');
 const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
-const projectsHref = isEn ? withBase('en/#projects') : withBase('#projects');
+const projectsHref = isEn ? withBase('en/projects/') : withBase('projects/');
 const writingHref = isEn ? withBase('en/writing/') : withBase('writing/');
 const contactHref = isEn ? withBase('en/contact/') : withBase('contact/');
 const startHref = isEn ? withBase('en/start/') : withBase('start/');
@@ -151,7 +151,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
       </a>
       <ul class="links" id="nav-links">
         <li><a href={startHref}>{t.navStart}</a></li>
-        <li><a href={projectsHref}>{t.navProjects}</a></li>
+        <li><a href={projectsHref} class={activeNav === 'projects' ? 'active' : ''} aria-current={activeNav === 'projects' ? 'page' : undefined}>{t.navProjects}</a></li>
         <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>{t.navWriting}</a></li>
         <li><a href={graphHref}>{t.navGraph}</a></li>
         <li><a href={gamesHref}>{isEn ? 'Games' : 'Игры'}</a></li>

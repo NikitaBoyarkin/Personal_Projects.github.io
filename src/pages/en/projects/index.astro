@@ -1,0 +1,23 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProjectBoard from '../../../components/ProjectBoard.astro';
+import { withBase } from '../../../lib/path';
+---
+
+<Base
+  title="Projects | Nikita Boyarkin"
+  description="Project catalog in product analytics: A/B tests, retention, dashboards. Cards can be reordered and shuffled."
+  canonical={withBase('en/projects/')}
+  activeNav="projects"
+  lang="en"
+  counterpartHref={withBase('projects/')}
+>
+  <h1 class="page-title reveal">Projects</h1>
+
+  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Project catalog by category. Drag a card by its three dots to reorder, or hit “Shuffle”.
+    The order is stored locally in your browser.
+  </p>
+
+  <ProjectBoard heading="Project catalog" />
+</Base>
