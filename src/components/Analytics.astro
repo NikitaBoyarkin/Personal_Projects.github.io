@@ -42,31 +42,39 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 
     // Content page-view events (in addition to autocapture $pageview).
     const path = pathUnderBase();
+    const isEnPath = path.startsWith('/en/');
     const projectMatch = path.match(/^\/(?:en\/)?projects\/([^/]+)\/?$/);
     if (projectMatch) {
       posthog.capture('project_viewed', {
         slug: projectMatch[1],
-        locale: path.startsWith('/en/') ? 'en' : 'ru',
+        locale: isEnPath ? 'en' : 'ru',
       });
     }
-    const postMatch = path.match(/^\/posts\/([^/]+)\/?$/);
+    const postMatch = path.match(/^\/(?:en\/)?posts\/([^/]+)\/?$/);
     if (postMatch) {
       posthog.capture('post_read', {
         slug: postMatch[1],
-        locale: 'ru',
+        locale: isEnPath ? 'en' : 'ru',
       });
     }
 
-    // Delegated click capture for language switch.
+    // Delegated click capture for any element carrying `data-analytics`.
+    // `lang_switch_<target>` maps to a structured `lang_switched` event;
+    // everything else is captured under its own event name (e.g.
+    // `project_view_volta`, `cv_download_pdf`, `telegram_header`).
     document.addEventListener('click', (e) => {
-      const t = (e.target as Element | null)?.closest('[data-analytics^="lang_switch_"]');
+      const t = (e.target as Element | null)?.closest('[data-analytics]');
       if (!t) return;
       const kind = t.getAttribute('data-analytics') || '';
-      const target = kind.replace('lang_switch_', '');
-      posthog.capture('lang_switched', {
-        from: window.location.pathname.startsWith(norm + '/en/') ? 'en' : 'ru',
-        to: target,
-      });
+      if (!kind) return;
+      if (kind.startsWith('lang_switch_')) {
+        posthog.capture('lang_switched', {
+          from: window.location.pathname.startsWith(norm + '/en/') ? 'en' : 'ru',
+          to: kind.replace('lang_switch_', ''),
+        });
+      } else {
+        posthog.capture(kind);
+      }
     });
   </script>
 )}
