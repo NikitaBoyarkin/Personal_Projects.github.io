@@ -127,6 +127,20 @@ describe('buildGraph', () => {
     expect(g.links.some((l) => l.source === 'post:x' && l.target === 'topic:retention')).toBe(true);
   });
 
+  it('adds a hub-scaled size to nodes', () => {
+    const g = buildGraph({
+      projects: [project('a', { related: ['/projects/b/', '/projects/c/'] })],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+    });
+    // 'a' has 2 edges, 'b'/'c' have 1 → 'a' is bigger.
+    const a = g.nodes.find((n) => n.id === 'p:a');
+    const b = g.nodes.find((n) => n.id === 'p:b');
+    expect(a?.size).toBeGreaterThan(b?.size ?? 0);
+    expect(g.nodes.every((n) => typeof n.size === 'number' && n.size > 0)).toBe(true);
+  });
+
   it('assigns url and weight/type to nodes and edges', () => {
     const g = buildGraph({
       projects: [

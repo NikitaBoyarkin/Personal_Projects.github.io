@@ -17,6 +17,8 @@ export interface GraphNode {
   group: string;
   /** Relative page URL (no base, locale-prefixed), e.g. `projects/volta/`. */
   url: string;
+  /** Node radius in world units, derived from kind + degree (hub ≈ bigger). */
+  size: number;
 }
 
 export type LinkType = "related" | "children" | "topic" | "shared";
@@ -240,8 +242,31 @@ export function buildGraph(opts: {
     edgeIds.add(l.source);
     edgeIds.add(l.target);
   }
+
+  // Node size: base by kind, scaled up by degree (hubs read bigger).
+  const degrees = new Map<string, number>();
+  for (const l of links) {
+    degrees.set(l.source, (degrees.get(l.source) ?? 0) + 1);
+    degrees.set(l.target, (degrees.get(l.target) ?? 0) + 1);
+  }
+  const BASE_SIZE: Record<string, number> = {
+    p: 9,
+    post: 7,
+    vp: 7,
+    topic: 6.5,
+  };
+  const nodesWithSize = nodes.filter(
+    (n) => !(n.id.startsWith("topic:") && !edgeIds.has(n.id)),
+  ).map((n) => {
+    const kind = n.id.split(":")[0];
+    const deg = degrees.get(n.id) ?? 0;
+    const base = BASE_SIZE[kind] ?? 6.5;
+    const size = base * (1 + 0.18 * Math.log1p(deg));
+    return { ...n, size: Math.round(size * 10) / 10 };
+  });
+
   return {
-    nodes: nodes.filter((n) => !(n.id.startsWith("topic:") && !edgeIds.has(n.id))),
+    nodes: nodesWithSize,
     links,
   };
 }

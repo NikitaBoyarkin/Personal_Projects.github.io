@@ -17,7 +17,8 @@ import { withBase } from '../../lib/path';
     <p style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 64ch;">
       The portfolio's content graph: projects, posts, topics and the Volta modules, linked by actual
       references (<code>related</code>, tags, Volta's composition). Node color = project track or post
-      category. Built from the content collections at build time, so it is always current.
+      category, node size = connection count (hubs are bigger), solid edges = explicit links,
+      dashed edges = thematic. Built from the content collections at build time, so it is always current.
       Mouse wheel — zoom, drag — pan (on the canvas) and move nodes, double-click restarts the
       simulation, the ⛶ button toggles fullscreen.
     </p>

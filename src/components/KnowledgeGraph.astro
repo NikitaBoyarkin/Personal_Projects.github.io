@@ -28,12 +28,32 @@ const t = {
   fullscreen: isEn ? 'Fullscreen' : 'Во весь экран',
   fullscreenExit: isEn ? 'Exit fullscreen' : 'Выйти из полноэкранного режима',
   open: isEn ? 'Open page' : 'Открыть страницу',
+  searchPlaceholder: isEn ? 'Find a project or topic…' : 'Найти проект или тему…',
+  searchLabel: isEn ? 'Search graph nodes' : 'Поиск по узлам графа',
+  searchEmpty: isEn ? 'No matches' : 'Ничего не найдено',
+  searchHint: isEn ? '↑↓ to navigate, Enter to center' : '↑↓ — навигация, Enter — центрировать',
+  searchClear: isEn ? 'Clear search' : 'Очистить поиск',
 };
 const groupList = Object.keys(GRAPH_GROUP_COLORS);
 ---
 
-<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')}>
+<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')} data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'}>
   <div class="kg-topbar">
+    <div class="kg-search" role="search">
+      <input
+        id="kg-search-input"
+        class="kg-search-input"
+        type="search"
+        placeholder={t.searchPlaceholder}
+        aria-label={t.searchLabel}
+        autocomplete="off"
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="kg-search-results"
+        aria-autocomplete="list"
+      />
+      <div id="kg-search-results" class="kg-search-results" role="listbox" hidden></div>
+    </div>
     <div class="kg-legend">
       {
         groupList.map((g) => (
@@ -113,11 +133,11 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     topic: '6 4',
     shared: '2 3',
   };
-  const EDGE_OPACITY: Record<string, number> = {
-    related: 0.55,
-    children: 0.7,
-    topic: 0.35,
-    shared: 0.25,
+  const EDGE_COLOR: Record<string, string> = {
+    related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
+    children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
+    topic: 'color-mix(in srgb, var(--text-muted) 45%, transparent)',
+    shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
   };
 
   function rebuild(data: any) {
@@ -143,9 +163,12 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
 
     const edgeLayer = el('g');
     svg.appendChild(edgeLayer);
-    edges = links.map(() => {
+    edges = links.map((l) => {
       const line = el('line');
       line.setAttribute('class', 'kg-edge');
+      line.setAttribute('stroke', EDGE_COLOR[l.type] || EDGE_COLOR.related);
+      const dash = EDGE_STYLE[l.type];
+      if (dash) line.setAttribute('stroke-dasharray', dash);
       edgeLayer.appendChild(line);
       return line as SVGLineElement;
     });
@@ -158,11 +181,12 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       g.setAttribute('role', 'link');
       g.setAttribute('aria-label', n.label);
       g.style.cursor = 'pointer';
+      const r = n.size || 6;
       const c = el('circle');
-      c.setAttribute('r', '6');
+      c.setAttribute('r', String(r));
       c.setAttribute('fill', colorFor(n.group));
       const txt = el('text');
-      txt.setAttribute('x', '10');
+      txt.setAttribute('x', String(r + 6));
       txt.setAttribute('y', '4');
       txt.setAttribute('class', 'kg-label');
       txt.textContent = n.label;
@@ -453,6 +477,115 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     { passive: false },
   );
 
+  // --- Search: filter nodes by label, center on a match ---
+  const searchInput = document.getElementById('kg-search-input') as HTMLInputElement | null;
+  const searchResults = document.getElementById('kg-search-results') as HTMLDivElement | null;
+  let searchActive = -1;
+
+  function applySearchFilter(query: string) {
+    const q = query.trim().toLowerCase();
+    nodes.forEach((n, i) => {
+      const match = !q || n.label.toLowerCase().includes(q);
+      nodeEls[i].style.opacity = match ? '' : '0.08';
+    });
+  }
+
+  function renderSearchResults(query: string) {
+    if (!searchResults) return;
+    const q = query.trim().toLowerCase();
+    searchResults.innerHTML = '';
+    if (!q) {
+      searchResults.hidden = true;
+      return;
+    }
+    const matches = nodes.filter((n) => n.label.toLowerCase().includes(q)).slice(0, 12);
+    searchResults.hidden = false;
+    searchActive = -1;
+    if (matches.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'kg-search-empty';
+      empty.textContent = root.dataset.searchEmpty || 'No matches';
+      searchResults.appendChild(empty);
+      return;
+    }
+    matches.forEach((n, i) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'kg-search-item';
+      item.setAttribute('role', 'option');
+      item.textContent = n.label;
+      item.addEventListener('click', () => {
+        centerOnNode(n.id);
+        searchInput?.blur();
+      });
+      searchResults.appendChild(item);
+    });
+  }
+
+  function centerOnNode(id: string) {
+    const n = nodes.find((x) => x.id === id);
+    if (!n) return;
+    // Recenter the viewport on the node's current position with a comfortable zoom.
+    vp = centerOn(vp, { x: n.x, y: n.y }, Math.max(1.5, vp.k), world);
+    applyViewport();
+    clearSearch();
+    // Flash highlight so the user sees which node was found.
+    hoveredId = n.id;
+    highlight(n.id);
+    const g = nodeEls[nodes.indexOf(n)];
+    if (g) g.focus();
+    window.setTimeout(() => {
+      if (hoveredId === n.id) clearHighlight();
+    }, 2500);
+  }
+
+  function clearSearch() {
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.setAttribute('aria-expanded', 'false');
+    }
+    if (searchResults) searchResults.hidden = true;
+    applySearchFilter('');
+  }
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value;
+      searchInput.setAttribute('aria-expanded', 'true');
+      renderSearchResults(q);
+      applySearchFilter(q);
+    });
+    searchInput.addEventListener('keydown', (e) => {
+      const items = Array.from(searchResults.querySelectorAll<HTMLButtonElement>('.kg-search-item'));
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        searchActive = (searchActive + 1) % Math.max(1, items.length);
+        items[searchActive]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        searchActive = (searchActive - 1 + items.length) % Math.max(1, items.length);
+        items[searchActive]?.focus();
+      } else if (e.key === 'Enter') {
+        if (items[Math.max(0, searchActive)]) {
+          e.preventDefault();
+          items[Math.max(0, searchActive)].click();
+        }
+      } else if (e.key === 'Escape') {
+        clearSearch();
+        searchInput.blur();
+      }
+    });
+    searchInput.addEventListener('blur', () => {
+      // Allow click on a result to land before hiding.
+      window.setTimeout(() => {
+        if (!root.contains(document.activeElement)) {
+          searchResults.hidden = true;
+          applySearchFilter('');
+        }
+      }, 120);
+    });
+  }
+
   // Control buttons.
   const fsBtn = root.querySelector<HTMLButtonElement>('[data-kg-action="fullscreen"]');
   root.querySelectorAll<HTMLButtonElement>('[data-kg-action]').forEach((btn) => {
@@ -632,6 +765,61 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     font-weight: 600;
     pointer-events: none;
     box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
+  }
+  .kg-search {
+    position: relative;
+    flex: 1 1 220px;
+    min-width: 180px;
+    max-width: 340px;
+  }
+  .kg-search-input {
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border-color);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
+  }
+  .kg-search-input:focus {
+    outline: none;
+    border-color: var(--text-accent);
+  }
+  .kg-search-results {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1200;
+    max-height: 240px;
+    overflow-y: auto;
+    background: var(--background-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.3);
+  }
+  .kg-search-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border: none;
+    background: transparent;
+    color: var(--text-normal);
+    font-size: 0.85rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+  }
+  .kg-search-item:hover,
+  .kg-search-item:focus {
+    background: color-mix(in srgb, var(--text-accent) 12%, transparent);
+    outline: none;
+  }
+  .kg-search-empty {
+    padding: 0.5rem 0.6rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
   }
   .kg-caption {
     color: var(--text-muted);
