@@ -26,12 +26,13 @@ function loadCollection(name: string): { id: string; data: Record<string, unknow
 let graphs: { ru: GraphData; en: GraphData };
 
 beforeAll(() => {
-  const projects = loadCollection('projects');
-  const projectsEn = loadCollection('projects-en');
-  const posts = loadCollection('posts');
-  const postsEn = loadCollection('posts-en');
-  const parts = loadCollection('volta-parts');
-  const partsEn = loadCollection('volta-parts-en');
+  type BuildOpts = Parameters<typeof buildGraph>[0];
+  const projects = loadCollection('projects') as BuildOpts['projects'];
+  const projectsEn = loadCollection('projects-en') as BuildOpts['projects'];
+  const posts = loadCollection('posts') as BuildOpts['posts'];
+  const postsEn = loadCollection('posts-en') as BuildOpts['posts'];
+  const parts = loadCollection('volta-parts') as BuildOpts['parts'];
+  const partsEn = loadCollection('volta-parts-en') as BuildOpts['parts'];
 
   graphs = {
     ru: buildGraph({ projects, posts, parts, topics: TOPICS, lang: 'ru' }),

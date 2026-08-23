@@ -18,7 +18,7 @@ export interface GraphNode {
   /** Relative page URL (no base, locale-prefixed), e.g. `projects/volta/`. */
   url: string;
   /** Node radius in world units, derived from kind + degree (hub ≈ bigger). */
-  size: number;
+  size?: number;
 }
 
 export type LinkType = "related" | "children" | "topic" | "shared";
