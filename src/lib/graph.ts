@@ -23,6 +23,19 @@ export interface GraphData {
   links: GraphLink[];
 }
 
+/** Group colors shared by the SSR legend and the client-side renderer. */
+export const GRAPH_GROUP_COLORS: Record<string, string> = {
+  experiments: '#5db8b0',
+  analytics: 'var(--text-accent)',
+  product: '#c9a24a',
+  engineering: '#9d7bd8',
+  guide: '#4caf78',
+  framework: '#e06c6c',
+  'decision-log': '#5b9bd5',
+  note: 'var(--text-muted)',
+  topic: '#b48ce0',
+};
+
 interface ProjectLike {
   id: string;
   data: {

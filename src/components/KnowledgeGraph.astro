@@ -1,8 +1,10 @@
 ---
 // Dependency-free force-directed knowledge graph island.
-// Reads /graph.json (base-path aware via data-src) and renders an SVG simulation.
-// Starts when scrolled into view; honors prefers-reduced-motion (renders static radial).
+// Reads graph.json / graph-en.json (base-path aware via data-src) and renders
+// an SVG simulation. Fullscreen toggle + wheel/pinch zoom + drag pan/zoom.
+// Starts when scrolled into view; honors prefers-reduced-motion (static radial).
 import { withBase } from '../lib/path';
+import { GRAPH_GROUP_COLORS } from '../lib/graph';
 
 interface Props {
   lang?: 'ru' | 'en';
@@ -17,221 +19,443 @@ const ariaLabel = isEn
   ? 'Knowledge graph of portfolio content'
   : 'Граф контента портфолио';
 
-const GROUP_COLORS: Record<string, string> = {
-  experiments: '#5db8b0',
-  analytics: 'var(--text-accent)',
-  product: '#c9a24a',
-  engineering: '#9d7bd8',
-  guide: '#4caf78',
-  framework: '#e06c6c',
-  'decision-log': '#5b9bd5',
-  note: 'var(--text-muted)',
-  topic: '#b48ce0',
+const t = {
+  zoomIn: isEn ? 'Zoom in' : 'Приблизить',
+  zoomOut: isEn ? 'Zoom out' : 'Отдалить',
+  reset: isEn ? 'Reset zoom and position' : 'Сбросить масштаб и положение',
+  fullscreen: isEn ? 'Fullscreen' : 'Во весь экран',
+  fullscreenExit: isEn ? 'Exit fullscreen' : 'Выйти из полноэкранного режима',
 };
-const groupList = Object.keys(GROUP_COLORS);
+const groupList = Object.keys(GRAPH_GROUP_COLORS);
 ---
 
 <div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')}>
-  <div class="kg-legend">
-    {
-      groupList.map((g) => (
-        <span class="kg-legend-item"><i style={`background:${GROUP_COLORS[g]}`}></i>{g}</span>
-      ))
-    }
+  <div class="kg-topbar">
+    <div class="kg-legend">
+      {
+        groupList.map((g) => (
+          <span class="kg-legend-item"><i style={`background:${GRAPH_GROUP_COLORS[g]}`}></i>{g}</span>
+        ))
+      }
+    </div>
+    <div class="kg-controls" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
+      <button type="button" class="kg-btn" data-kg-action="zoom-in" aria-label={t.zoomIn} title={t.zoomIn}>+</button>
+      <button type="button" class="kg-btn" data-kg-action="zoom-out" aria-label={t.zoomOut} title={t.zoomOut}>−</button>
+      <button type="button" class="kg-btn" data-kg-action="reset" aria-label={t.reset} title={t.reset}>⟲</button>
+      <button type="button" class="kg-btn" data-kg-action="fullscreen" aria-label={t.fullscreen} title={t.fullscreen} data-label-fs={t.fullscreen} data-label-fs-exit={t.fullscreenExit}>⛶</button>
+    </div>
   </div>
   <svg id="kg-svg" class="kg-svg" role="img" aria-label={ariaLabel}></svg>
   <p class="kg-caption">{caption}</p>
 </div>
 
-<script is:inline define:vars={{ GROUP_COLORS }}>
-  (function () {
-    const root = document.getElementById('kg-root');
-    if (!root) return;
-    const svg = document.getElementById('kg-svg');
-    const src = root.dataset.src;
-    if (!svg || !src) return;
+<script>
+  import { GRAPH_GROUP_COLORS } from '../lib/graph';
+  import { clampZoom, viewBoxOf, zoomAt, panBy, centerOn } from '../lib/graph-zoom';
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const colorFor = (g) => GROUP_COLORS[g] || 'var(--text-muted)';
+  const rootEl = document.getElementById('kg-root');
+  const svgEl = document.getElementById('kg-svg');
+  const src = rootEl?.dataset.src;
+  if (!rootEl || !svgEl || !src) throw new Error('kg-root / kg-svg not found');
+  const root = rootEl as HTMLElement;
+  const svg = svgEl as unknown as SVGSVGElement;
 
-    function renderStatic(data) {
-      // Radial layout by group.
-      const groups = {};
-      data.nodes.forEach((n) => { (groups[n.group] = groups[n.group] || []).push(n); });
-      const W = svg.clientWidth || 600;
-      const H = 420;
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      const cx = W / 2, cy = H / 2;
-      const groupKeys = Object.keys(groups);
-      const radius = Math.min(W, H) * 0.38;
-      const ns = 'http://www.w3.org/2000/svg';
-      const pos = {};
-      groupKeys.forEach((gk, gi) => {
-        const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
-        const gx = cx + Math.cos(ga) * radius;
-        const gy = cy + Math.sin(ga) * radius;
-        groups[gk].forEach((n, ni) => {
-          const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
-          const r = 34 + ni * 12;
-          pos[n.id] = { x: gx + Math.cos(a) * r, y: gy + Math.sin(a) * r };
-        });
-      });
-      data.links.forEach((l) => {
-        const a = pos[l.source], b = pos[l.target];
-        if (!a || !b) return;
-        const line = document.createElementNS(ns, 'line');
-        line.setAttribute('x1', a.x); line.setAttribute('y1', a.y);
-        line.setAttribute('x2', b.x); line.setAttribute('y2', b.y);
-        line.setAttribute('class', 'kg-edge');
-        svg.appendChild(line);
-      });
-      data.nodes.forEach((n) => {
-        const p = pos[n.id]; if (!p) return;
-        const g = document.createElementNS(ns, 'g');
-        g.setAttribute('transform', `translate(${p.x},${p.y})`);
-        const c = document.createElementNS(ns, 'circle');
-        c.setAttribute('r', 6); c.setAttribute('fill', colorFor(n.group));
-        const t = document.createElementNS(ns, 'text');
-        t.setAttribute('x', 10); t.setAttribute('y', 4); t.setAttribute('class', 'kg-label');
-        t.textContent = n.label;
-        g.appendChild(c); g.appendChild(t);
-        svg.appendChild(g);
-      });
-    }
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const colorFor = (g: string) => GRAPH_GROUP_COLORS[g] || 'var(--text-muted)';
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (name: string) => document.createElementNS(NS, name);
 
-    function renderForce(data) {
-      const W = svg.clientWidth || 600;
-      const H = 460;
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      const ns = 'http://www.w3.org/2000/svg';
-      const nodes = data.nodes.map((n) => ({ ...n, x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0 }));
-      const idx = new Map(nodes.map((n) => [n.id, n]));
-      const links = data.links.map((l) => ({ source: idx.get(l.source), target: idx.get(l.target) })).filter((l) => l.source && l.target);
+  let world = { w: 600, h: 460 };
+  let vp = { x: 0, y: 0, k: 1 };
+  let nodes: any[] = [];
+  let nodeEls: SVGGElement[] = [];
+  let links: { source: any; target: any }[] = [];
+  let edges: SVGLineElement[] = [];
+  let running = false;
+  let frames = 0;
+  let restart: (() => void) | null = null;
+  let dragging: any = null;
+  let panning: { startX: number; startY: number; vpX: number; vpY: number } | null = null;
+  let pinch: { startDist: number; vp0: typeof vp; mid0: { x: number; y: number } } | null = null;
+  const pointers = new Map<number, { x: number; y: number }>();
 
-      // Edge layer
-      const edgeLayer = document.createElementNS(ns, 'g');
-      svg.appendChild(edgeLayer);
-      const edges = links.map(() => {
-        const line = document.createElementNS(ns, 'line');
-        line.setAttribute('class', 'kg-edge');
-        edgeLayer.appendChild(line);
-        return line;
-      });
+  function applyViewport() {
+    const vb = viewBoxOf(vp, world);
+    svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
+  }
 
-      // Node layer
-      const nodeLayer = document.createElementNS(ns, 'g');
-      svg.appendChild(nodeLayer);
-      const nodeEls = nodes.map((n) => {
-        const g = document.createElementNS(ns, 'g');
-        const c = document.createElementNS(ns, 'circle');
-        c.setAttribute('r', 6); c.setAttribute('fill', colorFor(n.group));
-        const t = document.createElementNS(ns, 'text');
-        t.setAttribute('x', 10); t.setAttribute('y', 4); t.setAttribute('class', 'kg-label');
-        t.textContent = n.label;
-        g.appendChild(c); g.appendChild(t);
-        g.style.cursor = 'grab';
-        nodeLayer.appendChild(g);
-        return g;
-      });
+  function resetViewport() {
+    vp = centerOn({ x: 0, y: 0, k: 1 }, { x: world.w / 2, y: world.h / 2 }, 1, world);
+    applyViewport();
+  }
 
-      let dragging = null;
-      svg.addEventListener('mousedown', (e) => {
-        const target = nodeEls.find((el) => el.contains(e.target));
-        if (target) { dragging = nodes[nodeEls.indexOf(target)]; dragging.fx = dragging.x; dragging.fy = dragging.y; target.style.cursor = 'grabbing'; }
-      });
-      svg.addEventListener('mousemove', (e) => {
-        if (!dragging) return;
-        const rect = svg.getBoundingClientRect();
-        dragging.fx = (e.clientX - rect.left) * (W / rect.width);
-        dragging.fy = (e.clientY - rect.top) * (H / rect.height);
-      });
-      window.addEventListener('mouseup', () => {
-        if (dragging) { const el = nodeEls[nodes.indexOf(dragging)]; if (el) el.style.cursor = 'grab'; dragging.fx = null; dragging.fy = null; dragging = null; }
-      });
+  /** Convert a client (screen) point into world/viewBox coordinates. */
+  function toWorld(clientX: number, clientY: number) {
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const pt = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+    return { x: pt.x, y: pt.y };
+  }
 
-      function tick() {
-        // charge
-        for (let i = 0; i < nodes.length; i++) {
-          for (let j = i + 1; j < nodes.length; j++) {
-            const a = nodes[i], b = nodes[j];
-            let dx = a.x - b.x, dy = a.y - b.y;
-            let d2 = dx * dx + dy * dy || 1;
-            let d = Math.sqrt(d2);
-            const f = 1400 / d2;
-            a.vx += (dx / d) * f; a.vy += (dy / d) * f;
-            b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
-          }
+  function rebuild(data: any) {
+    svg.replaceChildren();
+    world = { w: svg.clientWidth || 600, h: 460 };
+
+    nodes = data.nodes.map((n: any) => ({
+      ...n,
+      x: world.w * (0.2 + 0.6 * Math.random()),
+      y: world.h * (0.2 + 0.6 * Math.random()),
+      vx: 0,
+      vy: 0,
+    }));
+    const idx = new Map(nodes.map((n) => [n.id, n]));
+    links = data.links
+      .map((l: any) => ({ source: idx.get(l.source), target: idx.get(l.target) }))
+      .filter((l: any) => l.source && l.target);
+
+    const edgeLayer = el('g');
+    svg.appendChild(edgeLayer);
+    edges = links.map(() => {
+      const line = el('line');
+      line.setAttribute('class', 'kg-edge');
+      edgeLayer.appendChild(line);
+      return line as SVGLineElement;
+    });
+
+    const nodeLayer = el('g');
+    svg.appendChild(nodeLayer);
+    nodeEls = nodes.map((n) => {
+      const g = el('g');
+      const c = el('circle');
+      c.setAttribute('r', '6');
+      c.setAttribute('fill', colorFor(n.group));
+      const txt = el('text');
+      txt.setAttribute('x', '10');
+      txt.setAttribute('y', '4');
+      txt.setAttribute('class', 'kg-label');
+      txt.textContent = n.label;
+      g.appendChild(c);
+      g.appendChild(txt);
+      g.style.cursor = 'grab';
+      nodeLayer.appendChild(g);
+      return g as SVGGElement;
+    });
+
+    resetViewport();
+  }
+
+  function renderStatic(data: any) {
+    rebuild(data);
+    // Radial layout by group, centered.
+    const groups: Record<string, any[]> = {};
+    nodes.forEach((n) => {
+      (groups[n.group] = groups[n.group] || []).push(n);
+    });
+    const cx = world.w / 2;
+    const cy = world.h / 2;
+    const groupKeys = Object.keys(groups);
+    const radius = Math.min(world.w, world.h) * 0.38;
+    const pos: Record<string, { x: number; y: number }> = {};
+    groupKeys.forEach((gk, gi) => {
+      const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
+      const gx = cx + Math.cos(ga) * radius;
+      const gy = cy + Math.sin(ga) * radius;
+      groups[gk].forEach((n, ni) => {
+        const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
+        const r = 34 + ni * 12;
+        pos[n.id] = { x: gx + Math.cos(a) * r, y: gy + Math.sin(a) * r };
+      });
+    });
+    links.forEach((l, i) => {
+      const a = pos[l.source.id], b = pos[l.target.id];
+      if (!a || !b) return;
+      edges[i].setAttribute('x1', String(a.x));
+      edges[i].setAttribute('y1', String(a.y));
+      edges[i].setAttribute('x2', String(b.x));
+      edges[i].setAttribute('y2', String(b.y));
+    });
+    nodes.forEach((n, i) => {
+      const p = pos[n.id];
+      if (p) nodeEls[i].setAttribute('transform', `translate(${p.x},${p.y})`);
+    });
+  }
+
+  function renderForce(data: any) {
+    rebuild(data);
+
+    function tick() {
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          let dx = a.x - b.x, dy = a.y - b.y;
+          let d2 = dx * dx + dy * dy || 1;
+          let d = Math.sqrt(d2);
+          const f = 1400 / d2;
+          a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+          b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
         }
-        // link spring
-        links.forEach((l) => {
-          const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
-          const d = Math.sqrt(dx * dx + dy * dy) || 1;
-          const f = (d - 70) * 0.04;
-          const fx = (dx / d) * f, fy = (dy / d) * f;
-          l.source.vx += fx; l.source.vy += fy;
-          l.target.vx -= fx; l.target.vy -= fy;
-        });
-        // center gravity + integrate
-        nodes.forEach((n) => {
-          if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
-          n.vx += (W / 2 - n.x) * 0.005;
-          n.vy += (H / 2 - n.y) * 0.005;
-          n.vx *= 0.85; n.vy *= 0.85;
-          n.x += n.vx; n.y += n.vy;
-          n.x = Math.max(60, Math.min(W - 60, n.x));
-          n.y = Math.max(20, Math.min(H - 20, n.y));
-        });
-        // render
-        links.forEach((l, i) => {
-          edges[i].setAttribute('x1', l.source.x); edges[i].setAttribute('y1', l.source.y);
-          edges[i].setAttribute('x2', l.target.x); edges[i].setAttribute('y2', l.target.y);
-        });
-        nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
       }
+      links.forEach((l) => {
+        const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const f = (d - 70) * 0.04;
+        const fx = (dx / d) * f, fy = (dy / d) * f;
+        l.source.vx += fx; l.source.vy += fy;
+        l.target.vx -= fx; l.target.vy -= fy;
+      });
+      nodes.forEach((n) => {
+        if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
+        n.vx += (world.w / 2 - n.x) * 0.005;
+        n.vy += (world.h / 2 - n.y) * 0.005;
+        n.vx *= 0.85; n.vy *= 0.85;
+        n.x += n.vx; n.y += n.vy;
+        n.x = Math.max(60, Math.min(world.w - 60, n.x));
+        n.y = Math.max(20, Math.min(world.h - 20, n.y));
+      });
+      links.forEach((l, i) => {
+        edges[i].setAttribute('x1', String(l.source.x));
+        edges[i].setAttribute('y1', String(l.source.y));
+        edges[i].setAttribute('x2', String(l.target.x));
+        edges[i].setAttribute('y2', String(l.target.y));
+      });
+      nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
+    }
 
-      let running = true;
-      let frames = 0;
-      function loop() {
-        if (!running) return;
-        tick();
-        frames++;
-        if (frames > 600) { running = false; }
-        requestAnimationFrame(loop);
-      }
+    function loop() {
+      if (!running) return;
+      tick();
+      frames++;
+      if (frames > 600) running = false;
+      requestAnimationFrame(loop);
+    }
+
+    restart = () => {
+      running = true;
+      frames = 0;
       loop();
-      svg.addEventListener('dblclick', () => { frames = 0; running = true; loop(); });
+    };
+    restart();
+  }
+
+  svg.addEventListener('dblclick', () => {
+    if (reduced || !restart) return;
+    restart();
+  });
+
+  // --- Pointer handling: node drag, canvas pan, pinch zoom ---
+  function handlePointerDown(e: PointerEvent) {
+    svg.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pointers.size === 2) {
+      dragging = null;
+      panning = null;
+      const [a, b] = [...pointers.values()];
+      const startDist = Math.hypot(a.x - b.x, a.y - b.y);
+      pinch = {
+        startDist: Math.max(1, startDist),
+        vp0: { ...vp },
+        mid0: toWorld((a.x + b.x) / 2, (a.y + b.y) / 2),
+      };
+      return;
     }
 
-    function load() {
-      fetch(src)
-        .then((r) => r.json())
-        .then((data) => { reduced ? renderStatic(data) : renderForce(data); })
-        .catch(() => {
-          const isEn = document.documentElement.lang === 'en';
-          svg.textContent = isEn ? 'Graph unavailable' : 'Граф недоступен';
-        });
+    // Single pointer: node drag if it hit a node, else canvas pan.
+    const target = nodeEls.find((g) => g.contains(e.target as Node));
+    if (target) {
+      const n = nodes[nodeEls.indexOf(target)];
+      const p = toWorld(e.clientX, e.clientY);
+      dragging = n;
+      n.fx = p.x;
+      n.fy = p.y;
+      target.style.cursor = 'grabbing';
+      return;
+    }
+    panning = { startX: e.clientX, startY: e.clientY, vpX: vp.x, vpY: vp.y };
+    svg.style.cursor = 'grabbing';
+  }
+
+  function handlePointerMove(e: PointerEvent) {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pinch && pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      const factor = clampZoom((pinch.vp0.k * dist) / pinch.startDist) / pinch.vp0.k;
+      vp = zoomAt(pinch.vp0, pinch.mid0, factor, world);
+      applyViewport();
+      return;
     }
 
-    // Start when visible (lazy).
-    if (reduced) { load(); return; }
+    if (dragging) {
+      const p = toWorld(e.clientX, e.clientY);
+      dragging.fx = p.x;
+      dragging.fy = p.y;
+      return;
+    }
+
+    if (panning) {
+      const p = toWorld(e.clientX, e.clientY);
+      const start = toWorld(panning.startX, panning.startY);
+      // Keep the world point grabbed at start under the cursor.
+      vp = panBy({ x: panning.vpX, y: panning.vpY, k: vp.k }, start.x - p.x, start.y - p.y);
+      applyViewport();
+    }
+  }
+
+  function handlePointerUp(e: PointerEvent) {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (dragging) {
+      const n = dragging;
+      n.fx = null;
+      n.fy = null;
+      const g = nodeEls[nodes.indexOf(n)];
+      if (g) g.style.cursor = 'grab';
+      dragging = null;
+    }
+    if (panning) {
+      panning = null;
+      svg.style.cursor = '';
+    }
+  }
+
+  svg.addEventListener('pointerdown', handlePointerDown);
+  svg.addEventListener('pointermove', handlePointerMove);
+  svg.addEventListener('pointerup', handlePointerUp);
+  svg.addEventListener('pointercancel', handlePointerUp);
+
+  // Wheel zoom around the cursor.
+  svg.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      const p = toWorld(e.clientX, e.clientY);
+      const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+      vp = zoomAt(vp, p, factor, world);
+      applyViewport();
+    },
+    { passive: false },
+  );
+
+  // Control buttons.
+  const fsBtn = root.querySelector<HTMLButtonElement>('[data-kg-action="fullscreen"]');
+  root.querySelectorAll<HTMLButtonElement>('[data-kg-action]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.kgAction;
+      const center = { x: world.w / 2, y: world.h / 2 };
+      if (action === 'zoom-in') {
+        vp = zoomAt(vp, center, 1.35, world);
+        applyViewport();
+      } else if (action === 'zoom-out') {
+        vp = zoomAt(vp, center, 1 / 1.35, world);
+        applyViewport();
+      } else if (action === 'reset') {
+        resetViewport();
+        if (restart) restart();
+      } else if (action === 'fullscreen') {
+        toggleFullscreen();
+      }
+    });
+  });
+
+  function toggleFullscreen() {
+    const isFs = root.classList.toggle('kg-fullscreen');
+    if (fsBtn) {
+      fsBtn.setAttribute('aria-label', isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!);
+      fsBtn.title = isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!;
+    }
+    // The SVG grew/shrunk; re-center the viewport so nothing disappears.
+    requestAnimationFrame(resetViewport);
+  }
+
+  // --- Load ---
+  function load() {
+    const url = src as string;
+    fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        reduced ? renderStatic(data) : renderForce(data);
+      })
+      .catch(() => {
+        const isEn = document.documentElement.lang === 'en';
+        svg.textContent = isEn ? 'Graph unavailable' : 'Граф недоступен';
+      });
+  }
+
+  // Start when visible (lazy).
+  if (reduced) {
+    load();
+  } else {
     const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); load(); }
+      if (entries.some((e) => e.isIntersecting)) {
+        io.disconnect();
+        load();
+      }
     }, { threshold: 0.15 });
     io.observe(root);
-  })();
+  }
 </script>
 
 <style>
   .kg-root {
+    position: relative;
     background: var(--background-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     padding: var(--space-5);
   }
+  .kg-root.kg-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    border-radius: 0;
+  }
+  .kg-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3);
+  }
   .kg-svg {
     width: 100%;
     height: 460px;
     display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+  .kg-fullscreen .kg-svg {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+  }
+  .kg-controls {
+    display: flex;
+    gap: 0.35rem;
+  }
+  .kg-btn {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    background: var(--background-primary);
+    color: var(--text-normal);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .kg-btn:hover {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
   }
   .kg-edge {
     stroke: color-mix(in srgb, var(--text-muted) 40%, transparent);
@@ -252,7 +476,6 @@ const groupList = Object.keys(GROUP_COLORS);
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
-    margin-bottom: var(--space-3);
     text-transform: capitalize;
     font-size: 0.8rem;
     color: var(--text-muted);
