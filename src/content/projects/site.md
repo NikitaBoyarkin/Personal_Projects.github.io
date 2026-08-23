@@ -14,6 +14,10 @@ tools:
   - Markdown
   - CSS custom properties
 github: https://github.com/NikitaBoyarkin/Personal_Projects.github.io
+related:
+  - /projects/garden/
+  - /projects/scrolly/
+  - /posts/data-analyst-portfolio-checklist/
 ---
 
 # This Portfolio Site

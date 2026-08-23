@@ -15,6 +15,9 @@ tools:
   - D3
   - Tailwind v4
 github: https://github.com/NikitaBoyarkin/scrolly-english-speaking
+related:
+  - /projects/site/
+  - /projects/garden/
 ---
 
 # Scrolly English Speaking

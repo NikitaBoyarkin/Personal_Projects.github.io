@@ -153,5 +153,15 @@ export function buildGraph(opts: {
     }
   }
 
-  return { nodes, links };
+  // Drop topic nodes with no edges (e.g. a locale where no post/project maps
+  // to that topic) — isolated theme pills are noise, not information.
+  const edgeIds = new Set<string>();
+  for (const l of links) {
+    edgeIds.add(l.source);
+    edgeIds.add(l.target);
+  }
+  return {
+    nodes: nodes.filter((n) => !(n.id.startsWith("topic:") && !edgeIds.has(n.id))),
+    links,
+  };
 }

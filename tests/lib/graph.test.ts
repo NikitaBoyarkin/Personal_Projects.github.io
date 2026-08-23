@@ -62,13 +62,24 @@ describe('buildGraph', () => {
 
   it('uses english topic keys as labels in en mode', () => {
     const g = buildGraph({
-      projects: [project('volta', { description: 'ab-testing' })],
+      projects: [project('volta', { description: 'ab testing methodology' })],
       posts: [],
       parts: [],
       topics: TOPICS,
       lang: 'en',
     });
     expect(g.nodes.find((n) => n.id === 'topic:ab-testing')?.label).toBe('ab-testing');
+  });
+
+  it('drops topic nodes that have no edges in a locale', () => {
+    const g = buildGraph({
+      projects: [],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+      lang: 'en',
+    });
+    expect(g.nodes.some((n) => n.id.startsWith('topic:'))).toBe(false);
   });
 
   it('links projects via related and volta children', () => {
