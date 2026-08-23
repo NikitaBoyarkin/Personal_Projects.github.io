@@ -13,17 +13,19 @@ import { withBase } from '../lib/path';
   lang="ru"
 >
   <section class="container reveal">
-    <h1 class="page-title">Граф знаний</h1>
+    <h1 class="page-title">Граф контента</h1>
     <p style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 64ch;">
-      Карта понятий product-аналитики, которая стоит за проектами портфолио. Узлы — концепции и методы,
-      рёбра — как они компонуются в петлю <strong>discover → validate → measure → optimize</strong>.
+      Граф контента портфолио: проекты, записи, темы и модули Volta, связанные реальными ссылками
+      (<code>related</code>, теги, состав Volta). Цвет узла — трек проекта или категория записи.
+      Собирается из коллекций на build-time, поэтому всегда актуален.
       Перетаскивайте узлы; двойной клик по холсту перезапускает симуляцию.
     </p>
 
     <KnowledgeGraph />
 
     <p style="color: var(--text-muted); margin-top: var(--space-8); font-size: 0.9rem;">
-      Это curated-подграф domain-модели из моего Obsidian vault. Полный граф knowledge base — в работе.
+      Генератор — <code>src/lib/graph.ts</code>; источник рёбер — <code>related</code> в frontmatter,
+      теги записей и <code>children</code> проекта Volta.
     </p>
   </section>
 </Base>

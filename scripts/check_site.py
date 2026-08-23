@@ -196,6 +196,18 @@ def check_index_assets() -> int:
     return errors
 
 
+def check_graph_assets() -> int:
+    errors = 0
+    graph_files = ["graph.json", "graph-en.json"]
+    for name in graph_files:
+        if not (DIST / name).exists():
+            print(f"  ERROR: missing generated {name} (run 'npm run build')")
+            errors += 1
+        else:
+            print(f"  OK    {name}")
+    return errors
+
+
 def main() -> int:
     if not DIST.exists():
         print("ERROR: dist/ not found. Run 'npm run build' first.")
@@ -207,6 +219,7 @@ def main() -> int:
     errors += check_internal_links()
     errors += check_profile_image()
     errors += check_index_assets()
+    errors += check_graph_assets()
 
     print()
     if errors:

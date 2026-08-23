@@ -13,17 +13,19 @@ import { withBase } from '../../lib/path';
   lang="en"
 >
   <section class="container reveal">
-    <h1 class="page-title">Knowledge graph</h1>
+    <h1 class="page-title">Content graph</h1>
     <p style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 64ch;">
-      A map of the product-analytics concepts behind the portfolio projects. Nodes are concepts and methods;
-      edges show how they compose into a <strong>discover → validate → measure → optimize</strong> loop.
+      The portfolio's content graph: projects, posts, topics and the Volta modules, linked by actual
+      references (<code>related</code>, tags, Volta's composition). Node color = project track or post
+      category. Built from the content collections at build time, so it is always current.
       Drag nodes; double-click the canvas to restart the simulation.
     </p>
 
     <KnowledgeGraph lang="en" />
 
     <p style="color: var(--text-muted); margin-top: var(--space-8); font-size: 0.9rem;">
-      A curated subgraph of the domain model from my Obsidian vault. The full knowledge-base graph is a work in progress.
+      Generator — <code>src/lib/graph.ts</code>; edge sources — <code>related</code> in frontmatter,
+      post tags and the Volta project's <code>children</code>.
     </p>
   </section>
 </Base>

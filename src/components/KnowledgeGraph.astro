@@ -11,23 +11,27 @@ const { lang = 'ru' } = Astro.props;
 const isEn = lang === 'en';
 const caption =
   isEn
-    ? 'Concept graph of product analytics behind the portfolio projects. The discover → validate → measure → optimize loop.'
-    : 'Граф понятий product-аналитики, который стоит за проектами портфолио. Петля discover → validate → measure → optimize.';
+    ? 'Content graph of the portfolio: projects, posts, topics and the Volta modules, linked by actual references. Built from the content collections at build time.'
+    : 'Граф контента портфолио: проекты, записи, темы и модули Volta, связанные реальными ссылками. Собирается из коллекций контента на build-time.';
 const ariaLabel = isEn
-  ? 'Knowledge graph of product analytics concepts'
-  : 'Граф понятий продуктовой аналитики';
+  ? 'Knowledge graph of portfolio content'
+  : 'Граф контента портфолио';
 
 const GROUP_COLORS: Record<string, string> = {
-  discover: 'var(--text-accent)',
-  validate: '#5db8b0',
-  measure: '#c9a24a',
-  optimize: '#9d7bd8',
-  tooling: 'var(--text-muted)',
+  experiments: '#5db8b0',
+  analytics: 'var(--text-accent)',
+  product: '#c9a24a',
+  engineering: '#9d7bd8',
+  guide: '#4caf78',
+  framework: '#e06c6c',
+  'decision-log': '#5b9bd5',
+  note: 'var(--text-muted)',
+  topic: '#b48ce0',
 };
 const groupList = Object.keys(GROUP_COLORS);
 ---
 
-<div id="kg-root" class="kg-root" data-src={withBase('graph.json')}>
+<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')}>
   <div class="kg-legend">
     {
       groupList.map((g) => (
