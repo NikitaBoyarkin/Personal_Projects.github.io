@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
   <rect width="400" height="440" fill="#0a0a12"/>
-  <text x="200" y="28" text-anchor="middle" fill="#00ff9c" font-size="16" font-weight="bold" letter-spacing="3">2048</text>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">2048</text>
   <text id="score" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Score: 0</text>
   <g id="board" transform="translate(30,70)">
-    <rect width="340" height="340" fill="#12121c" stroke="#00ff9c" stroke-width="2" rx="6"/>
+    <rect width="340" height="340" fill="#12121c" stroke="#ff6643" stroke-width="2" rx="6"/>
     <g id="tiles"></g>
   </g>
   <text id="overlay" x="200" y="430" text-anchor="middle" fill="#f4f4f5" font-size="13">Swipe or arrow keys to move</text>
@@ -14,8 +14,8 @@
       var scoreT = document.getElementById('score'), overlay = document.getElementById('overlay');
       var grid = [], score = 0, over = false, won = false;
       var COLORS = {
-        2:'#333a47', 4:'#3d4656', 8:'#00a06a', 16:'#00c17e', 32:'#00ff9c',
-        64:'#7dffc4', 128:'#ffd166', 256:'#ff9f1c', 512:'#ff6b6b', 1024:'#f43f5e', 2048:'#f43f5e'
+        2:'#333a47', 4:'#3d4656', 8:'#c0431e', 16:'#e05730', 32:'#ff6643',
+        64:'#ffbe99', 128:'#ffd166', 256:'#ff9f1c', 512:'#ff6b6b', 1024:'#f43f5e', 2048:'#f43f5e'
       };
 
       function empty() {

@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
   <rect width="400" height="440" fill="#0a0a12"/>
-  <text x="200" y="28" text-anchor="middle" fill="#00ff9c" font-size="16" font-weight="bold" letter-spacing="3">FUNNEL DROP</text>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">FUNNEL DROP</text>
   <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">CVR 0% · caught 0 · missed 0</text>
 
   <rect x="30" y="78" width="340" height="30" fill="#17212b" stroke="#2a3240" stroke-width="1.5" rx="4"/>
-  <text x="40" y="97" fill="#7dffc4" font-size="11" font-weight="bold">SIGNUP</text>
-  <rect x="70" y="118" width="260" height="30" fill="#14251e" stroke="#0f6b4a" stroke-width="1.5" rx="4"/>
-  <text x="80" y="137" fill="#7dffc4" font-size="11" font-weight="bold">ACTIVE</text>
-  <rect x="115" y="158" width="170" height="30" fill="#14211a" stroke="#00a06a" stroke-width="1.5" rx="4"/>
-  <text x="125" y="177" fill="#7dffc4" font-size="11" font-weight="bold">PAY</text>
+  <text x="40" y="97" fill="#ffbe99" font-size="11" font-weight="bold">SIGNUP</text>
+  <rect x="70" y="118" width="260" height="30" fill="#251712" stroke="#8a2e15" stroke-width="1.5" rx="4"/>
+  <text x="80" y="137" fill="#ffbe99" font-size="11" font-weight="bold">ACTIVE</text>
+  <rect x="115" y="158" width="170" height="30" fill="#211511" stroke="#c0431e" stroke-width="1.5" rx="4"/>
+  <text x="125" y="177" fill="#ffbe99" font-size="11" font-weight="bold">PAY</text>
 
   <rect x="30" y="200" width="340" height="200" fill="#12121c" stroke="#2a3240" stroke-width="1.5" rx="6"/>
   <g id="dots"></g>
@@ -31,7 +31,7 @@
           c.setAttribute('cx', dots[i].x);
           c.setAttribute('cy', dots[i].y);
           c.setAttribute('r', 6);
-          c.setAttribute('fill', '#00ff9c');
+          c.setAttribute('fill', '#ff6643');
           dotsG.appendChild(c);
         }
       }

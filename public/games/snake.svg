@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
   <rect width="400" height="440" fill="#0a0a12"/>
-  <text x="200" y="28" text-anchor="middle" fill="#00ff9c" font-size="16" font-weight="bold" letter-spacing="3">SNAKE</text>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">SNAKE</text>
   <text id="score" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Score: 0</text>
   <g transform="translate(30,70)">
-    <rect width="340" height="340" fill="#12121c" stroke="#00ff9c" stroke-width="2" rx="6"/>
+    <rect width="340" height="340" fill="#12121c" stroke="#ff6643" stroke-width="2" rx="6"/>
     <g id="snake"></g>
     <g id="food"></g>
   </g>
@@ -45,7 +45,7 @@
           r.setAttribute('width', CELL - 2);
           r.setAttribute('height', CELL - 2);
           r.setAttribute('rx', 3);
-          r.setAttribute('fill', i === 0 ? '#00ff9c' : '#0f6b4a');
+          r.setAttribute('fill', i === 0 ? '#ff6643' : '#8a2e15');
           snakeG.appendChild(r);
         }
         var f = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
