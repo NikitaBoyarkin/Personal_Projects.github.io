@@ -25,7 +25,7 @@ const I18N = {
   open: isEn ? 'Open' : 'Открыть',
 };
 
-const ORDER = ['volta', 'ab', 'supabase', 'posthog', 'streamlit', 'sales-calls', 'sql', 'rfm', 'cohort', 'bot', 'scrolly', 'garden', 'site'];
+const ORDER = ['volta', 'ab', 'supabase', 'posthog', 'streamlit', 'sales-calls', 'sql', 'rfm', 'cohort', 'ml', 'bot', 'scrolly', 'garden', 'site'];
 const SHOW = 6;
 
 const projects = (await getCollection(collection, (p) => !p.data.draft))
