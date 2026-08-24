@@ -2199,9 +2199,13 @@ button:focus-visible {
   flex-direction: column;
   flex: 1 1 0;
   min-height: 0;
+  width: 100%;
+  max-width: 860px;
+  margin-inline: auto;
+  justify-content: space-between;
 }
 .spotlight-slide .project .project-actions {
-  margin-top: auto;
+  margin-top: 0;
   padding-top: var(--space-5);
 }
 
@@ -2272,7 +2276,7 @@ button:focus-visible {
 }
 
 .spotlight-slide .project img {
-  height: clamp(160px, 22vh, 240px);
+  height: clamp(180px, 26vh, 300px);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-4);
 }
