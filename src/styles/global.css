@@ -2162,8 +2162,47 @@ button:focus-visible {
 }
 
 .kanban-project-body {
-  display: block;
+  display: flex;
+  flex-direction: column;
   padding-top: 0;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+/* Spotlight fills the Проекты column: the featured card stretches to the
+   full column width and height (the board stretches columns to equal height),
+   with the actions pinned to the bottom. */
+.kanban-column-projects {
+  display: flex;
+  flex-direction: column;
+}
+.project-spotlight {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+.spotlight-stage {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+.spotlight-slide {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+.spotlight-slide .project {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+}
+.spotlight-slide .project .project-actions {
+  margin-top: auto;
+  padding-top: var(--space-5);
 }
 
 /* ============================================================
@@ -2233,7 +2272,7 @@ button:focus-visible {
 }
 
 .spotlight-slide .project img {
-  height: 200px;
+  height: clamp(160px, 22vh, 240px);
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-4);
 }
