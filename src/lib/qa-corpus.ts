@@ -1,0 +1,368 @@
+// Curated Q&A corpus for the "Ask me" widget. Pure data — no Astro imports,
+// no `withBase` (hrefs are relative; the component applies the base path).
+// Unit-testable in isolation (see tests/lib/qa-corpus.test.ts).
+//
+// Each pair answers a question a recruiter or visitor might ask. `keywords`
+// are match tokens in both languages (lowercase, no punctuation). The
+// component scores a typed query against `keywords` and renders the best
+// match's answer plus its links.
+
+export interface QALink {
+  label: string;
+  /** Relative path (no base) — the component wraps it with `withBase`. */
+  href: string;
+}
+
+export interface QALocale {
+  question: string;
+  answer: string;
+  links?: QALink[];
+}
+
+export interface QAPair {
+  id: string;
+  keywords: string[];
+  ru: QALocale;
+  en: QALocale;
+}
+
+export const QA_CORPUS: QAPair[] = [
+  {
+    id: "who",
+    keywords: ["кто", "ты", "who", "about", "никита", "boyarkin", "nikita", "имя", "name", "представься"],
+    ru: {
+      question: "Кто ты?",
+      answer:
+        "Я Никита Бояркин — Data Analyst / Product Analyst. 4+ года превращаю данные в решения: клиентская аналитика, A/B-тесты, дашборды и пайплайны. Специализация — SQL, Python и воспроизводимая статистическая методология (CUPED, AA-тесты, ship-gates).",
+      links: [{ label: "Обо мне", href: "about/" }],
+    },
+    en: {
+      question: "Who are you?",
+      answer:
+        "I'm Nikita Boyarkin — a Data Analyst / Product Analyst. 4+ years turning data into decisions: customer analytics, A/B tests, dashboards and pipelines. Specialized in SQL, Python and reproducible statistical methodology (CUPED, AA-tests, ship-gates).",
+      links: [{ label: "About me", href: "en/about/" }],
+    },
+  },
+  {
+    id: "role",
+    keywords: ["роль", "role", "вакансия", "job", "позиция", "position", "целишься", "target", "ищу", "looking"],
+    ru: {
+      question: "На какую роль целишься?",
+      answer:
+        "Открыт к Data Analyst / Product Analyst ролям (middle). Сейчас активно готовлюсь к интервью в BI / DA / Product Analytics: SQL, pandas, алгоритмы и мок-собеседования.",
+      links: [{ label: "Контакты", href: "contact/" }],
+    },
+    en: {
+      question: "What role are you looking for?",
+      answer:
+        "Open to Data Analyst / Product Analyst roles (middle). Currently preparing for BI / DA / Product Analytics interviews: SQL, pandas, algorithms and mock interviews.",
+      links: [{ label: "Contact", href: "en/contact/" }],
+    },
+  },
+  {
+    id: "experience",
+    keywords: ["опыт", "experience", "лет", "years", "стаж", "сколько"],
+    ru: {
+      question: "Сколько у тебя опыта?",
+      answer:
+        "4+ года на стыке продукта, данных и экспериментов. Данные в портфолио синтетические, но методология боевая: каждый кейс воспроизводим и откалиброван симуляцией.",
+    },
+    en: {
+      question: "How much experience do you have?",
+      answer:
+        "4+ years at the intersection of product, data and experimentation. The portfolio data is synthetic, but the methodology is production-grade: every case is reproducible and calibrated by simulation.",
+    },
+  },
+  {
+    id: "stack",
+    // "sql"/"duckdb" intentionally NOT here — they route to the SQL case study.
+    keywords: ["стек", "stack", "технологии", "tech", "tools", "инструменты", "python", "tableau", "pandas", "навыки", "skills"],
+    ru: {
+      question: "Какой у тебя стек?",
+      answer:
+        "SQL (DuckDB), Python (pandas, NumPy, SciPy, scikit-learn), A/B-тестирование, retention-анализ, сегментация (RFM), Tableau, автоматизация (Telegram-боты, cron). Визуализация — Matplotlib / Seaborn / Streamlit.",
+      links: [{ label: "Темы", href: "topics/" }],
+    },
+    en: {
+      question: "What's your stack?",
+      answer:
+        "SQL (DuckDB), Python (pandas, NumPy, SciPy, scikit-learn), A/B testing, retention analysis, segmentation (RFM), Tableau, automation (Telegram bots, cron). Visualization — Matplotlib / Seaborn / Streamlit.",
+      links: [{ label: "Topics", href: "en/topics/" }],
+    },
+  },
+  {
+    id: "ab-testing",
+    keywords: ["ab", "a/b", "тест", "тестирование", "experiment", "cuped", "aa", "bonferroni", "ship", "gate", "p-value", "эксперимент"],
+    ru: {
+      question: "Что у тебя с A/B-тестами?",
+      answer:
+        "Полный toolkit: CUPED (сжатие SE), AA-тесты на Type I error, коррекция множественных сравнений (Bonferroni/BH), alpha-spending и always-valid p-values (mSPRT), delta-method для ratio-метрик. В кейсе Volta — ship-gate из 3 условий и +6.24pp KYC-конверсии (p<0.0001).",
+      links: [
+        { label: "A/B Toolkit", href: "projects/ab/" },
+        { label: "Volta", href: "projects/volta/" },
+      ],
+    },
+    en: {
+      question: "What about A/B testing?",
+      answer:
+        "A full toolkit: CUPED (SE reduction), AA-tests on Type I error, multiple-comparison correction (Bonferroni/BH), alpha-spending and always-valid p-values (mSPRT), delta-method for ratio metrics. In the Volta case — a 3-condition ship-gate and +6.24pp KYC conversion (p<0.0001).",
+      links: [
+        { label: "A/B Toolkit", href: "en/projects/ab/" },
+        { label: "Volta", href: "en/projects/volta/" },
+      ],
+    },
+  },
+  {
+    id: "retention",
+    keywords: ["retention", "когорт", "cohort", "удержание", "ltv", "arpu", "отток", "churn"],
+    ru: {
+      question: "Расскажи про retention-анализ.",
+      answer:
+        "Когортная матрица с треугольным затуханием, ARPU/LTV по когортам с честным caveat по возрасту наблюдения, кривые оттока. В Volta — +9.2pp M3-retention и +€227K/yr инкрементального LTV.",
+      links: [{ label: "Cohort Dashboard", href: "projects/cohort/" }],
+    },
+    en: {
+      question: "Tell me about retention analysis.",
+      answer:
+        "Cohort retention matrix with triangular decay, ARPU/LTV by cohort with an honest observation-age caveat, churn curves. In Volta — +9.2pp M3 retention and +€227K/yr incremental LTV.",
+      links: [{ label: "Cohort Dashboard", href: "en/projects/cohort/" }],
+    },
+  },
+  {
+    id: "segmentation",
+    keywords: ["сегмент", "segmentation", "rfm", "клиент", "сегментация"],
+    ru: {
+      question: "Что с сегментацией клиентов?",
+      answer:
+        "RFM-анализ банковских клиентов: Recency / Frequency / Monetary, 4 сегмента с per-segment стратегией монетизации. В Volta — миграция сегментов до +€310K/yr; в RFM-кейсе — 12% → 41% выручки от целевых сегментов.",
+      links: [{ label: "RFM", href: "projects/rfm/" }],
+    },
+    en: {
+      question: "What about customer segmentation?",
+      answer:
+        "RFM analysis of bank clients: Recency / Frequency / Monetary, 4 segments with a per-segment monetization strategy. In Volta — segment migration up to +€310K/yr; in the RFM case — 12% → 41% of revenue from target segments.",
+      links: [{ label: "RFM", href: "en/projects/rfm/" }],
+    },
+  },
+  {
+    id: "sql",
+    keywords: ["sql", "duckdb", "запрос", "query", "база", "database", "кейс", "case"],
+    ru: {
+      question: "Насколько силён твой SQL?",
+      answer:
+        "10 end-to-end SQL-кейсов на синтетическом датасете (~183k событий, 20k signups), запускаются на DuckDB одной командой: funnel, N-day retention, stickiness, gaps-and-islands, A/B-конверсия, revenue attribution. Regression-тесты защищают каждый кейс.",
+      links: [{ label: "SQL Case Study", href: "projects/sql/" }],
+    },
+    en: {
+      question: "How strong is your SQL?",
+      answer:
+        "10 end-to-end SQL cases on a synthetic dataset (~183k events, 20k signups), runnable on DuckDB with one command: funnel, N-day retention, stickiness, gaps-and-islands, A/B conversion, revenue attribution. Regression tests guard every case.",
+      links: [{ label: "SQL Case Study", href: "en/projects/sql/" }],
+    },
+  },
+  {
+    id: "automation",
+    keywords: ["бот", "bot", "telegram", "автоматизац", "automation", "отчёт", "report", "cron", "пайплайн", "pipeline"],
+    ru: {
+      question: "Что с автоматизацией отчётности?",
+      answer:
+        "Telegram-бот, который собирает еженедельный отчёт: cron-планировщик, SQL-запросы к витрине, KPI-таблица со sparklines, дельта к прошлой неделе. Ручная сборка 1–2ч → 0, с fallback-уведомлениями при сбоях источников.",
+      links: [{ label: "Telegram Bot", href: "projects/bot/" }],
+    },
+    en: {
+      question: "What about reporting automation?",
+      answer:
+        "A Telegram bot that assembles the weekly report: cron scheduler, SQL queries to the mart, KPI table with sparklines, delta vs last week. Manual assembly 1–2h → 0, with fallback notifications on source failures.",
+      links: [{ label: "Telegram Bot", href: "en/projects/bot/" }],
+    },
+  },
+  {
+    id: "volta",
+    keywords: ["volta", "необанк", "neobank", "главный", "featured", "kyc", "флагман"],
+    ru: {
+      question: "Что за проект Volta?",
+      answer:
+        "End-to-end аналитика необанка: funnel, A/B-тест, retention и сегментация одной петлёй на синтетических fintech-данных. Ключевой результат — +6.24pp KYC-конверсии (Z=6.35, p<0.0001), €716K/yr (48× ROI), с CUPED, AA-тестом и Bonferroni.",
+      links: [{ label: "Volta", href: "projects/volta/" }],
+    },
+    en: {
+      question: "What is the Volta project?",
+      answer:
+        "End-to-end neobank analytics: funnel, A/B test, retention and segmentation in one loop on synthetic fintech data. Key result — +6.24pp KYC conversion (Z=6.35, p<0.0001), €716K/yr (48× ROI), with CUPED, AA-test and Bonferroni.",
+      links: [{ label: "Volta", href: "en/projects/volta/" }],
+    },
+  },
+  {
+    id: "contact",
+    keywords: ["контакт", "contact", "связаться", "telegram", "github", "linkedin", "почта", "email", "написать", "reach"],
+    ru: {
+      question: "Как с тобой связаться?",
+      answer:
+        "Быстрее всего — Telegram @lofinibo. Также GitHub, LinkedIn и страница контактов. Резюме (PDF) лежит на странице CV.",
+      links: [
+        { label: "Контакты", href: "contact/" },
+        { label: "CV", href: "cv/" },
+      ],
+    },
+    en: {
+      question: "How can I reach you?",
+      answer:
+        "Fastest — Telegram @lofinibo. Also GitHub, LinkedIn and the contact page. The CV (PDF) is on the CV page.",
+      links: [
+        { label: "Contact", href: "en/contact/" },
+        { label: "CV", href: "cv/" },
+      ],
+    },
+  },
+  {
+    id: "portfolio",
+    keywords: ["портфолио", "portfolio", "навигац", "navigate", "start", "начать", "структура", "устроено", "как читать"],
+    ru: {
+      question: "Как устроено портфолио?",
+      answer:
+        "Начни со страницы «С чего начать» — там маршрут. Проекты сгруппированы по трекам (эксперименты / аналитика / продукт / инженерия), есть статьи, граф знаний и аркада мини-игр. Поиск открывается клавишей «/».",
+      links: [
+        { label: "С чего начать", href: "start/" },
+        { label: "Проекты", href: "projects/" },
+      ],
+    },
+    en: {
+      question: "How is the portfolio organized?",
+      answer:
+        "Start with the «Start here» page — it has the route. Projects are grouped by track (experiments / analytics / product / engineering), plus writing, a knowledge graph and a mini-game arcade. Search opens with «/».",
+      links: [
+        { label: "Start here", href: "en/start/" },
+        { label: "Projects", href: "en/projects/" },
+      ],
+    },
+  },
+  {
+    id: "interview",
+    keywords: ["интервью", "interview", "подготовка", "prep", "middle", "bi", "собеседование"],
+    ru: {
+      question: "Чем занимаешься сейчас?",
+      answer:
+        "Готовлюсь к BI / Data Analyst и Product Analyst middle-интервью: SQL, pandas, алгоритмы, мок-собеседования. Параллельно развиваю Obsidian knowledge base по product-аналитике и экспериментирую с AI-assisted аналитикой на Claude Code + MCP.",
+    },
+    en: {
+      question: "What are you working on now?",
+      answer:
+        "Preparing for BI / Data Analyst and Product Analyst middle interviews: SQL, pandas, algorithms, mock interviews. In parallel, maintaining an Obsidian knowledge base on product analytics and experimenting with AI-assisted analytics on Claude Code + MCP.",
+    },
+  },
+  {
+    id: "ai",
+    keywords: ["ai", "claude", "mcp", "llm", "искусственный", "интеллект", "автоматизац", "агент", "agent"],
+    ru: {
+      question: "Используешь AI в работе?",
+      answer:
+        "Да — экспериментирую с AI-assisted аналитическими workflow на Claude Code + MCP: автоматизация vault-операций, генерация кода, оркестрация агентов. Считаю, что аналитик будущего — это человек + агенты.",
+    },
+    en: {
+      question: "Do you use AI in your work?",
+      answer:
+        "Yes — experimenting with AI-assisted analytics workflows on Claude Code + MCP: vault automation, code generation, agent orchestration. I believe the analyst of the future is a human + agents.",
+    },
+  },
+  {
+    id: "games",
+    keywords: ["игра", "game", "аркада", "arcade", "snake", "pong", "2048", "развлечение", "fun"],
+    ru: {
+      question: "Что за игры на сайте?",
+      answer:
+        "Мини-игры в браузере — и про аналитику тоже: A/B Test (догони p < 0.05), Funnel Drop (лови пользователей в воронке), плюс классические Snake / 2048 / Pong. Работают на телефоне.",
+      links: [{ label: "Аркада", href: "games/" }],
+    },
+    en: {
+      question: "What are the games on the site?",
+      answer:
+        "Browser mini-games — including analytics ones: A/B Test (chase p < 0.05), Funnel Drop (catch users through the funnel), plus classic Snake / 2048 / Pong. They work on mobile too.",
+      links: [{ label: "Arcade", href: "games/" }],
+    },
+  },
+  {
+    id: "graph",
+    keywords: ["граф", "graph", "знания", "knowledge", "карта", "домен", "domain"],
+    ru: {
+      question: "Что такое граф знаний?",
+      answer:
+        "Интерактивная карта домена product-аналитики: темы, проекты и статьи как узлы графа. Показывает, как связаны SQL, A/B-тесты, retention и сегментация — и где в этой карте я.",
+      links: [{ label: "Граф", href: "graph/" }],
+    },
+    en: {
+      question: "What is the knowledge graph?",
+      answer:
+        "An interactive map of the product-analytics domain: topics, projects and posts as graph nodes. It shows how SQL, A/B testing, retention and segmentation connect — and where I sit in that map.",
+      links: [{ label: "Graph", href: "en/graph/" }],
+    },
+  },
+  {
+    id: "cv",
+    keywords: ["резюме", "cv", "resume", "pdf", "скачать"],
+    ru: {
+      question: "Где резюме?",
+      answer:
+        "Полное резюме — на странице CV, одностраничный PDF — по прямой ссылке. Оба синхронизированы с источником истины в rendercv.",
+      links: [
+        { label: "CV", href: "cv/" },
+        { label: "PDF", href: "CV-Nikita-Boyarkin.pdf" },
+      ],
+    },
+    en: {
+      question: "Where is the CV?",
+      answer:
+        "The full CV is on the CV page, the one-page PDF is a direct link. Both are synced with the rendercv source of truth.",
+      links: [
+        { label: "CV", href: "cv/" },
+        { label: "PDF", href: "CV-Nikita-Boyarkin.pdf" },
+      ],
+    },
+  },
+];
+
+/** Normalize a query for matching: lowercase, strip punctuation, collapse spaces. */
+export function normalizeQuery(q: string): string {
+  return q
+    .toLowerCase()
+    .replace(/[^a-zа-яё0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Score a pair against query tokens. Returns -1 if NO token matches any
+ * keyword (stop words like «как», «с», «тобой» are simply ignored); otherwise
+ * the sum of per-token overlap scores (2 for a full keyword match, 1 for a
+ * substring match).
+ */
+export function scorePair(pair: QAPair, tokens: string[]): number {
+  let total = 0;
+  for (const tk of tokens) {
+    let best = 0;
+    for (const kw of pair.keywords) {
+      if (kw === tk) {
+        best = Math.max(best, 2);
+      } else if (kw.includes(tk) || tk.includes(kw)) {
+        best = Math.max(best, 1);
+      }
+    }
+    total += best;
+  }
+  return total === 0 ? -1 : total;
+}
+
+/** Best matching pair for a query, or null if nothing scores ≥ 1. */
+export function bestMatch(q: string): QAPair | null {
+  const tokens = normalizeQuery(q).split(" ").filter(Boolean);
+  if (!tokens.length) return null;
+  let best: QAPair | null = null;
+  let bestScore = 0;
+  for (const pair of QA_CORPUS) {
+    const s = scorePair(pair, tokens);
+    if (s > bestScore) {
+      best = pair;
+      bestScore = s;
+    }
+  }
+  return bestScore >= 1 ? best : null;
+}

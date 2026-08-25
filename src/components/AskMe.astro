@@ -1,0 +1,494 @@
+---
+// "Ask me" widget — a static, client-side Q&A assistant (no API, no cost,
+// works on GitHub Pages). Same island pattern as SearchBox: bundled
+// type-checked script, i18n + corpus stamped server-side via data attributes.
+// The corpus lives in src/lib/qa-corpus.ts (pure data, unit-tested); hrefs are
+// wrapped with withBase here so the corpus stays base-agnostic.
+import { withBase } from "../lib/path";
+import { QA_CORPUS } from "../lib/qa-corpus";
+import MorphIcon from "morphicons/astro";
+
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+// Only the current locale's pairs are shipped to the client (halves the payload).
+const pairs = QA_CORPUS.map((p) => ({
+  id: p.id,
+  keywords: p.keywords,
+  question: isEn ? p.en.question : p.ru.question,
+  answer: isEn ? p.en.answer : p.ru.answer,
+  links: (isEn ? p.en.links : p.ru.links)?.map((l) => ({
+    label: l.label,
+    href: withBase(l.href),
+  })) ?? [],
+}));
+
+// Questions shown as one-tap suggestions when the panel opens.
+const SUGGEST_IDS = ["who", "ab-testing", "sql", "volta", "contact"];
+
+const i18n = {
+  title: isEn ? "Ask me" : "Спроси меня",
+  subtitle: isEn
+    ? "Answers about my skills, projects and experience."
+    : "Отвечаю о навыках, проектах и опыте.",
+  placeholder: isEn ? "e.g. A/B testing, SQL, contact…" : "напр. A/B-тесты, SQL, контакты…",
+  hint: isEn ? "Type a question and press Enter" : "Введите вопрос и нажмите Enter",
+  suggestionsLabel: isEn ? "Try:" : "Попробуйте:",
+  fallbackTitle: isEn ? "No exact match" : "Точного совпадения нет",
+  fallbackText: isEn
+    ? "Try one of the topics below, or write to me directly."
+    : "Попробуйте одну из тем ниже или напишите мне напрямую.",
+  openLabel: isEn ? "Open ask-me panel" : "Открыть панель «Спроси меня»",
+  closeLabel: isEn ? "Close" : "Закрыть",
+  answerLabel: isEn ? "Answer" : "Ответ",
+};
+
+// Chat-bubble ↔ close icons (stroke, 24×24), raw `d` strings for MorphIcon.
+const CHAT_D = "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z";
+const X_D = "M6 6l12 12M6 18L18 6";
+---
+
+<div
+  class="askme"
+  data-corpus={JSON.stringify(pairs)}
+  data-suggest={JSON.stringify(SUGGEST_IDS)}
+  data-i18n={JSON.stringify(i18n)}
+  data-icon-chat={CHAT_D}
+  data-icon-close={X_D}
+>
+  <button
+    id="askme-toggle"
+    class="askme-toggle"
+    data-analytics="ask_me_open"
+    type="button"
+    aria-label={i18n.openLabel}
+    aria-expanded="false"
+    aria-controls="askme-panel"
+  >
+    <MorphIcon id="askme-icon" icon={CHAT_D} spring="snappy" reducedMotion="user" size={20} />
+  </button>
+
+  <div id="askme-panel" class="askme-panel" role="dialog" aria-modal="true" aria-labelledby="askme-title" hidden>
+    <div class="askme-head">
+      <h3 id="askme-title" class="askme-title">{i18n.title}</h3>
+      <p class="askme-subtitle">{i18n.subtitle}</p>
+    </div>
+    <input
+      id="askme-input"
+      class="askme-input"
+      type="text"
+      placeholder={i18n.placeholder}
+      autocomplete="off"
+      aria-label={i18n.placeholder}
+    />
+    <p class="askme-hint">{i18n.hint}</p>
+    <div id="askme-suggestions" class="askme-suggestions" aria-label={i18n.suggestionsLabel}></div>
+    <div id="askme-answer" class="askme-answer" aria-live="polite" aria-label={i18n.answerLabel}></div>
+  </div>
+</div>
+
+<script>
+  import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
+
+  defineMorphIcon();
+  let askIcon: MorphIconElement | null = null;
+  async function morphIcon(to: string) {
+    if (!askIcon) {
+      await customElements.whenDefined("morph-icon");
+      askIcon = document.getElementById("askme-icon") as MorphIconElement | null;
+      if (!askIcon) return;
+    }
+    askIcon.morphTo(to);
+  }
+
+  // Wrap in init() — ES module top-level `return` is illegal.
+  function init() {
+    const root = document.querySelector<HTMLElement>(".askme");
+    if (!root) return;
+    const chatD = root.dataset.iconChat!;
+    const closeD = root.dataset.iconClose!;
+    const suggestIds: string[] = JSON.parse(root.dataset.suggest || "[]");
+
+    type Pair = {
+      id: string;
+      keywords: string[];
+      question: string;
+      answer: string;
+      links: { label: string; href: string }[];
+    };
+    const corpus: Pair[] = JSON.parse(root.dataset.corpus || "[]");
+    type I18n = {
+      title: string;
+      subtitle: string;
+      placeholder: string;
+      hint: string;
+      suggestionsLabel: string;
+      fallbackTitle: string;
+      fallbackText: string;
+      openLabel: string;
+      closeLabel: string;
+      answerLabel: string;
+    };
+    const t: I18n = JSON.parse(root.dataset.i18n || "{}");
+
+    const toggleEl = document.getElementById("askme-toggle");
+    const panelEl = document.getElementById("askme-panel");
+    const inputEl = document.getElementById("askme-input") as HTMLInputElement | null;
+    const suggestionsElEl = document.getElementById("askme-suggestions");
+    const answerElEl = document.getElementById("askme-answer");
+    if (!toggleEl || !panelEl || !inputEl || !suggestionsElEl || !answerElEl) return;
+    // Reassign to const so TS keeps the non-null narrowing inside closures.
+    const toggle = toggleEl;
+    const panel = panelEl;
+    const input = inputEl;
+    const suggestionsEl = suggestionsElEl;
+    const answerEl = answerElEl;
+
+    const locale = document.documentElement.lang === "en" ? "en" : "ru";
+    let lastQuestion = "";
+
+    // PostHog is only present when PUBLIC_POSTHOG_KEY is set at build time.
+    function track(question: string, matched: boolean) {
+      const ph = (window as { posthog?: { capture: (n: string, p: Record<string, unknown>) => void } }).posthog;
+      if (ph?.capture) {
+        ph.capture("ask_me_used", { question, answer_matched: matched, locale });
+      }
+    }
+
+    function normalize(s: string): string {
+      return s.toLowerCase().replace(/[^a-zа-яё0-9\s]/g, " ").replace(/\s+/g, " ").trim();
+    }
+
+    // Same scoring as src/lib/qa-corpus.ts (kept in sync by tests).
+    function score(pair: Pair, tokens: string[]): number {
+      let total = 0;
+      for (const tk of tokens) {
+        let best = 0;
+        for (const kw of pair.keywords) {
+          if (kw === tk) best = Math.max(best, 2);
+          else if (kw.includes(tk) || tk.includes(kw)) best = Math.max(best, 1);
+        }
+        total += best;
+      }
+      return total === 0 ? -1 : total;
+    }
+
+    function bestMatch(q: string): Pair | null {
+      const tokens = normalize(q).split(" ").filter(Boolean);
+      if (!tokens.length) return null;
+      let best: Pair | null = null;
+      let bestScore = 0;
+      for (const pair of corpus) {
+        const s = score(pair, tokens);
+        if (s > bestScore) {
+          best = pair;
+          bestScore = s;
+        }
+      }
+      return bestScore >= 1 ? best : null;
+    }
+
+    function renderSuggestions(ids: string[]) {
+      suggestionsEl.innerHTML = "";
+      const cap = document.createElement("span");
+      cap.className = "askme-suggestions-label";
+      cap.textContent = t.suggestionsLabel;
+      suggestionsEl.appendChild(cap);
+      for (const id of ids) {
+        const pair = corpus.find((p) => p.id === id);
+        if (!pair) continue;
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "askme-chip";
+        b.textContent = pair.question;
+        b.addEventListener("click", () => {
+          input.value = pair.question;
+          ask(pair.question);
+          input.focus();
+        });
+        suggestionsEl.appendChild(b);
+      }
+    }
+
+    function renderAnswer(pair: Pair) {
+      answerEl.innerHTML = "";
+      const q = document.createElement("p");
+      q.className = "askme-answer-q";
+      q.textContent = pair.question;
+      const a = document.createElement("p");
+      a.className = "askme-answer-text";
+      a.textContent = pair.answer;
+      answerEl.appendChild(q);
+      answerEl.appendChild(a);
+      if (pair.links.length) {
+        const wrap = document.createElement("div");
+        wrap.className = "askme-answer-links";
+        pair.links.forEach((l) => {
+          const link = document.createElement("a");
+          link.href = l.href;
+          link.className = "askme-answer-link";
+          link.textContent = l.label + " →";
+          wrap.appendChild(link);
+        });
+        answerEl.appendChild(wrap);
+      }
+    }
+
+    function renderFallback() {
+      answerEl.innerHTML = "";
+      const h = document.createElement("p");
+      h.className = "askme-fallback-title";
+      h.textContent = t.fallbackTitle;
+      const p = document.createElement("p");
+      p.className = "askme-fallback-text";
+      p.textContent = t.fallbackText;
+      answerEl.appendChild(h);
+      answerEl.appendChild(p);
+      renderSuggestions(suggestIds);
+    }
+
+    function ask(question: string) {
+      const pair = bestMatch(question);
+      if (pair) {
+        renderAnswer(pair);
+        track(question, true);
+      } else {
+        renderFallback();
+        track(question, false);
+      }
+      lastQuestion = question;
+    }
+
+    function open() {
+      panel.hidden = false;
+      toggle.setAttribute("aria-expanded", "true");
+      input.focus();
+      morphIcon(closeD);
+      if (!lastQuestion) renderSuggestions(suggestIds);
+    }
+
+    function close() {
+      panel.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.focus();
+      morphIcon(chatD);
+    }
+
+    toggle.addEventListener("click", () => {
+      panel.hidden ? open() : close();
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        ask(input.value);
+      } else if (e.key === "Escape") {
+        close();
+      }
+    });
+
+    // Minimal focus trap: keep Tab cycling within the panel.
+    panel.addEventListener("keydown", (e) => {
+      if (e.key !== "Tab") return;
+      const focusables = panel.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled])',
+      );
+      if (!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!root.contains(e.target as Node)) close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !panel.hidden) close();
+    });
+  }
+
+  init();
+</script>
+
+<style>
+  .askme-toggle {
+    position: fixed;
+    right: var(--space-6);
+    bottom: var(--space-6);
+    z-index: 60;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background: var(--background-secondary);
+    color: var(--text-accent);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px var(--shadow-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .askme-toggle:hover {
+    transform: translateY(-2px);
+    border-color: var(--text-accent);
+    box-shadow: 0 12px 32px rgb(0 0 0 / 0.24);
+  }
+  .askme-toggle:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+  }
+
+  .askme-panel {
+    position: fixed;
+    right: var(--space-6);
+    bottom: calc(var(--space-6) + 4.25rem);
+    z-index: 60;
+    width: min(24rem, calc(100vw - 2 * var(--space-4)));
+    max-height: min(70vh, 32rem);
+    overflow-y: auto;
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 48px var(--shadow-color);
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .askme-panel[hidden] {
+    display: none;
+  }
+
+  .askme-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-normal);
+  }
+  .askme-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .askme-input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--background-tertiary);
+    color: var(--text-normal);
+    font-size: 0.95rem;
+  }
+  .askme-input:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 1px;
+  }
+
+  .askme-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+  }
+
+  .askme-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    align-items: center;
+  }
+  .askme-suggestions-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+  .askme-chip {
+    border: 1px solid var(--border-color);
+    background: var(--background-tertiary);
+    color: var(--text-normal);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-3);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+  .askme-chip:hover {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+  }
+  .askme-chip:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 1px;
+  }
+
+  .askme-answer {
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--space-3);
+  }
+  .askme-answer-q {
+    margin: 0 0 var(--space-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    font-family: var(--font-mono);
+  }
+  .askme-answer-text {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.6;
+    color: var(--text-normal);
+  }
+  .askme-answer-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+  }
+  .askme-answer-link {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: var(--space-1) var(--space-3);
+    transition: border-color 0.2s ease;
+  }
+  .askme-answer-link:hover {
+    border-color: var(--text-accent);
+  }
+
+  .askme-fallback-title {
+    margin: 0 0 var(--space-1);
+    font-weight: 700;
+    color: var(--text-normal);
+  }
+  .askme-fallback-text {
+    margin: 0 0 var(--space-3);
+    font-size: 0.88rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .askme-toggle {
+      right: var(--space-4);
+      bottom: var(--space-4);
+    }
+    .askme-panel {
+      right: var(--space-4);
+      bottom: calc(var(--space-4) + 4rem);
+    }
+  }
+</style>

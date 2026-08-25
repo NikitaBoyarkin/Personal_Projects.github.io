@@ -166,6 +166,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       input.value = "";
       resultsEl.innerHTML = "";
       input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
       activeIndex = -1;
       setFacet("all");
       // Return focus to the trigger so keyboard users aren't dropped to <body>.
@@ -194,22 +195,30 @@ const X_D = "M6 6l12 12M6 18L18 6";
     }
 
     function score(entry: Entry, tokens: string[]): number {
-      const hay = (
-        entry.title +
-        " " +
-        entry.desc +
-        " " +
-        (entry.tags ?? []).join(" ") +
-        " " +
-        (entry.tools ?? []).join(" ")
-      ).toLowerCase();
+      const title = entry.title.toLowerCase();
+      const desc = entry.desc.toLowerCase();
+      const tags = (entry.tags ?? []).map((t) => t.toLowerCase());
+      const tools = (entry.tools ?? []).map((t) => t.toLowerCase());
+      const words = [title, desc, ...tags, ...tools].join(" ").split(/\s+/);
       let s = 0;
       for (const tk of tokens) {
-        if (!hay.includes(tk)) return -1;
-        s += entry.title.toLowerCase().includes(tk) ? 3 : 0;
-        s += (entry.tags ?? []).some((tag) => tag.toLowerCase() === tk) ? 2 : 0;
+        const inTitle = title.includes(tk);
+        const inDesc = desc.includes(tk);
+        const tagHit = tags.some((t) => t === tk);
+        const toolHit = tools.some((t) => t === tk);
+        // Fuzzy prefix: "ret" matches "retention" (word-boundary aware, so
+        // Cyrillic works too — \b is ASCII-only in JS).
+        const prefixHit = words.some((w) => w.startsWith(tk));
+        if (!inTitle && !inDesc && !tagHit && !toolHit && !prefixHit) return -1;
+        s += inTitle ? 3 : 0;
+        s += tagHit ? 2 : 0;
+        s += toolHit ? 2 : 0;
+        s += prefixHit ? 1 : 0;
         s += 1;
       }
+      // Locale boost: current-locale entries rank above cross-locale matches
+      // instead of being hard-filtered out (see runSearch).
+      if (entry.locale === lang) s += 5;
       return s;
     }
 
@@ -247,6 +256,8 @@ const X_D = "M6 6l12 12M6 18L18 6";
         const li = document.createElement("li");
         li.className = "search-result";
         li.setAttribute("role", "option");
+        li.id = "search-result-" + i;
+        li.setAttribute("aria-selected", "false");
         li.dataset.idx = String(i);
 
         const a = document.createElement("a");
@@ -275,6 +286,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
         resultsEl.appendChild(li);
       });
       activeIndex = -1;
+      input.removeAttribute("aria-activedescendant");
     }
 
     let debounce: ReturnType<typeof setTimeout> | undefined;
@@ -297,8 +309,10 @@ const X_D = "M6 6l12 12M6 18L18 6";
           .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
           .slice(0, 8);
       } else {
+        // No hard locale filter — score() boosts the current locale so
+        // cross-locale results still surface when they match better.
         rows = idx
-          .filter((e) => e.locale === lang && (facet === "all" || e.type === facet))
+          .filter((e) => facet === "all" || e.type === facet)
           .map((e) => ({ e, s: score(e, tokens) }))
           .filter((x) => x.s >= 0)
           .sort((a, b) => b.s - a.s)
@@ -325,7 +339,13 @@ const X_D = "M6 6l12 12M6 18L18 6";
       const items = resultsEl.querySelectorAll<HTMLElement>(".search-result");
       if (!items.length) return;
       activeIndex = (activeIndex + delta + items.length) % items.length;
-      items.forEach((it, i) => it.classList.toggle("active", i === activeIndex));
+      items.forEach((it, i) => {
+        const isActive = i === activeIndex;
+        it.classList.toggle("active", isActive);
+        it.setAttribute("aria-selected", String(isActive));
+      });
+      // Announce the active option to screen readers via the combobox.
+      input.setAttribute("aria-activedescendant", items[activeIndex].id);
       items[activeIndex].scrollIntoView({ block: "nearest" });
     }
 

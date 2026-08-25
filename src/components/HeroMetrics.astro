@@ -1,0 +1,142 @@
+---
+// Animated "live metrics" strip under the hero tagline. Numbers match the
+// HomeBoard metrics but count up once when scrolled into view. Respects
+// prefers-reduced-motion (renders final values, no animation). Bundled
+// type-checked script — same island pattern as SearchBox.
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+type Metric = {
+  value: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  label: string;
+};
+
+const METRICS: Metric[] = [
+  { value: 14, label: isEn ? "projects in portfolio" : "проектов в портфолио" },
+  { value: 10, label: isEn ? "SQL cases on DuckDB" : "SQL-кейсов на DuckDB" },
+  { value: 6.24, decimals: 2, prefix: "+", suffix: "pp", label: isEn ? "KYC conversion" : "KYC-конверсия" },
+  { value: 716, prefix: "€", suffix: "K/yr", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
+];
+---
+
+<div class="hero-metrics" aria-label={isEn ? "Key metrics" : "Ключевые метрики"}>
+  {
+    METRICS.map((m) => (
+      <div class="hero-metric">
+        <span
+          class="hero-metric-value"
+          data-value={m.value}
+          data-decimals={m.decimals ?? 0}
+          data-prefix={m.prefix ?? ""}
+          data-suffix={m.suffix ?? ""}
+        >
+          {m.prefix ?? ""}0{m.suffix ?? ""}
+        </span>
+        <span class="hero-metric-label">{m.label}</span>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  function init() {
+    const strip = document.querySelector<HTMLElement>(".hero-metrics");
+    if (!strip) return;
+    const cells = Array.from(strip.querySelectorAll<HTMLElement>(".hero-metric-value"));
+    if (!cells.length) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function format(v: number, decimals: number): string {
+      return decimals > 0 ? v.toFixed(decimals) : String(Math.round(v));
+    }
+
+    function setFinal(cell: HTMLElement) {
+      const value = Number(cell.dataset.value || 0);
+      const decimals = Number(cell.dataset.decimals || 0);
+      cell.textContent = `${cell.dataset.prefix ?? ""}${format(value, decimals)}${cell.dataset.suffix ?? ""}`;
+    }
+
+    function countUp(cell: HTMLElement) {
+      const value = Number(cell.dataset.value || 0);
+      const decimals = Number(cell.dataset.decimals || 0);
+      const prefix = cell.dataset.prefix ?? "";
+      const suffix = cell.dataset.suffix ?? "";
+      const duration = 1200;
+      const start = performance.now();
+
+      function frame(now: number) {
+        const t = Math.min(1, (now - start) / duration);
+        // easeOutCubic
+        const eased = 1 - Math.pow(1 - t, 3);
+        cell.textContent = `${prefix}${format(value * eased, decimals)}${suffix}`;
+        if (t < 1) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    if (reduceMotion) {
+      cells.forEach(setFinal);
+      return;
+    }
+
+    let started = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (started) return;
+        if (entries.some((e) => e.isIntersecting)) {
+          started = true;
+          cells.forEach(countUp);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(strip);
+  }
+
+  init();
+</script>
+
+<style>
+  .hero-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+  .hero-metric {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .hero-metric-value {
+    font-family: var(--font-mono);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .hero-metric-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    max-width: 12ch;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 640px) {
+    .hero-metrics {
+      gap: var(--space-4);
+    }
+    .hero-metric-value {
+      font-size: 1.3rem;
+    }
+  }
+</style>

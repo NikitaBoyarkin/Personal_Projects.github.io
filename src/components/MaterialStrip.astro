@@ -31,6 +31,8 @@ const projects = await getCollection(projectCollection, (p) => !p.data.draft);
 const volta = projects.find((p) => p.id.replace(/\.md$/, "") === "volta");
 
 const slugOf = (id: string) => id.replace(/\.md$/, "");
+// WebP sibling for lazy previews (PNG stays for OG meta tags).
+const webpOf = (src: string) => src.replace(/\.png$/, ".webp");
 ---
 
 <section id="materials" class="reveal reveal-delay-1" aria-label={heading}>
@@ -60,13 +62,16 @@ const slugOf = (id: string) => id.replace(/\.md$/, "");
       posts.map((post) => (
         <a class="strip-card" href={withBase(`${postLinkPrefix}posts/${slugOf(post.id)}/`)}>
           {post.data.image && (
-            <img
-              src={withBase(post.data.image)}
-              alt={post.data.title}
-              width="600"
-              height="200"
-              loading="lazy"
-            />
+            <picture>
+              <source type="image/webp" srcset={withBase(webpOf(post.data.image))} />
+              <img
+                src={withBase(post.data.image)}
+                alt={post.data.title}
+                width="600"
+                height="200"
+                loading="lazy"
+              />
+            </picture>
           )}
           <div class="strip-card-body">
             <span class="strip-badge strip-badge-post">

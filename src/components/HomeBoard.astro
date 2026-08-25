@@ -17,7 +17,6 @@ const allProjects = await getCollection(projectCollection, (p) => !p.data.draft)
 const t = {
   profile: isEn ? 'Profile' : 'Профиль',
   about: isEn ? 'About me' : 'Обо мне',
-  skillsLabel: isEn ? 'Skills' : 'Навыки',
   metricsLabel: isEn ? 'Metrics' : 'Метрики',
   contact: isEn ? 'Contact' : 'Контакты',
   projects: isEn ? 'Projects' : 'Проекты',
@@ -52,7 +51,6 @@ const t = {
     { value: '+6.24pp', label: isEn ? 'KYC conversion' : 'KYC-конверсия' },
     { value: '€716K/yr', label: isEn ? 'annual fix impact' : 'годовой эффект фикса' },
   ],
-  skills: ['SQL', 'Python', 'A/B Testing', 'Retention', 'Segmentation', 'Tableau', 'DuckDB'],
   timeline: isEn ? 'Path & timeline' : 'Путь и таймлайн',
   arcade: isEn ? 'Games arcade' : 'Аркада игр',
   graph: isEn ? 'Knowledge graph' : 'Граф знаний',
@@ -100,13 +98,6 @@ const contactHref = withBase('contact/');
           <p class="board-card-text board-card-experience">{t.experience}</p>
           <p class="board-card-open-to">{t.openTo}</p>
           <a class="board-card-link" href={withBase(isEn ? 'en/about/' : 'about/')}>{t.more}</a>
-        </div>
-
-        <div class="board-card">
-          <h3 class="board-card-title">{t.skillsLabel}</h3>
-          <div class="board-chips">
-            {t.skills.map((s) => <span class="board-chip">{s}</span>)}
-          </div>
         </div>
 
         <div class="board-card">

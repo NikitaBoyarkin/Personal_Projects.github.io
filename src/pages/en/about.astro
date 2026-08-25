@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import AskMe from '../../components/AskMe.astro';
 import { withBase } from '../../lib/path';
 
 const jsonLd = {
@@ -66,4 +67,7 @@ const jsonLd = {
       <a href={withBase('contact/')}>Contact</a>
     </p>
   </section>
+
+  <!-- AI assistant "Ask me" (static, client-side) -->
+  <AskMe lang="en" />
 </Base>

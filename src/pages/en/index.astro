@@ -6,6 +6,9 @@ import Manifesto from '../../components/Manifesto.astro';
 import ProjectTimeline from '../../components/ProjectTimeline.astro';
 import CollaborationFormats from '../../components/CollaborationFormats.astro';
 import MaterialStrip from '../../components/MaterialStrip.astro';
+import AskMe from '../../components/AskMe.astro';
+import CapabilitiesGrid from '../../components/CapabilitiesGrid.astro';
+import HeroMetrics from '../../components/HeroMetrics.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
 
@@ -59,6 +62,8 @@ const jsonLd = {
         <p class="tagline">Data → decisions. From hypothesis to ship-gate.</p>
         <div class="subtitle">Data Analyst / Product Analyst</div>
 
+        <HeroMetrics lang="en" />
+
         <p class="cta-row">
           <a class="button" href={withBase('en/start/')}>Start here</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
@@ -74,6 +79,12 @@ const jsonLd = {
 
   <!-- KANBAN BOARD: Profile | Projects | Now -->
   <HomeBoard lang="en" />
+
+  <!-- AI assistant "Ask me" (static, client-side) -->
+  <AskMe lang="en" />
+
+  <!-- Capabilities grid: deliverables + measured results -->
+  <CapabilitiesGrid lang="en" />
 
   <Manifesto lang="en" />
 
