@@ -148,11 +148,34 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
 
     nodes = data.nodes.map((n: any) => ({
       ...n,
-      x: world.w * (0.2 + 0.6 * Math.random()),
-      y: world.h * (0.2 + 0.6 * Math.random()),
+      x: 0,
+      y: 0,
       vx: 0,
       vy: 0,
     }));
+    // Initial positions: ring per group around the center (same idea as the
+    // reduced-motion radial layout below). The force simulation then only has
+    // to refine a near-converged layout instead of pulling a random scatter
+    // together — which is what made it run ~15s and visibly shake.
+    const groups: Record<string, any[]> = {};
+    nodes.forEach((n) => {
+      (groups[n.group] = groups[n.group] || []).push(n);
+    });
+    const groupKeys = Object.keys(groups);
+    const cx = world.w / 2;
+    const cy = world.h / 2;
+    const ringRadius = Math.min(world.w, world.h) * 0.35;
+    groupKeys.forEach((gk, gi) => {
+      const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
+      const gx = cx + Math.cos(ga) * ringRadius;
+      const gy = cy + Math.sin(ga) * ringRadius;
+      groups[gk].forEach((n, ni) => {
+        const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
+        const r = 30 + ni * 10;
+        n.x = gx + Math.cos(a) * r;
+        n.y = gy + Math.sin(a) * r;
+      });
+    });
     const idx = new Map(nodes.map((n) => [n.id, n]));
     links = data.links
       .map((l: any) => ({
@@ -286,8 +309,14 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     const charge = 2200 * Math.sqrt(N);          // repulsion grows with N
     const gravity = 0.004 + 0.001 * Math.sqrt(N); // pull-to-center grows mildly
     const damp = 0.86;
-    const maxFrames = Math.max(700, N * 25);      // more nodes → more ticks to settle
     const margin = Math.min(80, 60 + N * 0.5);
+    // Alpha-based settling (d3-force style): every force scales with `alpha`,
+    // which decays exponentially each tick, so the layout converges and stops
+    // on its own (~2–3s) instead of running a fixed frame count and shaking.
+    const alphaDecay = Math.max(0.015, 0.03 - 0.001 * Math.sqrt(N));
+    const alphaMin = 0.01;
+    const maxFrames = Math.max(400, N * 10);      // safety cap; alpha stops first
+    let alpha = 1;
 
     function tick() {
       for (let i = 0; i < nodes.length; i++) {
@@ -296,7 +325,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
           let dx = a.x - b.x, dy = a.y - b.y;
           let d2 = dx * dx + dy * dy || 1;
           let d = Math.sqrt(d2);
-          const f = charge / d2;
+          const f = (charge / d2) * alpha;
           a.vx += (dx / d) * f; a.vy += (dy / d) * f;
           b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
         }
@@ -306,15 +335,15 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
         // Stronger edges pull closer: ideal length shrinks with weight.
         const ideal = 60 + 80 * (1 - (l.weight || 1));
-        const f = (d - ideal) * 0.04 * (0.5 + 0.5 * (l.weight || 1));
+        const f = (d - ideal) * 0.04 * (0.5 + 0.5 * (l.weight || 1)) * alpha;
         const fx = (dx / d) * f, fy = (dy / d) * f;
         l.source.vx += fx; l.source.vy += fy;
         l.target.vx -= fx; l.target.vy -= fy;
       });
       nodes.forEach((n) => {
         if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
-        n.vx += (world.w / 2 - n.x) * gravity;
-        n.vy += (world.h / 2 - n.y) * gravity;
+        n.vx += (world.w / 2 - n.x) * gravity * alpha;
+        n.vy += (world.h / 2 - n.y) * gravity * alpha;
         n.vx *= damp; n.vy *= damp;
         n.x += n.vx; n.y += n.vy;
         n.x = Math.max(margin, Math.min(world.w - margin, n.x));
@@ -333,13 +362,15 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       if (!running) return;
       tick();
       frames++;
-      if (frames > maxFrames) running = false;
+      alpha *= 1 - alphaDecay;  // exponential decay → natural settle
+      if (alpha < alphaMin || frames > maxFrames) running = false;
       requestAnimationFrame(loop);
     }
 
     restart = () => {
       running = true;
       frames = 0;
+      alpha = 1;
       loop();
     };
     restart();
@@ -723,18 +754,20 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     color: var(--text-accent);
   }
   .kg-edge {
-    stroke: color-mix(in srgb, var(--text-muted) 40%, transparent);
+    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
     stroke-width: 1;
   }
   .kg-label {
     fill: var(--text-normal);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     font-family: var(--font-sans);
-    /* Halo so labels stay readable over crossing edges and node circles. */
+    /* Halo so labels stay readable over crossing edges and node circles.
+       Nearly opaque + thick so text separates cleanly in dense areas. */
     paint-order: stroke;
     stroke: var(--background-secondary);
-    stroke-width: 3.5px;
+    stroke-width: 5px;
+    stroke-opacity: 0.95;
     stroke-linejoin: round;
     pointer-events: none;
     transition: opacity 120ms ease;
@@ -754,7 +787,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     gap: var(--space-3);
     text-transform: capitalize;
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-normal);
   }
   .kg-legend-item {
     display: inline-flex;

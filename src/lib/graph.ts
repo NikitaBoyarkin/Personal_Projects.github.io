@@ -45,7 +45,8 @@ export const GRAPH_GROUP_COLORS: Record<string, string> = {
   guide: '#4caf78',
   framework: '#e06c6c',
   'decision-log': '#5b9bd5',
-  note: 'var(--text-muted)',
+  // Fixed slate (not var(--text-muted)) so note nodes don't blend into edges.
+  note: '#8fa3b8',
   topic: '#b48ce0',
 };
 
