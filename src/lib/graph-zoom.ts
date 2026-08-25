@@ -52,7 +52,7 @@ export function panBy(vp: Viewport, dx: number, dy: number): Viewport {
 
 /** Center the viewport on the given world point at a given zoom. */
 export function centerOn(
-  vp: Viewport,
+  _vp: Viewport,
   target: { x: number; y: number },
   k: number,
   world: WorldSize,

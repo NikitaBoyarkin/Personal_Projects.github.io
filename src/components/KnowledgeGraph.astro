@@ -230,7 +230,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   function clearHighlight() {
     hoveredId = null;
     if (tooltip) tooltip.hidden = true;
-    nodes.forEach((n, i) => nodeEls[i].style.opacity = '');
+    nodes.forEach((_, i) => nodeEls[i].style.opacity = '');
     edges.forEach((e) => (e.style.opacity = ''));
   }
 
@@ -550,7 +550,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       searchResults.appendChild(empty);
       return;
     }
-    matches.forEach((n, i) => {
+    matches.forEach((n, _i) => {
       const item = document.createElement('button');
       item.type = 'button';
       item.className = 'kg-search-item';
