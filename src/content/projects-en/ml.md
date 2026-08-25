@@ -17,6 +17,8 @@ tools:
   - uv
 github: https://github.com/NikitaBoyarkin/ml
 date: 2026-08-22
+related:
+  - /projects/sql/
 caseStudy:
   problem: "Course-style ML implementations often break on modern scikit-learn: legacy APIs (`cross_validation`, `Imputer`, `OneHotEncoder(categorical_features=)`) were removed in sklearn ≥ 0.22. The preprocessing stage of the pipeline needed to be rewritten on the current API and shown as the foundation for every later stage."
   approach: "All preprocessing lives in a single `ColumnTransformer` (`SimpleImputer` → `StandardScaler` for numerics, `OneHotEncoder` for categoricals) fit on the training split only, so no test information leaks into preprocessing. The split is deterministic 80/20: rows are stable-sorted by `(Country, Age)` and every 5th row becomes the test set (no reliance on a random seed). A seeded generator produces larger datasets per pipeline stage, and EDA plots share one unified style."

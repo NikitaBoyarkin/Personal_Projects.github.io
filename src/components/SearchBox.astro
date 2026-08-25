@@ -169,8 +169,9 @@ const X_D = "M6 6l12 12M6 18L18 6";
       input.removeAttribute("aria-activedescendant");
       activeIndex = -1;
       setFacet("all");
-      // Return focus to the trigger so keyboard users aren't dropped to <body>.
-      toggle.focus();
+      // Return focus to the trigger so keyboard users aren't dropped to <body> —
+      // but only if focus was inside this widget (don't steal it from a sibling).
+      if (root?.contains(document.activeElement)) toggle.focus();
       morphSearch(searchD);
     }
 
@@ -375,7 +376,10 @@ const X_D = "M6 6l12 12M6 18L18 6";
     });
 
     document.addEventListener("click", (e) => {
-      if (!root.contains(e.target as Node)) close();
+      // Only react when this panel is actually open — otherwise a click on a
+      // sibling widget (e.g. the AskMe toggle) would call close() and steal
+      // focus back to the search toggle.
+      if (!root.contains(e.target as Node) && !panel.hidden) close();
     });
 
     document.addEventListener("keydown", (e) => {

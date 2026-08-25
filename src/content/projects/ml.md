@@ -17,6 +17,8 @@ tools:
   - uv
 github: https://github.com/NikitaBoyarkin/ml
 date: 2026-08-22
+related:
+  - /posts/reproducible-data-pipelines/
 caseStudy:
   problem: "Курсовые ML-реализации часто сломаны на современном scikit-learn: старые API (`cross_validation`, `Imputer`, `OneHotEncoder(categorical_features=)`) удалены в sklearn ≥ 0.22. Нужно переписать preprocessing-часть пайплайна на современный API и показать его как основу для остальных этапов."
   approach: "Весь preprocessing — один `ColumnTransformer` (`SimpleImputer` → `StandardScaler` для числовых, `OneHotEncoder` для категориальных), fit на тренировочном сплите, чтобы тестовая информация не утекла. Разделение — детерминированное 80/20: стабильная сортировка по `(Country, Age)`, каждый 5-й ряд идёт в тест (без зависимости от случайного seed). Дополнительно — seeded-генератор крупных датасетов под каждый этап и EDA-графики в едином стиле."

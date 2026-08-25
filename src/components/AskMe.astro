@@ -265,7 +265,9 @@ const X_D = "M6 6l12 12M6 18L18 6";
     function close() {
       panel.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
-      toggle.focus();
+      // Return focus to the trigger only if focus was inside this widget —
+      // don't steal it from a sibling (e.g. the search input).
+      if (root?.contains(document.activeElement)) toggle.focus();
       morphIcon(chatD);
     }
 
@@ -301,7 +303,10 @@ const X_D = "M6 6l12 12M6 18L18 6";
     });
 
     document.addEventListener("click", (e) => {
-      if (!root.contains(e.target as Node)) close();
+      // Only react when this panel is actually open — otherwise a click on a
+      // sibling widget (e.g. the search toggle) would call close() and steal
+      // focus back to the ask-me toggle.
+      if (!root.contains(e.target as Node) && !panel.hidden) close();
     });
 
     document.addEventListener("keydown", (e) => {

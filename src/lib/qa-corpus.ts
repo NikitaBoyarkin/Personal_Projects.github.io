@@ -266,18 +266,18 @@ export const QA_CORPUS: QAPair[] = [
   },
   {
     id: "ml",
-    keywords: ["ml", "машин", "machine", "learning", "обучение", "scikit", "скоринг", "кластериз", "нейро", "deep", "модел"],
+    keywords: ["ml", "машин", "machine", "learning", "обучение", "scikit", "нейро", "deep", "модел", "пайплайн", "pipeline", "preprocess", "импутац", "imput", "сплит", "split", "скейл", "scale", "кодирован", "encode"],
     ru: {
       question: "Есть ли ML в твоей работе?",
       answer:
-        "Базово — да: scikit-learn для кластеризации, сегментации и скоринга в аналитических кейсах. Я не позиционируюсь как ML-инженер: сильная сторона — SQL, статистика и продуктовая аналитика, а ML-инструменты подключаю там, где они решают задачу.",
-      links: [{ label: "Темы", href: "topics/" }],
+        "Базово — да: в портфолио есть ML-проект — preprocessing-пайплайн на scikit-learn (ColumnTransformer: импутация пропусков, кодирование категорий, детерминированный сплит 80/20, масштабирование). Я не позиционируюсь как ML-инженер: сильная сторона — SQL, статистика и продуктовая аналитика, а ML-инструменты подключаю там, где они решают задачу.",
+      links: [{ label: "ML-проект", href: "projects/ml/" }],
     },
     en: {
       question: "Do you do ML?",
       answer:
-        "Baseline yes: scikit-learn for clustering, segmentation and scoring in analytics cases. I don't position myself as an ML engineer — my strength is SQL, statistics and product analytics, and I bring ML tools in where they solve the problem.",
-      links: [{ label: "Topics", href: "en/topics/" }],
+        "Baseline yes: there's an ML project in my portfolio — a scikit-learn preprocessing pipeline (ColumnTransformer: missing-data imputation, categorical encoding, deterministic 80/20 split, feature scaling). I don't position myself as an ML engineer — my strength is SQL, statistics and product analytics, and I bring ML tools in where they solve the problem.",
+      links: [{ label: "ML project", href: "en/projects/ml/" }],
     },
   },
   {
