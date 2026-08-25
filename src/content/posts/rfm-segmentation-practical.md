@@ -76,7 +76,7 @@ WITH metrics AS (
 scored AS (
   SELECT
     customer_id,
-    -- Recency инвертируем: меньше дней = лучше
+    -- Recency инвертирован: меньше дней = лучше
     6 - NTILE(5) OVER (ORDER BY recency) AS r,
     NTILE(5) OVER (ORDER BY frequency) AS f,
     NTILE(5) OVER (ORDER BY monetary) AS m

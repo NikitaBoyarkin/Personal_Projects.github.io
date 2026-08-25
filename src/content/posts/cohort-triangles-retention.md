@@ -35,7 +35,8 @@ draft: false
 ```python
 import pandas as pd
 
-# Строка на пользователя-месяц: user_id, cohort (месяц регистрации), age (месяц с регистрации), active (0/1)
+# Строка на пользователя-месяц: user_id, cohort (месяц регистрации),
+# age (месяц с регистрации), active (0/1)
 # df = ...
 
 retention = (

@@ -87,8 +87,8 @@ def send_weekly():
         bot.send_message(CHANNEL, text, parse_mode="HTML")
         log_run(status="ok")
     except Exception as e:
-        # Явный фолбэк: молчание хуже ошибки
-        bot.send_message(CHANNEL, "⚠️ Отчёт не собран: "+str(e))
+        # Фолбэк: молчание хуже ошибки
+        bot.send_message(CHANNEL, f"⚠️ Отчёт не собран: {e}")
         log_run(status="error", err=str(e))
 
 # Понедельник 09:00
@@ -107,7 +107,11 @@ while True:
 
 ```python
 def format_report(metrics: dict) -> str:
-    lines = ["<b>📊 Еженедельный отчёт</b>", f"Период: {metrics['period']}", ""]
+    lines = [
+        "<b>📊 Еженедельный отчёт</b>",
+        f"Период: {metrics['period']}",
+        "",
+    ]
     for m in metrics["items"]:
         # ▲ зелёный / ▼ красный — WoW
         arrow = "🟢" if m["wow"] > 0 else "🔴"

@@ -48,13 +48,13 @@ ctrl_s, ctrl_n = 320, 5000
 trt_s,  trt_n  = 380, 5000
 
 with pm.Model() as m:
-    # Бета-приоры — равномерные, без сильных предположений
+    # Равномерные приоры — без сильных предположений
     p_ctrl = pm.Beta("p_ctrl", alpha=1, beta=1)
     p_trt  = pm.Beta("p_trt",  alpha=1, beta=1)
     # Правдоподобия — биномиальные
     pm.Binomial("y_ctrl", n=ctrl_n, p=p_ctrl, observed=ctrl_s)
     pm.Binomial("y_trt",  n=trt_n,  p=p_trt,  observed=trt_s)
-    # Разница и вероятность, что она положительная
+    # Разница и вероятность положительного эффекта
     delta = pm.Deterministic("delta", p_trt - p_ctrl)
     trace = pm.sample(2000, tune=1000, random_seed=42)
 

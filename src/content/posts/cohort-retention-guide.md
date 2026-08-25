@@ -72,7 +72,7 @@ events['period'] = (
   - events['cohort_month'].astype('int64')
 )
 
-# Матрица: уникальные пользователи по когортам
+# Матрица: уникальные пользователи на когорту
 counts = (
   events
   .groupby(['cohort_month', 'period'])

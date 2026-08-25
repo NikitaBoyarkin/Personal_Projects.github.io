@@ -36,7 +36,7 @@ draft: false
 Ошибка: дашборд сам пересчитывает метрику на лету из сырых событий.
 
 ```python
-# ❌ дашборд агрегирует заново — каждый разработчик получит свой ответ
+# ❌ Дашборд агрегирует заново — ответ у каждого свой
 df = read_all_events()
 retention = df.groupby(["cohort", "age"]).agg(...)
 ```
@@ -44,9 +44,11 @@ retention = df.groupby(["cohort", "age"]).agg(...)
 Правильно: расчёт в пайплайне, дашборд раскладывает готовое.
 
 ```python
-# ✅ пайплайн посчитал один раз, дашборд читает результат
+# ✅ Пайплайн посчитал один раз, дашборд читает
 retention = pd.read_parquet("metrics/retention.parquet")
-st.line_chart(retention.pivot(index="cohort", columns="age", values="pct"))
+st.line_chart(
+    retention.pivot(index="cohort", columns="age", values="pct")
+)
 ```
 
 ## Как пишется

@@ -35,7 +35,7 @@ draft: false
 Типизированный каталог событий — схема, которая описывает событие, его свойства и обязательные поля:
 
 ```python
-# event_catalog.py — единый источник правды о событии
+# event_catalog.py — источник правды о событии
 class Event(TypedDict):
     name: str
     user_id: str
