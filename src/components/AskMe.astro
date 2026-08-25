@@ -92,6 +92,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
 <script>
   import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
+  import { matchPair, normalizeTokens } from "../lib/qa-corpus";
 
   defineMorphIcon();
   let askIcon: MorphIconElement | null = null;
@@ -158,34 +159,25 @@ const X_D = "M6 6l12 12M6 18L18 6";
       }
     }
 
-    function normalize(s: string): string {
-      return s.toLowerCase().replace(/[^a-zа-яё0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-    }
-
-    // Same scoring as src/lib/qa-corpus.ts (kept in sync by tests).
-    function score(pair: Pair, tokens: string[]): number {
-      let total = 0;
-      for (const tk of tokens) {
-        let best = 0;
-        for (const kw of pair.keywords) {
-          if (kw === tk) best = Math.max(best, 2);
-          else if (kw.includes(tk) || tk.includes(kw)) best = Math.max(best, 1);
-        }
-        total += best;
-      }
-      return total === 0 ? -1 : total;
-    }
-
     function bestMatch(q: string): Pair | null {
-      const tokens = normalize(q).split(" ").filter(Boolean);
+      const tokens = normalizeTokens(q);
       if (!tokens.length) return null;
       let best: Pair | null = null;
       let bestScore = 0;
+      let bestExact = 0;
+      let bestLen = 0;
       for (const pair of corpus) {
-        const s = score(pair, tokens);
-        if (s > bestScore) {
+        const m = matchPair(pair.keywords, tokens);
+        if (m.score < 1) continue;
+        const better =
+          m.score > bestScore ||
+          (m.score === bestScore && m.exact > bestExact) ||
+          (m.score === bestScore && m.exact === bestExact && m.matchedLen > bestLen);
+        if (better) {
           best = pair;
-          bestScore = s;
+          bestScore = m.score;
+          bestExact = m.exact;
+          bestLen = m.matchedLen;
         }
       }
       return bestScore >= 1 ? best : null;

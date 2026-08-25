@@ -76,7 +76,7 @@ export const QA_CORPUS: QAPair[] = [
   {
     id: "stack",
     // "sql"/"duckdb" intentionally NOT here — they route to the SQL case study.
-    keywords: ["стек", "stack", "технологии", "tech", "tools", "инструменты", "python", "tableau", "pandas", "навыки", "skills"],
+    keywords: ["стек", "stack", "технологии", "tech", "tools", "инструменты", "python", "питон", "tableau", "pandas", "навыки", "skills", "дашборд", "дашборды", "dashboard", "dashboards", "визуализ", "visualiz", "chart", "charts", "диаграмм", "excel"],
     ru: {
       question: "Какой у тебя стек?",
       answer:
@@ -92,7 +92,7 @@ export const QA_CORPUS: QAPair[] = [
   },
   {
     id: "ab-testing",
-    keywords: ["ab", "a/b", "тест", "тестирование", "experiment", "cuped", "aa", "bonferroni", "ship", "gate", "p-value", "эксперимент"],
+    keywords: ["ab", "a/b", "тест", "тестирование", "experiment", "cuped", "купед", "aa", "bonferroni", "ship", "gate", "p-value", "эксперимент"],
     ru: {
       question: "Что у тебя с A/B-тестами?",
       answer:
@@ -194,7 +194,7 @@ export const QA_CORPUS: QAPair[] = [
   },
   {
     id: "contact",
-    keywords: ["контакт", "contact", "связаться", "telegram", "github", "linkedin", "почта", "email", "написать", "reach"],
+    keywords: ["контакт", "contact", "связаться", "telegram", "телеграм", "github", "linkedin", "почта", "email", "написать", "напиши", "reach", "связь", "телеф"],
     ru: {
       question: "Как с тобой связаться?",
       answer:
@@ -238,7 +238,7 @@ export const QA_CORPUS: QAPair[] = [
   },
   {
     id: "interview",
-    keywords: ["интервью", "interview", "подготовка", "prep", "middle", "bi", "собеседование"],
+    keywords: ["интервью", "interview", "подготовка", "prep", "middle", "bi", "собеседование", "чем", "занимаешься", "занят", "сейчас", "currently", "doing", "working", "now"],
     ru: {
       question: "Чем занимаешься сейчас?",
       answer:
@@ -265,8 +265,24 @@ export const QA_CORPUS: QAPair[] = [
     },
   },
   {
+    id: "ml",
+    keywords: ["ml", "машин", "machine", "learning", "обучение", "scikit", "скоринг", "кластериз", "нейро", "deep", "модел"],
+    ru: {
+      question: "Есть ли ML в твоей работе?",
+      answer:
+        "Базово — да: scikit-learn для кластеризации, сегментации и скоринга в аналитических кейсах. Я не позиционируюсь как ML-инженер: сильная сторона — SQL, статистика и продуктовая аналитика, а ML-инструменты подключаю там, где они решают задачу.",
+      links: [{ label: "Темы", href: "topics/" }],
+    },
+    en: {
+      question: "Do you do ML?",
+      answer:
+        "Baseline yes: scikit-learn for clustering, segmentation and scoring in analytics cases. I don't position myself as an ML engineer — my strength is SQL, statistics and product analytics, and I bring ML tools in where they solve the problem.",
+      links: [{ label: "Topics", href: "en/topics/" }],
+    },
+  },
+  {
     id: "games",
-    keywords: ["игра", "game", "аркада", "arcade", "snake", "pong", "2048", "развлечение", "fun"],
+    keywords: ["игра", "игр", "game", "аркада", "arcade", "snake", "pong", "2048", "развлечение", "fun"],
     ru: {
       question: "Что за игры на сайте?",
       answer:
@@ -318,50 +334,131 @@ export const QA_CORPUS: QAPair[] = [
       ],
     },
   },
+  {
+    id: "conditions",
+    keywords: ["зарплат", "salary", "услов", "conditions", "график", "режим", "день", "when", "начинаешь", "срок", "remote", "удалён", "office", "офис", "часы", "pay", "компенсац", "вилк", "бюджет", "договор", "заработ"],
+    ru: {
+      question: "Условия: зарплата, график, старт?",
+      answer:
+        "Условия обсуждаю индивидуально на интервью — публично не озвучиваю. Открыт к data / product analyst middle-ролям; формат (офис/гибрид/удалёнка) и сроки выхода — по договорённости.",
+    },
+    en: {
+      question: "Salary, schedule, start date?",
+      answer:
+        "I discuss terms individually at the interview stage — I don't publish them. Open to data / product analyst middle roles; format (office/hybrid/remote) and start date are negotiable.",
+    },
+  },
 ];
+
+// RU/EN function words that carry no topical signal. Deliberately small: a
+// keyword must never be dropped («сколько» stays — it's an experience keyword).
+const STOPWORDS = new Set([
+  // RU
+  "а", "о", "у", "ты", "вы", "он", "она", "мы", "мне", "меня", "тебя", "тобой",
+  "что", "как", "за", "на", "по", "из", "в", "с", "для", "ли", "об", "же",
+  "бы", "то", "это", "так", "все", "всё", "или", "где", "когда", "свой", "свои",
+  // EN
+  "a", "an", "the", "is", "are", "do", "does", "you", "your", "my", "me",
+  "what", "with", "how", "and", "or", "of", "to", "in", "on", "at",
+]);
+
+/**
+ * Normalize a query into match tokens: lowercase, fold `a/b`/`а/б` → `ab`
+ * (the placeholder's example form), strip punctuation, drop stop words and
+ * single-character tokens (they substring-match everything and add noise).
+ * This is the shared tokenizer used by both the server-side corpus API and
+ * the client-side widget script.
+ */
+export function normalizeTokens(q: string): string[] {
+  return q
+    .toLowerCase()
+    .replace(/a\/b|а\/б/gi, "ab")
+    .replace(/[^a-zа-яё0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length >= 2 && !STOPWORDS.has(t));
+}
+
+export interface TokenMatch {
+  score: number;
+  /** Number of exact full-keyword hits — the primary tie-breaker. */
+  exact: number;
+  /** Total length of matched tokens — secondary tie-breaker. */
+  matchedLen: number;
+}
+
+/**
+ * Score a pair's keywords against pre-normalized tokens. An exact keyword hit
+ * scores 2; a prefix overlap scores 1, but only when the token is ≥ 3 chars
+ * (a 2-char keyword must match exactly — this kills the `бот` inside
+ * `работу` false positive and single-letter noise). Returns -1 when nothing
+ * matched. Prefix rules: `kw.startsWith(tk)` covers user typing a stem
+ * (`тест` → `тестирование`); `tk.startsWith(kw)` covers inflections of a
+ * keyword (`тесты` ← `тест`).
+ */
+export function matchPair(keywords: string[], tokens: string[]): TokenMatch {
+  let score = 0;
+  let exact = 0;
+  let matchedLen = 0;
+  for (const tk of tokens) {
+    let best = 0;
+    for (const kw of keywords) {
+      let s = 0;
+      if (kw === tk) {
+        s = 2;
+      } else if (tk.length >= 3 && kw.startsWith(tk)) {
+        s = 1;
+      } else if (kw.length >= 3 && tk.startsWith(kw)) {
+        s = 1;
+      }
+      if (s > best) best = s;
+    }
+    if (best > 0) {
+      score += best;
+      if (best === 2) exact++;
+      matchedLen += tk.length;
+    }
+  }
+  return { score: score === 0 ? -1 : score, exact, matchedLen };
+}
 
 /** Normalize a query for matching: lowercase, strip punctuation, collapse spaces. */
 export function normalizeQuery(q: string): string {
-  return q
-    .toLowerCase()
-    .replace(/[^a-zа-яё0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return normalizeTokens(q).join(" ");
 }
 
 /**
  * Score a pair against query tokens. Returns -1 if NO token matches any
- * keyword (stop words like «как», «с», «тобой» are simply ignored); otherwise
- * the sum of per-token overlap scores (2 for a full keyword match, 1 for a
- * substring match).
+ * keyword; otherwise the sum of per-token overlap scores (2 for a full
+ * keyword match, 1 for a prefix/stem match).
  */
 export function scorePair(pair: QAPair, tokens: string[]): number {
-  let total = 0;
-  for (const tk of tokens) {
-    let best = 0;
-    for (const kw of pair.keywords) {
-      if (kw === tk) {
-        best = Math.max(best, 2);
-      } else if (kw.includes(tk) || tk.includes(kw)) {
-        best = Math.max(best, 1);
-      }
-    }
-    total += best;
-  }
-  return total === 0 ? -1 : total;
+  return matchPair(pair.keywords, tokens).score;
 }
 
-/** Best matching pair for a query, or null if nothing scores ≥ 1. */
+/**
+ * Best matching pair for a query, or null if nothing scores ≥ 1. Ties are
+ * broken by exact-hit count, then by total matched-token length, then by
+ * corpus order — so short/noisy queries no longer drift to the first pair.
+ */
 export function bestMatch(q: string): QAPair | null {
-  const tokens = normalizeQuery(q).split(" ").filter(Boolean);
+  const tokens = normalizeTokens(q);
   if (!tokens.length) return null;
   let best: QAPair | null = null;
   let bestScore = 0;
+  let bestExact = 0;
+  let bestLen = 0;
   for (const pair of QA_CORPUS) {
-    const s = scorePair(pair, tokens);
-    if (s > bestScore) {
+    const m = matchPair(pair.keywords, tokens);
+    if (m.score < 1) continue;
+    const better =
+      m.score > bestScore ||
+      (m.score === bestScore && m.exact > bestExact) ||
+      (m.score === bestScore && m.exact === bestExact && m.matchedLen > bestLen);
+    if (better) {
       best = pair;
-      bestScore = s;
+      bestScore = m.score;
+      bestExact = m.exact;
+      bestLen = m.matchedLen;
     }
   }
   return bestScore >= 1 ? best : null;
