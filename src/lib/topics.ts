@@ -62,6 +62,20 @@ export const TOPICS: Topic[] = [
     "portfolio",
     "data-analyst",
   ]),
+  topic(
+    "causal-inference",
+    "Causal-вывод",
+    "senior",
+    "Feature impact, DiD, synthetic control — причинность вне рамок A/B.",
+    ["causal-inference", "feature-impact", "causal"],
+  ),
+  topic(
+    "metric-design",
+    "Metric design",
+    "senior",
+    "North Star, дерево метрик, конфликты метрик и Goodhart.",
+    ["metric-design", "north-star", "metrics", "goodhart"],
+  ),
 ];
 
 export interface TopicRow {
