@@ -1456,7 +1456,7 @@ button:focus-visible {
   margin-top: var(--space-4);
 }
 .now-teaser-cta a {
-  color: var(--text-accent);
+  color: #1a1a1a; /* primary button convention: dark text on --button-bg */
   text-decoration: none;
   font-weight: 600;
 }
