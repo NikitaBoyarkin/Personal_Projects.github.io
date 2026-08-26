@@ -7,23 +7,75 @@
     <g id="tiles"></g>
   </g>
   <text id="overlay" x="200" y="430" text-anchor="middle" fill="#f4f4f5" font-size="13">Swipe or arrow keys to move</text>
+  <g id="cta" style="display:none">
+    <rect x="50" y="360" width="300" height="58" rx="8" fill="#12121c" stroke="#ff6643" stroke-width="1"/>
+    <text x="200" y="378" text-anchor="middle" fill="#f4f4f5" font-size="11">🎉 New best! Want games/analytics like this?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><rect x="80" y="386" width="105" height="22" rx="5" fill="#ff6643"/><text x="132" y="401" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">LinkedIn</text></a>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><rect x="215" y="386" width="105" height="22" rx="5" fill="#ff6643"/><text x="267" y="401" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">Telegram</text></a>
+  </g>
   <script type="text/javascript"><![CDATA[
     (function () {
       var W = 4, CELL = 79, GAP = 8, STEP = 87;
       var tiles = document.getElementById('tiles');
       var scoreT = document.getElementById('score'), overlay = document.getElementById('overlay');
-      var grid = [], score = 0, over = false, won = false;
+      var grid = [], score = 0, over = false, won = false, started = false;
+      var maxTile = 0;
       var COLORS = {
         2:'#333a47', 4:'#3d4656', 8:'#c0431e', 16:'#e05730', 32:'#ff6643',
         64:'#ffbe99', 128:'#ffd166', 256:'#ff9f1c', 512:'#ff6b6b', 1024:'#f43f5e', 2048:'#f43f5e'
       };
 
+      // —— retention + contact (shared pattern) ——
+      var GAME = '2048', DAILY_TARGET = 512;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var cta = document.getElementById('cta');
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        var phs = document.createElement('script');
+        phs.src = 'https://us-assets.i.posthog.com/static/array.js';
+        phs.async = true;
+        phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+        document.head.appendChild(phs);
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; }
+      var winFired = false, overFired = false;
+      function finish(kind) {
+        if (kind === 'over') { if (overFired) return; overFired = true; }
+        if (kind === 'win') { if (winFired) return; winFired = true; }
+        var best = bestOf();
+        var newBest = score > best;
+        if (newBest) lsSet(LS_BEST, String(score));
+        var isDaily = todayGame() === GAME && maxTile >= DAILY_TARGET;
+        if (isDaily) markDaily();
+        showCTA(newBest || kind === 'win');
+        ph(kind === 'win' ? 'game_win' : 'game_over', { game: GAME, score: score, max_tile: maxTile, new_best: newBest, daily_done: !!isDaily });
+      }
+      // —— /retention ——
+
       function empty() {
         grid = []; for (var i = 0; i < W; i++) grid.push([0, 0, 0, 0]);
-        score = 0; over = false; won = false;
-        scoreT.textContent = 'Score: 0';
+        score = 0; over = false; won = false; started = false;
+        winFired = false; overFired = false; maxTile = 0;
+        scoreT.textContent = 'Score: 0 · Best: ' + bestOf();
         overlay.textContent = 'Swipe or arrow keys to move';
         overlay.setAttribute('fill', '#f4f4f5');
+        showCTA(false);
       }
 
       function spawn() {
@@ -62,17 +114,24 @@
             grid[r + dr * k][c + dc * k] = na[k];
           }
         }
-        if (moved) { spawn(); scoreT.textContent = 'Score: ' + score; checkEnd(); draw(); }
+        if (moved) { spawn(); scoreT.textContent = 'Score: ' + score + ' · Best: ' + Math.max(bestOf(), score); checkEnd(); draw(); }
       }
 
       function checkEnd() {
+        maxTile = 0;
         for (var i = 0; i < W; i++) for (var j = 0; j < W; j++) {
-          if (grid[i][j] === 2048 && !won) { won = true; overlay.textContent = '2048! You did it · tap to continue'; }
+          maxTile = Math.max(maxTile, grid[i][j]);
+          if (grid[i][j] === 2048 && !won) {
+            won = true;
+            overlay.textContent = '2048! You did it · tap to continue';
+            finish('win');
+          }
           if (!grid[i][j]) return;
           if (j + 1 < W && grid[i][j] === grid[i][j + 1]) return;
           if (i + 1 < W && grid[i][j] === grid[i + 1][j]) return;
         }
         over = true;
+        finish('over');
         overlay.textContent = 'Game over · tap to restart';
         overlay.setAttribute('fill', '#ff4b4b');
       }
@@ -115,6 +174,7 @@
         else if (k === 'ArrowLeft' || k === 'a' || k === 'A') { e.preventDefault(); move('left'); }
         else if (k === 'ArrowRight' || k === 'd' || k === 'D') { e.preventDefault(); move('right'); }
         else if (k === 'r' || k === 'R') { empty(); spawn(); spawn(); draw(); }
+        if (!started && !over) { started = true; ph('game_started', { game: GAME }); }
       });
 
       // --- Touch controls (mobile) ---
@@ -125,6 +185,7 @@
         var t = e.changedTouches[0];
         var dx = t.clientX - tsx, dy = t.clientY - tsy;
         if (Math.abs(dx) < 24 && Math.abs(dy) < 24) { if (over) { empty(); spawn(); spawn(); draw(); } return; }
+        if (!started && !over) { started = true; ph('game_started', { game: GAME }); }
         if (Math.abs(dx) > Math.abs(dy)) move(dx > 0 ? 'right' : 'left');
         else move(dy > 0 ? 'down' : 'up');
       }, {passive: false});

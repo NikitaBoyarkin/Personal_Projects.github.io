@@ -19,7 +19,13 @@
 
   <rect id="btn" x="80" y="316" width="240" height="46" rx="8" fill="#ff6643"/>
   <text id="btnLabel" x="200" y="345" text-anchor="middle" fill="#0a0a12" font-size="13" font-weight="bold">COLLECT DATA</text>
-  <text x="200" y="408" text-anchor="middle" fill="#666" font-size="10">tap / click anywhere to run the experiment</text>
+  <text id="hint" x="200" y="408" text-anchor="middle" fill="#666" font-size="10">tap / click anywhere to run the experiment</text>
+  <g id="cta" style="display:none">
+    <text x="200" y="408" text-anchor="middle" fill="#4ade80" font-size="10">🎉 Significant! Want real experiments?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><text x="154" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">LinkedIn</text></a>
+    <text x="200" y="422" text-anchor="middle" fill="#666" font-size="11">·</text>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><text x="246" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">Telegram</text></a>
+  </g>
   <script type="text/javascript"><![CDATA[
     (function () {
       var state = {nA:0, xA:0, nB:0, xB:0, sig:false};
@@ -27,12 +33,55 @@
       var valA = document.getElementById('valA'), valB = document.getElementById('valB');
       var pval = document.getElementById('pval'), btnLabel = document.getElementById('btnLabel');
       var btn = document.getElementById('btn');
+      var statusT = document.getElementById('status'), hint = document.getElementById('hint'), cta = document.getElementById('cta');
+      var started = false;
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'abtest', DAILY_TARGET = 12;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        var phs = document.createElement('script');
+        phs.src = 'https://us-assets.i.posthog.com/static/array.js';
+        phs.async = true;
+        phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+        document.head.appendChild(phs);
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; if (hint) hint.style.display = on ? 'none' : 'block'; }
+      // —— /retention ——
 
       function normcdf(x) {
         var t = 1 / (1 + 0.2316419 * Math.abs(x));
         var d = 0.3989422804014327 * Math.exp(-x*x/2);
         var p = d * t * (0.319381530 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
         return x > 0 ? 1 - p : p;
+      }
+
+      function onSig() {
+        var taps = Math.round(state.nA / 150);
+        var best = bestOf();
+        var newBest = best === 0 || taps < best;
+        if (newBest) lsSet(LS_BEST, String(taps));
+        var isDaily = todayGame() === GAME && taps <= DAILY_TARGET;
+        if (isDaily) markDaily();
+        showCTA(newBest || isDaily);
+        ph('sig_reached', { game: GAME, taps: taps, new_best: newBest, daily_done: !!isDaily });
       }
 
       function update() {
@@ -58,17 +107,19 @@
           if (!state.sig) {
             state.sig = true;
             btnLabel.textContent = 'RESET';
+            onSig();
           }
         } else {
           pval.textContent = p.toFixed(3);
           pval.setAttribute('fill', '#f4f4f5');
         }
-        var n = document.getElementById('status');
-        n.textContent = 'p = ' + (p < 0.05 ? '< 0.05' : p.toFixed(3)) + ' · n = ' + Math.round(nA) + ' / arm';
+        var best = bestOf();
+        statusT.textContent = 'p = ' + (p < 0.05 ? '< 0.05' : p.toFixed(3)) + ' · n = ' + Math.round(nA) + ' / arm' + (best ? ' · Best: ' + best + ' taps' : '');
       }
 
       function collect() {
         if (state.sig) { reset(); return; }
+        if (!started) { started = true; ph('experiment_started', { game: GAME }); }
         for (var i = 0; i < 150; i++) { if (Math.random() < 0.34) state.xA++; }
         for (var j = 0; j < 150; j++) { if (Math.random() < 0.30) state.xB++; }
         state.nA += 150; state.nB += 150;
@@ -77,7 +128,9 @@
 
       function reset() {
         state = {nA:0, xA:0, nB:0, xB:0, sig:false};
+        started = false;
         btnLabel.textContent = 'COLLECT DATA';
+        showCTA(false);
         update();
       }
 

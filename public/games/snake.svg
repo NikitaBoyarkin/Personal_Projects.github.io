@@ -8,6 +8,12 @@
     <g id="food"></g>
   </g>
   <text id="overlay" x="200" y="250" text-anchor="middle" fill="#f4f4f5" font-size="15">Swipe or arrow keys to start</text>
+  <g id="cta" style="display:none">
+    <rect x="50" y="278" width="300" height="58" rx="8" fill="#12121c" stroke="#ff6643" stroke-width="1"/>
+    <text x="200" y="296" text-anchor="middle" fill="#f4f4f5" font-size="11">🎉 New best! Want games/analytics like this?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><rect x="80" y="304" width="105" height="22" rx="5" fill="#ff6643"/><text x="132" y="319" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">LinkedIn</text></a>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><rect x="215" y="304" width="105" height="22" rx="5" fill="#ff6643"/><text x="267" y="319" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">Telegram</text></a>
+  </g>
   <script type="text/javascript"><![CDATA[
     (function () {
       var CELL = 17, COLS = 20, ROWS = 20;
@@ -15,18 +21,60 @@
       var foodG = document.getElementById('food');
       var scoreT = document.getElementById('score');
       var overlay = document.getElementById('overlay');
-      var snake, dir, nextDir, food, score, running, gameOver, timer;
+      var snake, dir, nextDir, food, score, running, gameOver, timer, started;
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'snake', DAILY_TARGET = 200;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var cta = document.getElementById('cta');
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        var phs = document.createElement('script');
+        phs.src = 'https://us-assets.i.posthog.com/static/array.js';
+        phs.async = true;
+        phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+        document.head.appendChild(phs);
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; }
+      // —— /retention ——
+
+      function begin() {
+        if (!running && !gameOver) {
+          running = true;
+          overlay.textContent = '';
+          if (!started) { started = true; ph('game_started', { game: GAME }); }
+          timer = setInterval(step, 120);
+        }
+      }
 
       function init() {
         snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
         dir = {x:1,y:0}; nextDir = {x:1,y:0};
         score = 0; running = false; gameOver = false;
+        started = false;
         if (timer) { clearInterval(timer); timer = null; }
         placeFood();
         draw();
-        scoreT.textContent = 'Score: 0';
+        scoreT.textContent = 'Score: 0 · Best: ' + bestOf();
         overlay.textContent = 'Press any arrow key to start';
         overlay.setAttribute('fill', '#f4f4f5');
+        showCTA(false);
       }
 
       function placeFood() {
@@ -68,7 +116,7 @@
         snake.unshift(head);
         if (head.x === food.x && head.y === food.y) {
           score += 10;
-          scoreT.textContent = 'Score: ' + score;
+          scoreT.textContent = 'Score: ' + score + ' · Best: ' + Math.max(bestOf(), score);
           placeFood();
         } else {
           snake.pop();
@@ -79,8 +127,15 @@
       function endGame() {
         running = false; gameOver = true;
         if (timer) { clearInterval(timer); timer = null; }
-        overlay.textContent = 'Game over — Score: ' + score + '. Press R to restart';
-        overlay.setAttribute('fill', '#ff4b4b');
+        var best = bestOf();
+        var newBest = score > best;
+        if (newBest) lsSet(LS_BEST, String(score));
+        var isDaily = todayGame() === GAME && score >= DAILY_TARGET;
+        if (isDaily) markDaily();
+        showCTA(newBest);
+        overlay.textContent = (newBest ? 'NEW BEST! ' : 'Game over — Score: ') + score + '. Press R to restart';
+        overlay.setAttribute('fill', newBest ? '#4ade80' : '#ff4b4b');
+        ph('game_over', { game: GAME, score: score, new_best: newBest, daily_done: !!isDaily });
       }
 
       document.addEventListener('keydown', function (e) {
@@ -90,16 +145,11 @@
         else if (k === 'ArrowLeft' || k === 'a' || k === 'A') { if (dir.x !== 1) nextDir = {x:-1,y:0}; e.preventDefault(); }
         else if (k === 'ArrowRight' || k === 'd' || k === 'D') { if (dir.x !== -1) nextDir = {x:1,y:0}; e.preventDefault(); }
         else if (k === 'r' || k === 'R') { init(); return; }
-        if (!running && !gameOver) {
-          running = true;
-          overlay.textContent = '';
-          timer = setInterval(step, 120);
-        }
+        begin();
       });
 
       // --- Touch controls (mobile) ---
       var tsx = 0, tsy = 0;
-      function startGame() { if (!running && !gameOver) { running = true; overlay.textContent = ''; timer = setInterval(step, 120); } }
       function setDir(nx, ny) {
         if (nx === 0 && ny === -1) { if (dir.y !== 1) nextDir = {x: 0, y: -1}; }
         else if (nx === 0 && ny === 1) { if (dir.y !== -1) nextDir = {x: 0, y: 1}; }
@@ -113,11 +163,11 @@
         var dx = t.clientX - tsx, dy = t.clientY - tsy;
         if (Math.abs(dx) < 24 && Math.abs(dy) < 24) {
           if (gameOver) { init(); return; }
-          startGame(); return;
+          begin(); return;
         }
         if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 1 : -1, 0);
         else setDir(0, dy > 0 ? 1 : -1);
-        startGame();
+        begin();
       }, {passive: false});
 
       init();

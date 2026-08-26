@@ -15,12 +15,50 @@
   <rect id="paddle" x="120" y="385" width="80" height="10" rx="5" fill="#f4f4f5"/>
 
   <text x="200" y="425" text-anchor="middle" fill="#666" font-size="10">Drag or ← → · catch users to convert</text>
+  <g id="cta" style="display:none">
+    <rect x="50" y="222" width="300" height="58" rx="8" fill="#12121c" stroke="#ff6643" stroke-width="1"/>
+    <text x="200" y="240" text-anchor="middle" fill="#f4f4f5" font-size="11">🎉 Best run! Want games/analytics like this?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><rect x="80" y="248" width="105" height="22" rx="5" fill="#ff6643"/><text x="132" y="263" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">LinkedIn</text></a>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><rect x="215" y="248" width="105" height="22" rx="5" fill="#ff6643"/><text x="267" y="263" text-anchor="middle" fill="#0a0a12" font-size="10" font-weight="bold">Telegram</text></a>
+  </g>
   <script type="text/javascript"><![CDATA[
     (function () {
       var dotsG = document.getElementById('dots');
       var paddle = document.getElementById('paddle');
       var statusT = document.getElementById('status');
       var dots = [], caught = 0, missed = 0, px = 160, keys = {};
+      var best = 0, dailyFired = false;
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'funnel', DAILY_TARGET = 25;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var cta = document.getElementById('cta');
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        var phs = document.createElement('script');
+        phs.src = 'https://us-assets.i.posthog.com/static/array.js';
+        phs.async = true;
+        phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+        document.head.appendChild(phs);
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; }
+      // —— /retention ——
 
       function spawn() { dots.push({x: 40 + Math.random() * 320, y: 42, s: 1.6 + Math.random() * 1.2}); }
 
@@ -41,14 +79,23 @@
         if (keys['ArrowRight'] || keys['d'] || keys['D']) px += 6;
         px = Math.max(40, Math.min(360, px));
         paddle.setAttribute('x', px - 40);
+        var newBest = false;
         for (var i = dots.length - 1; i >= 0; i--) {
           var d = dots[i];
           d.y += d.s;
-          if (d.y + 6 >= 375 && d.y - 6 <= 405 && Math.abs(d.x - px) < 46) { caught++; dots.splice(i, 1); }
+          if (d.y + 6 >= 375 && d.y - 6 <= 405 && Math.abs(d.x - px) < 46) {
+            caught++; dots.splice(i, 1);
+            if (caught > best) { best = caught; lsSet(LS_BEST, String(best)); newBest = true; }
+          }
           else if (d.y > 425) { missed++; dots.splice(i, 1); }
         }
         var cvr = caught + missed ? Math.round(caught / (caught + missed) * 100) : 0;
-        statusT.textContent = 'CVR ' + cvr + '% · caught ' + caught + ' · missed ' + missed;
+        statusT.textContent = 'CVR ' + cvr + '% · caught ' + caught + ' · missed ' + missed + ' · Best ' + Math.max(bestOf(), best);
+        if (newBest || (caught >= DAILY_TARGET && !dailyFired)) {
+          if (caught >= DAILY_TARGET && !dailyFired) { dailyFired = true; markDaily(); }
+          showCTA(true);
+          ph('milestone', { game: GAME, caught: caught, best: Math.max(bestOf(), best), daily_done: caught >= DAILY_TARGET });
+        }
         draw();
       }
 
@@ -69,6 +116,8 @@
       document.addEventListener('touchstart', function (e) { e.preventDefault(); touchPaddleX(e.touches[0].clientX); }, {passive: false});
       document.addEventListener('touchmove', function (e) { e.preventDefault(); touchPaddleX(e.touches[0].clientX); }, {passive: false});
 
+      best = bestOf();
+      ph('game_started', { game: GAME });
       for (var i = 0; i < 3; i++) spawn();
       setInterval(step, 16);
       setInterval(spawn, Math.max(350, 700 - caught * 4));
