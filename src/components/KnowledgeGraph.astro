@@ -6,7 +6,6 @@
 // Edge weight (0..1) drives spring length; edge type drives line style.
 // Starts when scrolled into view; honors prefers-reduced-motion (static radial).
 import { withBase } from '../lib/path';
-import { GRAPH_GROUP_COLORS } from '../lib/graph';
 
 interface Props {
   lang?: 'ru' | 'en';
@@ -33,8 +32,10 @@ const t = {
   searchEmpty: isEn ? 'No matches' : 'Ничего не найдено',
   searchHint: isEn ? '↑↓ to navigate, Enter to center' : '↑↓ — навигация, Enter — центрировать',
   searchClear: isEn ? 'Clear search' : 'Очистить поиск',
+  colorByGroup: isEn ? 'Track/Category' : 'Трек/Категория',
+  colorByCommunity: isEn ? 'Community' : 'Комьюнити',
+  colorMode: isEn ? 'Switch node colors: track/category or community' : 'Переключить цвет узлов: трек/категория или комьюнити',
 };
-const groupList = Object.keys(GRAPH_GROUP_COLORS);
 ---
 
 <div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')} data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'}>
@@ -54,14 +55,9 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       />
       <div id="kg-search-results" class="kg-search-results" role="listbox" hidden></div>
     </div>
-    <div class="kg-legend">
-      {
-        groupList.map((g) => (
-          <span class="kg-legend-item"><i style={`background:${GRAPH_GROUP_COLORS[g]}`}></i>{g}</span>
-        ))
-      }
-    </div>
+    <div class="kg-legend" id="kg-legend" role="list" aria-label={isEn ? 'Graph color legend' : 'Легенда цветов графа'}></div>
     <div class="kg-controls" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
+      <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-color" aria-pressed="false" aria-label={t.colorMode} title={t.colorByGroup} data-label-group={t.colorByGroup} data-label-community={t.colorByCommunity}>{t.colorByGroup}</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-in" aria-label={t.zoomIn} title={t.zoomIn}>+</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-out" aria-label={t.zoomOut} title={t.zoomOut}>−</button>
       <button type="button" class="kg-btn" data-kg-action="reset" aria-label={t.reset} title={t.reset}>⟲</button>
@@ -74,7 +70,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
 </div>
 
 <script>
-  import { GRAPH_GROUP_COLORS } from '../lib/graph';
+  import { GRAPH_GROUP_COLORS, GRAPH_COMMUNITY_COLORS } from '../lib/graph';
   import { clampZoom, viewBoxOf, zoomAt, panBy, centerOn } from '../lib/graph-zoom';
 
   const rootEl = document.getElementById('kg-root');
@@ -86,7 +82,32 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
   const tooltip = document.getElementById('kg-tooltip') as HTMLDivElement | null;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const colorFor = (g: string) => GRAPH_GROUP_COLORS[g] || 'var(--text-muted)';
+  const groupList = Object.keys(GRAPH_GROUP_COLORS);
+  // Color mode: fixed track/category taxonomy vs emergent communities.
+  let mode: 'group' | 'community' = 'group';
+  let communities: number[] = [];
+  const colorFor = (n: any) =>
+    mode === 'community'
+      ? GRAPH_COMMUNITY_COLORS[(n.community ?? 0) % GRAPH_COMMUNITY_COLORS.length]
+      : GRAPH_GROUP_COLORS[n.group] || 'var(--text-muted)';
+  const legendEl = document.getElementById('kg-legend') as HTMLDivElement | null;
+  function renderLegend() {
+    if (!legendEl) return;
+    legendEl.replaceChildren();
+    const items =
+      mode === 'community'
+        ? communities.map((c) => ({ key: String(c), color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length] }))
+        : groupList.map((g) => ({ key: g, color: GRAPH_GROUP_COLORS[g] }));
+    for (const it of items) {
+      const span = document.createElement('span');
+      span.className = 'kg-legend-item';
+      const i = document.createElement('i');
+      i.style.background = it.color;
+      span.appendChild(i);
+      span.appendChild(document.createTextNode(it.key));
+      legendEl.appendChild(span);
+    }
+  }
   const NS = 'http://www.w3.org/2000/svg';
   const el = (name: string) => document.createElementNS(NS, name);
   // Base path derived from the data URL (e.g. /Personal_Projects.github.io/graph.json).
@@ -209,7 +230,7 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
       const r = n.size || 6;
       const c = el('circle');
       c.setAttribute('r', String(r));
-      c.setAttribute('fill', colorFor(n.group));
+      c.setAttribute('fill', colorFor(n));
       const txt = el('text');
       txt.setAttribute('x', String(r + 6));
       txt.setAttribute('y', '4');
@@ -645,6 +666,17 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
         if (restart) restart();
       } else if (action === 'fullscreen') {
         toggleFullscreen();
+      } else if (action === 'toggle-color') {
+        mode = mode === 'group' ? 'community' : 'group';
+        const isCommunity = mode === 'community';
+        btn.setAttribute('aria-pressed', String(isCommunity));
+        btn.textContent = isCommunity ? btn.dataset.labelCommunity! : btn.dataset.labelGroup!;
+        btn.title = btn.textContent;
+        nodes.forEach((n, i) => {
+          const circle = nodeEls[i].querySelector('circle');
+          if (circle) circle.setAttribute('fill', colorFor(n));
+        });
+        renderLegend();
       }
     });
   });
@@ -664,6 +696,11 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     fetch(url)
       .then((r) => r.json())
       .then((data) => {
+        const rawNodes: any[] = (data as any).nodes ?? [];
+        const communityIds = new Set<number>();
+        for (const n of rawNodes) communityIds.add((n as any).community ?? 0);
+        communities = [...communityIds].sort((a, b) => a - b);
+        renderLegend();
         // Build adjacency once before rendering.
         adjacency.clear();
         for (const l of data.links) {
@@ -750,6 +787,17 @@ const groupList = Object.keys(GRAPH_GROUP_COLORS);
     line-height: 1;
   }
   .kg-btn:hover {
+    border-color: var(--text-accent);
+    color: var(--text-accent);
+  }
+  .kg-btn-toggle {
+    width: auto;
+    padding: 0 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .kg-btn-toggle[aria-pressed='true'] {
     border-color: var(--text-accent);
     color: var(--text-accent);
   }

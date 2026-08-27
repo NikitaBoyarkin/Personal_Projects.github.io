@@ -19,6 +19,8 @@ export interface GraphNode {
   url: string;
   /** Node radius in world units, derived from kind + degree (hub ≈ bigger). */
   size?: number;
+  /** Emergent community id (label propagation), 0-based. Cuts across `group`. */
+  community?: number;
 }
 
 export type LinkType = "related" | "children" | "topic" | "shared";
@@ -49,6 +51,21 @@ export const GRAPH_GROUP_COLORS: Record<string, string> = {
   note: '#8fa3b8',
   topic: '#b48ce0',
 };
+
+/** Community palette — 10 distinct hues for the emergent clusters. Hex (not
+ *  CSS vars) so community colors stay distinguishable in both themes. */
+export const GRAPH_COMMUNITY_COLORS = [
+  '#e06c6c', // red
+  '#5b9bd5', // blue
+  '#4caf78', // green
+  '#c9a24a', // gold
+  '#9d7bd8', // purple
+  '#5db8b0', // teal
+  '#e08a5b', // orange
+  '#b48ce0', // lavender
+  '#6c8ae0', // indigo
+  '#8fa3b8', // slate
+];
 
 interface ProjectLike {
   id: string;
@@ -96,6 +113,98 @@ const TOOL_TOPICS = new Set(["python", "sql"]);
 
 /** Project↔project edge weight when two projects share `n` topics. */
 const sharedTopicWeight = (n: number) => Math.min(1, 0.4 + 0.15 * n);
+
+/** Greedy modularity maximization (Clauset–Newman–Moore) for community
+ *  detection. Deterministic: pairs are scanned in a fixed order and ties break
+ *  to the first pair, so the result is reproducible across builds. Modularity
+ *  explicitly penalizes oversized communities, so high-degree topic hubs
+ *  (sql, python) don't sweep the whole graph the way label propagation does.
+ *  Communities are renumbered by first-seen order → small, stable ids.
+ */
+export function detectCommunities(
+  nodes: { id: string }[],
+  links: { source: string; target: string }[],
+): Map<string, number> {
+  const m = links.length;
+  const result = new Map<string, number>();
+  if (m === 0) {
+    nodes.forEach((n, i) => result.set(n.id, i));
+    return result;
+  }
+
+  // Undirected adjacency (deduped).
+  const adj = new Map<string, Set<string>>();
+  for (const n of nodes) adj.set(n.id, new Set());
+  for (const l of links) {
+    adj.get(l.source)?.add(l.target);
+    adj.get(l.target)?.add(l.source);
+  }
+
+  // Start: every node is its own community.
+  const comm = new Map<string, number>();
+  nodes.forEach((n, i) => comm.set(n.id, i));
+  const members = nodes.map((n) => new Set([n.id]));
+  const L = nodes.map(() => 0); // internal edges per community
+  const K = nodes.map(() => 0); // degree sum per community
+  for (const n of nodes) K[comm.get(n.id)!] = adj.get(n.id)!.size;
+  for (const l of links) {
+    if (comm.get(l.source) === comm.get(l.target)) L[comm.get(l.source)!]++;
+  }
+  // Edges between communities (upper triangle).
+  const E: number[][] = nodes.map(() => nodes.map(() => 0));
+  for (const l of links) {
+    const a = comm.get(l.source)!;
+    const b = comm.get(l.target)!;
+    if (a !== b) E[Math.min(a, b)][Math.max(a, b)]++;
+  }
+
+  const twoM = 2 * m;
+  // Greedy merge loop: repeatedly merge the pair with the largest ΔQ > 0.
+  for (;;) {
+    let bestDelta = 0;
+    let bestA = -1;
+    let bestB = -1;
+    for (let a = 0; a < nodes.length; a++) {
+      if (members[a].size === 0) continue;
+      for (let b = a + 1; b < nodes.length; b++) {
+        if (members[b].size === 0 || E[a][b] === 0) continue;
+        const delta = 2 * (E[a][b] / m - (K[a] / twoM) * (K[b] / twoM));
+        if (delta > bestDelta) {
+          bestDelta = delta;
+          bestA = a;
+          bestB = b;
+        }
+      }
+    }
+    if (bestA < 0) break;
+    // Merge bestB into bestA.
+    for (const id of members[bestB]) {
+      comm.set(id, bestA);
+      members[bestA].add(id);
+    }
+    members[bestB].clear();
+    L[bestA] += L[bestB] + E[bestA][bestB];
+    K[bestA] += K[bestB];
+    for (let c = 0; c < nodes.length; c++) {
+      if (c === bestA || members[c].size === 0) continue;
+      const eBc = E[Math.min(bestB, c)][Math.max(bestB, c)];
+      if (eBc > 0) {
+        E[Math.min(bestA, c)][Math.max(bestA, c)] += eBc;
+        E[Math.min(bestB, c)][Math.max(bestB, c)] = 0;
+      }
+    }
+    E[bestA][bestB] = 0;
+  }
+
+  // Renumber by first-seen order so ids are stable and compact.
+  const idByComm = new Map<number, number>();
+  for (const n of nodes) {
+    const c = comm.get(n.id)!;
+    if (!idByComm.has(c)) idByComm.set(c, idByComm.size);
+    result.set(n.id, idByComm.get(c)!);
+  }
+  return result;
+}
 
 export function buildGraph(opts: {
   projects: ProjectLike[];
@@ -266,8 +375,16 @@ export function buildGraph(opts: {
     return { ...n, size: Math.round(size * 10) / 10 };
   });
 
+  // Community detection — emergent clusters that cut across the fixed
+  // track/category taxonomy (e.g. "A/B methodology", "Volta loop").
+  const communities = detectCommunities(nodesWithSize, links);
+  const nodesWithCommunity = nodesWithSize.map((n) => ({
+    ...n,
+    community: communities.get(n.id) ?? 0,
+  }));
+
   return {
-    nodes: nodesWithSize,
+    nodes: nodesWithCommunity,
     links,
   };
 }
