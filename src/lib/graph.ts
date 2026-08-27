@@ -19,8 +19,10 @@ export interface GraphNode {
   url: string;
   /** Node radius in world units, derived from kind + degree (hub ≈ bigger). */
   size?: number;
-  /** Emergent community id (label propagation), 0-based. Cuts across `group`. */
+  /** Emergent community id (greedy modularity), 0-based. Cuts across `group`. */
   community?: number;
+  /** Human-readable community name (per-locale), e.g. "Аналитический тулкит". */
+  communityLabel?: string;
 }
 
 export type LinkType = "related" | "children" | "topic" | "shared";
@@ -111,8 +113,26 @@ export function parseRelatedPath(
  *  into black holes. They are still matched by post tags. */
 const TOOL_TOPICS = new Set(["python", "sql"]);
 
-/** Project↔project edge weight when two projects share `n` topics. */
-const sharedTopicWeight = (n: number) => Math.min(1, 0.4 + 0.15 * n);
+/** Lateral edge weight when two nodes share `n` signals (topics/tags/tools).
+ *  Salience grows with evidence, mirroring the vault linker's scoring. */
+const sharedSignalWeight = (n: number) => Math.min(1, 0.4 + 0.15 * n);
+
+/** Community labels keyed by a representative node id per cluster. Resolved at
+ *  build time by finding which representative each community contains, so labels
+ *  survive community renumbering when content changes. Fallback: `#<id>`. */
+const COMMUNITY_LABELS: Record<'ru' | 'en', [string, string][]> = {
+  ru: [
+    ['p:site', 'Карьера и портфолио'],
+    ['p:sql', 'Аналитический тулкит'],
+    ['p:volta', 'Эксперименты и петля Volta'],
+  ],
+  en: [
+    ['p:bot', 'Automation'],
+    ['p:sql', 'Analytics toolkit'],
+    ['p:site', 'Portfolio & site'],
+    ['p:volta', 'Experiments & Volta loop'],
+  ],
+};
 
 /** Greedy modularity maximization (Clauset–Newman–Moore) for community
  *  detection. Deterministic: pairs are scanned in a fixed order and ties break
@@ -330,6 +350,10 @@ export function buildGraph(opts: {
     projectTopics.set(slug, matched);
   }
 
+  // Lateral links (mirror the vault linker: nodes that share concepts get a
+  // direct related-style edge instead of only meeting through a topic hub).
+  // Weight = salience, growing with the number of shared signals.
+
   // project↔project via shared topics (≥2 common topics → direct edge).
   const projectSlugs = projects.map((p) => slugOf(p.id));
   for (let i = 0; i < projectSlugs.length; i++) {
@@ -340,7 +364,53 @@ export function buildGraph(opts: {
         [...(projectTopics.get(a) ?? [])].filter((t) => projectTopics.get(b)?.has(t)),
       );
       if (shared.size >= 2) {
-        addLink(`p:${a}`, `p:${b}`, sharedTopicWeight(shared.size), "shared");
+        addLink(`p:${a}`, `p:${b}`, sharedSignalWeight(shared.size), "shared");
+      }
+    }
+  }
+
+  // project↔project via shared tools (≥2 common tools → direct edge). `python`
+  // and `sql` are excluded — the same TOOL_TOPICS guard that keeps them from
+  // becoming topic hubs, since they appear in nearly every project.
+  const projectTools = new Map<string, Set<string>>();
+  for (const p of projects) {
+    projectTools.set(
+      slugOf(p.id),
+      new Set(
+        (p.data.tools ?? [])
+          .map((t) => t.toLowerCase())
+          .filter((t) => !TOOL_TOPICS.has(t)),
+      ),
+    );
+  }
+  for (let i = 0; i < projectSlugs.length; i++) {
+    for (let j = i + 1; j < projectSlugs.length; j++) {
+      const a = projectSlugs[i];
+      const b = projectSlugs[j];
+      const shared = new Set(
+        [...(projectTools.get(a) ?? [])].filter((t) => projectTools.get(b)?.has(t)),
+      );
+      if (shared.size >= 2) {
+        addLink(`p:${a}`, `p:${b}`, sharedSignalWeight(shared.size), "shared");
+      }
+    }
+  }
+
+  // post↔post via shared tags (≥2 common tags → direct edge).
+  const postTags = new Map<string, Set<string>>();
+  for (const post of posts) {
+    postTags.set(slugOf(post.id), new Set(post.data.tags ?? []));
+  }
+  const postSlugs = posts.map((p) => slugOf(p.id));
+  for (let i = 0; i < postSlugs.length; i++) {
+    for (let j = i + 1; j < postSlugs.length; j++) {
+      const a = postSlugs[i];
+      const b = postSlugs[j];
+      const shared = new Set(
+        [...(postTags.get(a) ?? [])].filter((t) => postTags.get(b)?.has(t)),
+      );
+      if (shared.size >= 2) {
+        addLink(`post:${a}`, `post:${b}`, sharedSignalWeight(shared.size), "shared");
       }
     }
   }
@@ -377,11 +447,32 @@ export function buildGraph(opts: {
 
   // Community detection — emergent clusters that cut across the fixed
   // track/category taxonomy (e.g. "A/B methodology", "Volta loop").
-  const communities = detectCommunities(nodesWithSize, links);
-  const nodesWithCommunity = nodesWithSize.map((n) => ({
-    ...n,
-    community: communities.get(n.id) ?? 0,
-  }));
+  // Runs on the explicit structure (related/children/topic) only: lateral
+  // `shared` edges add connectivity for the layout, but on a graph this small
+  // they would collapse the taxonomy into one cluster if they drove the
+  // clustering too. They still appear in the layout — just don't shape it.
+  const explicitLinks = links.filter((l) => l.type !== "shared");
+  const communities = detectCommunities(nodesWithSize, explicitLinks);
+
+  // Resolve per-locale community labels by representative node: find which
+  // community each representative landed in, then label every node in it.
+  // Keyed by representative so labels survive community renumbering.
+  const labelByCommunity = new Map<number, string>();
+  for (const [rep, label] of COMMUNITY_LABELS[lang]) {
+    const c = communities.get(rep);
+    if (c !== undefined && !labelByCommunity.has(c)) {
+      labelByCommunity.set(c, label);
+    }
+  }
+
+  const nodesWithCommunity = nodesWithSize.map((n) => {
+    const c = communities.get(n.id) ?? 0;
+    return {
+      ...n,
+      community: c,
+      communityLabel: labelByCommunity.get(c) ?? `#${c}`,
+    };
+  });
 
   return {
     nodes: nodesWithCommunity,

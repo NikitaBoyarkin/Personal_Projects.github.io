@@ -86,6 +86,7 @@ const t = {
   // Color mode: fixed track/category taxonomy vs emergent communities.
   let mode: 'group' | 'community' = 'group';
   let communities: number[] = [];
+  let communityLabels = new Map<number, string>();
   const colorFor = (n: any) =>
     mode === 'community'
       ? GRAPH_COMMUNITY_COLORS[(n.community ?? 0) % GRAPH_COMMUNITY_COLORS.length]
@@ -96,7 +97,10 @@ const t = {
     legendEl.replaceChildren();
     const items =
       mode === 'community'
-        ? communities.map((c) => ({ key: String(c), color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length] }))
+        ? communities.map((c) => ({
+            key: communityLabels.get(c) ?? `#${c}`,
+            color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length],
+          }))
         : groupList.map((g) => ({ key: g, color: GRAPH_GROUP_COLORS[g] }));
     for (const it of items) {
       const span = document.createElement('span');
@@ -698,7 +702,14 @@ const t = {
       .then((data) => {
         const rawNodes: any[] = (data as any).nodes ?? [];
         const communityIds = new Set<number>();
-        for (const n of rawNodes) communityIds.add((n as any).community ?? 0);
+        communityLabels = new Map<number, string>();
+        for (const n of rawNodes) {
+          const c = (n as any).community ?? 0;
+          communityIds.add(c);
+          if (!communityLabels.has(c)) {
+            communityLabels.set(c, (n as any).communityLabel ?? `#${c}`);
+          }
+        }
         communities = [...communityIds].sort((a, b) => a - b);
         renderLegend();
         // Build adjacency once before rendering.
