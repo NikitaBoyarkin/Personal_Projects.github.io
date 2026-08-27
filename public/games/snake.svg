@@ -31,11 +31,13 @@
       var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
       var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
       if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
-        var phs = document.createElement('script');
-        phs.src = 'https://us-assets.i.posthog.com/static/array.js';
-        phs.async = true;
-        phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
-        document.head.appendChild(phs);
+        try {
+          var phs = document.createElementNS('http://www.w3.org/2000/svg', 'script');
+          phs.setAttribute('href', 'https://us-assets.i.posthog.com/static/array.js');
+          phs.setAttribute('type', 'text/javascript');
+          phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+          document.documentElement.appendChild(phs);
+        } catch (e) {}
       }
       function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
       function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
