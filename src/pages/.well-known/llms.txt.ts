@@ -1,8 +1,8 @@
-// Build-time llms.txt — canonical URL, format per https://llmstxt.org/.
-// Generation logic lives in src/lib/llms-txt.ts (shared with the
-// .well-known alias, so they can never drift). Emitted at /llms.txt.
+// Well-known alias per llmstxt.org: /.well-known/llms.txt is the canonical
+// discovery URL; /llms.txt also works. One generator, two routes — see
+// src/lib/llms-txt.ts. Emitted at /.well-known/llms.txt.
 import type { APIContext } from "astro";
-import { buildLlmsTxt } from "../lib/llms-txt";
+import { buildLlmsTxt } from "../../lib/llms-txt";
 
 const SITE = "https://nikitaboyarkin.github.io";
 

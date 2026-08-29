@@ -96,6 +96,19 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
     <link rel="icon" type="image/svg+xml" href={faviconUrl} />
     <link rel="apple-touch-icon" href={faviconUrl} />
     <link rel="alternate" type="application/rss+xml" title="Nikita Boyarkin — Writing" href={withBase('rss.xml')} />
+
+    {
+      /* LCP: preload the Inter subsets used above the fold so the hero `h1`
+         (the LCP element) renders in the final font as early as possible.
+         Inter is a variable font — one woff2 per subset covers all weights.
+         Latin is always needed ("Nikita Boyarkin"); add the script subset.
+         crossorigin is required for font preloads. */
+      ['inter-latin.woff2', ...(isEn ? ['inter-latin-ext.woff2'] : ['inter-cyrillic.woff2'])].map(
+        (f) => (
+          <link rel="preload" as="font" type="font/woff2" crossorigin="anonymous" href={withBase(`fonts/${f}`)} />
+        ),
+      )
+    }
     <meta id="theme-color" name="theme-color" content="#0f2a2b" />
 
     <meta property="og:title" content={title} />
