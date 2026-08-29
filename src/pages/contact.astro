@@ -1,6 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { withBase } from '../lib/path';
+
+// Telegram deep-link: pre-fills the message so the first contact carries context.
+const tgDeepLink = `https://t.me/lofinibo?text=${encodeURIComponent('Привет! Обсудим продуктовую аналитику / роли аналитика.')}`;
 ---
 
 <Base title="Контакты | Nikita Boyarkin" description="Связаться с Никитой Бояркиным — продуктовая аналитика, A/B-тестирование, сотрудничество." activeNav="contact" canonical={withBase('contact/')} lang="ru">
@@ -11,13 +14,34 @@ import { withBase } from '../lib/path';
         Хотите обсудить product-аналитику, A/B-тестирование или формат сотрудничества — я открыт к разговорам.
         Открыт к Data / Product Analyst ролям.
       </p>
-      <a href="https://t.me/lofinibo" class="contact-email" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo</a>
+      <a href="https://t.me/lofinibo" class="contact-email" data-analytics="telegram_contact" target="_blank" rel="noopener noreferrer">Telegram: @lofinibo</a>
+      <p style="margin-top: var(--space-2);">
+        <a href={tgDeepLink} data-analytics="telegram_deeplink" target="_blank" rel="noopener noreferrer">Написать с контекстом →</a>
+      </p>
 
       <p style="margin-top: var(--space-6);">
         <a href={withBase('start/')}>С чего начать →</a> ·
         <a href={withBase('now/')}>Что сейчас в работе →</a> ·
-        <a href={withBase('CV-Nikita-Boyarkin.pdf')}>CV (PDF)</a>
+        <a href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_download_pdf">CV (PDF)</a>
       </p>
+    </div>
+
+    <div class="board-card look-card" style="max-width: 60ch;">
+      <h2 class="look-title">Что я ищу</h2>
+      <dl class="look-grid">
+        <div class="look-item">
+          <dt>Роль</dt>
+          <dd>Data / Product Analyst · middle</dd>
+        </div>
+        <div class="look-item">
+          <dt>Стек</dt>
+          <dd>SQL · Python · A/B-эксперименты · продуктовые метрики</dd>
+        </div>
+        <div class="look-item">
+          <dt>Формат</dt>
+          <dd>Открыт к ролям — формат сотрудничества обсудим</dd>
+        </div>
+      </dl>
     </div>
 
     <div class="linkedin-badge">
@@ -26,6 +50,39 @@ import { withBase } from '../lib/path';
       </div>
     </div>
   </section>
+
+  <style>
+    .look-card {
+      margin-top: var(--space-6);
+      padding: var(--space-6);
+    }
+    .look-title {
+      margin: 0 0 var(--space-4);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .look-grid {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .look-item dt {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: var(--space-1);
+    }
+    .look-item dd {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-normal);
+      line-height: 1.5;
+    }
+  </style>
 
   <script is:inline>
     // Match LinkedIn badge theme to current site theme before the badge script initializes.

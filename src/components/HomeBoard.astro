@@ -3,6 +3,7 @@ import ProjectSpotlight from './ProjectSpotlight.astro';
 import ArrowMorph from './ArrowMorph.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
+import { METRICS as SIG } from '../lib/metrics';
 
 interface Props {
   lang?: 'ru' | 'en';
@@ -48,8 +49,8 @@ const t = {
   metrics: [
     { value: String(allProjects.length), label: isEn ? 'projects in portfolio' : 'проектов в портфолио' },
     { value: '10', label: isEn ? 'SQL cases on DuckDB' : 'SQL-кейсов на DuckDB' },
-    { value: '+6.24pp', label: isEn ? 'KYC conversion' : 'KYC-конверсия' },
-    { value: '€716K/yr', label: isEn ? 'annual fix impact' : 'годовой эффект фикса' },
+    { value: `+${SIG.abKyc.deltaPp}pp`, label: isEn ? 'KYC conversion' : 'KYC-конверсия' },
+    { value: `€${SIG.abKyc.annualEurK}K/yr`, label: isEn ? 'annual fix impact' : 'годовой эффект фикса' },
   ],
   timeline: isEn ? 'Path & timeline' : 'Путь и таймлайн',
   arcade: isEn ? 'Games arcade' : 'Аркада игр',
@@ -115,9 +116,9 @@ const contactHref = withBase('contact/');
         <div class="board-card">
           <h3 class="board-card-title">{t.contact}</h3>
           <ul class="board-links">
-            <li><a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer">{t.telegram}</a></li>
-            <li><a href="https://github.com/NikitaBoyarkin" target="_blank" rel="noopener noreferrer">{t.github}</a></li>
-            <li><a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer">{t.linkedin}</a></li>
+            <li><a href="https://t.me/lofinibo" data-analytics="telegram_board" target="_blank" rel="noopener noreferrer">{t.telegram}</a></li>
+            <li><a href="https://github.com/NikitaBoyarkin" data-analytics="github_board" target="_blank" rel="noopener noreferrer">{t.github}</a></li>
+            <li><a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_board" target="_blank" rel="noopener noreferrer">{t.linkedin}</a></li>
             <li><a href={contactHref}>{isEn ? 'Contact page' : 'Страница контактов'}</a></li>
           </ul>
         </div>

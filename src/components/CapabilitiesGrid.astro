@@ -4,6 +4,7 @@
 // project link, inline stroke icon (same visual language as MorphIcon).
 // Responsive: 3 columns desktop, 2 tablet, 1 mobile.
 import { withBase } from "../lib/path";
+import { METRICS as SIG } from "../lib/metrics";
 
 interface Props {
   lang?: "ru" | "en";
@@ -38,7 +39,7 @@ const CARDS = [
     deliverable: isEn
       ? "CUPED + AA + Bonferroni, a 3-condition ship-gate."
       : "CUPED + AA + Bonferroni, ship-gate из 3 условий.",
-    metric: "+6.24pp KYC",
+    metric: `+${SIG.abKyc.deltaPp}pp KYC`,
     href: p("projects/ab/"),
   },
   {
@@ -58,7 +59,9 @@ const CARDS = [
     deliverable: isEn
       ? "RFM: 4 segments + targeted monetization actions."
       : "RFM: 4 сегмента + точечные действия по монетизации.",
-    metric: isEn ? "12% → 41% of revenue" : "12% → 41% выручки",
+    metric: isEn
+      ? `${SIG.rfm.revenueBeforePct}% → ${SIG.rfm.revenueAfterPct}% of revenue`
+      : `${SIG.rfm.revenueBeforePct}% → ${SIG.rfm.revenueAfterPct}% выручки`,
     href: p("projects/rfm/"),
   },
   {
@@ -76,8 +79,8 @@ const CARDS = [
     icon: ICONS.automation,
     title: isEn ? "Automation" : "Автоматизация",
     deliverable: isEn
-      ? "Telegram bot: weekly report 1–2h → cron."
-      : "Telegram-бот: еженедельный отчёт 1–2ч → cron.",
+      ? `Telegram bot: weekly report ${SIG.bot.hoursBefore}h → ${SIG.bot.minutesAfter} min.`
+      : `Telegram-бот: еженедельный отчёт ${SIG.bot.hoursBefore}ч → ${SIG.bot.minutesAfter} мин.`,
     metric: isEn ? "0 manual steps" : "0 ручных шагов",
     href: p("projects/bot/"),
   },
@@ -88,7 +91,7 @@ const CARDS = [
     deliverable: isEn
       ? "Funnel + A/B + retention + segmentation in one loop."
       : "Funnel + A/B + retention + сегментация одной петлёй.",
-    metric: "€716K/yr",
+    metric: `€${SIG.abKyc.annualEurK}K/yr`,
     href: p("projects/volta/"),
   },
 ];

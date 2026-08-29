@@ -212,7 +212,11 @@ Custom events captured (in addition to autocapture `$pageview`/`$pageleave`):
 
 Any element carrying `data-analytics="<name>"` fires `<name>` on click via a
 delegated listener in `Analytics.astro`. Existing attributes: `project_view_*`,
-`project_demo_*`, `project_github_*` (ProjectCard), `cv_download_pdf`,
+`project_demo_*`, `project_github_*` (ProjectCard), `cv_download_pdf` (cv page, hero PDF button, contact),
+`telegram_deeplink` (contact «написать с контекстом»),
+`github_hero` / `linkedin_hero` (hero CTA row),
+`telegram_board` / `github_board` / `linkedin_board` (HomeBoard profile column),
+`telegram_contact` (contact main Telegram link),
 `telegram_header` / `github_footer` / `linkedin_footer` / `telegram_footer` /
 `cv_footer` / `cv_pdf_footer` / `writing_footer` (Base), `search_open`
 (SearchBox). `lang_switch_*` is special-cased into the structured

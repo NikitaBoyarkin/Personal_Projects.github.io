@@ -2,15 +2,18 @@
 // «Опыт» + «Образование» — compact two-card snapshot under the board.
 // Career-switcher honesty: no employer history exists in the CV, so the
 // experience card leads with the grade claim (Middle, 4+ years) and measured
-// portfolio outcomes — the same numbers already shown in CapabilitiesGrid /
-// Volta case study. Education line comes straight from the rendercv YAML.
+// portfolio outcomes — the same numbers shown across the homepage, sourced
+// from src/lib/metrics.ts (CV-authoritative). Education comes from rendercv.
 import { withBase } from "../lib/path";
+import { METRICS as SIG } from "../lib/metrics";
 
 interface Props {
   lang?: "ru" | "en";
 }
 const { lang = "ru" } = Astro.props;
 const isEn = lang === "en";
+
+const { abKyc, retention, rfm, bot } = SIG;
 
 const I18N = {
   heading: isEn ? "Experience & education" : "Опыт и образование",
@@ -23,10 +26,10 @@ const I18N = {
     ? "4+ years at the intersection of product, data, and experimentation."
     : "4+ года на стыке продукта, данных и экспериментов.",
   bullets: [
-    isEn ? "A/B KYC: +6.24pp conversion → €716K/yr" : "A/B KYC: +6.24pp конверсии → €716K в год",
-    isEn ? "Retention: +9.2pp → €227K LTV" : "Retention: +9.2pp → €227K LTV",
-    isEn ? "RFM: 4 segments concentrate 12% → 41% of revenue" : "RFM: 4 сегмента концентрируют 12% → 41% выручки",
-    isEn ? "Telegram bot: weekly report 2h → 5 min" : "Telegram-бот: еженедельный отчёт 2ч → 5 мин",
+    isEn ? `A/B KYC: +${abKyc.deltaPp}pp conversion → €${abKyc.annualEurK}K/yr` : `A/B KYC: +${abKyc.deltaPp}pp конверсии → €${abKyc.annualEurK}K в год`,
+    isEn ? `Retention: +${retention.deltaPp}pp → €${retention.ltvEurK}K LTV` : `Retention: +${retention.deltaPp}pp → €${retention.ltvEurK}K LTV`,
+    isEn ? `RFM: 4 segments concentrate ${rfm.revenueBeforePct}% → ${rfm.revenueAfterPct}% of revenue` : `RFM: 4 сегмента концентрируют ${rfm.revenueBeforePct}% → ${rfm.revenueAfterPct}% выручки`,
+    isEn ? `Telegram bot: weekly report ${bot.hoursBefore}h → ${bot.minutesAfter} min` : `Telegram-бот: еженедельный отчёт ${bot.hoursBefore}ч → ${bot.minutesAfter} мин`,
   ],
   eduTitle: isEn ? "Education" : "Образование",
   eduItems: [

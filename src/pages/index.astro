@@ -33,6 +33,27 @@ const jsonLd = {
         'https://github.com/NikitaBoyarkin',
         'https://www.linkedin.com/in/nikita-boyarkin',
       ],
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'Data Analyst / Product Analyst',
+      },
+      alumniOf: {
+        '@type': 'CollegeOrUniversity',
+        name: 'UMC',
+      },
+      knowsAbout: [
+        'A/B testing',
+        'Product analytics',
+        'Retention analysis',
+        'Customer segmentation (RFM)',
+        'SQL',
+        'Python',
+        'Data visualization',
+      ],
+      speakable: {
+        '@type': 'SpeakableSpecification',
+        cssSelector: ['h1', '.tagline'],
+      },
     },
     {
       '@type': 'ItemList',
@@ -73,9 +94,10 @@ const jsonLd = {
         <p class="cta-row">
           <a class="button" href={withBase('start/')}>С чего начать</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
+          <a class="button button-secondary" href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_download_pdf" target="_blank" rel="noopener">Скачать PDF</a>
           <span class="cta-links">
-            <a href="https://github.com/NikitaBoyarkin">GitHub</a> ·
-            <a href="https://www.linkedin.com/in/nikita-boyarkin">LinkedIn</a> ·
+            <a href="https://github.com/NikitaBoyarkin" data-analytics="github_hero">GitHub</a> ·
+            <a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_hero">LinkedIn</a> ·
             <a href={withBase('graph/')}>Граф</a>
           </span>
         </p>
