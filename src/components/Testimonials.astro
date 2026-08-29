@@ -1,0 +1,111 @@
+---
+// Social-proof block. Data-driven: renders nothing while
+// src/lib/testimonials.ts is empty (which it is until a real
+// recommendation is collected — no fabrication, no placeholder quotes).
+import { testimonials, hasTestimonials } from "../lib/testimonials";
+
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+const heading = isEn ? "Recommendations" : "Отзывы";
+const sub = isEn
+  ? "What people I've worked with say."
+  : "Что говорят люди, с которыми я работал.";
+---
+
+{
+  hasTestimonials && (
+    <section id="recommendations" class="testimonials reveal" aria-label={heading}>
+      <h2>{heading}</h2>
+      <p class="testimonials-lead">{sub}</p>
+      <div class="testimonials-grid">
+        {
+          testimonials.map((t) => (
+            <figure class="testimonial-card">
+              <blockquote>“{t.quote}”</blockquote>
+              <figcaption>
+                <span class="testimonial-name">{t.name}</span>
+                {(t.role || t.company) && (
+                  <span class="testimonial-role">
+                    {[t.role, t.company].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+                {t.url && (
+                  <a class="testimonial-link" href={t.url} target="_blank" rel="noopener noreferrer">
+                    {isEn ? "Profile →" : "Профиль →"}
+                  </a>
+                )}
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .testimonials {
+    margin: var(--space-16) 0;
+  }
+  .testimonials h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    color: var(--text-normal);
+  }
+  .testimonials-lead {
+    color: var(--text-muted);
+    max-width: 60ch;
+    margin-bottom: var(--space-10);
+  }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-5);
+  }
+  .testimonial-card {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--background-secondary);
+  }
+  .testimonial-card blockquote {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--text-normal);
+  }
+  .testimonial-card figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-color);
+  }
+  .testimonial-name {
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  .testimonial-role {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .testimonial-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-accent);
+    text-decoration: none;
+  }
+  .testimonial-link:hover {
+    color: var(--text-accent-hover);
+  }
+</style>

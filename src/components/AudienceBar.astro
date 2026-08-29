@@ -1,0 +1,170 @@
+---
+// «Кто смотрит» — Netflix-style audience switch. A segmented control that
+// reorders the homepage stack for recruiters / analyst colleagues / learners.
+// Mechanics: html[data-audience] is stamped pre-paint in Base.astro; each
+// .home-stack wrapper carries data-order-<audience>="{rank}" attributes; the
+// shared window.__reorderHomeStack() (Base.astro) moves the stack into rank
+// order before the first paint — no CSS reorder, no layout flash. Choice
+// persists in localStorage; every switch fires a PostHog event.
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+const AUDIENCES = [
+  { id: "recruiter", label: isEn ? "Recruiter" : "Рекрутер" },
+  { id: "analyst", label: isEn ? "Colleague" : "Коллега" },
+  { id: "learner", label: isEn ? "Learner" : "Учусь" },
+];
+
+const label = isEn ? "Who is looking?" : "Кто смотрит?";
+
+const notes: Record<string, string> = {
+  recruiter: isEn
+    ? "Ordered for hiring: outcomes and proof first, writing last."
+    : "Порядок для найма: результаты и доказательства в начале.",
+  analyst: isEn
+    ? "Ordered for analyst colleagues: projects, methods, notes."
+    : "Порядок для коллег: проекты, методы, записи.",
+  learner: isEn
+    ? "Ordered for learning: writing and topics first, then projects."
+    : "Порядок для изучения: записи и темы в начале, проекты ниже.",
+};
+---
+
+<div
+  class="audience-bar"
+  role="group"
+  aria-label={label}
+  data-audience-bar
+  data-notes={JSON.stringify(notes)}
+>
+  <span class="audience-label">{label}</span>
+  {
+    AUDIENCES.map((a) => (
+      <button class="audience-option" type="button" data-audience-option={a.id} aria-pressed="false">
+        {a.label}
+      </button>
+    ))
+  }
+</div>
+<p class="audience-note" data-audience-note aria-live="polite">{notes.recruiter}</p>
+
+<script>
+  declare global {
+    interface Window {
+      __reorderHomeStack?: (aud: string) => void;
+      posthog?: { capture: (event: string, props?: Record<string, unknown>) => void };
+    }
+  }
+
+  type Audience = "recruiter" | "analyst" | "learner";
+
+  function init() {
+    const barEl = document.querySelector<HTMLElement>("[data-audience-bar]");
+    const noteEl = document.querySelector<HTMLElement>("[data-audience-note]");
+    if (!barEl || !noteEl) return;
+    // Reassign so TS keeps the non-null narrowing inside the closures below.
+    const bar = barEl;
+    const note = noteEl;
+    const notes = JSON.parse(bar.dataset.notes || "{}") as Record<string, string>;
+    const html = document.documentElement;
+
+    function apply(aud: Audience) {
+      html.setAttribute("data-audience", aud);
+      bar.querySelectorAll<HTMLButtonElement>("[data-audience-option]").forEach((b) => {
+        const active = b.dataset.audienceOption === aud;
+        b.setAttribute("aria-pressed", String(active));
+        b.classList.toggle("is-active", active);
+      });
+      if (note) note.textContent = notes[aud] || "";
+      // Reorder the homepage stack live (no-op on non-home pages).
+      window.__reorderHomeStack?.(aud);
+    }
+
+    const current = (html.getAttribute("data-audience") as Audience) || "recruiter";
+    apply(current);
+
+    bar.querySelectorAll<HTMLButtonElement>("[data-audience-option]").forEach((b) => {
+      b.addEventListener("click", () => {
+        const aud = (b.dataset.audienceOption as Audience) || "recruiter";
+        apply(aud);
+        try {
+          localStorage.setItem("audience", aud);
+        } catch (e) {
+          // ignore storage errors
+        }
+        if (window.posthog) {
+          try {
+            window.posthog.capture("audience_select", { audience: aud });
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
+    });
+  }
+
+  init();
+</script>
+
+<style>
+  .audience-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    max-width: 1000px;
+    margin: var(--space-10) auto var(--space-3);
+    padding: 0 var(--space-5);
+  }
+  .audience-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .audience-option {
+    background: var(--background-secondary);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: var(--space-2) var(--space-5);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .audience-option:hover {
+    border-color: color-mix(in srgb, var(--text-accent) 40%, transparent);
+    color: var(--text-normal);
+  }
+  .audience-option[aria-pressed="true"] {
+    background: var(--text-accent);
+    color: #1a1a1a;
+    border-color: var(--text-accent);
+  }
+  .audience-option:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+  }
+  .audience-note {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 auto var(--space-6);
+    max-width: 56ch;
+  }
+  @media (max-width: 640px) {
+    .audience-bar {
+      gap: var(--space-2);
+    }
+    .audience-option {
+      padding: var(--space-2) var(--space-4);
+      font-size: 0.85rem;
+    }
+  }
+</style>

@@ -1,0 +1,207 @@
+---
+// «Опыт» + «Образование» — compact two-card snapshot under the board.
+// Career-switcher honesty: no employer history exists in the CV, so the
+// experience card leads with the grade claim (Middle, 4+ years) and measured
+// portfolio outcomes — the same numbers already shown in CapabilitiesGrid /
+// Volta case study. Education line comes straight from the rendercv YAML.
+import { withBase } from "../lib/path";
+
+interface Props {
+  lang?: "ru" | "en";
+}
+const { lang = "ru" } = Astro.props;
+const isEn = lang === "en";
+
+const I18N = {
+  heading: isEn ? "Experience & education" : "Опыт и образование",
+  lead: isEn
+    ? "Who I am in facts — grade, experience, and measured outcomes."
+    : "Кто я по фактам — грейд, опыт и измеренные результаты.",
+  expTitle: isEn ? "Experience" : "Опыт",
+  expHeadline: isEn ? "Data Analyst / Product Analyst · Mid" : "Аналитик данных / продуктовый аналитик · Middle",
+  expSub: isEn
+    ? "4+ years at the intersection of product, data, and experimentation."
+    : "4+ года на стыке продукта, данных и экспериментов.",
+  bullets: [
+    isEn ? "A/B KYC: +6.24pp conversion → €716K/yr" : "A/B KYC: +6.24pp конверсии → €716K в год",
+    isEn ? "Retention: +9.2pp → €227K LTV" : "Retention: +9.2pp → €227K LTV",
+    isEn ? "RFM: 4 segments concentrate 12% → 41% of revenue" : "RFM: 4 сегмента концентрируют 12% → 41% выручки",
+    isEn ? "Telegram bot: weekly report 2h → 5 min" : "Telegram-бот: еженедельный отчёт 2ч → 5 мин",
+  ],
+  eduTitle: isEn ? "Education" : "Образование",
+  eduItems: [
+    { degree: isEn ? "BSc · Business informatics" : "BSc · Бизнес-информатика", years: "2016–2020", place: isEn ? "UMC" : "UMC" },
+    { degree: isEn ? "MSc · Work psychology" : "MSc · Психология труда", years: "2020–2022", place: isEn ? "UMC" : "UMC" },
+    { degree: isEn ? "PhD · Work psychology" : "PhD · Психология труда", years: "2022–2025", place: isEn ? "UMC" : "UMC" },
+  ],
+  link: isEn ? "Full CV →" : "Полное резюме →",
+};
+---
+
+<section id="career" class="career reveal" aria-label={I18N.heading}>
+  <h2>{I18N.heading}</h2>
+  <p class="career-lead">{I18N.lead}</p>
+
+  <div class="career-grid">
+    <div class="career-card">
+      <h3 class="career-card-title">{I18N.expTitle}</h3>
+      <p class="career-headline">{I18N.expHeadline}</p>
+      <p class="career-sub">{I18N.expSub}</p>
+      <ul class="career-list">
+        {I18N.bullets.map((b) => (
+          <li>{b}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="career-card">
+      <h3 class="career-card-title">{I18N.eduTitle}</h3>
+      <ul class="career-edu">
+        {I18N.eduItems.map((e) => (
+          <li>
+            <span class="career-edu-degree">
+              {e.degree}
+              <span class="career-edu-place"> · {e.place}</span>
+            </span>
+            <span class="career-edu-years">{e.years}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="career-cta">
+        <a href={withBase("cv/")}>{I18N.link}</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .career {
+    margin: var(--space-16) 0;
+  }
+  .career h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+    color: var(--text-normal);
+  }
+  .career-lead {
+    color: var(--text-muted);
+    max-width: 60ch;
+    margin-bottom: var(--space-10);
+  }
+
+  .career-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5);
+  }
+
+  .career-card {
+    padding: var(--space-6);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--background-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .career-card-title {
+    margin: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .career-headline {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-normal);
+    line-height: 1.35;
+  }
+  .career-sub {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .career-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .career-list li {
+    position: relative;
+    padding-left: 1.4rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--text-normal);
+  }
+  .career-list li::before {
+    content: '▹';
+    position: absolute;
+    left: 0;
+    color: var(--text-accent);
+  }
+
+  .career-edu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  .career-edu li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-color);
+  }
+  .career-edu li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .career-edu-degree {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-normal);
+  }
+  .career-edu-place {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+  .career-edu-years {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-accent);
+    white-space: nowrap;
+  }
+
+  .career-cta {
+    margin: 0;
+    padding-top: var(--space-2);
+  }
+  .career-cta a {
+    color: var(--text-accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+  .career-cta a:hover {
+    color: var(--text-accent-hover);
+  }
+
+  @media (max-width: 900px) {
+    .career-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

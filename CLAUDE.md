@@ -208,6 +208,7 @@ Custom events captured (in addition to autocapture `$pageview`/`$pageleave`):
 | `post_read` | blog post page load (RU or EN) | `slug`, `locale` |
 | `lang_switched` | click on `LangSwitch` link | `from`, `to` |
 | `theme_change` | theme toggle click (in `Base.astro`) | `theme` |
+| `audience_select` | «Кто смотрит» switch in `AudienceBar.astro` | `audience` (`recruiter`\|`analyst`\|`learner`) |
 
 Any element carrying `data-analytics="<name>"` fires `<name>` on click via a
 delegated listener in `Analytics.astro`. Existing attributes: `project_view_*`,

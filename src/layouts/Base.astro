@@ -133,6 +133,20 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
         html.setAttribute('data-theme', theme);
         if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
       })();
+
+      // Prevent audience-order flash: apply the saved audience before the first
+      // paint so the homepage stack renders in the right order immediately.
+      (function () {
+        const html = document.documentElement;
+        let audience = 'recruiter';
+        try {
+          const saved = localStorage.getItem('audience');
+          if (saved === 'recruiter' || saved === 'analyst' || saved === 'learner') audience = saved;
+        } catch (e) {
+          // localStorage may be unavailable
+        }
+        html.setAttribute('data-audience', audience);
+      })();
     </script>
 
     <Analytics />
@@ -304,6 +318,28 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
         document.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') setOpen(false);
         });
+      })();
+
+      // Audience router — reorder the homepage stack for the active audience.
+      // Runs at end of body, before first paint, so there is no layout flash.
+      // Each .home-stack child carries data-order-<audience>="{rank}"; blocks
+      // without a rank for the active audience keep their DOM order at the end.
+      window.__reorderHomeStack = function (aud) {
+        const stack = document.querySelector('.home-stack');
+        if (!stack || !aud || aud === 'recruiter') return;
+        const key = 'data-order-' + aud;
+        const items = Array.prototype.slice.call(stack.children);
+        if (!items.length) return;
+        const rank = (el) => {
+          const n = Number(el.getAttribute(key));
+          return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
+        };
+        items.sort((a, b) => rank(a) - rank(b));
+        items.forEach((el) => stack.appendChild(el));
+      };
+      (function () {
+        const aud = document.documentElement.getAttribute('data-audience') || 'recruiter';
+        window.__reorderHomeStack(aud);
       })();
     </script>
 

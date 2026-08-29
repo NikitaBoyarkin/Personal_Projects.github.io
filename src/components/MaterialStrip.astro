@@ -8,6 +8,7 @@ import { getCollection } from "astro:content";
 import { withBase } from "../lib/path";
 import { formatDate } from "../lib/date";
 import { categoryLabel } from "../lib/categories";
+import { PROJECT_ORDER, projectTracks } from "../lib/projects";
 
 interface Props {
   lang?: "ru" | "en";
@@ -22,6 +23,7 @@ const postLinkPrefix = isEn ? "en/" : "";
 const heading = isEn ? "Fresh materials" : "Свежие материалы";
 const projectBadge = isEn ? "Project" : "Проект";
 const footLabel = isEn ? "All writing" : "Все записи";
+const row2Heading = isEn ? "More projects" : "Ещё проекты";
 
 const posts = (await getCollection(postCollection, (p) => !p.data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -33,6 +35,20 @@ const volta = projects.find((p) => p.id.replace(/\.md$/, "") === "volta");
 const slugOf = (id: string) => id.replace(/\.md$/, "");
 // WebP sibling for lazy previews (PNG stays for OG meta tags).
 const webpOf = (src: string) => src.replace(/\.png$/, ".webp");
+
+// Row 2 — non-featured projects in canonical order (PROJECT_ORDER) with a
+// track badge, so recruiters/colleagues see breadth past Volta.
+const trackLabels = new Map(projectTracks(isEn ? "en" : "ru").map((t) => [t.key, t.label]));
+const orderRank = (id: string) => {
+  const i = PROJECT_ORDER.indexOf(id);
+  return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+};
+const rowProjects = projects
+  .map((p) => ({ p, id: slugOf(p.id) }))
+  .filter(({ p, id }) => id !== "volta" && !p.data.private)
+  .sort((a, b) => orderRank(a.id) - orderRank(b.id));
+const impactOf = (p: (typeof projects)[number]) =>
+  (p.data.impact[0] || p.data.description).slice(0, 72);
 ---
 
 <section id="materials" class="reveal reveal-delay-1" aria-label={heading}>
@@ -84,7 +100,42 @@ const webpOf = (src: string) => src.replace(/\.png$/, ".webp");
       ))
     }
   </div>
+
+  {
+    rowProjects.length > 0 && (
+      <>
+        <p class="project-row-heading">{row2Heading}</p>
+        <div class="material-strip project-strip">
+          {
+            rowProjects.map(({ p, id }) => (
+              <a class="strip-card" href={withBase(`${linkPrefix}projects/${id}/`)}>
+                <div class="strip-card-body">
+                  <span class="strip-badge strip-badge-track" data-track={p.data.track}>
+                    {trackLabels.get(p.data.track) || p.data.track}
+                  </span>
+                  <span class="strip-title">{p.data.title}</span>
+                  <span class="strip-meta">{impactOf(p)}…</span>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </>
+    )
+  }
+
   <p class="strip-foot">
     <a href={withBase(`${isEn ? 'en/' : ''}writing/`)}>{footLabel} →</a>
   </p>
 </section>
+
+<style>
+  .project-row-heading {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+</style>

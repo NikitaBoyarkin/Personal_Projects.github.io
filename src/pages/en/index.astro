@@ -11,6 +11,10 @@ import CapabilitiesGrid from '../../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../../components/HeroMetrics.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
+import AudienceBar from '../../components/AudienceBar.astro';
+import CareerSnapshot from '../../components/CareerSnapshot.astro';
+import Testimonials from '../../components/Testimonials.astro';
+import ReadingBlock from '../../components/ReadingBlock.astro';
 
 const allProjects = await getCollection('projects-en', (p) => !p.data.draft);
 
@@ -60,7 +64,7 @@ const jsonLd = {
       <div class="intro-content">
         <h1>Nikita Boyarkin</h1>
         <p class="tagline">Data → decisions. From hypothesis to ship-gate.</p>
-        <div class="subtitle">Data Analyst / Product Analyst</div>
+        <div class="subtitle">Data / Product Analyst · SQL · Python · A/B testing</div>
 
         <HeroMetrics lang="en" />
 
@@ -77,33 +81,69 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- KANBAN BOARD: Profile | Projects | Now -->
-  <HomeBoard lang="en" />
+  <!-- Who's watching: audience switch reorders the stack below -->
+  <AudienceBar lang="en" />
 
-  <!-- AI assistant "Ask me" (static, client-side) -->
-  <AskMe lang="en" />
+  <div class="home-stack">
+    <div class="home-board" data-order-analyst="0" data-order-learner="0">
+      <!-- KANBAN BOARD: Profile | Projects | Now -->
+      <HomeBoard lang="en" />
+    </div>
 
-  <!-- Capabilities grid: deliverables + measured results -->
-  <CapabilitiesGrid lang="en" />
+    <div class="home-career" data-order-analyst="6" data-order-learner="7">
+      <!-- Experience + Education: grade claim and measured outcomes -->
+      <CareerSnapshot lang="en" />
+    </div>
 
-  <Manifesto lang="en" />
+    <div class="home-askme" data-order-analyst="7" data-order-learner="5">
+      <!-- AI assistant "Ask me" (static, client-side) -->
+      <AskMe lang="en" />
+    </div>
 
-  <ProjectTimeline lang="en" />
+    <div class="home-caps" data-order-analyst="1" data-order-learner="3">
+      <!-- Capabilities grid: deliverables + measured results -->
+      <CapabilitiesGrid lang="en" />
+    </div>
 
-  <!-- GAMES ARCADE -->
-  <section id="arcade" class="reveal" aria-label="Games">
-    <h2>🎮 Arcade</h2>
-    <p>
-      Browser mini-games — including some about analytics: A/B Test (chase p &lt; 0.05), Funnel Drop
-      (catch users through the funnel), plus classic Snake / 2048 / Pong. Works on phone too:
-      swipe, drag, tap.
-    </p>
-    <p>
-      <a class="button" href={withBase('games/')}>Play</a>
-    </p>
-  </section>
+    <div class="home-manifesto" data-order-analyst="6" data-order-learner="7">
+      <Manifesto lang="en" />
+    </div>
 
-  <CollaborationFormats lang="en" />
+    <div class="home-timeline" data-order-analyst="2" data-order-learner="4">
+      <ProjectTimeline lang="en" />
+    </div>
 
-  <MaterialStrip lang="en" />
+    <div class="home-arcade" data-order-analyst="8" data-order-learner="8">
+      <!-- GAMES ARCADE -->
+      <section id="arcade" class="reveal" aria-label="Games">
+        <h2>🎮 Arcade</h2>
+        <p>
+          Browser mini-games — including some about analytics: A/B Test (chase p &lt; 0.05), Funnel Drop
+          (catch users through the funnel), plus classic Snake / 2048 / Pong. Works on phone too:
+          swipe, drag, tap.
+        </p>
+        <p>
+          <a class="button" href={withBase('games/')}>Play</a>
+        </p>
+      </section>
+    </div>
+
+    <div class="home-collab" data-order-analyst="5" data-order-learner="6">
+      <CollaborationFormats lang="en" />
+    </div>
+
+    <!-- Testimonials: renders nothing until real recommendations are collected -->
+    <div class="home-testimonials" data-order-analyst="7" data-order-learner="9">
+      <Testimonials lang="en" />
+    </div>
+
+    <!-- Library / now reading -->
+    <div class="home-library" data-order-analyst="8" data-order-learner="4">
+      <ReadingBlock lang="en" />
+    </div>
+
+    <div class="home-strip" data-order-analyst="3" data-order-learner="1">
+      <MaterialStrip lang="en" />
+    </div>
+  </div>
 </Base>
