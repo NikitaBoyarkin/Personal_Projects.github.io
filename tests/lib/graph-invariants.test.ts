@@ -5,7 +5,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { buildGraph, parseRelatedPath, type GraphData } from '../../src/lib/graph';
+import { buildGraph, mergePostsForLocale, parseRelatedPath, type GraphData } from '../../src/lib/graph';
 import { TOPICS } from '../../src/lib/topics';
 
 const CONTENT = join(__dirname, '..', '..', 'src', 'content');
@@ -36,7 +36,13 @@ beforeAll(() => {
 
   graphs = {
     ru: buildGraph({ projects, posts, parts, topics: TOPICS, lang: 'ru' }),
-    en: buildGraph({ projects: projectsEn, posts: postsEn, parts: partsEn, topics: TOPICS, lang: 'en' }),
+    en: buildGraph({
+      projects: projectsEn,
+      posts: mergePostsForLocale(posts, postsEn),
+      parts: partsEn,
+      topics: TOPICS,
+      lang: 'en',
+    }),
   };
 });
 

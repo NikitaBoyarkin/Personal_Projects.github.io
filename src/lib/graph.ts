@@ -88,6 +88,9 @@ interface PostLike {
     category?: string;
     tags?: string[];
     related?: string[];
+    /** Optional URL override — used by the EN graph for untranslated posts so
+     *  they link to the RU page instead of a missing EN page. */
+    url?: string;
   };
 }
 
@@ -106,6 +109,57 @@ export function parseRelatedPath(
   const m = path.match(/^\/(?:en\/)?(projects|posts)\/([^/]+)\/?$/);
   if (!m) return null;
   return { type: m[1] === "projects" ? "project" : "post", slug: m[2] };
+}
+
+/** Merge EN posts with RU fallback so both locale graphs stay in sync: a post
+ *  that has an EN translation keeps its EN title and EN page URL; an
+ *  untranslated post falls back to the RU entry (RU title, RU page URL) — the
+ *  same convention the EN project pages already use for related links. */
+export function mergePostsForLocale(
+  ruPosts: PostLike[],
+  enPosts: PostLike[],
+): PostLike[] {
+  const enBySlug = new Map(enPosts.map((p) => [slugOf(p.id), p]));
+  return ruPosts.map((p) => {
+    const slug = slugOf(p.id);
+    const en = enBySlug.get(slug);
+    if (en) return en;
+    return { ...p, data: { ...p.data, url: `posts/${slug}/` } };
+  });
+}
+
+/** Extract the `hops`-hop neighborhood of a node from a full graph. Used by the
+ *  per-project mini-graph: the project node plus everything it links to.
+ *  BFS by frontier: each hop expands only from nodes added in the previous hop,
+ *  so a 1-hop subgraph never cascades into 2-hop nodes. */
+export function subgraphAround(
+  graph: GraphData,
+  centerId: string,
+  hops = 1,
+): GraphData {
+  if (!graph.nodes.some((n) => n.id === centerId)) {
+    return { nodes: [], links: [] };
+  }
+  const include = new Set<string>([centerId]);
+  let frontier = new Set<string>([centerId]);
+  for (let h = 0; h < hops; h++) {
+    const next = new Set<string>();
+    for (const l of graph.links) {
+      if (frontier.has(l.source) && !include.has(l.target)) {
+        include.add(l.target);
+        next.add(l.target);
+      }
+      if (frontier.has(l.target) && !include.has(l.source)) {
+        include.add(l.source);
+        next.add(l.source);
+      }
+    }
+    frontier = next;
+  }
+  return {
+    nodes: graph.nodes.filter((n) => include.has(n.id)),
+    links: graph.links.filter((l) => include.has(l.source) && include.has(l.target)),
+  };
 }
 
 /** Topics that must not get project edges via the `tools` signal — tool names
@@ -277,7 +331,7 @@ export function buildGraph(opts: {
       id: `post:${slug}`,
       label: post.data.title,
       group: post.data.category || "note",
-      url: `${localePrefix}posts/${slug}/`,
+      url: post.data.url ?? `${localePrefix}posts/${slug}/`,
     });
   }
   for (const part of parts) {

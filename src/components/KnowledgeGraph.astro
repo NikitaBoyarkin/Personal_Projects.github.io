@@ -65,7 +65,6 @@ const t = {
     </div>
   </div>
   <svg id="kg-svg" class="kg-svg" role="img" aria-label={ariaLabel}></svg>
-  <div id="kg-tooltip" class="kg-tooltip" hidden></div>
   <p class="kg-caption">{caption}</p>
 </div>
 
@@ -79,7 +78,6 @@ const t = {
   if (!rootEl || !svgEl || !src) throw new Error('kg-root / kg-svg not found');
   const root = rootEl as HTMLElement;
   const svg = svgEl as unknown as SVGSVGElement;
-  const tooltip = document.getElementById('kg-tooltip') as HTMLDivElement | null;
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const groupList = Object.keys(GRAPH_GROUP_COLORS);
@@ -137,8 +135,6 @@ const t = {
   function applyViewport() {
     const vb = viewBoxOf(vp, world);
     svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
-    // Hide labels when zoomed far out so the graph reads as a cloud of dots.
-    root.classList.toggle('kg-zoom-out', vp.k < 0.62);
   }
 
   function resetViewport() {
@@ -249,12 +245,11 @@ const t = {
     resetViewport();
   }
 
-  // --- Hover: highlight neighbors + tooltip ---
+  // --- Hover: highlight neighbors; the label appears via CSS on hover/focus ---
   const adjacency = new Map<string, Set<string>>();
 
   function clearHighlight() {
     hoveredId = null;
-    if (tooltip) tooltip.hidden = true;
     nodes.forEach((_, i) => nodeEls[i].style.opacity = '');
     edges.forEach((e) => (e.style.opacity = ''));
   }
@@ -270,19 +265,6 @@ const t = {
       const on = l.source.id === id || l.target.id === id;
       e.style.opacity = on ? String(Math.min(1, (l.weight || 1) * 0.9 + 0.2)) : '0.05';
     });
-  }
-
-  function showTooltip(n: any, clientX: number, clientY: number) {
-    if (!tooltip) return;
-    tooltip.hidden = false;
-    tooltip.textContent = n.label;
-    const pad = 8;
-    tooltip.style.left = `${clientX + pad}px`;
-    tooltip.style.top = `${clientY + pad}px`;
-  }
-
-  function nodeById(id: string) {
-    return nodes.find((n) => n.id === id);
   }
 
   function navigateTo(n: any) {
@@ -499,7 +481,7 @@ const t = {
   svg.addEventListener('pointerup', handlePointerUp);
   svg.addEventListener('pointercancel', handlePointerUp);
 
-  // Hover: highlight neighbors and show a tooltip.
+  // Hover: highlight neighbors; the label appears via CSS on hover/focus.
   svg.addEventListener('pointerover', (e) => {
     const target = nodeEls.find((g) => g.contains(e.target as Node));
     if (!target) {
@@ -509,12 +491,6 @@ const t = {
     const n = nodes[nodeEls.indexOf(target)];
     hoveredId = n.id;
     highlight(n.id);
-    showTooltip(n, e.clientX, e.clientY);
-  });
-  svg.addEventListener('pointermove', (e) => {
-    if (!hoveredId) return;
-    const n = nodeById(hoveredId);
-    if (n && tooltip && !tooltip.hidden) showTooltip(n, e.clientX, e.clientY);
   });
   svg.addEventListener('pointerout', (e) => {
     const stillIn = (e.relatedTarget as Node | null) && svg.contains(e.relatedTarget as Node);
@@ -829,13 +805,16 @@ const t = {
     stroke-opacity: 0.95;
     stroke-linejoin: round;
     pointer-events: none;
-    transition: opacity 120ms ease;
-  }
-  .kg-zoom-out .kg-label {
+    /* Labels appear only on hover/focus — the graph reads as a cloud of dots. */
     opacity: 0;
+    transition: opacity 120ms ease;
   }
   .kg-root :is(g[tabindex]) {
     outline: none;
+  }
+  .kg-root :is(g[tabindex]:hover) .kg-label,
+  .kg-root :is(g[tabindex]:focus) .kg-label {
+    opacity: 1;
   }
   .kg-root :is(g[tabindex]:focus) text {
     fill: var(--text-accent);
@@ -858,20 +837,6 @@ const t = {
     height: 10px;
     border-radius: 50%;
     display: inline-block;
-  }
-  .kg-tooltip {
-    position: fixed;
-    z-index: 1100;
-    max-width: 280px;
-    padding: 0.4rem 0.6rem;
-    background: var(--background-primary);
-    color: var(--text-normal);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 0.8rem;
-    font-weight: 600;
-    pointer-events: none;
-    box-shadow: 0 4px 16px rgb(0 0 0 / 0.25);
   }
   .kg-search {
     position: relative;

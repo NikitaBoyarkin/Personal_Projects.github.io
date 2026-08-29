@@ -3,19 +3,23 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import InnerTOC from '../../../components/InnerTOC.astro';
 import CaseStudy from '../../../components/CaseStudy.astro';
+import ProjectGraph from '../../../components/ProjectGraph.astro';
 import { withBase } from '../../../lib/path';
+import { buildGraph, mergePostsForLocale, subgraphAround } from '../../../lib/graph';
+import { TOPICS } from '../../../lib/topics';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects-en', (p) => !p.data.draft);
   const allPosts = await getCollection('posts', (p) => !p.data.draft);
+  const postsEn = await getCollection('posts-en', (p) => !p.data.draft);
   const allParts = await getCollection('volta-parts-en', (p) => !p.data.draft);
   return projects.map((project) => ({
     params: { slug: project.id.replace(/\.md$/, '') },
-    props: { project, allPosts, allProjects: projects, allParts },
+    props: { project, allPosts, allProjects: projects, allParts, postsEn },
   }));
 }
 
-const { project, allPosts, allProjects, allParts } = Astro.props;
+const { project, allPosts, allProjects, allParts, postsEn } = Astro.props;
 const { Content } = await render(project);
 const slug = project.id.replace(/\.md$/, '');
 const caseStudy = project.data.caseStudy;
@@ -57,6 +61,13 @@ const children = (project.data.children ?? [])
     return found ? { href: withBase(`en/projects/${slug}/${c}/`), title: found.data.title } : null;
   })
   .filter((x): x is { href: string; title: string } => x !== null);
+
+// Mini-graph: the 1-hop neighborhood of this project in the full EN graph.
+// Posts are merged with a RU fallback so untranslated posts still appear
+// (RU title, link to the RU page) — same convention as the EN graph page.
+const posts = mergePostsForLocale(allPosts, postsEn);
+const graph = buildGraph({ projects: allProjects, posts, parts: allParts, topics: TOPICS, lang: 'en' });
+const sub = subgraphAround(graph, `p:${slug}`);
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
 const pageUrl = `${siteUrl}${withBase(`en/projects/${slug}/`)}`;
@@ -234,6 +245,15 @@ const pageJsonLd = {
               <li><a href={r.href}>{r.title}</a></li>
             ))}
           </ul>
+        </section>
+      )
+    }
+
+    {
+      sub.nodes.length > 1 && (
+        <section class="post-related reveal reveal-delay-3" aria-label="Connection map">
+          <h2>Connection map</h2>
+          <ProjectGraph nodes={sub.nodes} links={sub.links} centerId={`p:${slug}`} lang="en" />
         </section>
       )
     }

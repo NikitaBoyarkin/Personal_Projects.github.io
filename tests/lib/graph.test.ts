@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildGraph, parseRelatedPath } from '../../src/lib/graph';
+import { buildGraph, mergePostsForLocale, parseRelatedPath, subgraphAround } from '../../src/lib/graph';
 import { TOPICS } from '../../src/lib/topics';
 
 const project = (
@@ -42,6 +42,78 @@ describe('parseRelatedPath', () => {
     expect(parseRelatedPath('https://github.com/foo/bar')).toBeNull();
     expect(parseRelatedPath('/topics/sql/')).toBeNull();
     expect(parseRelatedPath('/posts/')).toBeNull();
+  });
+});
+
+describe('mergePostsForLocale', () => {
+  it('keeps the EN entry for translated posts', () => {
+    const ru = [post('ab-calibration', { title: 'Калибровка A/B' })];
+    const en = [post('ab-calibration', { title: 'A/B Calibration' })];
+    const merged = mergePostsForLocale(ru, en);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].data.title).toBe('A/B Calibration');
+    expect(merged[0].data.url).toBeUndefined();
+  });
+
+  it('falls back to the RU entry with a RU url for untranslated posts', () => {
+    const ru = [post('cohort-triangles', { title: 'Треугольники когорт' })];
+    const merged = mergePostsForLocale(ru, []);
+    expect(merged).toHaveLength(1);
+    expect(merged[0].data.title).toBe('Треугольники когорт');
+    expect(merged[0].data.url).toBe('posts/cohort-triangles/');
+  });
+
+  it('drops EN-only posts that have no RU counterpart', () => {
+    const ru = [post('a')];
+    const en = [post('a'), post('en-only')];
+    const merged = mergePostsForLocale(ru, en);
+    expect(merged.map((p) => p.id)).toEqual(['a.md']);
+  });
+});
+
+describe('subgraphAround', () => {
+  it('returns the 1-hop neighborhood of a node', () => {
+    const g = buildGraph({
+      projects: [
+        project('volta', { related: ['/posts/ab-calibration/'] }),
+        project('ab', { related: ['/posts/ab-calibration/'] }),
+      ],
+      posts: [post('ab-calibration', { related: ['/projects/ab/'] })],
+      parts: [],
+      topics: TOPICS,
+    });
+    const sub = subgraphAround(g, 'p:volta');
+    const ids = sub.nodes.map((n) => n.id);
+    expect(ids).toContain('p:volta');
+    expect(ids).toContain('post:ab-calibration');
+    // p:ab is 2 hops away (volta → post → ab) — not in a 1-hop subgraph.
+    expect(ids).not.toContain('p:ab');
+    // Every link in the subgraph connects two included nodes.
+    for (const l of sub.links) {
+      expect(ids).toContain(l.source);
+      expect(ids).toContain(l.target);
+    }
+  });
+
+  it('expands to 2 hops when asked', () => {
+    const g = buildGraph({
+      projects: [
+        project('volta', { related: ['/posts/ab-calibration/'] }),
+        project('ab', { related: ['/posts/ab-calibration/'] }),
+      ],
+      posts: [post('ab-calibration', { related: ['/projects/ab/'] })],
+      parts: [],
+      topics: TOPICS,
+    });
+    const sub = subgraphAround(g, 'p:volta', 2);
+    expect(sub.nodes.map((n) => n.id)).toContain('p:ab');
+  });
+
+  it('returns an empty graph for a missing center', () => {
+    const g = buildGraph({ projects: [project('a')], posts: [], parts: [], topics: TOPICS });
+    const sub = subgraphAround(g, 'p:nope');
+    expect(sub.nodes).toEqual([]);
+    expect(sub.links).toEqual([]);
   });
 });
 

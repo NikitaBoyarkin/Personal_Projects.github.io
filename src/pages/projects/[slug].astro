@@ -3,7 +3,10 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import InnerTOC from '../../components/InnerTOC.astro';
 import CaseStudy from '../../components/CaseStudy.astro';
+import ProjectGraph from '../../components/ProjectGraph.astro';
 import { withBase } from '../../lib/path';
+import { buildGraph, subgraphAround } from '../../lib/graph';
+import { TOPICS } from '../../lib/topics';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects', (p) => !p.data.draft);
@@ -51,6 +54,10 @@ const children = (project.data.children ?? [])
     return found ? { href: withBase(`projects/${slug}/${c}/`), title: found.data.title } : null;
   })
   .filter((x): x is { href: string; title: string } => x !== null);
+
+// Mini-graph: the 1-hop neighborhood of this project in the full knowledge graph.
+const graph = buildGraph({ projects: allProjects, posts: allPosts, parts: allParts, topics: TOPICS, lang: 'ru' });
+const sub = subgraphAround(graph, `p:${slug}`);
 
 const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
 const pageUrl = `${siteUrl}${withBase(`projects/${slug}/`)}`;
@@ -227,6 +234,15 @@ const pageJsonLd = {
               <li><a href={r.href}>{r.title}</a></li>
             ))}
           </ul>
+        </section>
+      )
+    }
+
+    {
+      sub.nodes.length > 1 && (
+        <section class="post-related reveal reveal-delay-3" aria-label="Карта связей">
+          <h2>Карта связей</h2>
+          <ProjectGraph nodes={sub.nodes} links={sub.links} centerId={`p:${slug}`} lang="ru" />
         </section>
       )
     }

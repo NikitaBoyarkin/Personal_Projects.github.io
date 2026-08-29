@@ -1,0 +1,380 @@
+---
+// Compact per-project knowledge subgraph. Renders the 1-hop neighborhood of a
+// project node (computed at build time via subgraphAround) as a small
+// force-directed SVG. Labels appear on hover/focus; the center node's label is
+// always visible as the anchor. Click a node to navigate to its page.
+import { withBase } from '../lib/path';
+import type { GraphNode, GraphLink } from '../lib/graph';
+
+interface Props {
+  nodes: GraphNode[];
+  links: GraphLink[];
+  centerId: string;
+  lang?: 'ru' | 'en';
+}
+
+const { nodes, links, centerId, lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
+// Taller canvas for denser subgraphs (volta's hub pulls in ~20 nodes).
+const height = Math.max(280, Math.min(460, 240 + nodes.length * 10));
+
+// Pre-resolve URLs with the base path so the client can navigate directly.
+const data = {
+  nodes: nodes.map((n) => ({ ...n, href: withBase(n.url) })),
+  links,
+  centerId,
+};
+// Escape `<` so a label can never close the JSON script tag early.
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
+const ariaLabel = isEn ? 'Connections of this project' : 'Связи этого проекта';
+const caption = isEn
+  ? 'Projects, posts and topics connected to this one. Hover a node to see its name; click to open.'
+  : 'Проекты, записи и темы, связанные с этим проектом. Наведите на узел, чтобы увидеть название; клик — открыть.';
+---
+
+<div id="pg-root" class="pg-root">
+  <svg id="pg-svg" class="pg-svg" style={`height:${height}px`} role="img" aria-label={ariaLabel}></svg>
+  <p class="pg-caption">{caption}</p>
+</div>
+<script is:inline type="application/json" id="pg-data" set:html={json}></script>
+
+<script>
+  import { GRAPH_GROUP_COLORS } from '../lib/graph';
+
+  const rootEl = document.getElementById('pg-root');
+  const svgEl = document.getElementById('pg-svg');
+  const dataEl = document.getElementById('pg-data');
+  if (!rootEl || !svgEl || !dataEl) throw new Error('pg-root / pg-svg / pg-data not found');
+  const svg = svgEl as unknown as SVGSVGElement;
+  const data = JSON.parse(dataEl.textContent || '{}');
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (name: string) => document.createElementNS(NS, name);
+
+  let world = { w: 600, h: 280 };
+  let nodes: any[] = [];
+  let nodeEls: SVGGElement[] = [];
+  let links: { source: any; target: any; weight: number; type: string }[] = [];
+  let edges: SVGLineElement[] = [];
+  let running = false;
+  let frames = 0;
+  let restart: (() => void) | null = null;
+  let dragging: any = null;
+  let dragStart: { x: number; y: number } | null = null;
+  let moved = false;
+
+  const adjacency = new Map<string, Set<string>>();
+
+  function toWorld(clientX: number, clientY: number) {
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
+    const pt = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+    return { x: pt.x, y: pt.y };
+  }
+
+  function rebuild() {
+    svg.replaceChildren();
+    world = { w: svg.clientWidth || 600, h: svg.clientHeight || 280 };
+
+    nodes = data.nodes.map((n: any) => ({ ...n, x: 0, y: 0, vx: 0, vy: 0 }));
+    const idx = new Map(nodes.map((n) => [n.id, n]));
+    links = data.links
+      .map((l: any) => ({
+        source: idx.get(l.source),
+        target: idx.get(l.target),
+        weight: typeof l.weight === 'number' ? l.weight : 1,
+        type: l.type || 'related',
+      }))
+      .filter((l: any) => l.source && l.target);
+
+    adjacency.clear();
+    for (const l of links) {
+      if (!adjacency.has(l.source.id)) adjacency.set(l.source.id, new Set());
+      if (!adjacency.has(l.target.id)) adjacency.set(l.target.id, new Set());
+      adjacency.get(l.source.id)!.add(l.target.id);
+      adjacency.get(l.target.id)!.add(l.source.id);
+    }
+
+    const edgeLayer = el('g');
+    svg.appendChild(edgeLayer);
+    edges = links.map((l) => {
+      const line = el('line');
+      line.setAttribute('class', 'pg-edge');
+      edgeLayer.appendChild(line);
+      return line as SVGLineElement;
+    });
+
+    const nodeLayer = el('g');
+    svg.appendChild(nodeLayer);
+    nodeEls = nodes.map((n) => {
+      const g = el('g');
+      g.setAttribute('tabindex', '0');
+      g.setAttribute('role', 'link');
+      g.setAttribute('aria-label', n.label);
+      g.style.cursor = 'pointer';
+      if (n.id === data.centerId) g.classList.add('pg-center');
+      const r = n.size || 6;
+      const c = el('circle');
+      c.setAttribute('r', String(r));
+      c.setAttribute('fill', GRAPH_GROUP_COLORS[n.group] || 'var(--text-accent)');
+      const txt = el('text');
+      txt.setAttribute('x', String(r + 6));
+      txt.setAttribute('y', '4');
+      txt.setAttribute('class', 'pg-label');
+      txt.textContent = n.label;
+      g.appendChild(c);
+      g.appendChild(txt);
+      nodeLayer.appendChild(g);
+      return g as SVGGElement;
+    });
+
+    // Keyboard: Enter/Space on a focused node navigates.
+    nodeEls.forEach((g, i) => {
+      g.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigateTo(nodes[i]);
+        }
+      });
+    });
+
+    // Initial positions: center node at the middle, the rest on a ring around it.
+    const cx = world.w / 2;
+    const cy = world.h / 2;
+    const ring = Math.min(world.w, world.h) * 0.3;
+    const others = nodes.filter((n) => n.id !== data.centerId);
+    nodes.forEach((n) => {
+      if (n.id === data.centerId) {
+        n.x = cx;
+        n.y = cy;
+        return;
+      }
+      const i = others.indexOf(n);
+      const a = (i / Math.max(1, others.length)) * 2 * Math.PI - Math.PI / 2;
+      n.x = cx + Math.cos(a) * ring;
+      n.y = cy + Math.sin(a) * ring;
+    });
+  }
+
+  function clearHighlight() {
+    nodes.forEach((_, i) => (nodeEls[i].style.opacity = ''));
+    edges.forEach((e) => (e.style.opacity = ''));
+  }
+
+  function highlight(id: string) {
+    const neighbors = adjacency.get(id) || new Set<string>();
+    neighbors.add(id);
+    nodes.forEach((n, i) => {
+      nodeEls[i].style.opacity = neighbors.has(n.id) ? '1' : '0.12';
+    });
+    edges.forEach((e, i) => {
+      const l = links[i];
+      const on = l.source.id === id || l.target.id === id;
+      e.style.opacity = on ? String(Math.min(1, (l.weight || 1) * 0.9 + 0.2)) : '0.05';
+    });
+  }
+
+  function navigateTo(n: any) {
+    if (n?.href) window.location.href = n.href;
+  }
+
+  function renderStatic() {
+    rebuild();
+    links.forEach((l, i) => {
+      edges[i].setAttribute('x1', String(l.source.x));
+      edges[i].setAttribute('y1', String(l.source.y));
+      edges[i].setAttribute('x2', String(l.target.x));
+      edges[i].setAttribute('y2', String(l.target.y));
+    });
+    nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
+  }
+
+  function renderForce() {
+    rebuild();
+
+    // Same alpha-based settling as the main graph, scaled to node count.
+    const N = Math.max(1, nodes.length);
+    const charge = 2200 * Math.sqrt(N);
+    const gravity = 0.004 + 0.001 * Math.sqrt(N);
+    const damp = 0.86;
+    const margin = Math.min(80, 60 + N * 0.5);
+    const alphaDecay = Math.max(0.015, 0.03 - 0.001 * Math.sqrt(N));
+    const alphaMin = 0.01;
+    const maxFrames = Math.max(400, N * 10);
+    let alpha = 1;
+
+    function tick() {
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i], b = nodes[j];
+          let dx = a.x - b.x, dy = a.y - b.y;
+          let d2 = dx * dx + dy * dy || 1;
+          let d = Math.sqrt(d2);
+          const f = (charge / d2) * alpha;
+          a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+          b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
+        }
+      }
+      links.forEach((l) => {
+        const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const ideal = 60 + 80 * (1 - (l.weight || 1));
+        const f = (d - ideal) * 0.04 * (0.5 + 0.5 * (l.weight || 1)) * alpha;
+        const fx = (dx / d) * f, fy = (dy / d) * f;
+        l.source.vx += fx; l.source.vy += fy;
+        l.target.vx -= fx; l.target.vy -= fy;
+      });
+      nodes.forEach((n) => {
+        if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
+        n.vx += (world.w / 2 - n.x) * gravity * alpha;
+        n.vy += (world.h / 2 - n.y) * gravity * alpha;
+        n.vx *= damp; n.vy *= damp;
+        n.x += n.vx; n.y += n.vy;
+        n.x = Math.max(margin, Math.min(world.w - margin, n.x));
+        n.y = Math.max(margin, Math.min(world.h - margin, n.y));
+      });
+      links.forEach((l, i) => {
+        edges[i].setAttribute('x1', String(l.source.x));
+        edges[i].setAttribute('y1', String(l.source.y));
+        edges[i].setAttribute('x2', String(l.target.x));
+        edges[i].setAttribute('y2', String(l.target.y));
+      });
+      nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
+    }
+
+    function loop() {
+      if (!running) return;
+      tick();
+      frames++;
+      alpha *= 1 - alphaDecay;
+      if (alpha < alphaMin || frames > maxFrames) running = false;
+      requestAnimationFrame(loop);
+    }
+
+    restart = () => {
+      running = true;
+      frames = 0;
+      alpha = 1;
+      loop();
+    };
+    restart();
+  }
+
+  // Pointer: drag a node (click = navigate).
+  function handlePointerDown(e: PointerEvent) {
+    svg.setPointerCapture(e.pointerId);
+    const target = nodeEls.find((g) => g.contains(e.target as Node));
+    if (!target) return;
+    const n = nodes[nodeEls.indexOf(target)];
+    const p = toWorld(e.clientX, e.clientY);
+    dragging = n;
+    dragStart = { x: p.x, y: p.y };
+    moved = false;
+    n.fx = p.x;
+    n.fy = p.y;
+    target.style.cursor = 'grabbing';
+  }
+
+  function handlePointerMove(e: PointerEvent) {
+    if (!dragging) return;
+    const p = toWorld(e.clientX, e.clientY);
+    const dx = p.x - (dragStart?.x ?? p.x);
+    const dy = p.y - (dragStart?.y ?? p.y);
+    if (dx * dx + dy * dy > 9) moved = true;
+    dragging.fx = p.x;
+    dragging.fy = p.y;
+  }
+
+  function handlePointerUp() {
+    if (!dragging) return;
+    const n = dragging;
+    const wasClick = !moved;
+    n.fx = null;
+    n.fy = null;
+    const g = nodeEls[nodes.indexOf(n)];
+    if (g) g.style.cursor = 'pointer';
+    dragging = null;
+    dragStart = null;
+    if (wasClick) navigateTo(n);
+  }
+
+  svg.addEventListener('pointerdown', handlePointerDown);
+  svg.addEventListener('pointermove', handlePointerMove);
+  svg.addEventListener('pointerup', handlePointerUp);
+  svg.addEventListener('pointercancel', handlePointerUp);
+
+  // Hover: highlight neighbors; the label appears via CSS on hover/focus.
+  svg.addEventListener('pointerover', (e) => {
+    const target = nodeEls.find((g) => g.contains(e.target as Node));
+    if (!target) {
+      clearHighlight();
+      return;
+    }
+    const n = nodes[nodeEls.indexOf(target)];
+    highlight(n.id);
+  });
+  svg.addEventListener('pointerout', (e) => {
+    const stillIn = (e.relatedTarget as Node | null) && svg.contains(e.relatedTarget as Node);
+    if (!stillIn) clearHighlight();
+  });
+
+  reduced ? renderStatic() : renderForce();
+</script>
+
+<style>
+  .pg-root {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+  }
+  .pg-svg {
+    width: 100%;
+    display: block;
+    touch-action: none;
+    cursor: grab;
+  }
+  .pg-edge {
+    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
+    stroke-width: 1;
+  }
+  .pg-center circle {
+    stroke: var(--text-accent);
+    stroke-width: 2.5px;
+  }
+  .pg-label {
+    fill: var(--text-normal);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    paint-order: stroke;
+    stroke: var(--background-secondary);
+    stroke-width: 5px;
+    stroke-opacity: 0.95;
+    stroke-linejoin: round;
+    pointer-events: none;
+    /* Labels appear only on hover/focus — except the center anchor. */
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+  .pg-center .pg-label {
+    opacity: 1;
+  }
+  .pg-root :is(g[tabindex]) {
+    outline: none;
+  }
+  .pg-root :is(g[tabindex]:hover) .pg-label,
+  .pg-root :is(g[tabindex]:focus) .pg-label {
+    opacity: 1;
+  }
+  .pg-root :is(g[tabindex]:focus) text {
+    fill: var(--text-accent);
+  }
+  .pg-caption {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: var(--space-2);
+    text-align: center;
+  }
+</style>
