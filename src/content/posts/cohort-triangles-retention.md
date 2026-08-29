@@ -1,6 +1,7 @@
 ---
 title: "Почему агрегат врёт: когортные треугольники удержания"
 date: 2026-08-10
+updated: 2026-08-25
 category: guide
 image: /images/og/cohort-triangles-retention.png
 tags:

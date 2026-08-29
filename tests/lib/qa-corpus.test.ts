@@ -31,7 +31,7 @@ describe('QA_CORPUS', () => {
 
   it('covers the core recruiter topics', () => {
     const ids = QA_CORPUS.map((p) => p.id);
-    for (const id of ['who', 'role', 'experience', 'stack', 'ab-testing', 'retention', 'segmentation', 'sql', 'automation', 'volta', 'contact', 'cv']) {
+    for (const id of ['who', 'role', 'experience', 'stack', 'ab-testing', 'retention', 'segmentation', 'sql', 'automation', 'volta', 'contact', 'cv', 'differentiate']) {
       expect(ids).toContain(id);
     }
   });
@@ -138,6 +138,19 @@ describe('bestMatch', () => {
 
   it('routes "напиши мне" to contact', () => {
     expect(bestMatch('напиши мне')?.id).toBe('contact');
+  });
+
+  // 5.3: differentiation pair — «чем отличаешься» must beat the interview
+  // pair's «чем» via matchedLen, and EN variants must route too.
+  it('routes differentiation questions to the differentiate pair', () => {
+    expect(bestMatch('чем ты отличаешься')?.id).toBe('differentiate');
+    expect(bestMatch('what makes you different')?.id).toBe('differentiate');
+    expect(bestMatch('сильные стороны')?.id).toBe('differentiate');
+    expect(bestMatch('почему ты уникален')?.id).toBe('differentiate');
+  });
+
+  it('keeps "чем занимаешься" on the interview pair (no regression)', () => {
+    expect(bestMatch('чем занимаешься сейчас')?.id).toBe('interview');
   });
 });
 

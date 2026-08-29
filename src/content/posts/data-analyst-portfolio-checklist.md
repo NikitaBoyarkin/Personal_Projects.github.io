@@ -1,6 +1,7 @@
 ---
 title: "Чек-лист портфолио дата-аналитика"
 date: 2025-05-22
+updated: 2026-08-11
 category: note
 image: /images/og/data-analyst-portfolio-checklist.png
 tags:

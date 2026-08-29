@@ -1,6 +1,7 @@
 ---
 title: "Кейс Volta: воронка, A/B и retention на синтетике необанка"
 date: 2026-08-20
+updated: 2026-08-25
 category: decision-log
 image: /images/og/volta-neobank-case-study.png
 tags:

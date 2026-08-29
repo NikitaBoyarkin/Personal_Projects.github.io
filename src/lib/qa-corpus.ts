@@ -348,6 +348,30 @@ export const QA_CORPUS: QAPair[] = [
         "I discuss terms individually at the interview stage — I don't publish them. Open to data / product analyst middle roles; format (office/hybrid/remote) and start date are negotiable.",
     },
   },
+  {
+    id: "differentiate",
+    // «чем» deliberately NOT here — it routes to the interview pair; the
+    // longer «отличаешься»/«different» tokens win the tie via matchedLen.
+    keywords: ["отличаешься", "отличие", "отличает", "уникальн", "уникален", "выделяешься", "выделяешь", "преимуществ", "сильные", "стороны", "плюсы", "конкурентн", "different", "unique", "strengths", "advantage", "competitive", "distinguish", "standout", "stand"],
+    ru: {
+      question: "Чем ты отличаешься от других кандидатов?",
+      answer:
+        "Три вещи. (1) Методология, а не дашборды: каждый кейс воспроизводим — CUPED, AA-тесты, ship-gates, калибровка симуляцией. (2) Полный цикл в одном проекте: Volta — funnel → A/B → retention → сегментация одной петлёй. (3) Сайт сам — кейс product analytics: PostHog, события, дашборд под рекрутера. Плюс экспериментирую с AI-assisted аналитикой (Claude Code + MCP).",
+      links: [
+        { label: "Volta", href: "projects/volta/" },
+        { label: "Граф знаний", href: "graph/" },
+      ],
+    },
+    en: {
+      question: "What makes you different from other candidates?",
+      answer:
+        "Three things. (1) Methodology, not dashboards: every case is reproducible — CUPED, AA-tests, ship-gates, simulation calibration. (2) A full loop in one project: Volta — funnel → A/B → retention → segmentation in a single pass. (3) The site itself is a product-analytics case: PostHog, events, a recruiter-facing dashboard. Plus I experiment with AI-assisted analytics (Claude Code + MCP).",
+      links: [
+        { label: "Volta", href: "en/projects/volta/" },
+        { label: "Knowledge graph", href: "en/graph/" },
+      ],
+    },
+  },
 ];
 
 // RU/EN function words that carry no topical signal. Deliberately small: a

@@ -1,6 +1,7 @@
 ---
 title: "Calibrating A/B methods with simulation: how to verify a method before production"
 date: 2026-08-05
+updated: 2026-08-23
 category: guide
 image: /images/og/ab-calibration-simulation.png
 tags:

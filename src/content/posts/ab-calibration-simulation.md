@@ -1,6 +1,7 @@
 ---
 title: "Калибровка A/B-методов симуляцией: как проверить метод до продакшена"
 date: 2026-08-05
+updated: 2026-08-23
 category: guide
 image: /images/og/ab-calibration-simulation.png
 tags:

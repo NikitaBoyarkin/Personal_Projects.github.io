@@ -1,6 +1,7 @@
 ---
 title: "Оконные функции: gaps-and-islands, топ-N, range-join для stickiness"
 date: 2026-08-15
+updated: 2026-08-23
 category: guide
 image: /images/og/sql-window-functions.png
 tags:

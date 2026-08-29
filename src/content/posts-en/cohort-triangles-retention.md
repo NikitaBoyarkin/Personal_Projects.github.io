@@ -1,6 +1,7 @@
 ---
 title: "Why the aggregate lies: cohort retention triangles"
 date: 2026-08-10
+updated: 2026-08-23
 category: guide
 image: /images/og/cohort-triangles-retention.png
 tags:

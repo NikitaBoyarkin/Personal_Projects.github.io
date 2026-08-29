@@ -1,6 +1,7 @@
 ---
 title: "Дашборды, которые не врут: принципы продуктовой визуализации"
 date: 2026-08-22
+updated: 2026-08-25
 category: guide
 image: /images/og/dashboards-that-dont-lie.png
 tags:

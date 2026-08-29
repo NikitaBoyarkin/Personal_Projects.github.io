@@ -10,7 +10,7 @@ tags:
   - python
   - article
 excerpt: "Недельные отчёты выглядят мелкой задачей, но съедают часы. Как вынести рутину из слайдов в расписание Telegram-бота, что из этого вышло и какие уроки остались за полтора года эксплуатации."
-updated: 2026-08-05
+updated: 2026-08-25
 related:
   - /projects/bot/
   - /posts/rfm-segmentation-practical/

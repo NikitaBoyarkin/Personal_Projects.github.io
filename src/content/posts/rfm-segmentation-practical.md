@@ -1,6 +1,7 @@
 ---
 title: "RFM-сегментация клиентов"
 date: 2025-04-24
+updated: 2026-08-25
 category: framework
 image: /images/og/rfm-segmentation-practical.png
 tags:

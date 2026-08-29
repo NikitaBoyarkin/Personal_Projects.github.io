@@ -1,6 +1,7 @@
 ---
 title: "Воспроизводимые пайплайны данных: от seed до CI"
 date: 2026-08-18
+updated: 2026-08-25
 category: guide
 image: /images/og/reproducible-data-pipelines.png
 tags:
