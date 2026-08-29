@@ -35,6 +35,8 @@ const t = {
   colorByGroup: isEn ? 'Track/Category' : 'Трек/Категория',
   colorByCommunity: isEn ? 'Community' : 'Комьюнити',
   colorMode: isEn ? 'Switch node colors: track/category or community' : 'Переключить цвет узлов: трек/категория или комьюнити',
+  arrows: isEn ? 'Arrows' : 'Стрелки',
+  arrowsLabel: isEn ? 'Show link direction' : 'Показать направление ссылок',
 };
 ---
 
@@ -58,6 +60,7 @@ const t = {
     <div class="kg-legend" id="kg-legend" role="list" aria-label={isEn ? 'Graph color legend' : 'Легенда цветов графа'}></div>
     <div class="kg-controls" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
       <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-color" aria-pressed="false" aria-label={t.colorMode} title={t.colorByGroup} data-label-group={t.colorByGroup} data-label-community={t.colorByCommunity}>{t.colorByGroup}</button>
+      <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-arrows" aria-pressed="false" aria-label={t.arrowsLabel} title={t.arrowsLabel}>{t.arrows}</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-in" aria-label={t.zoomIn} title={t.zoomIn}>+</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-out" aria-label={t.zoomOut} title={t.zoomOut}>−</button>
       <button type="button" class="kg-btn" data-kg-action="reset" aria-label={t.reset} title={t.reset}>⟲</button>
@@ -69,7 +72,7 @@ const t = {
 </div>
 
 <script>
-  import { GRAPH_GROUP_COLORS, GRAPH_COMMUNITY_COLORS } from '../lib/graph';
+  import { GRAPH_GROUP_COLORS, GRAPH_COMMUNITY_COLORS, isDirected } from '../lib/graph';
   import { clampZoom, viewBoxOf, zoomAt, panBy, centerOn } from '../lib/graph-zoom';
 
   const rootEl = document.getElementById('kg-root');
@@ -83,6 +86,10 @@ const t = {
   const groupList = Object.keys(GRAPH_GROUP_COLORS);
   // Color mode: fixed track/category taxonomy vs emergent communities.
   let mode: 'group' | 'community' = 'group';
+  // Obsidian "Arrows": show link direction on directed edge types.
+  let showArrows = false;
+  // Obsidian "Tags" filter: groups hidden via legend checkboxes.
+  let hiddenGroups = new Set<string>();
   let communities: number[] = [];
   let communityLabels = new Map<number, string>();
   const colorFor = (n: any) =>
@@ -93,22 +100,60 @@ const t = {
   function renderLegend() {
     if (!legendEl) return;
     legendEl.replaceChildren();
-    const items =
-      mode === 'community'
-        ? communities.map((c) => ({
-            key: communityLabels.get(c) ?? `#${c}`,
-            color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length],
-          }))
-        : groupList.map((g) => ({ key: g, color: GRAPH_GROUP_COLORS[g] }));
+    const isCommunity = mode === 'community';
+    const items = isCommunity
+      ? communities.map((c) => ({
+          key: communityLabels.get(c) ?? `#${c}`,
+          color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length],
+        }))
+      : groupList.map((g) => ({ key: g, color: GRAPH_GROUP_COLORS[g] }));
     for (const it of items) {
       const span = document.createElement('span');
       span.className = 'kg-legend-item';
       const i = document.createElement('i');
       i.style.background = it.color;
       span.appendChild(i);
-      span.appendChild(document.createTextNode(it.key));
+      if (isCommunity) {
+        span.appendChild(document.createTextNode(it.key));
+      } else {
+        // Obsidian "Tags" filter: checkbox chips show/hide a whole group.
+        const label = document.createElement('label');
+        label.className = 'kg-legend-toggle';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !hiddenGroups.has(it.key);
+        cb.setAttribute('aria-label', it.key);
+        cb.addEventListener('change', () => {
+          if (cb.checked) {
+            hiddenGroups.delete(it.key);
+          } else {
+            // Never hide the last visible group — an empty graph is noise.
+            if (hiddenGroups.size + 1 >= groupList.length) {
+              cb.checked = true;
+              return;
+            }
+            hiddenGroups.add(it.key);
+          }
+          applyGroupFilter();
+        });
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(it.key));
+        span.appendChild(label);
+      }
       legendEl.appendChild(span);
     }
+  }
+
+  /** Obsidian "Tags" filter: hide/show whole groups (and their edges). */
+  function applyGroupFilter() {
+    nodes.forEach((n, i) => {
+      nodeEls[i].style.display = hiddenGroups.has(n.group) ? 'none' : '';
+    });
+    edges.forEach((e, i) => {
+      const l = links[i];
+      e.style.display =
+        hiddenGroups.has(l.source.group) || hiddenGroups.has(l.target.group) ? 'none' : '';
+    });
   }
   const NS = 'http://www.w3.org/2000/svg';
   const el = (name: string) => document.createElementNS(NS, name);
@@ -167,6 +212,26 @@ const t = {
     svg.replaceChildren();
     world = { w: svg.clientWidth || 600, h: 460 };
 
+    // Arrowhead marker for directed edges (Obsidian "Arrows" display option).
+    const defs = el('defs');
+    const marker = el('marker');
+    marker.setAttribute('id', 'kg-arrow');
+    marker.setAttribute('viewBox', '0 0 10 10');
+    marker.setAttribute('refX', '8');
+    marker.setAttribute('refY', '5');
+    marker.setAttribute('markerWidth', '6');
+    marker.setAttribute('markerHeight', '6');
+    // Constant arrowhead size regardless of edge stroke-width (the default
+    // markerUnits="strokeWidth" would scale arrows with link thickness).
+    marker.setAttribute('markerUnits', 'userSpaceOnUse');
+    marker.setAttribute('orient', 'auto-start-reverse');
+    const arrowPath = el('path');
+    arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
+    arrowPath.setAttribute('fill', 'var(--text-muted)');
+    marker.appendChild(arrowPath);
+    defs.appendChild(marker);
+    svg.appendChild(defs);
+
     nodes = data.nodes.map((n: any) => ({
       ...n,
       x: 0,
@@ -215,6 +280,11 @@ const t = {
       line.setAttribute('stroke', EDGE_COLOR[l.type] || EDGE_COLOR.related);
       const dash = EDGE_STYLE[l.type];
       if (dash) line.setAttribute('stroke-dasharray', dash);
+      // Obsidian "Link thickness": strong edges draw thicker.
+      line.style.strokeWidth = String(0.6 + 1.6 * (l.weight || 1));
+      if (showArrows && isDirected(l.type)) {
+        line.setAttribute('marker-end', 'url(#kg-arrow)');
+      }
       edgeLayer.appendChild(line);
       return line as SVGLineElement;
     });
@@ -296,10 +366,15 @@ const t = {
     links.forEach((l, i) => {
       const a = pos[l.source.id], b = pos[l.target.id];
       if (!a || !b) return;
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      // Stop the line at the target's edge so arrowheads (and lines) don't
+      // hide under the node circle.
+      const r = (l.target.size || 6) + 2;
       edges[i].setAttribute('x1', String(a.x));
       edges[i].setAttribute('y1', String(a.y));
-      edges[i].setAttribute('x2', String(b.x));
-      edges[i].setAttribute('y2', String(b.y));
+      edges[i].setAttribute('x2', String(b.x - (dx / d) * r));
+      edges[i].setAttribute('y2', String(b.y - (dy / d) * r));
     });
     nodes.forEach((n, i) => {
       const p = pos[n.id];
@@ -357,10 +432,15 @@ const t = {
         n.y = Math.max(margin, Math.min(world.h - margin, n.y));
       });
       links.forEach((l, i) => {
+        const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        // Stop the line at the target's edge so arrowheads (and lines) don't
+        // hide under the node circle.
+        const r = (l.target.size || 6) + 2;
         edges[i].setAttribute('x1', String(l.source.x));
         edges[i].setAttribute('y1', String(l.source.y));
-        edges[i].setAttribute('x2', String(l.target.x));
-        edges[i].setAttribute('y2', String(l.target.y));
+        edges[i].setAttribute('x2', String(l.target.x - (dx / d) * r));
+        edges[i].setAttribute('y2', String(l.target.y - (dy / d) * r));
       });
       nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
     }
@@ -568,6 +648,12 @@ const t = {
   function centerOnNode(id: string) {
     const n = nodes.find((x) => x.id === id);
     if (!n) return;
+    // Un-hide the node's group so a search hit is always visible.
+    if (hiddenGroups.has(n.group)) {
+      hiddenGroups.delete(n.group);
+      renderLegend();
+      applyGroupFilter();
+    }
     // Recenter the viewport on the node's current position with a comfortable zoom.
     vp = centerOn(vp, { x: n.x, y: n.y }, Math.max(1.5, vp.k), world);
     applyViewport();
@@ -652,11 +738,26 @@ const t = {
         btn.setAttribute('aria-pressed', String(isCommunity));
         btn.textContent = isCommunity ? btn.dataset.labelCommunity! : btn.dataset.labelGroup!;
         btn.title = btn.textContent;
+        // Community mode has no group chips — reset the filter so nothing
+        // stays hidden when switching back.
+        hiddenGroups.clear();
         nodes.forEach((n, i) => {
           const circle = nodeEls[i].querySelector('circle');
           if (circle) circle.setAttribute('fill', colorFor(n));
         });
         renderLegend();
+        applyGroupFilter();
+      } else if (action === 'toggle-arrows') {
+        showArrows = !showArrows;
+        btn.setAttribute('aria-pressed', String(showArrows));
+        edges.forEach((e, i) => {
+          const l = links[i];
+          if (showArrows && isDirected(l.type)) {
+            e.setAttribute('marker-end', 'url(#kg-arrow)');
+          } else {
+            e.removeAttribute('marker-end');
+          }
+        });
       }
     });
   });
@@ -837,6 +938,16 @@ const t = {
     height: 10px;
     border-radius: 50%;
     display: inline-block;
+  }
+  .kg-legend-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    cursor: pointer;
+  }
+  .kg-legend-toggle input {
+    accent-color: var(--text-accent);
+    cursor: pointer;
   }
   .kg-search {
     position: relative;

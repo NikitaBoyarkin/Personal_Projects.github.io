@@ -101,6 +101,8 @@ const caption = isEn
     edges = links.map((l) => {
       const line = el('line');
       line.setAttribute('class', 'pg-edge');
+      // Obsidian "Link thickness": strong edges draw thicker.
+      line.style.strokeWidth = String(0.6 + 1.6 * (l.weight || 1));
       edgeLayer.appendChild(line);
       return line as SVGLineElement;
     });

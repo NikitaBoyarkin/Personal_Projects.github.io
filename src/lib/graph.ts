@@ -27,6 +27,18 @@ export interface GraphNode {
 
 export type LinkType = "related" | "children" | "topic" | "shared";
 
+/** Edge types that carry a meaningful direction (source → target). Lateral
+ *  `shared` edges are symmetric — they must never get arrowheads. */
+export const DIRECTED_TYPES: ReadonlySet<LinkType> = new Set([
+  "related",
+  "children",
+  "topic",
+]);
+
+/** Runtime predicate on edge types (client data arrives as loose strings). */
+export const isDirected = (type: string): boolean =>
+  DIRECTED_TYPES.has(type as LinkType);
+
 export interface GraphLink {
   source: string;
   target: string;

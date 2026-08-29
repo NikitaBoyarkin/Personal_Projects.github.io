@@ -18,8 +18,9 @@ import { withBase } from '../../lib/path';
       The portfolio's content graph: projects, posts, topics and the Volta modules, linked by actual
       references (<code>related</code>, tags, Volta's composition). Node color = project track or post
       category; a button switches to community — clusters the algorithm finds on top of the taxonomy.
-      Node size = connection count (hubs are bigger), solid edges = explicit links,
-      dashed edges = thematic and lateral (shared topics/tags/tools). Built from the content collections at
+      Node size = connection count (hubs are bigger), edge thickness = link strength, solid edges = explicit
+      links, dashed edges = thematic and lateral (shared topics/tags/tools). The "Arrows" button shows link
+      direction; legend checkboxes hide groups. Built from the content collections at
       build time, so it is always current.
       Mouse wheel — zoom, drag — pan (on the canvas) and move nodes, double-click restarts the
       simulation, the ⛶ button toggles fullscreen.

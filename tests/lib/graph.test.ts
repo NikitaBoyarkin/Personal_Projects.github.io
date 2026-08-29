@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildGraph, mergePostsForLocale, parseRelatedPath, subgraphAround } from '../../src/lib/graph';
+import { buildGraph, isDirected, mergePostsForLocale, parseRelatedPath, subgraphAround } from '../../src/lib/graph';
 import { TOPICS } from '../../src/lib/topics';
 
 const project = (
@@ -28,6 +28,18 @@ const post = (
     tags: extra.tags ?? [],
     related: extra.related ?? [],
   },
+});
+
+describe('isDirected', () => {
+  it('marks related, children and topic edges as directed', () => {
+    expect(isDirected('related')).toBe(true);
+    expect(isDirected('children')).toBe(true);
+    expect(isDirected('topic')).toBe(true);
+  });
+
+  it('marks shared (lateral) edges as undirected', () => {
+    expect(isDirected('shared')).toBe(false);
+  });
 });
 
 describe('parseRelatedPath', () => {
