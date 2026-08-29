@@ -18,7 +18,7 @@ const {
 } = Astro.props;
 ---
 
-<MorphIcon data-arrow data-from-d={from} data-to-d={to} icon={from} spring="snappy" reducedMotion="user" size={size} />
+<MorphIcon data-arrow aria-hidden="true" data-from-d={from} data-to-d={to} icon={from} spring="snappy" reducedMotion="user" size={size} />
 
 <script>
   import { defineMorphIcon, type MorphIconElement } from 'morphicons/element';

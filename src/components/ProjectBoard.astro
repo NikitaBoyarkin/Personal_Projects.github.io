@@ -276,6 +276,39 @@ const byTrack = TRACKS.map((track) => ({
 
     root.addEventListener('dragend', clearDrag);
 
+    // --- Keyboard reorder (WCAG 2.1.1 / 2.5.7): ArrowUp/ArrowDown moves the
+    // focused card within its column. Drag is a pointer progressive enhancement;
+    // Shuffle/Reset remain alternate bulk paths. ---
+    root.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      // Only drive the card when the card itself is focused (keyboard path),
+      // never from a link/button inside it — those keep their own behavior.
+      const target = e.target as HTMLElement;
+      const card = target.closest<HTMLElement>('.project');
+      if (!card || !root.contains(card) || target !== card) return;
+      const col = card.closest<HTMLElement>('.kanban-column');
+      const body = colBody(col as HTMLElement);
+      if (!col || !body) return;
+      const items = colProjects(col);
+      const idx = items.indexOf(card);
+      if (idx < 0) return;
+      const delta = e.key === 'ArrowDown' ? 1 : -1;
+      const next = idx + delta;
+      if (next < 0 || next >= items.length) return;
+      e.preventDefault();
+      const targetCard = items[next];
+      if (delta > 0) {
+        const after = targetCard.nextElementSibling as HTMLElement | null;
+        if (after) body.insertBefore(card, after);
+        else body.appendChild(card);
+      } else {
+        body.insertBefore(card, targetCard);
+      }
+      writeOrder(currentOrder());
+      showHint(hintEl?.dataset.saved || 'Saved');
+      card.focus(); // stay on the card so repeated moves work
+    });
+
     // --- Shuffle: randomize within every column ---
     shuffleBtn?.addEventListener('click', () => {
       root.querySelectorAll<HTMLElement>('.kanban-column').forEach((col) => {

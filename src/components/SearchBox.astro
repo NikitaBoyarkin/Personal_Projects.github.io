@@ -25,6 +25,7 @@ const i18n = {
   empty: isEn ? "Nothing found" : "Ничего не найдено",
   topicsLabel: isEn ? "Browse topics:" : "Смотрите темы:",
   toggleLabel: isEn ? "Open search" : "Открыть поиск",
+  closeLabel: isEn ? "Close search" : "Закрыть поиск",
   facetsLabel: isEn ? "Filter by type" : "Фильтр по типу",
   resultsLabel: isEn ? "Search results" : "Результаты поиска",
 };
@@ -61,6 +62,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       class="search-input"
       type="search"
       placeholder={i18n.placeholder}
+      aria-label={i18n.placeholder}
       autocomplete="off"
       role="combobox"
       aria-expanded="false"
@@ -111,6 +113,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       empty: string;
       topicsLabel: string;
       toggleLabel: string;
+      closeLabel: string;
       facetsLabel: string;
       resultsLabel: string;
     };
@@ -156,6 +159,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
     function open() {
       panel.hidden = false;
       toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", t.closeLabel);
       input.focus();
       morphSearch(closeD);
     }
@@ -163,8 +167,10 @@ const X_D = "M6 6l12 12M6 18L18 6";
     function close() {
       panel.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", t.toggleLabel);
       input.value = "";
       resultsEl.innerHTML = "";
+      document.querySelector(".search-empty-sibling")?.remove();
       input.setAttribute("aria-expanded", "false");
       input.removeAttribute("aria-activedescendant");
       activeIndex = -1;
@@ -225,12 +231,17 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
     function render(rows: Entry[], tokens: string[]) {
       resultsEl.innerHTML = "";
+      document.querySelector(".search-empty-sibling")?.remove();
       if (!rows.length) {
-        const li = document.createElement("li");
-        li.className = "search-empty";
+        // Empty state lives OUTSIDE the listbox: a listbox may only contain
+        // option/group children, and the topic chips are real links (Tab-ready)
+        // that would break the combobox key model inside role="listbox"
+        // (WCAG 4.1.2). Render it as a sibling block after the list instead.
+        const block = document.createElement("div");
+        block.className = "search-empty search-empty-sibling";
         const label = document.createElement("span");
         label.textContent = t.empty;
-        li.appendChild(label);
+        block.appendChild(label);
         if (topics.length) {
           const wrap = document.createElement("div");
           wrap.className = "search-topics";
@@ -245,9 +256,9 @@ const X_D = "M6 6l12 12M6 18L18 6";
             a.textContent = tp.l;
             wrap.appendChild(a);
           });
-          li.appendChild(wrap);
+          block.appendChild(wrap);
         }
-        resultsEl.appendChild(li);
+        resultsEl.insertAdjacentElement("afterend", block);
         input.setAttribute("aria-expanded", "false");
         activeIndex = -1;
         return;

@@ -257,6 +257,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
     function open() {
       panel.hidden = false;
       toggle.setAttribute("aria-expanded", "true");
+      toggle.setAttribute("aria-label", t.closeLabel);
       input.focus();
       morphIcon(closeD);
       if (!lastQuestion) renderSuggestions(suggestIds);
@@ -265,6 +266,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
     function close() {
       panel.hidden = true;
       toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", t.openLabel);
       // Return focus to the trigger only if focus was inside this widget —
       // don't steal it from a sibling (e.g. the search input).
       if (root?.contains(document.activeElement)) toggle.focus();

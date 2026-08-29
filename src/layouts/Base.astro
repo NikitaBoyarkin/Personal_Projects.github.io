@@ -199,13 +199,13 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
             <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>
           </svg>
         </a>
-        <button id="theme-toggle" class="theme-toggle" aria-label={`${t.themeLabel}dark${t.themeCycle}`} data-theme-label={t.themeLabel} data-theme-cycle={t.themeCycle} type="button" aria-pressed="true" title={t.themeTitle} data-icon-dark={THEME_MOON} data-icon-light={THEME_SUN} data-icon-cyber={THEME_CYBER}>
+        <button id="theme-toggle" class="theme-toggle" aria-label={`${t.themeLabel}dark${t.themeCycle}`} data-theme-label={t.themeLabel} data-theme-cycle={t.themeCycle} type="button" title={t.themeTitle} data-icon-dark={THEME_MOON} data-icon-light={THEME_SUN} data-icon-cyber={THEME_CYBER}>
           <MorphIcon id="theme-icon" icon={THEME_MOON} spring="snappy" reducedMotion="user" size={18} />
         </button>
       </div>
     </nav>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
       <slot />
     </main>
 
@@ -241,7 +241,6 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
           if (themeIcon && ICON_PATHS[theme]) themeIcon.icon = ICON_PATHS[theme];
           if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[theme] || THEME_COLORS.dark);
           if (toggle) {
-            toggle.setAttribute('aria-pressed', String(theme === 'dark'));
             const label = (toggle.dataset.themeLabel || 'Theme: ') + theme + (toggle.dataset.themeCycle || '. Click to cycle.');
             toggle.setAttribute('aria-label', label);
           }
@@ -325,6 +324,10 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
           links.classList.toggle('open', open);
           toggle.setAttribute('aria-expanded', String(open));
           if (icon && (open ? CLOSE : MENU)) icon.icon = open ? CLOSE : MENU;
+          // Move focus into the revealed menu: the links precede the toggle in
+          // the DOM, so without this a keyboard user tabs straight past the menu
+          // into .nav-aux on mobile (WCAG 2.4.3 Focus Order).
+          if (open) links.querySelector('a')?.focus();
         }
         toggle.addEventListener('click', () => setOpen(!links.classList.contains('open')));
         links.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));

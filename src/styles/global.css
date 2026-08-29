@@ -755,6 +755,13 @@ nav ul.links a[aria-current="page"] {
   opacity: 1;
 }
 
+/* Keyboard-reorderable cards carry tabindex="0"; give them a visible focus.
+   Negative offset keeps it inside the card's overflow:hidden clipping. */
+.project:focus-visible {
+  outline: 2px solid var(--text-accent);
+  outline-offset: -2px;
+}
+
 .project img {
   width: 100%;
   height: 200px;
@@ -1404,19 +1411,22 @@ button:focus-visible {
   --background-tertiary: #1a1a2e;
   --text-normal: #e6f1ff;
   --text-muted: #8a8aa8;
-  --text-accent: #ff6643;
+  /* #ff8569 (was #ff6643): the darker accent fails 1.4.3 on accent-tinted
+     backgrounds (skill-badge, topic-count, search-facet). Matches the dark
+     theme's accent so the same tint recipes pass there and here. */
+  --text-accent: #ff8569;
   --text-accent-hover: #ffbe99;
   --button-bg: #ff2bd6;
   --button-bg-hover: #ff5ce0;
   --interactive-normal: #1a1a2e;
   --interactive-hover: #232342;
   --border-color: #2a2a4a;
-  --border-active: #ff6643;
+  --border-active: #ff8569;
   --code-background: #1a1a2e;
   --blockquote-border: #2a2a4a;
   --table-border: #2a2a4a;
   --table-header-background: #1a1a2e;
-  --shadow-color: rgba(255, 102, 67, 0.15);
+  --shadow-color: rgba(255, 133, 105, 0.15);
 }
 
 /* Generic secondary button (used in intro CTAs, not just .project) */
@@ -1571,8 +1581,13 @@ button:focus-visible {
   font-family: inherit;
 }
 .search-input:focus {
-  outline: none;
   border-color: var(--text-accent);
+}
+/* 1px border-color alone is below the 2px focus indicator (2.4.11); a proper
+   focus-visible outline brings parity with the AskMe input. */
+.search-input:focus-visible {
+  outline: 2px solid var(--text-accent);
+  outline-offset: 1px;
 }
 .search-results {
   list-style: none;

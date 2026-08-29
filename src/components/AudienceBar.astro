@@ -147,6 +147,11 @@ const notes: Record<string, string> = {
     color: #1a1a1a;
     border-color: var(--text-accent);
   }
+  /* Light theme: --text-accent is a dark brick (#a8331a), so dark text on it
+     is ~2.6:1. White text lifts the active state to ~7.6:1 (WCAG 1.4.3). */
+  [data-theme="light"] .audience-option[aria-pressed="true"] {
+    color: #fff;
+  }
   .audience-option:focus-visible {
     outline: 2px solid var(--text-accent);
     outline-offset: 2px;

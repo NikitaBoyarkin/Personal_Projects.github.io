@@ -35,6 +35,12 @@
 .filter-tag.active {
   color: var(--text-accent);
   font-weight: 500;
+  /* Non-color cue alongside the color change (1.4.1) — the active filter is
+     also underlined, not just recolored. */
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--text-accent);
 }
 
 /* Blog cards — sticky-note style, matching the kanban project cards */

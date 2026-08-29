@@ -27,7 +27,7 @@ const words = t.statement.split(' ').map((w) => ({
 }));
 ---
 
-<section id="manifesto" class="manifesto reveal" aria-label="Позиционирование">
+<section id="manifesto" class="manifesto reveal" aria-label={lang === 'en' ? 'Positioning' : 'Позиционирование'}>
   <p class="manifesto-text">
     {
       words.map(({ w, strong }) => (
