@@ -790,7 +790,7 @@ nav ul.links a[aria-current="page"] {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: var(--space-3);
-  color: var(--text-accent);
+  color: var(--text-normal);
   letter-spacing: -0.01em;
 }
 
@@ -873,13 +873,13 @@ nav ul.links a[aria-current="page"] {
 .project-tool {
   display: inline-flex;
   align-items: center;
-  background: var(--background-tertiary);
-  color: var(--text-muted);
+  background: color-mix(in srgb, var(--text-accent) 8%, transparent);
+  color: var(--text-accent);
   font-size: 0.8rem;
   font-weight: 500;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
-  border: 1px solid var(--border-color);
+  border: 1px solid color-mix(in srgb, var(--text-accent) 20%, transparent);
 }
 
 .project-actions {
