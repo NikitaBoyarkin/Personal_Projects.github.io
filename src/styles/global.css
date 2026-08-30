@@ -80,6 +80,16 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
   --radius-full: 9999px;
+
+  /* Z-index scale — fixed tokens, no bare layer numbers */
+  --z-decor: -1;
+  --z-base: 0;
+  --z-float: 60;
+  --z-sticky: 100;
+  --z-panel: 150;
+  --z-top: 200;
+  --z-overlay: 1000;
+  --z-dialog: 1200;
 }
 
 [data-theme="light"] {
@@ -108,9 +118,9 @@
   padding: 0;
   box-sizing: border-box;
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease,
-    border-color 0.3s ease;
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 body {
@@ -124,8 +134,21 @@ body {
   padding: var(--space-5);
   position: relative;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Readable text wrapping — balance headings, pretty body paragraphs */
+h1,
+h2,
+h3,
+h4 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 /* Skip link */
@@ -143,20 +166,21 @@ body {
 
 .skip-link {
   position: absolute;
-  top: -100%;
+  top: var(--space-4);
   left: var(--space-4);
-  z-index: 200;
+  z-index: var(--z-top);
   background: var(--text-accent);
   color: #1a1a1a;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--space-2);
   text-decoration: none;
   font-weight: 500;
-  transition: top 0.2s ease;
+  transform: translateY(-250%);
+  transition: transform 0.2s ease;
 }
 
 .skip-link:focus {
-  top: var(--space-4);
+  transform: translateY(0);
 }
 
 /* Reveal animations */
@@ -199,13 +223,13 @@ nav {
     var(--background-primary) 85%,
     transparent
   );
-  z-index: 100;
+  z-index: var(--z-sticky);
   backdrop-filter: blur(12px) saturate(1.2);
   -webkit-backdrop-filter: blur(12px) saturate(1.2);
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
   box-shadow: 0 1px 3px var(--shadow-color);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 nav.scrolled {
@@ -287,7 +311,7 @@ nav.scrolled {
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-toggle:hover {
@@ -312,7 +336,7 @@ nav ul.links a {
   font-size: 0.95rem;
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }
 
 nav ul.links a:hover,
@@ -324,7 +348,7 @@ nav ul.links a[aria-current="page"] {
 /* Table of Contents */
 #toc {
   position: fixed;
-  right: 2rem;
+  right: max(2rem, env(safe-area-inset-right));
   top: 50%;
   transform: translateY(-50%);
   background: var(--background-secondary);
@@ -332,7 +356,7 @@ nav ul.links a[aria-current="page"] {
   border-radius: 8px;
   padding: 1rem;
   width: 200px;
-  z-index: 50;
+  z-index: var(--z-float);
 }
 
 #toc .toc-title {
@@ -372,7 +396,7 @@ nav ul.links a[aria-current="page"] {
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
+  z-index: var(--z-decor);
   pointer-events: none;
   overflow: hidden;
   opacity: 0.45;
@@ -452,7 +476,7 @@ nav ul.links a[aria-current="page"] {
   font-size: 0.9rem;
   border: none;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .button:hover {
@@ -502,7 +526,7 @@ nav ul.links a[aria-current="page"] {
   font-size: 0.875rem;
   font-weight: 500;
   border: 1px solid color-mix(in srgb, var(--text-accent) 20%, transparent);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   cursor: default;
 }
 
@@ -533,10 +557,12 @@ nav ul.links a[aria-current="page"] {
   position: absolute;
   bottom: -2px;
   left: 0;
-  width: 0;
+  width: 100%;
   height: 1.5px;
   background: var(--text-accent);
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
 }
 
 .intro-content a:hover {
@@ -544,7 +570,7 @@ nav ul.links a[aria-current="page"] {
 }
 
 .intro-content a:hover::after {
-  width: 100%;
+  transform: scaleX(1);
 }
 
 /* CTA button inside intro: beat .intro-content a link color (specificity) + drop the animated underline.
@@ -570,30 +596,15 @@ nav ul.links a[aria-current="page"] {
 .intro-photo::before {
   content: "";
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: 340px;
+  height: 340px;
   border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    var(--text-accent),
-    var(--text-accent-hover),
-    var(--text-accent)
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--text-accent) 14%, transparent) 0%,
+    transparent 62%
   );
-  opacity: 0.15;
-  filter: blur(30px);
-  animation: pulse-glow 4s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: scale(1.05);
-    opacity: 0.25;
-  }
+  opacity: 0.8;
 }
 
 .photo-placeholder {
@@ -607,7 +618,7 @@ nav ul.links a[aria-current="page"] {
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 10px 40px var(--shadow-color);
 }
 
@@ -723,7 +734,7 @@ nav ul.links a[aria-current="page"] {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   padding: var(--space-6);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -741,7 +752,7 @@ nav ul.links a[aria-current="page"] {
     var(--text-accent-hover)
   );
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.2s ease;
 }
 
 .project:hover {
@@ -768,7 +779,7 @@ nav ul.links a[aria-current="page"] {
   object-fit: cover;
   border-radius: var(--radius-lg);
   margin-bottom: var(--space-4);
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease;
 }
 
 .project:hover img {
@@ -808,7 +819,7 @@ nav ul.links a[aria-current="page"] {
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9rem;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   border: none;
   cursor: pointer;
   position: relative;
@@ -940,7 +951,7 @@ nav ul.links a[aria-current="page"] {
   background: var(--background-secondary);
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  transition: box-shadow 0.2s ease;
 }
 
 #about:hover {
@@ -1006,7 +1017,7 @@ footer p {
   color: var(--text-accent);
   text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .back:hover {
@@ -1079,7 +1090,7 @@ footer p {
   color: var(--text-accent);
   text-decoration: none;
   border-bottom: 1px dotted var(--text-accent);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
 }
 
 #project-content a:hover {
@@ -1116,12 +1127,13 @@ footer p {
 #inner-toc {
   position: fixed;
   top: 120px;
-  left: 40px;
+  left: max(40px, env(safe-area-inset-left));
   width: 200px;
   padding-right: 12px;
   border-right: 1px solid var(--border-color);
   font-size: 0.9rem;
   max-height: 70vh;
+  max-height: 70dvh;
   overflow-y: auto;
   scrollbar-width: none;
 }
@@ -1151,13 +1163,13 @@ footer p {
   color: var(--text-muted);
   text-decoration: none;
   font-size: 0.85rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 #inner-toc li a:hover {
   background: var(--background-secondary);
   color: var(--text-accent);
-  padding-left: 10px;
+  transform: translateX(4px);
 }
 
 #inner-toc li a.active {
@@ -1568,7 +1580,7 @@ button:focus-visible {
   border-radius: var(--radius-lg);
   box-shadow: 0 20px 50px var(--shadow-color);
   padding: var(--space-3);
-  z-index: 150;
+  z-index: var(--z-panel);
 }
 .search-input {
   width: 100%;

@@ -21,8 +21,10 @@
       if (!container) return;
 
       try {
-        const darkColors = ['#5100ff', '#00ff80', '#ffcc00', '#ea00ff'];
-        const lightColors = ['#c4b5fd', '#86efac', '#fde047', '#f0abfc'];
+        // Palette is derived from the theme tokens (coral accent + Obsidian
+        // teal surfaces) — no off-palette hues competing with the accent.
+        const darkColors = ['#ff6643', '#ffa68a', '#1a3435', '#2a5d5f'];
+        const lightColors = ['#a8331a', '#ffd1c4', '#7fb3b5', '#e4e4e7'];
 
         const makeUniforms = (colors: string[]) => ({
           u_colors: colors.map(getShaderColorFromString),

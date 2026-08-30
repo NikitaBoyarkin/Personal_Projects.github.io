@@ -322,9 +322,9 @@ const X_D = "M6 6l12 12M6 18L18 6";
 <style>
   .askme-toggle {
     position: fixed;
-    right: var(--space-6);
-    bottom: var(--space-6);
-    z-index: 60;
+    right: max(var(--space-6), env(safe-area-inset-right));
+    bottom: calc(var(--space-6) + env(safe-area-inset-bottom));
+    z-index: var(--z-float);
     width: 3.25rem;
     height: 3.25rem;
     border-radius: var(--radius-full);
@@ -349,11 +349,12 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
   .askme-panel {
     position: fixed;
-    right: var(--space-6);
-    bottom: calc(var(--space-6) + 4.25rem);
-    z-index: 60;
+    right: max(var(--space-6), env(safe-area-inset-right));
+    bottom: calc(var(--space-6) + env(safe-area-inset-bottom) + 4.25rem);
+    z-index: var(--z-float);
     width: min(24rem, calc(100vw - 2 * var(--space-4)));
-    max-height: min(70vh, 32rem);
+    max-height: 70vh;
+    max-height: min(70dvh, 32rem);
     overflow-y: auto;
     background: var(--background-secondary);
     border: 1px solid var(--border-color);

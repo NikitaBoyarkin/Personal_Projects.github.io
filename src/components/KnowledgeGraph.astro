@@ -40,7 +40,7 @@ const t = {
 };
 ---
 
-<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')} data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'}>
+<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')} data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'} data-search-reset={isEn ? 'Clear search' : 'Очистить поиск'}>
   <div class="kg-topbar">
     <div class="kg-search" role="search">
       <input
@@ -628,6 +628,21 @@ const t = {
       const empty = document.createElement('div');
       empty.className = 'kg-search-empty';
       empty.textContent = root.dataset.searchEmpty || 'No matches';
+      // Empty state needs one clear next action: a button that clears the
+      // query and restores the full graph.
+      const reset = document.createElement('button');
+      reset.type = 'button';
+      reset.className = 'kg-search-empty-btn';
+      reset.textContent = root.dataset.searchReset || 'Clear search';
+      reset.addEventListener('click', () => {
+        if (!searchInput) return;
+        searchInput.value = '';
+        searchInput.setAttribute('aria-expanded', 'false');
+        applySearchFilter('');
+        searchResults.hidden = true;
+        searchInput.focus();
+      });
+      empty.appendChild(reset);
       searchResults.appendChild(empty);
       return;
     }
@@ -830,7 +845,7 @@ const t = {
   .kg-root.kg-fullscreen {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: var(--z-overlay);
     display: flex;
     flex-direction: column;
     padding: var(--space-5);
@@ -974,7 +989,7 @@ const t = {
     top: calc(100% + 4px);
     left: 0;
     right: 0;
-    z-index: 1200;
+    z-index: var(--z-panel);
     max-height: 240px;
     overflow-y: auto;
     background: var(--background-primary);
@@ -1003,6 +1018,29 @@ const t = {
     padding: 0.5rem 0.6rem;
     color: var(--text-muted);
     font-size: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  .kg-search-empty-btn {
+    align-self: flex-start;
+    padding: 0.15rem 0.4rem;
+    border: none;
+    background: transparent;
+    color: var(--text-accent);
+    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .kg-search-empty-btn:hover {
+    color: var(--text-accent-hover);
+  }
+  .kg-search-empty-btn:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
   }
   .kg-caption {
     color: var(--text-muted);
