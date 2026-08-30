@@ -1,4 +1,6 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
+import { glob } from 'astro/loaders';
 
 const projectSchema = z.object({
   title: z.string(),
@@ -6,7 +8,7 @@ const projectSchema = z.object({
   hero: z.string(),
   impact: z.array(z.string()).default([]),
   tools: z.array(z.string()).default([]),
-  github: z.string().url().optional(),
+  github: z.url().optional(),
   demo: z.string().optional(),
   track: z.enum(['experiments', 'analytics', 'product', 'engineering']).default('analytics'),
   related: z.array(z.string()).default([]),
@@ -32,7 +34,7 @@ const voltaPartSchema = z.object({
   order: z.number(),
   impact: z.array(z.string()).default([]),
   tools: z.array(z.string()).default([]),
-  github: z.string().url().optional(),
+  github: z.url().optional(),
   draft: z.boolean().default(false),
 });
 
@@ -49,12 +51,30 @@ const postSchema = z.object({
   draft: z.boolean().default(false),
 });
 
-const projects = defineCollection({ schema: projectSchema });
-const projectsEn = defineCollection({ schema: projectSchema });
-const voltaParts = defineCollection({ schema: voltaPartSchema });
-const voltaPartsEn = defineCollection({ schema: voltaPartSchema });
-const posts = defineCollection({ schema: postSchema });
-const postsEn = defineCollection({ schema: postSchema });
+const projects = defineCollection({
+  loader: glob({ base: './src/content/projects', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: projectSchema,
+});
+const projectsEn = defineCollection({
+  loader: glob({ base: './src/content/projects-en', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: projectSchema,
+});
+const voltaParts = defineCollection({
+  loader: glob({ base: './src/content/volta-parts', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: voltaPartSchema,
+});
+const voltaPartsEn = defineCollection({
+  loader: glob({ base: './src/content/volta-parts-en', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: voltaPartSchema,
+});
+const posts = defineCollection({
+  loader: glob({ base: './src/content/posts', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: postSchema,
+});
+const postsEn = defineCollection({
+  loader: glob({ base: './src/content/posts-en', pattern: '**/[^_]*.{md,mdx}' }),
+  schema: postSchema,
+});
 
 export const collections = {
   projects,

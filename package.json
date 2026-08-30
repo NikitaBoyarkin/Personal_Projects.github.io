@@ -19,12 +19,12 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@paper-design/shaders": "^0.0.78",
-    "astro": "^5.0.0",
+    "astro": "^7.2.9",
     "morphicons": "^1.7.0",
     "posthog-js": "^1.417.1"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.9",
+    "@astrojs/check": "^0.9.10",
     "@types/jsdom": "^30.0.0",
     "jsdom": "^30.0.1",
     "typescript": "^5.9.3",

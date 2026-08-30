@@ -38,7 +38,7 @@ const posts = (await getCollection('posts', (p) => !p.data.draft)).sort(
           image={post.data.image}
           updated={post.data.updated}
           excerpt={post.data.excerpt}
-          readTime={estimateReadTime(post.body)}
+          readTime={estimateReadTime(post.body ?? '')}
         />
       ))
     }

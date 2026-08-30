@@ -7,6 +7,9 @@ export default defineConfig({
   base: "/Personal_Projects.github.io",
   output: "static",
   trailingSlash: "ignore",
+  // v7 default is 'jsx', which strips whitespace between inline elements;
+  // keep the v5/v6 boolean behaviour to avoid layout regressions.
+  compressHTML: true,
   i18n: {
     defaultLocale: "ru",
     locales: ["ru", "en"],
