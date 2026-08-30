@@ -68,6 +68,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       aria-expanded="false"
       aria-controls="search-results"
       aria-autocomplete="list"
+      aria-describedby="search-hint"
     />
     <div class="search-facets" role="group" aria-label={i18n.facetsLabel}>
       <button class="search-facet is-active" data-facet="all" type="button">{i18n.all}</button>
@@ -75,7 +76,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       <button class="search-facet" data-facet="post" type="button">{i18n.posts}</button>
     </div>
     <ul id="search-results" class="search-results" role="listbox" aria-label={i18n.resultsLabel}></ul>
-    <p class="search-hint">{i18n.hint}</p>
+    <p class="search-hint" id="search-hint">{i18n.hint}</p>
   </div>
 </div>
 

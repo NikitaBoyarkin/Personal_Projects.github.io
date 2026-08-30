@@ -25,6 +25,9 @@ const METRICS: Metric[] = [
   { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: "pp", label: isEn ? "KYC conversion" : "KYC-конверсия" },
   { value: SIG.abKyc.annualEurK, prefix: "€", suffix: "K/yr", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
 ];
+// Server-side formatter — mirrors the client `format()` so the HTML carries
+// the final values (no-JS fallback) and the script counts up from 0.
+const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(v)));
 ---
 
 <div class="hero-metrics" role="group" aria-label={isEn ? "Key metrics" : "Ключевые метрики"}>
@@ -38,7 +41,7 @@ const METRICS: Metric[] = [
           data-prefix={m.prefix ?? ""}
           data-suffix={m.suffix ?? ""}
         >
-          {m.prefix ?? ""}0{m.suffix ?? ""}
+          {m.prefix ?? ""}{fmt(m.value, m.decimals ?? 0)}{m.suffix ?? ""}
         </span>
         <span class="hero-metric-label">{m.label}</span>
       </div>

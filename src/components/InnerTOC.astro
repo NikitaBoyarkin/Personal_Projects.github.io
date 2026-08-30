@@ -78,6 +78,8 @@ const isEn = lang === 'en';
     updateActive();
     window.addEventListener('scroll', updateActive, { passive: true });
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     tocWrap?.addEventListener('click', (e) => {
       const a = e.target.closest('a');
       if (!a) return;
@@ -88,7 +90,12 @@ const isEn = lang === 'en';
       e.preventDefault();
       const offset = 110;
       const top = window.scrollY + target.getBoundingClientRect().top - offset;
-      window.scrollTo({ top, behavior: 'smooth' });
+      window.scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
+      // The default anchor jump was prevented, so move focus to the target
+      // heading — otherwise keyboard/SR users stay "at" the TOC link while
+      // visually at the section (WCAG 2.4.3).
+      target.tabIndex = -1;
+      target.focus({ preventScroll: true });
 
       document.querySelectorAll('#inner-toc a').forEach((el) => {
         const isActive = el === a;

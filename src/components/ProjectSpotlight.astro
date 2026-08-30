@@ -43,6 +43,7 @@ const i18n = {
           aria-selected={i === 0}
           aria-controls="spotlight-stage"
           data-category={track.key}
+          tabindex={i === 0 ? 0 : -1}
           type="button"
         >
           {track.label}
@@ -119,6 +120,8 @@ const i18n = {
         const on = tab.dataset.category === activeCat;
         tab.classList.toggle('active', on);
         tab.setAttribute('aria-selected', String(on));
+        // Roving tabindex: only the active tab stays in the Tab order.
+        tab.tabIndex = on ? 0 : -1;
       });
       slides.forEach((slide) => {
         const on = slide.dataset.category === activeCat && Number(slide.dataset.index) === activeIdx;

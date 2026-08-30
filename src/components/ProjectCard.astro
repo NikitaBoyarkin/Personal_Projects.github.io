@@ -31,6 +31,11 @@ const i18n = {
 
 <article class="project reveal" data-tools={(tools ?? []).join(',').toLowerCase()} data-slug={slug} draggable={draggable ? 'true' : undefined} tabindex={draggable ? '0' : undefined}>
   <span class="project-grip" aria-hidden="true"><span></span><span></span><span></span></span>
+  {draggable && (
+    <span class="visually-hidden">
+      {isEn ? ' — reorder with Arrow Up/Down' : ' — перемещение стрелками ↑/↓'}
+    </span>
+  )}
   {image && <img src={withBase(image)} alt={title} loading="lazy" width="600" height="200" />}
   <h3>{title}</h3>
   <p>{description}</p>

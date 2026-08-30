@@ -40,6 +40,9 @@ const words = t.statement.split(' ').map((w) => ({
 <script>
   const el = document.querySelector('.manifesto');
   if (el) {
+    // Gate the hidden state behind .js so the statement stays readable
+    // without JavaScript (no-JS fallback).
+    document.documentElement.classList.add('js');
     const words = el.querySelectorAll('.w');
     const io = new IntersectionObserver(
       (entries) => {
@@ -74,20 +77,26 @@ const words = t.statement.split(' ').map((w) => ({
   }
   .w {
     display: inline-block;
-    opacity: 0.15;
-    transform: translateY(6px);
-    transition: opacity 0.55s ease, transform 0.55s ease;
+    /* Fully visible by default so the statement is readable without JS;
+       the hidden state is scoped under .js (added by the script). */
+    opacity: 1;
+    transform: none;
   }
   .w-strong {
     color: var(--text-accent);
   }
-  .w-revealed {
+  .js .w {
+    opacity: 0.15;
+    transform: translateY(6px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .js .w-revealed {
     opacity: 1;
     transform: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .w {
+    .js .w {
       opacity: 1;
       transform: none;
       transition: none;
