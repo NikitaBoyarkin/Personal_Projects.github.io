@@ -85,9 +85,12 @@ const X_D = "M6 6l12 12M6 18L18 6";
       aria-label={i18n.placeholder}
     />
     <p class="askme-hint">{i18n.hint}</p>
-    <div id="askme-suggestions" class="askme-suggestions" aria-label={i18n.suggestionsLabel}></div>
-    <div id="askme-answer" class="askme-answer" aria-live="polite" aria-label={i18n.answerLabel}></div>
+    <div id="askme-suggestions" class="askme-suggestions" role="group" aria-label={i18n.suggestionsLabel}></div>
+    <div id="askme-answer" class="askme-answer" role="region" aria-live="polite" aria-label={i18n.answerLabel}></div>
   </div>
+  <!-- Transparent click-catcher: keeps "click outside to close" working while
+       the page behind the panel is inert (aria-modal contract). -->
+  <div id="askme-backdrop" class="askme-backdrop" aria-hidden="true" hidden></div>
 </div>
 
 <script>
@@ -140,13 +143,39 @@ const X_D = "M6 6l12 12M6 18L18 6";
     const inputEl = document.getElementById("askme-input") as HTMLInputElement | null;
     const suggestionsElEl = document.getElementById("askme-suggestions");
     const answerElEl = document.getElementById("askme-answer");
-    if (!toggleEl || !panelEl || !inputEl || !suggestionsElEl || !answerElEl) return;
+    const backdropEl = document.getElementById("askme-backdrop");
+    if (!toggleEl || !panelEl || !inputEl || !suggestionsElEl || !answerElEl || !backdropEl) return;
     // Reassign to const so TS keeps the non-null narrowing inside closures.
     const toggle = toggleEl;
     const panel = panelEl;
     const input = inputEl;
     const suggestionsEl = suggestionsElEl;
     const answerEl = answerElEl;
+    const backdrop = backdropEl;
+
+    // Make the page behind the panel inert while it's open (aria-modal
+    // contract): every branch of the DOM except the widget itself.
+    function setBackgroundInert(inert: boolean) {
+      const chain: HTMLElement[] = [];
+      let node: HTMLElement | null = root;
+      while (node && node.parentElement && node.parentElement !== document.body) {
+        chain.unshift(node);
+        node = node.parentElement;
+      }
+      const top = node ?? root!; // direct child of <body> (or the widget itself)
+      for (const child of Array.from(document.body.children)) {
+        if (child !== top) (child as HTMLElement).inert = inert;
+      }
+      const chainSet = new Set(chain);
+      const apply = (el: HTMLElement) => {
+        for (const child of Array.from(el.children)) {
+          if (child === root) continue;
+          if (chainSet.has(child as HTMLElement)) apply(child as HTMLElement);
+          else (child as HTMLElement).inert = inert;
+        }
+      };
+      if (top !== root) apply(top);
+    }
 
     const locale = document.documentElement.lang === "en" ? "en" : "ru";
     let lastQuestion = "";
@@ -256,6 +285,8 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
     function open() {
       panel.hidden = false;
+      backdrop.hidden = false;
+      setBackgroundInert(true);
       toggle.setAttribute("aria-expanded", "true");
       toggle.setAttribute("aria-label", t.closeLabel);
       input.focus();
@@ -265,6 +296,8 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
     function close() {
       panel.hidden = true;
+      backdrop.hidden = true;
+      setBackgroundInert(false);
       toggle.setAttribute("aria-expanded", "false");
       toggle.setAttribute("aria-label", t.openLabel);
       // Return focus to the trigger only if focus was inside this widget —
@@ -276,6 +309,9 @@ const X_D = "M6 6l12 12M6 18L18 6";
     toggle.addEventListener("click", () => {
       panel.hidden ? open() : close();
     });
+
+    // Clicking the backdrop = click outside: close the panel.
+    backdrop.addEventListener("click", close);
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -345,6 +381,19 @@ const X_D = "M6 6l12 12M6 18L18 6";
   .askme-toggle:focus-visible {
     outline: 2px solid var(--text-accent);
     outline-offset: 2px;
+  }
+
+  .askme-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-float) - 1);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .askme-backdrop[hidden] {
+    display: none;
   }
 
   .askme-panel {

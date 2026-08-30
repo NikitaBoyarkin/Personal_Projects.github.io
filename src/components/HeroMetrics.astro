@@ -27,7 +27,7 @@ const METRICS: Metric[] = [
 ];
 ---
 
-<div class="hero-metrics" aria-label={isEn ? "Key metrics" : "Ключевые метрики"}>
+<div class="hero-metrics" role="group" aria-label={isEn ? "Key metrics" : "Ключевые метрики"}>
   {
     METRICS.map((m) => (
       <div class="hero-metric">

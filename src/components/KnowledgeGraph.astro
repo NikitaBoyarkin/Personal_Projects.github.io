@@ -58,7 +58,7 @@ const t = {
       <div id="kg-search-results" class="kg-search-results" role="listbox" hidden></div>
     </div>
     <div class="kg-legend" id="kg-legend" role="list" aria-label={isEn ? 'Graph color legend' : 'Легенда цветов графа'}></div>
-    <div class="kg-controls" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
+    <div class="kg-controls" role="group" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
       <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-color" aria-pressed="false" aria-label={t.colorMode} title={t.colorByGroup} data-label-group={t.colorByGroup} data-label-community={t.colorByCommunity}>{t.colorByGroup}</button>
       <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-arrows" aria-pressed="false" aria-label={t.arrowsLabel} title={t.arrowsLabel}>{t.arrows}</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-in" aria-label={t.zoomIn} title={t.zoomIn}>+</button>
@@ -110,6 +110,7 @@ const t = {
     for (const it of items) {
       const span = document.createElement('span');
       span.className = 'kg-legend-item';
+      span.setAttribute('role', 'listitem');
       const i = document.createElement('i');
       i.style.background = it.color;
       span.appendChild(i);
@@ -777,14 +778,48 @@ const t = {
     });
   });
 
-  function toggleFullscreen() {
-    const isFs = root.classList.toggle('kg-fullscreen');
+  function setFullscreen(isFs: boolean) {
+    root.classList.toggle('kg-fullscreen', isFs);
     if (fsBtn) {
       fsBtn.setAttribute('aria-label', isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!);
       fsBtn.title = isFs ? fsBtn.dataset.labelFsExit! : fsBtn.dataset.labelFs!;
     }
+    if (isFs) {
+      // Move focus into the overlay so keyboard users land inside it.
+      (root.querySelector<HTMLElement>('g[tabindex]') ?? searchInput)?.focus();
+    } else {
+      fsBtn?.focus();
+    }
     requestAnimationFrame(resetViewport);
   }
+
+  function toggleFullscreen() {
+    setFullscreen(!root.classList.contains('kg-fullscreen'));
+  }
+
+  // Fullscreen: Escape exits; Tab is trapped within the overlay.
+  document.addEventListener('keydown', (e) => {
+    if (!root.classList.contains('kg-fullscreen')) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setFullscreen(false);
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const focusables = Array.from(
+      root.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), g[tabindex]'),
+    );
+    if (!focusables.length) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 
   // --- Load ---
   function load() {
@@ -928,6 +963,10 @@ const t = {
   .kg-root :is(g[tabindex]) {
     outline: none;
   }
+  .kg-root :is(g[tabindex]:focus-visible) {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+  }
   .kg-root :is(g[tabindex]:hover) .kg-label,
   .kg-root :is(g[tabindex]:focus) .kg-label {
     opacity: 1;
@@ -981,8 +1020,11 @@ const t = {
     font-family: var(--font-sans);
   }
   .kg-search-input:focus {
-    outline: none;
     border-color: var(--text-accent);
+  }
+  .kg-search-input:focus-visible {
+    outline: 2px solid var(--text-accent);
+    outline-offset: 1px;
   }
   .kg-search-results {
     position: absolute;

@@ -27,10 +27,17 @@ const categories = categoryKeys.map((key) => ({
     ))
   }
 </div>
+<span class="visually-hidden" role="status" id="blog-filter-status"></span>
 
 <script>
   const filterTags = document.querySelectorAll('.filter-tag');
   const cards = document.querySelectorAll('.blog-card');
+  const statusEl = document.getElementById('blog-filter-status');
+  const isEn = document.documentElement.lang === 'en';
+  const statusText = (n: number, filter: string) =>
+    isEn
+      ? filter === 'all' ? `${n} posts shown` : `${n} posts in ${filter}`
+      : filter === 'all' ? `Показано записей: ${n}` : `Показано записей в «${filter}»: ${n}`;
 
   function applyFilter(filter: string) {
     filterTags.forEach((t) => {
@@ -43,6 +50,8 @@ const categories = categoryKeys.map((key) => ({
       el.style.display =
         filter === 'all' || el.dataset.category === filter ? '' : 'none';
     });
+    const visible = Array.from(cards).filter((c) => (c as HTMLElement).style.display !== 'none').length;
+    if (statusEl) statusEl.textContent = statusText(visible, filter);
   }
 
   filterTags.forEach((tag) => {

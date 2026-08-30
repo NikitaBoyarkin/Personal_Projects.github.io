@@ -28,10 +28,17 @@ const tools = [
     ))
   }
 </div>
+<span class="visually-hidden" role="status" id="project-filter-status"></span>
 
 <script>
   const filterTags = document.querySelectorAll('.project-filter .filter-tag');
   const cards = document.querySelectorAll('#project-list .project');
+  const statusEl = document.getElementById('project-filter-status');
+  const isEn = document.documentElement.lang === 'en';
+  const statusText = (n: number, filter: string) =>
+    isEn
+      ? filter === 'all' ? `${n} projects shown` : `${n} projects with ${filter}`
+      : filter === 'all' ? `Показано проектов: ${n}` : `Показано проектов с ${filter}: ${n}`;
 
   function applyFilter(filter: string) {
     filterTags.forEach((t) => {
@@ -52,6 +59,8 @@ const tools = [
       );
       colEl.style.display = hasVisible ? '' : 'none';
     });
+    const visible = Array.from(cards).filter((c) => (c as HTMLElement).style.display !== 'none').length;
+    if (statusEl) statusEl.textContent = statusText(visible, filter);
   }
 
   filterTags.forEach((tag) => {
