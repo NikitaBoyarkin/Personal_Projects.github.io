@@ -82,6 +82,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
 <script>
   import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
+  import { ldWithin } from "../lib/fuzzy";
 
   // Same stroke paths as the SSR render (see frontmatter). Morphing the
   // toggle magnifier ↔ close is a pure animation on the custom element.
@@ -217,11 +218,17 @@ const X_D = "M6 6l12 12M6 18L18 6";
         // Fuzzy prefix: "ret" matches "retention" (word-boundary aware, so
         // Cyrillic works too — \b is ASCII-only in JS).
         const prefixHit = words.some((w) => w.startsWith(tk));
-        if (!inTitle && !inDesc && !tagHit && !toolHit && !prefixHit) return -1;
+        // Typo recovery: ≤2 edits against any index word, only for tokens long
+        // enough to be meaningful (early-exit LD, zero-dep — see lib/fuzzy).
+        // Threshold 5: 4-char tokens with max=2 edit distance match almost every
+        // index word (e.g. "data" ~ "hat") → noise in the top-8 results.
+        const fuzzyHit = tk.length >= 5 && words.some((w) => ldWithin(tk, w));
+        if (!inTitle && !inDesc && !tagHit && !toolHit && !prefixHit && !fuzzyHit) return -1;
         s += inTitle ? 3 : 0;
         s += tagHit ? 2 : 0;
         s += toolHit ? 2 : 0;
         s += prefixHit ? 1 : 0;
+        s += fuzzyHit ? 1 : 0;
         s += 1;
       }
       // Locale boost: current-locale entries rank above cross-locale matches

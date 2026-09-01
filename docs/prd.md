@@ -526,13 +526,13 @@ Analytics: PostHog (edge: none — клиентские события, build-ti
 - [ ] 3.2: Посты + governance-тема когда контент готов — Medium
 **Validation Checkpoint:** темы в таксономии, посты связаны, sitemap обновлён.
 
-### Phase 4: Тех-residuals (REQ-017…019) — ~4h
+### Phase 4: Тех-residuals (REQ-017…019) — DONE 2026-09-02
 **Goal:** Закрыть известные a11y/perf/SEO-хвосты.
 **Tasks:**
-- [ ] 4.1: OG dual-format (REQ-017) — Small (1h)
-- [ ] 4.2: aria-activedescendant (REQ-018) — Medium (2h)
-- [ ] 4.3: Search ranking/fuzzy (REQ-019) — Medium (2h)
-**Validation Checkpoint:** скринридер анонсирует поиск; social-превью не регрессировали; выдача на опечатки находит цель.
+- [x] 4.1: OG dual-format (REQ-017) — уже был реализован (`<picture>` webp + PNG-фолбэк в MaterialStrip) — Small (1h)
+- [x] 4.2: aria-activedescendant (REQ-018) — уже был реализован (SearchBox:361, `role="listbox"`) — Medium (2h)
+- [x] 4.3: Search ranking/fuzzy (REQ-019) — добавлен `src/lib/fuzzy.ts` `ldWithin()` (Левенштейн ≤2, early-exit) в `score()`; title-boost/prefix/locale-boost были. Тест `tests/lib/fuzzy.test.ts` — Medium (2h)
+**Validation Checkpoint:** скринридер анонсирует поиск; social-превью не регрессировали; выдача на опечатки находит цель. ✅ vitest 100/100, build 91, check 0/0/0, make check OK
 
 ### Phase 5: EN-блог (REQ-020) — отложен
 **Goal:** Расширение на EN-рынок при спросе.
