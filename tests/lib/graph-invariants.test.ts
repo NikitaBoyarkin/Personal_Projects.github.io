@@ -71,7 +71,7 @@ function invariants(name: string, getGraph: () => GraphData) {
       for (const l of g.links) {
         expect(l.weight, `edge ${l.source}→${l.target}`).toBeGreaterThan(0);
         expect(l.weight, `edge ${l.source}→${l.target}`).toBeLessThanOrEqual(1);
-        expect(['related', 'children', 'topic', 'shared']).toContain(l.type);
+        expect(['related', 'children', 'topic', 'shared', 'core']).toContain(l.type);
       }
     });
 

@@ -40,6 +40,10 @@ describe('isDirected', () => {
   it('marks shared (lateral) edges as undirected', () => {
     expect(isDirected('shared')).toBe(false);
   });
+
+  it('marks core (hub) edges as directed', () => {
+    expect(isDirected('core')).toBe(true);
+  });
 });
 
 describe('parseRelatedPath', () => {
@@ -297,5 +301,64 @@ describe('buildGraph', () => {
     });
     const dangling = g.links.filter((l) => l.source === 'p:a');
     expect(dangling).toHaveLength(0);
+  });
+
+  it('creates core hub nodes for projects and posts', () => {
+    const g = buildGraph({
+      projects: [project('volta', { track: 'experiments' })],
+      posts: [post('ab-calibration', { category: 'guide' })],
+      parts: [],
+      topics: TOPICS,
+      lang: 'ru',
+    });
+    const projectsCore = g.nodes.find((n) => n.id === 'core:projects');
+    const postsCore = g.nodes.find((n) => n.id === 'core:posts');
+    expect(projectsCore?.label).toBe('Проекты');
+    expect(projectsCore?.group).toBe('projects');
+    expect(projectsCore?.url).toBe('projects/');
+    expect(postsCore?.label).toBe('Статьи');
+    expect(postsCore?.group).toBe('articles');
+    expect(postsCore?.url).toBe('writing/');
+  });
+
+  it('links every project to the projects core and every post to the posts core', () => {
+    const g = buildGraph({
+      projects: [project('a'), project('b')],
+      posts: [post('x'), post('y')],
+      parts: [],
+      topics: TOPICS,
+    });
+    const coreEdges = g.links.filter((l) => l.type === 'core');
+    expect(coreEdges).toHaveLength(4);
+    expect(coreEdges.some((l) => l.source === 'core:projects' && l.target === 'p:a' && l.weight === 1)).toBe(true);
+    expect(coreEdges.some((l) => l.source === 'core:projects' && l.target === 'p:b')).toBe(true);
+    expect(coreEdges.some((l) => l.source === 'core:posts' && l.target === 'post:x')).toBe(true);
+    expect(coreEdges.some((l) => l.source === 'core:posts' && l.target === 'post:y')).toBe(true);
+  });
+
+  it('uses english labels and urls for cores in en mode', () => {
+    const g = buildGraph({
+      projects: [project('a')],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+      lang: 'en',
+    });
+    expect(g.nodes.find((n) => n.id === 'core:projects')?.label).toBe('Projects');
+    expect(g.nodes.find((n) => n.id === 'core:projects')?.url).toBe('en/projects/');
+    expect(g.nodes.find((n) => n.id === 'core:posts')?.label).toBe('Articles');
+    expect(g.nodes.find((n) => n.id === 'core:posts')?.url).toBe('en/writing/');
+  });
+
+  it('sizes core hubs larger than regular nodes', () => {
+    const g = buildGraph({
+      projects: [project('a', { related: ['/projects/b/'] }), project('b')],
+      posts: [],
+      parts: [],
+      topics: TOPICS,
+    });
+    const core = g.nodes.find((n) => n.id === 'core:projects');
+    const a = g.nodes.find((n) => n.id === 'p:a');
+    expect(core?.size).toBeGreaterThan(a?.size ?? 0);
   });
 });

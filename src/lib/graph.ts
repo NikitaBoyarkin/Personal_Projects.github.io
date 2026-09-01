@@ -25,14 +25,16 @@ export interface GraphNode {
   communityLabel?: string;
 }
 
-export type LinkType = "related" | "children" | "topic" | "shared";
+export type LinkType = "related" | "children" | "topic" | "shared" | "core";
 
 /** Edge types that carry a meaningful direction (source → target). Lateral
- *  `shared` edges are symmetric — they must never get arrowheads. */
+ *  `shared` edges are symmetric — they must never get arrowheads. `core` edges
+ *  point from a group hub to its members. */
 export const DIRECTED_TYPES: ReadonlySet<LinkType> = new Set([
   "related",
   "children",
   "topic",
+  "core",
 ]);
 
 /** Runtime predicate on edge types (client data arrives as loose strings). */
@@ -64,6 +66,10 @@ export const GRAPH_GROUP_COLORS: Record<string, string> = {
   // Fixed slate (not var(--text-muted)) so note nodes don't blend into edges.
   note: '#8fa3b8',
   topic: '#b48ce0',
+  // Core (hub) groups — the "00" index notes. Bright so the anchors read
+  // clearly against the track/category palette in both themes.
+  projects: '#ff8c42',
+  articles: '#4cc9f0',
 };
 
 /** Community palette — 10 distinct hues for the emergent clusters. Hex (not
@@ -152,11 +158,14 @@ export function subgraphAround(
   if (!graph.nodes.some((n) => n.id === centerId)) {
     return { nodes: [], links: [] };
   }
+  // Hub ("core") edges are meta-structure, not content connections — the
+  // per-project mini-graph shouldn't show the group hub as a neighbor.
+  const contentLinks = graph.links.filter((l) => l.type !== "core");
   const include = new Set<string>([centerId]);
   let frontier = new Set<string>([centerId]);
   for (let h = 0; h < hops; h++) {
     const next = new Set<string>();
-    for (const l of graph.links) {
+    for (const l of contentLinks) {
       if (frontier.has(l.source) && !include.has(l.target)) {
         include.add(l.target);
         next.add(l.target);
@@ -188,11 +197,17 @@ const sharedSignalWeight = (n: number) => Math.min(1, 0.4 + 0.15 * n);
  *  survive community renumbering when content changes. Fallback: `#<id>`. */
 const COMMUNITY_LABELS: Record<'ru' | 'en', [string, string][]> = {
   ru: [
+    // Cores are isolated in the community graph (their edges are excluded from
+    // clustering), so each is its own singleton community — label them.
+    ['core:projects', 'Проекты'],
+    ['core:posts', 'Статьи'],
     ['p:site', 'Карьера и портфолио'],
     ['p:sql', 'Аналитический тулкит'],
     ['p:volta', 'Эксперименты и петля Volta'],
   ],
   en: [
+    ['core:projects', 'Projects'],
+    ['core:posts', 'Articles'],
     ['p:bot', 'Automation'],
     ['p:sql', 'Analytics toolkit'],
     ['p:site', 'Portfolio & site'],
@@ -328,6 +343,22 @@ export function buildGraph(opts: {
   const localePrefix = lang === "en" ? "en/" : "";
 
   // Node pass.
+  // Core (hub) nodes — the "00" index notes of the graph. Each aggregates a
+  // content type: every project links to the projects core, every post to the
+  // posts core. Strong (weight 1) edges pull each group's members toward its
+  // core in the force layout.
+  addNode({
+    id: "core:projects",
+    label: lang === "en" ? "Projects" : "Проекты",
+    group: "projects",
+    url: `${localePrefix}projects/`,
+  });
+  addNode({
+    id: "core:posts",
+    label: lang === "en" ? "Articles" : "Статьи",
+    group: "articles",
+    url: `${localePrefix}writing/`,
+  });
   for (const p of projects) {
     const slug = slugOf(p.id);
     addNode({
@@ -385,6 +416,16 @@ export function buildGraph(opts: {
       const to = parsed.type === "project" ? `p:${parsed.slug}` : `post:${parsed.slug}`;
       addLink(from, to, 1, "related");
     }
+  }
+
+  // Core edges: every project → projects core, every post → posts core.
+  // Weight 1 so the force layout pulls each group's members toward its hub.
+  // Excluded from community detection and mini-graphs (see below).
+  for (const p of projects) {
+    addLink("core:projects", `p:${slugOf(p.id)}`, 1, "core");
+  }
+  for (const post of posts) {
+    addLink("core:posts", `post:${slugOf(post.id)}`, 1, "core");
   }
 
   // post↔topic by tag match.
@@ -500,6 +541,7 @@ export function buildGraph(opts: {
     post: 7,
     vp: 7,
     topic: 6.5,
+    core: 10,
   };
   const nodesWithSize = nodes.filter(
     (n) => !(n.id.startsWith("topic:") && !edgeIds.has(n.id)),
@@ -514,10 +556,13 @@ export function buildGraph(opts: {
   // Community detection — emergent clusters that cut across the fixed
   // track/category taxonomy (e.g. "A/B methodology", "Volta loop").
   // Runs on the explicit structure (related/children/topic) only: lateral
-  // `shared` edges add connectivity for the layout, but on a graph this small
-  // they would collapse the taxonomy into one cluster if they drove the
-  // clustering too. They still appear in the layout — just don't shape it.
-  const explicitLinks = links.filter((l) => l.type !== "shared");
+  // `shared` edges and hub `core` edges add connectivity for the layout, but
+  // on a graph this small they would collapse the taxonomy into one cluster if
+  // they drove the clustering too. They still appear in the layout — just
+  // don't shape it. (Cores become singleton communities as a result.)
+  const explicitLinks = links.filter(
+    (l) => l.type !== "shared" && l.type !== "core",
+  );
   const communities = detectCommunities(nodesWithSize, explicitLinks);
 
   // Resolve per-locale community labels by representative node: find which
