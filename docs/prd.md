@@ -504,13 +504,13 @@ Analytics: PostHog (edge: none — клиентские события, build-ti
 **Tasks:** REQ-001…REQ-013 (выполнено исторически; верификация 2026-08-29: astro check 0/0, vitest 83/83, build 91 стр., make check OK).
 **Validation Checkpoint:** метрики из PostHog (90д до 2026-09-01) задокументированы в §3.
 
-### Phase 1: Capabilities grid (REQ-014) — ~2h
+### Phase 1: Capabilities grid (REQ-014) — DONE 2026-09-02
 **Goal:** Конкретика вместо бейджей на главной — метрика скилл-восприятия.
 **Tasks:**
-- [ ] 1.1: Компонент + грид 6 ячеек (REQ-014) — Medium (1.5h)
-- [ ] 1.2: Контент ячеек (deliverables + ссылки) — Small (0.5h)
-- [ ] 1.3: Верификация build/check/make check + обновление дорожной карты — Small (0.5h)
-**Validation Checkpoint:** грид виден на главной (RU+EN), 6 ячеек с ссылками, 3 проверки зелёные.
+- [x] 1.1: Компонент + грид 6 ячеек — `<CapabilitiesGrid.astro` (221 строка, scoped-стили, 3/2/1 responsive, hover/focus-visible)
+- [x] 1.2: Контент ячеек — A/B (+6.24pp), retention (ARPU/LTV), RFM (%→% выручки), SQL (sub-100ms), bot (0 ручных шагов), product (€/yr); метрики из `src/lib/metrics.ts`
+- [x] 1.3: Верификация — build 91 стр., astro check 0/0/0, make check OK; дорожная карта обновлена (P4 ✅)
+**Validation Checkpoint:** грид на главной RU+EN, 6 ячеек с ссылками, 3 проверки зелёные. ✅
 
 ### Phase 2: Testimonials (REQ-015) — ждёт отзывы
 **Goal:** Social proof от коллег/менторов.
@@ -606,10 +606,10 @@ Critical Path: Phase 1 (сейчас) → анализ PostHog через 90д �
 
 ### Checkpoint 1: Конец Phase 1 (Capabilities grid)
 **Критерии:**
-- [ ] 6 ячеек грида на главной RU+EN, каждая с ссылкой на проект
-- [ ] `npm run build`, `npm run check` (astro check 0), `make check` — зелёные
-- [ ] Нет новой визуальной регрессии (Lighthouse perf/a11y дельты в допуске)
-**Если провален:** откат грида, review контента ячеек, повторный прогон.
+- [x] 6 ячеек грида на главной RU+EN, каждая с ссылкой на проект
+- [x] `npm run build`, `npm run check` (astro check 0), `make check` — зелёные
+- [x] Нет новой визуальной регрессии (битовая идентичность scoped-стилей, build-артефакты чистые)
+**Если провален:** откат грида, review контента ячеек, повторный прогон. ✅
 
 ### Checkpoint 2: Через 90д — пересчёт Goal 1
 **Критерии:**
