@@ -11,12 +11,16 @@ export interface GraphUrlState {
   hiddenCommunities: number[];
   /** Edge types hidden by the "Edges" filter (mode-independent). */
   hiddenEdges: string[];
+  /** Quick-view preset: filter to a single node kind ('project' | 'post' |
+   *  'topic' | 'volta'), or null for everything. */
+  preset: 'project' | 'post' | 'topic' | 'volta' | null;
 }
 
 const MODE_PARAM = 'mode';
 const HIDE_GROUPS_PARAM = 'hideGroups';
 const HIDE_COMMUNITIES_PARAM = 'hideC';
 const HIDE_EDGES_PARAM = 'hideEdges';
+const PRESET_PARAM = 'preset';
 
 /** Serialize state into a query string (leading `?`, or `''` when every value
  *  is the default). Merges into `existing` search so unrelated params (e.g.
@@ -31,6 +35,8 @@ export function encodeGraphState(state: GraphUrlState, existing: string = ''): s
   else p.delete(HIDE_COMMUNITIES_PARAM);
   if (state.hiddenEdges.length) p.set(HIDE_EDGES_PARAM, state.hiddenEdges.join(','));
   else p.delete(HIDE_EDGES_PARAM);
+  if (state.preset) p.set(PRESET_PARAM, state.preset);
+  else p.delete(PRESET_PARAM);
   const q = p.toString();
   return q ? `?${q}` : '';
 }
@@ -55,5 +61,10 @@ export function decodeGraphState(search: string): GraphUrlState {
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  return { mode, hiddenGroups, hiddenCommunities, hiddenEdges };
+  const presetRaw = p.get(PRESET_PARAM);
+  const preset =
+    presetRaw === 'project' || presetRaw === 'post' || presetRaw === 'topic' || presetRaw === 'volta'
+      ? presetRaw
+      : null;
+  return { mode, hiddenGroups, hiddenCommunities, hiddenEdges, preset };
 }
