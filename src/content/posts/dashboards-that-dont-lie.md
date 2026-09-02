@@ -11,6 +11,7 @@ related:
   - /projects/streamlit/
   - /projects/supabase/
   - /posts/cohort-triangles-retention/
+  - /projects/sales-calls/
 keywords:
   - принципы дашбордов
   - продуктовая визуализация

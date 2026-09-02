@@ -14,6 +14,8 @@ related:
   - /projects/cohort/
   - /posts/cohort-retention-guide/
   - /posts/ab-calibration-simulation/
+  - /projects/volta/
+  - /posts/volta-neobank-case-study/
 keywords:
   - когортная матрица удержания
   - треугольник удержания pandas
