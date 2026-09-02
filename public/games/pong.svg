@@ -26,7 +26,7 @@
 
       // —— retention + contact (shared pattern) ——
       var GAME = 'pong';
-      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
       var LS_BEST = 'arcade_best_' + GAME;
       var cta = document.getElementById('cta');
       var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
@@ -55,6 +55,17 @@
         ph('daily_completed', { game: GAME, streak: streak });
       }
       function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
       // —— /retention ——
 
       function resetBall(dir) { ballx = 170; bally = 150; vx = 3 * dir; vy = (Math.random() < 0.5 ? -1 : 1) * 2; }
@@ -99,6 +110,7 @@
           if (win) {
             var w = winsOf() + 1;
             lsSet(LS_BEST, String(w));
+            ph('best_broken', { game: GAME, old_best: w - 1, new_best: w, score: w });
             var isDaily = todayGame() === GAME;
             if (isDaily) markDaily();
             showCTA(true);
@@ -142,6 +154,7 @@
       }, {passive: false});
       document.addEventListener('touchmove', function (e) { e.preventDefault(); touchPaddle(e.touches[0].clientY); }, {passive: false});
 
+      wireCTA();
       setInterval(step, 16);
       draw();
       scoreT.textContent = '0 : 0 · Wins: ' + winsOf();

@@ -38,7 +38,7 @@
 
       // —— retention + contact (shared pattern) ——
       var GAME = 'abtest', DAILY_TARGET = 12;
-      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
       var LS_BEST = 'arcade_best_' + GAME;
       var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
       var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
@@ -66,6 +66,17 @@
         ph('daily_completed', { game: GAME, streak: streak });
       }
       function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; if (hint) hint.style.display = on ? 'none' : 'block'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
       // —— /retention ——
 
       function normcdf(x) {
@@ -79,7 +90,7 @@
         var taps = Math.round(state.nA / 150);
         var best = bestOf();
         var newBest = best === 0 || taps < best;
-        if (newBest) lsSet(LS_BEST, String(taps));
+        if (newBest) { lsSet(LS_BEST, String(taps)); ph('best_broken', { game: GAME, old_best: best, new_best: taps, score: taps }); }
         var isDaily = todayGame() === GAME && taps <= DAILY_TARGET;
         if (isDaily) markDaily();
         showCTA(newBest || isDaily);
@@ -145,6 +156,7 @@
         if (e.key === ' ' || e.key === 'Enter') collect();
       });
 
+      wireCTA();
       update();
     })();
   ]]></script>

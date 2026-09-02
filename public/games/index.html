@@ -1,16 +1,4 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Arcade — Nikita Boyarkin</title>
-    <meta
-      name="description"
-      content="Playable browser mini-games about analytics and classic arcade fun. Works on phone (swipe / drag / tap) and desktop."
-    />
-    <meta name="robots" content="index, follow" />
-    <meta id="theme-color" name="theme-color" content="#0f2a2b" />
-    <script>
+<!DOCTYPE html><html lang="en"> <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Arcade — Nikita Boyarkin</title><meta name="description" content="Playable browser mini-games about analytics and classic arcade fun. Works on phone (swipe / drag / tap) and desktop."><meta name="robots" content="index, follow"><meta id="theme-color" name="theme-color" content="#0f2a2b"><script>
       // Prevent theme flash: apply saved (or system) theme before first paint.
       // Shares the 'theme' key with the main portfolio so both stay in sync.
       (function () {
@@ -37,726 +25,196 @@
             THEME_COLORS[theme] || THEME_COLORS.dark,
           );
       })();
-    </script>
-    <style>
-      :root {
-        --bg: #0f2a2b;
-        --surface: #1a3435;
-        --surface2: #234044;
-        --accent: #ff8569;
-        --accent2: #ffa68a;
-        --text: #e4e4e7;
-        --muted: #a1a1aa;
-        --border: #3f3f46;
-      }
-      [data-theme="light"] {
-        --bg: #f4efca;
-        --surface: #ffffff;
-        --surface2: #f4f4f5;
-        --accent: #a8331a;
-        --accent2: #8a2a16;
-        --text: #18181b;
-        --muted: #52525b;
-        --border: #e4e4e7;
-      }
-      [data-theme="cyberpunk"] {
-        --bg: #0a0a12;
-        --surface: #11111d;
-        --surface2: #1a1a2e;
-        --accent: #ff6643;
-        --accent2: #ffbe99;
-        --text: #e6f1ff;
-        --muted: #8a8aa8;
-        --border: #2a2a4a;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      html {
-        -webkit-text-size-adjust: 100%;
-      }
-      body {
-        margin: 0;
-        background: var(--bg);
-        color: var(--text);
-        font-family:
-          "Fira Code", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
-        line-height: 1.5;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        transition:
-          background-color 0.25s ease,
-          color 0.25s ease,
-          border-color 0.25s ease;
-      }
-      a {
-        color: var(--accent);
-        text-decoration: none;
-      }
-      header {
-        position: relative;
-        padding: 40px 20px 8px;
-        text-align: center;
-      }
-      .home {
-        display: inline-block;
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 18px;
-        border: 1px solid var(--border);
-        padding: 6px 12px;
-        border-radius: 8px;
-        background: var(--surface);
-      }
-      .home:hover {
-        color: var(--accent);
-        border-color: var(--accent);
-      }
-      .theme-toggle {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--surface);
-        color: var(--muted);
-        cursor: pointer;
-        transition:
-          color 0.2s ease,
-          border-color 0.2s ease,
-          background-color 0.2s ease;
-      }
-      .theme-toggle:hover {
-        color: var(--accent);
-        border-color: var(--accent);
-      }
-      .theme-toggle morph-icon {
-        display: contents;
-      }
-      h1 {
-        margin: 0;
-        font-size: clamp(28px, 6vw, 44px);
-        letter-spacing: 2px;
-        font-weight: 700;
-      }
-      h1 .t {
-        color: var(--accent);
-      }
-      .lede {
-        max-width: 620px;
-        margin: 14px auto 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-      main.grid {
-        max-width: 1080px;
-        margin: 28px auto;
-        padding: 0 20px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 18px;
-        width: 100%;
-      }
-      .card {
-        display: flex;
-        flex-direction: column;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        overflow: hidden;
-        color: var(--text);
-        transition:
-          transform 0.15s ease,
-          border-color 0.2s ease,
-          box-shadow 0.2s ease;
-      }
-      .card:hover {
-        transform: translateY(-3px);
-        border-color: var(--accent);
-        box-shadow: 0 8px 24px
-          color-mix(in srgb, var(--accent) 20%, transparent);
-      }
-      .card:focus-visible {
-        outline: 2px solid var(--accent);
-        outline-offset: 3px;
-      }
-      .thumb {
-        background: var(--surface2);
-        aspect-ratio: 400/440;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-bottom: 1px solid var(--border);
-      }
-      .thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-      }
-      .card-body {
-        padding: 14px 16px 18px;
-      }
-      .card h2 {
-        margin: 0 0 6px;
-        font-size: 17px;
-        letter-spacing: 0.5px;
-      }
-      .ctrl {
-        margin: 0 0 2px;
-        color: var(--accent2);
-        font-size: 12px;
-      }
-      .goal {
-        margin: 0 0 12px;
-        color: var(--muted);
-        font-size: 12px;
-      }
-      .play {
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 700;
-        color: #1a1a1a;
-        background: var(--accent);
-        padding: 7px 14px;
-        border-radius: 8px;
-      }
-      .card:hover .play {
-        background: var(--accent2);
-      }
-      footer {
-        margin-top: auto;
-        padding: 26px 20px 34px;
-        text-align: center;
-        color: var(--muted);
-        font-size: 12px;
-      }
-      footer a {
-        color: var(--accent2);
-      }
-      footer .socials {
-        display: flex;
-        justify-content: center;
-        gap: 14px;
-        margin-bottom: 16px;
-      }
-      footer .socials a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--surface);
-        color: var(--muted);
-        transition:
-          color 0.2s ease,
-          border-color 0.2s ease,
-          transform 0.15s ease,
-          background-color 0.2s ease;
-      }
-      footer .socials a:hover {
-        color: var(--accent);
-        border-color: var(--accent);
-        transform: translateY(-2px);
-      }
-      footer .socials svg {
-        width: 18px;
-        height: 18px;
-      }
-      @media (max-width: 520px) {
-        header {
-          padding: 28px 16px 6px;
-        }
-        main.grid {
-          padding: 0 16px;
-          gap: 14px;
-        }
-      }
-      .daily {
-        max-width: 1080px;
-        margin: 18px auto 0;
-        padding: 10px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        flex-wrap: wrap;
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        font-size: 13px;
-      }
-      .daily .tag {
-        font-weight: 700;
-        color: var(--accent);
-        letter-spacing: 0.5px;
-      }
-      .daily .goal {
-        color: var(--muted);
-        font-size: 12px;
-        flex: 1;
-        min-width: 200px;
-      }
-      .daily a {
-        font-weight: 700;
-      }
-      .best {
-        display: inline-block;
-        margin: 0 0 8px;
-        font-size: 11px;
-        color: var(--accent2);
-        background: color-mix(in srgb, var(--accent) 12%, transparent);
-        border: 1px solid var(--border);
-        padding: 2px 8px;
-        border-radius: 999px;
-      }
-      .best:empty {
-        display: none;
-      }
-      .contact {
-        max-width: 1080px;
-        margin: 22px auto 0;
-        padding: 24px 20px;
-        text-align: center;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: var(--surface);
-      }
-      .contact h2 {
-        margin: 0 0 8px;
-        font-size: 16px;
-        letter-spacing: 0.5px;
-      }
-      .contact p {
-        margin: 0 0 16px;
-        color: var(--muted);
-        font-size: 13px;
-      }
-      .contact .row {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-      .contact .row a {
-        display: inline-block;
-        font-size: 13px;
-        font-weight: 700;
-        color: #1a1a1a;
-        background: var(--accent);
-        padding: 8px 20px;
-        border-radius: 8px;
-      }
-      .contact .row a:hover {
-        background: var(--accent2);
-      }
-      @media (max-width: 520px) {
-        .daily {
-          justify-content: center;
-          text-align: center;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <a
-        class="home"
-        href="https://nikitaboyarkin.github.io/Personal_Projects.github.io/"
-        aria-label="Back to portfolio"
-        >← Portfolio</a
-      >
-      <button
-        id="theme-toggle"
-        class="theme-toggle"
-        type="button"
-        aria-label="Theme: dark. Click to cycle."
-        aria-pressed="true"
-        title="Theme: dark / light / cyberpunk"
-        data-icon-dark="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-        data-icon-light="M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
-        data-icon-cyber="M13 2 3 14 12 14 11 22 21 10 12 10 13 2z"
-      >
-        <morph-icon
-          icon="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-          spring="snappy"
-          reduced-motion="user"
-          size="18"
-          aria-hidden="true"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-          </svg>
-        </morph-icon>
-      </button>
-      <h1><span class="t">⌘</span> Arcade</h1>
-      <p class="lede">
-        Tiny browser mini-games — some about analytics, some just for fun. Play
-        inline, on phone (swipe / drag / tap) or desktop (keyboard / mouse).
-      </p>
-    </header>
-    <section class="daily" id="daily" aria-label="Daily challenge">
-      <span class="tag" id="daily-tag">Daily</span>
-      <span class="goal" id="daily-text"></span>
-      <span id="daily-status"></span>
-    </section>
-    <main class="grid">
-      <a class="card" href="snake.svg" aria-label="Play Snake">
-        <div class="thumb">
-          <img
-            src="snake.svg"
-            alt="Snake preview"
-            loading="lazy"
-            width="400"
-            height="440"
-          />
-        </div>
-        <div class="card-body">
-          <h2>🐍 Snake</h2>
-          <span class="best" data-game="snake"></span>
-          <p class="ctrl">Swipe / arrows</p>
-          <p class="goal">Eat, grow, don’t crash</p>
-          <span class="play">Play →</span>
-        </div>
-      </a>
-      <a class="card" href="ab-test.svg" aria-label="Play A/B Test">
-        <div class="thumb">
-          <img
-            src="ab-test.svg"
-            alt="A/B Test preview"
-            loading="lazy"
-            width="400"
-            height="440"
-          />
-        </div>
-        <div class="card-body">
-          <h2>🧪 A/B Test</h2>
-          <span class="best" data-game="abtest"></span>
-          <p class="ctrl">Tap / click</p>
-          <p class="goal">Collect data until p &lt; 0.05</p>
-          <span class="play">Play →</span>
-        </div>
-      </a>
-      <a class="card" href="pong.svg" aria-label="Play Pong">
-        <div class="thumb">
-          <img
-            src="pong.svg"
-            alt="Pong preview"
-            loading="lazy"
-            width="400"
-            height="440"
-          />
-        </div>
-        <div class="card-body">
-          <h2>🏓 Pong</h2>
-          <span class="best" data-game="pong"></span>
-          <p class="ctrl">Drag / W·S</p>
-          <p class="goal">Beat the CPU — first to 11</p>
-          <span class="play">Play →</span>
-        </div>
-      </a>
-      <a class="card" href="2048.svg" aria-label="Play 2048">
-        <div class="thumb">
-          <img
-            src="2048.svg"
-            alt="2048 preview"
-            loading="lazy"
-            width="400"
-            height="440"
-          />
-        </div>
-        <div class="card-body">
-          <h2>🔢 2048</h2>
-          <span class="best" data-game="2048"></span>
-          <p class="ctrl">Swipe / arrows</p>
-          <p class="goal">Merge tiles to reach 2048</p>
-          <span class="play">Play →</span>
-        </div>
-      </a>
-      <a class="card" href="funnel-drop.svg" aria-label="Play Funnel Drop">
-        <div class="thumb">
-          <img
-            src="funnel-drop.svg"
-            alt="Funnel Drop preview"
-            loading="lazy"
-            width="400"
-            height="440"
-          />
-        </div>
-        <div class="card-body">
-          <h2>🔻 Funnel Drop</h2>
-          <span class="best" data-game="funnel"></span>
-          <p class="ctrl">Drag / ←·→</p>
-          <p class="goal">Catch falling users to convert</p>
-          <span class="play">Play →</span>
-        </div>
-      </a>
-    </main>
-    <section class="contact">
-      <h2>Want analytics or games like this for your product?</h2>
-      <p>
-        I build product analytics, experiments, dashboards — and playful ways to
-        present them.
-      </p>
-      <div class="row">
-        <a
-          href="https://www.linkedin.com/in/nikita-boyarkin"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-channel="linkedin"
-          >LinkedIn</a
-        >
-        <a
-          href="https://t.me/lofinibo"
-          target="_blank"
-          rel="noopener noreferrer"
-          data-channel="telegram"
-          >Telegram</a
-        >
-      </div>
-    </section>
-    <footer>
-      <div class="socials">
-        <a
-          href="https://github.com/NikitaBoyarkin"
-          aria-label="GitHub"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor">
-            <path
-              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://www.linkedin.com/in/nikita-boyarkin"
-          aria-label="LinkedIn"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z"
-            />
-          </svg>
-        </a>
-        <a
-          href="https://t.me/lofinibo"
-          aria-label="Telegram"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"
-            />
-          </svg>
-        </a>
-      </div>
-      <p>
-        Games run client-side as self-contained SVG.
-        <a href="https://nikitaboyarkin.github.io/Personal_Projects.github.io/"
-          >Portfolio</a
-        >
-        ·
-        <a href="https://github.com/NikitaBoyarkin/browser-mini-games"
-          >Source</a
-        >
-      </p>
-    </footer>
-    <script>
-      // Theme toggle — cycles dark → light → cyberpunk → dark, same as the main portfolio.
-      (function () {
-        var html = document.documentElement;
-        var toggle = document.getElementById("theme-toggle");
-        var themeColorMeta = document.getElementById("theme-color");
-        var THEME_COLORS = {
-          dark: "#0f2a2b",
-          light: "#f4efca",
-          cyberpunk: "#0a0a12",
-        };
-        var ORDER = ["dark", "light", "cyberpunk"];
-        var ICON_PATHS = {};
-        if (toggle) {
-          ICON_PATHS.dark = toggle.dataset.iconDark;
-          ICON_PATHS.light = toggle.dataset.iconLight;
-          ICON_PATHS.cyberpunk = toggle.dataset.iconCyber;
-        }
-
-        function applyTheme(theme) {
-          html.setAttribute("data-theme", theme);
-          var themeIcon = document.getElementById("theme-icon");
-          if (themeIcon && ICON_PATHS[theme])
-            themeIcon.icon = ICON_PATHS[theme];
-          if (themeColorMeta)
-            themeColorMeta.setAttribute(
-              "content",
-              THEME_COLORS[theme] || THEME_COLORS.dark,
-            );
-          if (toggle) {
-            toggle.setAttribute("aria-pressed", String(theme === "dark"));
-            toggle.setAttribute(
-              "aria-label",
-              "Theme: " + theme + ". Click to cycle.",
-            );
-          }
-        }
-
-        function persistTheme(theme) {
-          try {
-            localStorage.setItem("theme", theme);
-          } catch (e) {}
-        }
-
-        // Sync icon with already-applied theme
-        applyTheme(html.getAttribute("data-theme") || "dark");
-
-        if (toggle) {
-          toggle.addEventListener("click", function () {
-            var cur = html.getAttribute("data-theme") || "dark";
-            var next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
-            applyTheme(next);
-            persistTheme(next);
+    </script><style>:root{--bg:#0f2a2b;--surface:#1a3435;--surface2:#234044;--accent:#ff8569;--accent2:#ffa68a;--text:#e4e4e7;--muted:#a1a1aa;--border:#3f3f46}[data-theme=light]{--bg:#f4efca;--surface:#fff;--surface2:#f4f4f5;--accent:#a8331a;--accent2:#8a2a16;--text:#18181b;--muted:#52525b;--border:#e4e4e7}[data-theme=cyberpunk]{--bg:#0a0a12;--surface:#11111d;--surface2:#1a1a2e;--accent:#ff6643;--accent2:#ffbe99;--text:#e6f1ff;--muted:#8a8aa8;--border:#2a2a4a}*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{background:var(--bg);color:var(--text);flex-direction:column;min-height:100vh;margin:0;font-family:Fira Code,SF Mono,ui-monospace,Menlo,Consolas,monospace;line-height:1.5;transition:background-color .25s,color .25s,border-color .25s;display:flex}a{color:var(--accent);text-decoration:none}.theme-toggle[data-astro-cid-l6lhmie6]{border:1px solid var(--border);background:var(--surface);width:38px;height:38px;color:var(--muted);cursor:pointer;border-radius:8px;justify-content:center;align-items:center;transition:color .2s,border-color .2s,background-color .2s;display:inline-flex;position:absolute;top:16px;right:16px}.theme-toggle[data-astro-cid-l6lhmie6]:hover{color:var(--accent);border-color:var(--accent)}.theme-toggle[data-astro-cid-l6lhmie6] morph-icon[data-astro-cid-l6lhmie6]{display:contents}.card[data-astro-cid-wzgjbdq5]{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:12px;flex-direction:column;transition:transform .15s,border-color .2s,box-shadow .2s;display:flex;overflow:hidden}.card[data-astro-cid-wzgjbdq5]:hover{border-color:var(--accent);box-shadow:0 8px 24px color-mix(in srgb, var(--accent) 20%, transparent);transform:translateY(-3px)}.card[data-astro-cid-wzgjbdq5]:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.thumb[data-astro-cid-wzgjbdq5]{background:var(--surface2);aspect-ratio:400/440;border-bottom:1px solid var(--border);justify-content:center;align-items:center;display:flex}.thumb[data-astro-cid-wzgjbdq5] img[data-astro-cid-wzgjbdq5]{object-fit:contain;width:100%;height:100%;display:block}.card-body[data-astro-cid-wzgjbdq5]{padding:14px 16px 18px}.card[data-astro-cid-wzgjbdq5] h2[data-astro-cid-wzgjbdq5]{letter-spacing:.5px;margin:0 0 6px;font-size:17px}.ctrl[data-astro-cid-wzgjbdq5]{color:var(--accent2);margin:0 0 2px;font-size:12px}.goal[data-astro-cid-wzgjbdq5]{color:var(--muted);margin:0 0 12px;font-size:12px}.play[data-astro-cid-wzgjbdq5]{color:#1a1a1a;background:var(--accent);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;display:inline-block}.card[data-astro-cid-wzgjbdq5]:hover .play[data-astro-cid-wzgjbdq5]{background:var(--accent2)}.best[data-astro-cid-wzgjbdq5]{color:var(--accent2);background:color-mix(in srgb, var(--accent) 12%, transparent);border:1px solid var(--border);border-radius:999px;margin:0 0 8px;padding:2px 8px;font-size:11px;display:inline-block}.best[data-astro-cid-wzgjbdq5]:empty{display:none}.daily[data-astro-cid-yjqesnu5]{background:var(--surface);border:1px solid var(--border);border-radius:12px;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;max-width:1080px;margin:18px auto 0;padding:10px 16px;font-size:13px;display:flex}.daily[data-astro-cid-yjqesnu5] .tag[data-astro-cid-yjqesnu5]{color:var(--accent);letter-spacing:.5px;font-weight:700}.daily[data-astro-cid-yjqesnu5] .goal[data-astro-cid-yjqesnu5]{color:var(--muted);flex:1;min-width:200px;font-size:12px}.daily[data-astro-cid-yjqesnu5] a[data-astro-cid-yjqesnu5]{font-weight:700}@media (width<=520px){.daily[data-astro-cid-yjqesnu5]{text-align:center;justify-content:center}}.contact[data-astro-cid-df764wnf]{text-align:center;border:1px solid var(--border);background:var(--surface);border-radius:12px;max-width:1080px;margin:22px auto 0;padding:24px 20px}.contact[data-astro-cid-df764wnf] h2[data-astro-cid-df764wnf]{letter-spacing:.5px;margin:0 0 8px;font-size:16px}.contact[data-astro-cid-df764wnf] p[data-astro-cid-df764wnf]{color:var(--muted);margin:0 0 16px;font-size:13px}.contact[data-astro-cid-df764wnf] .row[data-astro-cid-df764wnf]{flex-wrap:wrap;justify-content:center;gap:12px;display:flex}.contact[data-astro-cid-df764wnf] .row[data-astro-cid-df764wnf] a[data-astro-cid-df764wnf]{color:#1a1a1a;background:var(--accent);border-radius:8px;padding:8px 20px;font-size:13px;font-weight:700;display:inline-block}.contact[data-astro-cid-df764wnf] .row[data-astro-cid-df764wnf] a[data-astro-cid-df764wnf]:hover{background:var(--accent2)}footer[data-astro-cid-jo6i4kqk]{text-align:center;color:var(--muted);margin-top:auto;padding:26px 20px 34px;font-size:12px}footer[data-astro-cid-jo6i4kqk] a[data-astro-cid-jo6i4kqk]{color:var(--accent2)}footer[data-astro-cid-jo6i4kqk] .socials[data-astro-cid-jo6i4kqk]{justify-content:center;gap:14px;margin-bottom:16px;display:flex}footer[data-astro-cid-jo6i4kqk] .socials[data-astro-cid-jo6i4kqk] a[data-astro-cid-jo6i4kqk]{border:1px solid var(--border);background:var(--surface);width:38px;height:38px;color:var(--muted);border-radius:8px;justify-content:center;align-items:center;transition:color .2s,border-color .2s,transform .15s,background-color .2s;display:inline-flex}footer[data-astro-cid-jo6i4kqk] .socials[data-astro-cid-jo6i4kqk] a[data-astro-cid-jo6i4kqk]:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px)}footer[data-astro-cid-jo6i4kqk] .socials[data-astro-cid-jo6i4kqk] svg[data-astro-cid-jo6i4kqk]{width:18px;height:18px}header[data-astro-cid-lcdefpme]{text-align:center;padding:40px 20px 8px;position:relative}.home[data-astro-cid-lcdefpme]{color:var(--muted);border:1px solid var(--border);background:var(--surface);border-radius:8px;margin-bottom:18px;padding:6px 12px;font-size:13px;display:inline-block}.home[data-astro-cid-lcdefpme]:hover{color:var(--accent);border-color:var(--accent)}h1[data-astro-cid-lcdefpme]{letter-spacing:2px;margin:0;font-size:clamp(28px,6vw,44px);font-weight:700}h1[data-astro-cid-lcdefpme] .t[data-astro-cid-lcdefpme]{color:var(--accent)}.lede[data-astro-cid-lcdefpme]{max-width:620px;color:var(--muted);margin:14px auto 0;font-size:14px}main[data-astro-cid-lcdefpme].grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;width:100%;max-width:1080px;margin:28px auto;padding:0 20px;display:grid}@media (width<=520px){header[data-astro-cid-lcdefpme]{padding:28px 16px 6px}main[data-astro-cid-lcdefpme].grid{gap:14px;padding:0 16px}}
+</style></head> <body>  <script>
+  // PostHog + hub event tracking (game selection, contact clicks).
+  (function () {
+    var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(
+      window.location.hostname,
+    );
+    var PH_KEY = "phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv";
+    var PH_HOST = "https://us.i.posthog.com";
+    if (!IS_LOCAL && PH_KEY.indexOf("__PH_") !== 0 && !window.posthog) {
+      var s = document.createElement("script");
+      s.src = "https://us-assets.i.posthog.com/static/array.js";
+      s.async = true;
+      s.onload = function () {
+        try {
+          window.posthog.init(PH_KEY, {
+            api_host: PH_HOST,
+            capture_pageview: true,
+            capture_pageleave: true,
+            autocapture: true,
           });
-        }
+        } catch (e) {}
+      };
+      document.head.appendChild(s);
+    }
+    function ph(name, props) {
+      try {
+        if (window.posthog && window.posthog.capture)
+          window.posthog.capture(name, props || {});
+      } catch (e) {}
+    }
 
-        window
-          .matchMedia("(prefers-color-scheme: dark)")
-          .addEventListener("change", function (e) {
-            try {
-              if (localStorage.getItem("theme")) return;
-            } catch (err) {
-              return;
-            }
-            applyTheme(e.matches ? "dark" : "light");
-          });
-      })();
-    </script>
-    <script>
-      // PostHog + hub retention state (best scores, daily challenge, streak).
-      (function () {
-        var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(
-          window.location.hostname,
+    // Contact clicks + game selection → structured events.
+    document.querySelectorAll(".contact a").forEach(function (a) {
+      a.addEventListener("click", function () {
+        ph("contact_click", {
+          location: "hub",
+          channel: a.getAttribute("data-channel"),
+        });
+      });
+    });
+    document.querySelectorAll(".card").forEach(function (c) {
+      c.addEventListener("click", function () {
+        ph("game_selected", {
+          game: c.getAttribute("href").replace(".svg", ""),
+          from_hub: true,
+        });
+      });
+    });
+  })();
+</script> <header data-astro-cid-lcdefpme> <a class="home" href="https://nikitaboyarkin.github.io/Personal_Projects.github.io/" aria-label="Back to portfolio" data-astro-cid-lcdefpme>← Portfolio</a> <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme: dark. Click to cycle." aria-pressed="true" title="Theme: dark / light / cyberpunk" data-icon-dark="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-icon-light="M12 7a5 5 0 1 0 0 10a5 5 0 1 0 0-10M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" data-icon-cyber="M13 2 3 14 12 14 11 22 21 10 12 10 13 2z" data-astro-cid-l6lhmie6> <morph-icon icon="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" spring="snappy" reduced-motion="user" size="18" aria-hidden="true" data-astro-cid-l6lhmie6="true"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-astro-cid-l6lhmie6> <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-l6lhmie6></path> </svg> </morph-icon> </button> <script>
+  // Inline (not bundled) so dist/index.html stays self-contained.
+  (function () {
+    var html = document.documentElement;
+    var toggle = document.getElementById("theme-toggle");
+    var themeColorMeta = document.getElementById("theme-color");
+    var THEME_COLORS = {
+      dark: "#0f2a2b",
+      light: "#f4efca",
+      cyberpunk: "#0a0a12",
+    };
+    var ORDER = ["dark", "light", "cyberpunk"];
+    var ICON_PATHS = {};
+    if (toggle) {
+      ICON_PATHS.dark = toggle.dataset.iconDark;
+      ICON_PATHS.light = toggle.dataset.iconLight;
+      ICON_PATHS.cyberpunk = toggle.dataset.iconCyber;
+    }
+
+    function applyTheme(theme) {
+      html.setAttribute("data-theme", theme);
+      var themeIcon = document.getElementById("theme-icon");
+      if (themeIcon && ICON_PATHS[theme]) themeIcon.icon = ICON_PATHS[theme];
+      if (themeColorMeta)
+        themeColorMeta.setAttribute(
+          "content",
+          THEME_COLORS[theme] || THEME_COLORS.dark,
         );
-        var PH_KEY = "phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv";
-        var PH_HOST = "https://us.i.posthog.com";
-        if (!IS_LOCAL && PH_KEY.indexOf("__PH_") !== 0 && !window.posthog) {
-          var s = document.createElement("script");
-          s.src = "https://us-assets.i.posthog.com/static/array.js";
-          s.async = true;
-          s.onload = function () {
-            try {
-              window.posthog.init(PH_KEY, {
-                api_host: PH_HOST,
-                capture_pageview: true,
-                capture_pageleave: true,
-                autocapture: true,
-              });
-            } catch (e) {}
-          };
-          document.head.appendChild(s);
-        }
-        function ph(name, props) {
-          try {
-            if (window.posthog && window.posthog.capture)
-              window.posthog.capture(name, props || {});
-          } catch (e) {}
-        }
+      if (toggle) {
+        toggle.setAttribute("aria-pressed", String(theme === "dark"));
+        toggle.setAttribute(
+          "aria-label",
+          "Theme: " + theme + ". Click to cycle.",
+        );
+      }
+    }
 
-        function lsGet(k, d) {
-          try {
-            var v = localStorage.getItem(k);
-            return v === null ? d : v;
-          } catch (e) {
-            return d;
-          }
-        }
-        function today() {
-          var n = new Date();
-          return (
-            n.getFullYear() +
-            "-" +
-            ("0" + (n.getMonth() + 1)).slice(-2) +
-            "-" +
-            ("0" + n.getDate()).slice(-2)
-          );
-        }
-        var GAMES = [
-          { key: "snake", label: "🐍 Snake", target: "200 pts" },
-          { key: "2048", label: "🔢 2048", target: "tile 512+" },
-          { key: "pong", label: "🏓 Pong", target: "win" },
-          { key: "abtest", label: "🧪 A/B Test", target: "sig ≤ 12 taps" },
-          { key: "funnel", label: "🔻 Funnel Drop", target: "25 caught" },
-        ];
-        function todayGame() {
-          return GAMES[Math.floor(Date.now() / 86400000) % GAMES.length];
-        }
+    function persistTheme(theme) {
+      try {
+        localStorage.setItem("theme", theme);
+      } catch (e) {}
+    }
 
-        // Best score badges on cards.
-        document.querySelectorAll(".best").forEach(function (el) {
-          var g = el.getAttribute("data-game");
-          var b = parseInt(lsGet("arcade_best_" + g, "0"), 10) || 0;
-          if (b > 0) el.textContent = "Best: " + b;
-        });
+    // Sync icon with already-applied theme
+    applyTheme(html.getAttribute("data-theme") || "dark");
 
-        // Daily challenge strip.
-        var d = todayGame();
-        var done =
-          lsGet("arcade_daily_date", "") === today() &&
-          lsGet("arcade_daily_done", "0") === "1";
-        var streak = parseInt(lsGet("arcade_streak", "0"), 10) || 0;
-        var tag = document.getElementById("daily-tag");
-        var txt = document.getElementById("daily-text");
-        var st = document.getElementById("daily-status");
-        if (tag && txt && st) {
-          txt.textContent = d.label + " — " + d.target;
-          if (done) {
-            tag.textContent = "✅ Done";
-            st.textContent =
-              streak > 1 ? "🔥 " + streak + "-day streak" : "🔥 streak started";
-          } else {
-            st.innerHTML = '<a href="' + d.key + '.svg">Play →</a>';
-          }
+    if (toggle) {
+      toggle.addEventListener("click", function () {
+        var cur = html.getAttribute("data-theme") || "dark";
+        var next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
+        applyTheme(next);
+        persistTheme(next);
+      });
+    }
+
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", function (e) {
+        try {
+          if (localStorage.getItem("theme")) return;
+        } catch (err) {
+          return;
         }
+        applyTheme(e.matches ? "dark" : "light");
+      });
+  })();
+</script> <h1 data-astro-cid-lcdefpme><span class="t" data-astro-cid-lcdefpme>⌘</span> Arcade</h1> <p class="lede" data-astro-cid-lcdefpme>
+Tiny browser mini-games — some about analytics, some just for fun. Play
+      inline, on phone (swipe / drag / tap) or desktop (keyboard / mouse).
+</p> </header> <section class="daily" id="daily" aria-label="Daily challenge" data-astro-cid-yjqesnu5> <span class="tag" id="daily-tag" data-astro-cid-yjqesnu5>Daily</span> <span class="goal" id="daily-text" data-astro-cid-yjqesnu5></span> <span id="daily-status" data-astro-cid-yjqesnu5></span> </section> <main class="grid" data-astro-cid-lcdefpme> <a class="card" href="snake.svg" aria-label="Play Snake" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="snake.svg" alt="Snake preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🐍 Snake</h2> <span class="best" data-game="snake" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Swipe / arrows</p> <p class="goal" data-astro-cid-wzgjbdq5>Eat, grow, don’t crash</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="ab-test.svg" aria-label="Play A/B Test" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="ab-test.svg" alt="A/B Test preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🧪 A/B Test</h2> <span class="best" data-game="abtest" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Tap / click</p> <p class="goal" data-astro-cid-wzgjbdq5>Collect data until p &lt; 0.05</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="pong.svg" aria-label="Play Pong" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="pong.svg" alt="Pong preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🏓 Pong</h2> <span class="best" data-game="pong" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Drag / W·S</p> <p class="goal" data-astro-cid-wzgjbdq5>Beat the CPU — first to 11</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="2048.svg" aria-label="Play 2048" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="2048.svg" alt="2048 preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🔢 2048</h2> <span class="best" data-game="2048" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Swipe / arrows</p> <p class="goal" data-astro-cid-wzgjbdq5>Merge tiles to reach 2048</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="funnel-drop.svg" aria-label="Play Funnel Drop" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="funnel-drop.svg" alt="Funnel Drop preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🔻 Funnel Drop</h2> <span class="best" data-game="funnel" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Drag / ←·→</p> <p class="goal" data-astro-cid-wzgjbdq5>Catch falling users to convert</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="cohort-catch.svg" aria-label="Play Cohort Catch" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="cohort-catch.svg" alt="Cohort Catch preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>📊 Cohort Catch</h2> <span class="best" data-game="cohort" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Drag / ←·→</p> <p class="goal" data-astro-cid-wzgjbdq5>Catch returning users, avoid churned</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="sql-query.svg" aria-label="Play SQL Query" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="sql-query.svg" alt="SQL Query preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🧩 SQL Query</h2> <span class="best" data-game="sql" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Click / keys 1-4</p> <p class="goal" data-astro-cid-wzgjbdq5>Fill the SQL blank</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="metric-match.svg" aria-label="Play Metric Match" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="metric-match.svg" alt="Metric Match preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🃏 Metric Match</h2> <span class="best" data-game="metric" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Click two cards</p> <p class="goal" data-astro-cid-wzgjbdq5>Match metric to formula</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="retention-day.svg" aria-label="Play Retention Day" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="retention-day.svg" alt="Retention Day preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>📅 Retention Day</h2> <span class="best" data-game="retention" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Click / keys 1-4</p> <p class="goal" data-astro-cid-wzgjbdq5>Pick the right retention day</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a><a class="card" href="funnel-bottleneck.svg" aria-label="Play Funnel Bottleneck" data-astro-cid-wzgjbdq5> <div class="thumb" data-astro-cid-wzgjbdq5> <img src="funnel-bottleneck.svg" alt="Funnel Bottleneck preview" loading="eager" width="400" height="440" decoding="async" data-astro-cid-wzgjbdq5> </div> <div class="card-body" data-astro-cid-wzgjbdq5> <h2 data-astro-cid-wzgjbdq5>🔍 Funnel Bottleneck</h2> <span class="best" data-game="bottleneck" data-astro-cid-wzgjbdq5></span> <p class="ctrl" data-astro-cid-wzgjbdq5>Click / keys 1-4</p> <p class="goal" data-astro-cid-wzgjbdq5>Find the biggest funnel drop</p> <span class="play" data-astro-cid-wzgjbdq5>Play →</span> </div> </a> </main> <section class="contact" data-astro-cid-df764wnf> <h2 data-astro-cid-df764wnf>Want analytics or games like this for your product?</h2> <p data-astro-cid-df764wnf>
+I build product analytics, experiments, dashboards — and playful ways to
+    present them.
+</p> <div class="row" data-astro-cid-df764wnf> <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer" data-channel="linkedin" data-astro-cid-df764wnf>LinkedIn</a> <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" data-channel="telegram" data-astro-cid-df764wnf>Telegram</a> </div> </section> ---
+<footer data-astro-cid-jo6i4kqk> <div class="socials" data-astro-cid-jo6i4kqk> <a href="https://github.com/NikitaBoyarkin" aria-label="GitHub" target="_blank" rel="noopener noreferrer" data-astro-cid-jo6i4kqk> <svg aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" data-astro-cid-jo6i4kqk> <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z" data-astro-cid-jo6i4kqk></path> </svg> </a> <a href="https://www.linkedin.com/in/nikita-boyarkin" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer" data-astro-cid-jo6i4kqk> <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" data-astro-cid-jo6i4kqk> <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.72C24 .77 23.2 0 22.22 0z" data-astro-cid-jo6i4kqk></path> </svg> </a> <a href="https://t.me/lofinibo" aria-label="Telegram" target="_blank" rel="noopener noreferrer" data-astro-cid-jo6i4kqk> <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" data-astro-cid-jo6i4kqk> <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z" data-astro-cid-jo6i4kqk></path> </svg> </a> </div> <p data-astro-cid-jo6i4kqk>
+Games run client-side as self-contained SVG.
+<a href="https://nikitaboyarkin.github.io/Personal_Projects.github.io/" data-astro-cid-jo6i4kqk>Portfolio</a>
+·
+<a href="https://github.com/NikitaBoyarkin/browser-mini-games" data-astro-cid-jo6i4kqk>Source</a> </p> </footer> <script>
+    // Hub retention state: best-score badges + daily challenge strip.
+    (function () {
+      var GAMES = [
+        { key: "snake", label: "🐍 Snake", target: "200 pts" },
+        { key: "2048", label: "🔢 2048", target: "tile 512+" },
+        { key: "pong", label: "🏓 Pong", target: "win" },
+        { key: "abtest", label: "🧪 A/B Test", target: "sig ≤ 12 taps" },
+        { key: "funnel", label: "🔻 Funnel Drop", target: "25 caught" },
+        { key: "cohort", label: "📊 Cohort Catch", target: "25 kept" },
+        { key: "sql", label: "🧩 SQL Query", target: "perfect round (6/6)" },
+        { key: "metric", label: "🃏 Metric Match", target: "solve the board" },
+        { key: "retention", label: "📅 Retention Day", target: "perfect round (6/6)" },
+        { key: "bottleneck", label: "🔍 Funnel Bottleneck", target: "perfect round (6/6)" },
+      ];
 
-        // Track contact clicks + game selection.
-        document.querySelectorAll(".contact a").forEach(function (a) {
-          a.addEventListener("click", function () {
-            ph("contact_click", {
-              location: "hub",
-              channel: a.getAttribute("data-channel"),
-            });
-          });
-        });
-        document.querySelectorAll(".card").forEach(function (c) {
-          c.addEventListener("click", function () {
-            ph("game_selected", {
-              game: c.getAttribute("href").replace(".svg", ""),
-              from_hub: true,
-            });
-          });
-        });
-      })();
-    </script>
-    <!-- morph-icon falls back to its embedded SVG without the vendor element; kept self-contained. -->
-  </body>
-</html>
+      function lsGet(k, d) {
+        try {
+          var v = localStorage.getItem(k);
+          return v === null ? d : v;
+        } catch (e) {
+          return d;
+        }
+      }
+      function today() {
+        var n = new Date();
+        return (
+          n.getFullYear() +
+          "-" +
+          ("0" + (n.getMonth() + 1)).slice(-2) +
+          "-" +
+          ("0" + n.getDate()).slice(-2)
+        );
+      }
+      function todayGame() {
+        return GAMES[Math.floor(Date.now() / 86400000) % GAMES.length];
+      }
+
+      // Best score badges on cards.
+      document.querySelectorAll(".best").forEach(function (el) {
+        var g = el.getAttribute("data-game");
+        var b = parseInt(lsGet("arcade_best_" + g, "0"), 10) || 0;
+        if (b > 0) el.textContent = "Best: " + b;
+      });
+
+      // Daily challenge strip.
+      var d = todayGame();
+      var done =
+        lsGet("arcade_daily_date", "") === today() &&
+        lsGet("arcade_daily_done", "0") === "1";
+      var streak = parseInt(lsGet("arcade_streak", "0"), 10) || 0;
+      var tag = document.getElementById("daily-tag");
+      var txt = document.getElementById("daily-text");
+      var st = document.getElementById("daily-status");
+      if (tag && txt && st) {
+        txt.textContent = d.label + " — " + d.target;
+        if (done) {
+          tag.textContent = "✅ Done";
+          st.textContent =
+            streak > 1 ? "🔥 " + streak + "-day streak" : "🔥 streak started";
+        } else {
+          st.innerHTML = '<a href="' + d.key + '.svg">Play →</a>';
+        }
+      }
+    })();
+  </script> </body> </html>

@@ -1,0 +1,156 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
+  <rect width="400" height="440" fill="#0a0a12"/>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">FUNNEL BOTTLENECK</text>
+  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Round 1 / 6 · score 0</text>
+  <text id="question" x="200" y="78" text-anchor="middle" fill="#f4f4f5" font-size="12">Which step has the biggest absolute drop?</text>
+  <g id="funnel"></g>
+  <g id="opts"></g>
+  <text id="hint" x="200" y="410" text-anchor="middle" fill="#666" font-size="10">click the step · keys 1-4</text>
+  <g id="cta" style="display:none">
+    <text x="200" y="408" text-anchor="middle" fill="#4ade80" font-size="10">🎉 Perfect round! Want real analytics?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><text x="154" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">LinkedIn</text></a>
+    <text x="200" y="422" text-anchor="middle" fill="#666" font-size="11">·</text>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><text x="246" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">Telegram</text></a>
+  </g>
+  <script type="text/javascript"><![CDATA[
+    (function () {
+      var svgns = 'http://www.w3.org/2000/svg';
+      var LABELS = ['Visit','Signup','Activate','Pay'];
+      var COLORS = ['#3FCF8E','#ffbe99','#ff6643','#c0431e'];
+      var idx = 0, score = 0, answered = false, best = 0, dailyFired = false;
+      var statusT = document.getElementById('status'), funnelG = document.getElementById('funnel'), optsG = document.getElementById('opts');
+      var hint = document.getElementById('hint'), cta = document.getElementById('cta');
+      var btns = [], lbls = [], rounds = [];
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'bottleneck', DAILY_TARGET = 6;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        try {
+          var phs = document.createElementNS('http://www.w3.org/2000/svg', 'script');
+          phs.setAttribute('href', 'https://us-assets.i.posthog.com/static/array.js');
+          phs.setAttribute('type', 'text/javascript');
+          phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+          document.documentElement.appendChild(phs);
+        } catch (e) {}
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; if (hint) hint.style.display = on ? 'none' : 'block'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
+      // —— /retention ——
+
+      function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+      function makeRound() {
+        var counts = [Math.floor(600 + Math.random() * 400)];
+        for (var i = 1; i < 4; i++) counts[i] = Math.floor(counts[i - 1] * (0.25 + Math.random() * 0.55));
+        var drops = [0];
+        for (var i = 1; i < 4; i++) drops[i] = counts[i - 1] - counts[i];
+        var maxDrop = Math.max(drops[1], drops[2], drops[3]);
+        var correctLabel = LABELS[drops.indexOf(maxDrop)];
+        var opts = shuffle(LABELS.slice()).slice(0, 4);
+        if (opts.indexOf(correctLabel) === -1) opts[0] = correctLabel;
+        opts = shuffle(opts);
+        return { counts: counts, opts: opts, a: opts.indexOf(correctLabel) };
+      }
+      function buildRounds() { rounds = []; for (var i = 0; i < 6; i++) rounds.push(makeRound()); }
+
+      function render() {
+        var r = rounds[idx];
+        statusT.textContent = 'Round ' + (idx + 1) + ' / ' + rounds.length + ' · score ' + score + ' · Best ' + Math.max(bestOf(), best);
+        while (funnelG.firstChild) funnelG.removeChild(funnelG.firstChild);
+        var max = r.counts[0], barH = 22, gap = 10, left = 50, top = 100;
+        for (var i = 0; i < 4; i++) {
+          var w = Math.max(40, Math.round(r.counts[i] / max * 300));
+          var y = top + i * (barH + gap);
+          var rect = document.createElementNS(svgns, 'rect');
+          rect.setAttribute('x', left); rect.setAttribute('y', y); rect.setAttribute('width', w); rect.setAttribute('height', barH); rect.setAttribute('rx', 4);
+          rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', COLORS[i]); rect.setAttribute('stroke-width', '1.5');
+          var lbl = document.createElementNS(svgns, 'text');
+          lbl.setAttribute('x', left + 8); lbl.setAttribute('y', y + 15); lbl.setAttribute('fill', COLORS[i]); lbl.setAttribute('font-size', '11'); lbl.setAttribute('font-weight', 'bold'); lbl.textContent = LABELS[i];
+          var num = document.createElementNS(svgns, 'text');
+          num.setAttribute('x', left + w - 8); num.setAttribute('y', y + 15); num.setAttribute('text-anchor', 'end'); num.setAttribute('fill', '#f4f4f5'); num.setAttribute('font-size', '11'); num.textContent = r.counts[i];
+          funnelG.appendChild(rect); funnelG.appendChild(lbl); funnelG.appendChild(num);
+        }
+        while (optsG.firstChild) optsG.removeChild(optsG.firstChild);
+        btns = []; lbls = [];
+        var ys = [252, 290, 328, 366];
+        for (var i = 0; i < 4; i++) {
+          var y = ys[i];
+          var rect = document.createElementNS(svgns, 'rect');
+          rect.setAttribute('x', 40); rect.setAttribute('y', y); rect.setAttribute('width', 320); rect.setAttribute('height', 30); rect.setAttribute('rx', 6);
+          rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', '#2a3240'); rect.setAttribute('stroke-width', '1.5'); rect.style.cursor = 'pointer';
+          var t = document.createElementNS(svgns, 'text');
+          t.setAttribute('x', 60); t.setAttribute('y', y + 20); t.setAttribute('fill', '#f4f4f5'); t.setAttribute('font-size', '12'); t.style.pointerEvents = 'none';
+          t.textContent = (i + 1) + '.  ' + r.opts[i];
+          (function (k) { rect.addEventListener('click', function () { choose(k); }); })(i);
+          optsG.appendChild(rect); optsG.appendChild(t);
+          btns[i] = rect; lbls[i] = t;
+        }
+        answered = false;
+      }
+
+      function choose(i) {
+        if (answered) return; answered = true;
+        var r = rounds[idx];
+        if (i === r.a) {
+          score++; btns[i].setAttribute('stroke', '#3FCF8E'); lbls[i].setAttribute('fill', '#3FCF8E');
+        } else {
+          btns[i].setAttribute('stroke', '#c0431e'); lbls[i].setAttribute('fill', '#c0431e'); btns[r.a].setAttribute('stroke', '#3FCF8E');
+        }
+        statusT.textContent = 'Round ' + (idx + 1) + ' / ' + rounds.length + ' · score ' + score + ' · Best ' + Math.max(bestOf(), best);
+        setTimeout(function () {
+          idx = (idx + 1) % rounds.length;
+          if (idx === 0) {
+            var newBest = score > best;
+            if (newBest) { var oldBest = best; best = score; lsSet(LS_BEST, String(best)); ph('best_broken', { game: GAME, old_best: oldBest, new_best: best, score: score }); }
+            var isDaily = score >= DAILY_TARGET && !dailyFired;
+            if (isDaily) { dailyFired = true; markDaily(); }
+            showCTA(newBest || isDaily);
+            ph('game_over', { game: GAME, score: score, new_best: newBest, daily_done: !!isDaily });
+            score = 0;
+          }
+          render();
+        }, 1200);
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'r' || e.key === 'R') { idx = 0; score = 0; dailyFired = false; showCTA(false); buildRounds(); render(); return; }
+        if (answered) return;
+        var n = parseInt(e.key, 10);
+        if (n >= 1 && n <= 4) choose(n - 1);
+      });
+
+      wireCTA();
+      best = bestOf();
+      ph('game_started', { game: GAME });
+      buildRounds();
+      render();
+    })();
+  ]]></script>
+</svg>

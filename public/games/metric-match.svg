@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
+  <rect width="400" height="440" fill="#0a0a12"/>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">METRIC MATCH</text>
+  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Matches 0 / 6 · moves 0</text>
+  <g id="board"></g>
+  <text id="hint" x="200" y="410" text-anchor="middle" fill="#666" font-size="10">flip two cards · match metric to its formula</text>
+  <g id="cta" style="display:none">
+    <text x="200" y="408" text-anchor="middle" fill="#4ade80" font-size="10">🎉 Board solved! Want games/analytics like this?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><text x="154" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">LinkedIn</text></a>
+    <text x="200" y="422" text-anchor="middle" fill="#666" font-size="11">·</text>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><text x="246" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">Telegram</text></a>
+  </g>
+  <script type="text/javascript"><![CDATA[
+    (function () {
+      var svgns = 'http://www.w3.org/2000/svg';
+      var ALL_PAIRS = [
+        ["DAU", "unique users / day"],
+        ["MAU", "unique users / month"],
+        ["Retention", "Dn / D0"],
+        ["Churn", "1 - retention"],
+        ["LTV", "ARPU x lifespan"],
+        ["ARPU", "revenue / users"],
+        ["CTR", "clicks / impressions"],
+        ["CPA", "cost / acquisition"],
+        ["Conversion", "conversions / visitors"],
+        ["Bounce rate", "1-page / total"],
+        ["Stickiness", "DAU / MAU"],
+        ["NPS", "% promoters - % detractors"],
+        ["CAC", "cost / new customers"],
+        ["ARPPU", "revenue / paying users"],
+        ["Payback", "CAC / ARPU"],
+        ["MoM growth", "(now - last) / last"],
+        ["Activation", "activated / signed up"],
+        ["Engagement", "engaged / total"],
+        ["Depth", "events / session"]
+      ];
+      function pickPairs(n) {
+        var pool = ALL_PAIRS.slice();
+        for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp; }
+        return pool.slice(0, n);
+      }
+      var pairs = pickPairs(6);
+      var board = document.getElementById('board');
+      var statusT = document.getElementById('status');
+      var hint = document.getElementById('hint'), cta = document.getElementById('cta');
+      var first = null, lock = false, moves = 0, matches = 0;
+      var best = 0, dailyFired = false;
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'metric', DAILY_TARGET = 6;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        try {
+          var phs = document.createElementNS('http://www.w3.org/2000/svg', 'script');
+          phs.setAttribute('href', 'https://us-assets.i.posthog.com/static/array.js');
+          phs.setAttribute('type', 'text/javascript');
+          phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+          document.documentElement.appendChild(phs);
+        } catch (e) {}
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; if (hint) hint.style.display = on ? 'none' : 'block'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
+      // —— /retention ——
+
+      var cols = 4, rows = 3, cw = 85, ch = 95, gx = 8, gy = 8;
+      var startX = (400 - (cols * cw + (cols - 1) * gx)) / 2;
+      var startY = 66;
+
+      function buildDeck() {
+        var deck = [];
+        for (var p = 0; p < pairs.length; p++) { deck.push({pairId: p, text: pairs[p][0]}); deck.push({pairId: p, text: pairs[p][1]}); }
+        for (var i = deck.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp; }
+        return deck;
+      }
+
+      function makeCard(c, r, info) {
+        var x = startX + c * (cw + gx), y = startY + r * (ch + gy);
+        var g = document.createElementNS(svgns, 'g'); g.style.cursor = 'pointer';
+        var rect = document.createElementNS(svgns, 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', y); rect.setAttribute('width', cw); rect.setAttribute('height', ch); rect.setAttribute('rx', 6); rect.setAttribute('stroke-width', '1.5');
+        var t = document.createElementNS(svgns, 'text');
+        t.setAttribute('x', x + cw / 2); t.setAttribute('y', y + ch / 2 + 4); t.setAttribute('text-anchor', 'middle');
+        t.setAttribute('font-size', info.text.length > 10 ? '9' : '11'); t.setAttribute('font-weight', 'bold');
+        var card = {g: g, rect: rect, t: t, info: info, up: false, matched: false};
+        card.paint = function () {
+          if (card.matched) { rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', '#3FCF8E'); t.setAttribute('fill', '#3FCF8E'); t.textContent = info.text; }
+          else if (card.up) { rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', '#ff6643'); t.setAttribute('fill', '#f4f4f5'); t.textContent = info.text; }
+          else { rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', '#2a3240'); t.setAttribute('fill', '#8a8aa8'); t.textContent = '?'; }
+        };
+        g.appendChild(rect); g.appendChild(t);
+        g.addEventListener('click', function () { flip(card); });
+        card.paint();
+        return card;
+      }
+
+      function buildBoard() {
+        while (board.firstChild) board.removeChild(board.firstChild);
+        var deck = buildDeck();
+        var k = 0;
+        for (var rr = 0; rr < rows; rr++) for (var cc = 0; cc < cols; cc++) {
+          var card = makeCard(cc, rr, deck[k++]); board.appendChild(card.g);
+        }
+      }
+
+      function flip(card) {
+        if (lock || card.up || card.matched) return;
+        card.up = true; card.paint();
+        if (!first) { first = card; return; }
+        moves++; lock = true;
+        var a = first, b = card; first = null;
+        if (a.info.pairId === b.info.pairId) {
+          matches++; a.matched = true; b.matched = true; a.paint(); b.paint(); lock = false;
+          if (matches === pairs.length) {
+            var curBest = bestOf();
+            var newBest = curBest === 0 || moves < curBest;
+            if (newBest) { best = moves; lsSet(LS_BEST, String(best)); ph('best_broken', { game: GAME, old_best: curBest, new_best: best, score: moves }); }
+            var isDaily = !dailyFired;
+            if (isDaily) { dailyFired = true; markDaily(); }
+            showCTA(newBest || isDaily);
+            ph('game_win', { game: GAME, moves: moves, new_best: newBest, daily_done: !!isDaily });
+            statusT.textContent = 'Matches ' + matches + ' / ' + pairs.length + ' · moves ' + moves + ' · SOLVED' + (newBest ? ' · NEW BEST' : '');
+          } else {
+            statusT.textContent = 'Matches ' + matches + ' / ' + pairs.length + ' · moves ' + moves + ' · Best ' + (best || moves);
+          }
+        } else {
+          statusT.textContent = 'Matches ' + matches + ' / ' + pairs.length + ' · moves ' + moves + ' · Best ' + (best || moves);
+          setTimeout(function () { a.up = false; b.up = false; a.paint(); b.paint(); lock = false; }, 750);
+        }
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'r' || e.key === 'R') { moves = 0; matches = 0; first = null; lock = false; dailyFired = false; showCTA(false); buildBoard(); statusT.textContent = 'Matches 0 / ' + pairs.length + ' · moves 0 · Best ' + (best || 0); }
+      });
+
+      wireCTA();
+      best = bestOf();
+      ph('game_started', { game: GAME });
+      buildBoard();
+      statusT.textContent = 'Matches 0 / ' + pairs.length + ' · moves 0 · Best ' + (best || 0);
+    })();
+  ]]></script>
+</svg>

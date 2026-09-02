@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
+  <rect width="400" height="440" fill="#0a0a12"/>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">SQL QUERY</text>
+  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Round 1 / 6 · score 0</text>
+  <text id="metric" x="200" y="76" text-anchor="middle" fill="#ffbe99" font-size="11">metric: ...</text>
+  <rect x="20" y="92" width="360" height="58" fill="#12121c" stroke="#2a3240" stroke-width="1.5" rx="6"/>
+  <text id="query" x="30" y="126" fill="#f4f4f5" font-size="11.5">SELECT ___ FROM events</text>
+  <g id="opts"></g>
+  <text id="hint" x="200" y="410" text-anchor="middle" fill="#666" font-size="10">click the token that fills the blank · keys 1-4</text>
+  <g id="cta" style="display:none">
+    <text x="200" y="408" text-anchor="middle" fill="#4ade80" font-size="10">🎉 Perfect round! Want real analytics?</text>
+    <a href="https://www.linkedin.com/in/nikita-boyarkin" target="_blank" rel="noopener noreferrer"><text x="154" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">LinkedIn</text></a>
+    <text x="200" y="422" text-anchor="middle" fill="#666" font-size="11">·</text>
+    <a href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer"><text x="246" y="422" text-anchor="middle" fill="#ff6643" font-size="11" font-weight="bold">Telegram</text></a>
+  </g>
+  <script type="text/javascript"><![CDATA[
+    (function () {
+      var svgns = 'http://www.w3.org/2000/svg';
+      var rounds = [
+        {m: "DAU - distinct users in a day", q: "SELECT ___(user_id) FROM events WHERE d='2026-08-31'", o: ["COUNT", "DISTINCT", "SUM", "AVG"], a: 1},
+        {m: "Sign-ups today", q: "SELECT ___(*) FROM users WHERE created_at = today", o: ["COUNT", "DISTINCT", "GROUP BY", "ORDER BY"], a: 0},
+        {m: "Revenue per paying user", q: "SELECT ___(price) / COUNT(user_id) FROM orders", o: ["SUM", "MIN", "DISTINCT", "MAX"], a: 0},
+        {m: "7-day retention rate", q: "SELECT COUNT(d7) ___ COUNT(d0) AS r7 FROM cohort", o: ["/", "*", "+", "-"], a: 0},
+        {m: "MAU - monthly active users", q: "SELECT ___(user_id) FROM events WHERE d BETWEEN m0 AND m1", o: ["COUNT", "DISTINCT", "SUM", "GROUP"], a: 1},
+        {m: "Top 5 users by revenue", q: "SELECT user_id, SUM(price) FROM orders ___ BY user_id ORDER BY 2 DESC", o: ["GROUP", "ORDER", "WHERE", "HAVING"], a: 0},
+        {m: "Average order value", q: "SELECT ___(price) FROM orders", o: ["AVG", "SUM", "COUNT", "MAX"], a: 0},
+        {m: "Users with >1 order", q: "SELECT user_id FROM orders ___ BY user_id HAVING COUNT(*)>1", o: ["GROUP", "ORDER", "WHERE", "JOIN"], a: 0},
+        {m: "Monthly revenue trend", q: "SELECT month, ___(price) FROM orders ___ BY month", o: ["SUM,GROUP", "AVG,ORDER", "COUNT,WHERE", "SUM,ORDER"], a: 0},
+        {m: "Revenue from mobile", q: "SELECT SUM(price) FROM orders ___ platform='mobile'", o: ["WHERE", "GROUP", "ORDER", "HAVING"], a: 0},
+        {m: "Active last 7 days", q: "SELECT COUNT(DISTINCT user_id) FROM events WHERE d >= today ___ 7", o: ["-", "+", "/", "*"], a: 0},
+        {m: "Top country by revenue", q: "SELECT country, SUM(price) FROM orders GROUP BY country ORDER BY 2 ___ LIMIT 1", o: ["DESC", "ASC", "GROUP", "HAVING"], a: 0},
+        {m: "Exclude test accounts", q: "SELECT * FROM users WHERE email ___ '%test%'", o: ["NOT LIKE", "LIKE", "IS", "="], a: 0},
+        {m: "Join orders to users", q: "SELECT * FROM orders ___ users ON orders.user_id = users.id", o: ["JOIN", "GROUP", "WHERE", "ORDER"], a: 0},
+        {m: "Distinct event names", q: "SELECT ___(event) FROM events", o: ["DISTINCT", "COUNT", "SUM", "GROUP"], a: 0}
+      ];
+      var idx = 0, score = 0, answered = false, best = 0, dailyFired = false;
+      var metricT = document.getElementById('metric'), queryT = document.getElementById('query'), statusT = document.getElementById('status'), optsG = document.getElementById('opts');
+      var hint = document.getElementById('hint'), cta = document.getElementById('cta');
+      var btns = [], lbls = [];
+
+      // —— retention + contact (shared pattern) ——
+      var GAME = 'sql', DAILY_TARGET = 6;
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
+      var LS_BEST = 'arcade_best_' + GAME;
+      var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
+      var PH_KEY = 'phc_tdju2w288PnkFE2e96efWKpoCvBPHPtveSztZK9NnGrv';
+      if (!IS_LOCAL && PH_KEY.indexOf('__PH_') !== 0 && !window.posthog) {
+        try {
+          var phs = document.createElementNS('http://www.w3.org/2000/svg', 'script');
+          phs.setAttribute('href', 'https://us-assets.i.posthog.com/static/array.js');
+          phs.setAttribute('type', 'text/javascript');
+          phs.onload = function () { try { window.posthog.init(PH_KEY, { api_host: 'https://us.i.posthog.com' }); } catch (e) {} };
+          document.documentElement.appendChild(phs);
+        } catch (e) {}
+      }
+      function ph(name, props) { try { if (window.posthog && window.posthog.capture) window.posthog.capture(name, props || {}); } catch (e) {} }
+      function lsGet(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } }
+      function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+      function bestOf() { return parseInt(lsGet(LS_BEST, '0'), 10) || 0; }
+      function todayStr() { var n = new Date(); return n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2); }
+      function todayGame() { return DAILY_GAMES[Math.floor(Date.now() / 86400000) % DAILY_GAMES.length]; }
+      function markDaily() {
+        var t = todayStr();
+        var y = new Date(); y.setDate(y.getDate() - 1);
+        var yst = y.getFullYear() + '-' + ('0' + (y.getMonth() + 1)).slice(-2) + '-' + ('0' + y.getDate()).slice(-2);
+        var streak = lsGet('arcade_daily_date', '') === yst ? (parseInt(lsGet('arcade_streak', '0'), 10) || 0) + 1 : 1;
+        lsSet('arcade_daily_date', t); lsSet('arcade_daily_done', '1'); lsSet('arcade_streak', String(streak));
+        ph('daily_completed', { game: GAME, streak: streak });
+      }
+      function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; if (hint) hint.style.display = on ? 'none' : 'block'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
+      // —— /retention ——
+
+      function render() {
+        var r = rounds[idx];
+        metricT.textContent = 'metric: ' + r.m;
+        queryT.textContent = r.q; queryT.setAttribute('fill', '#f4f4f5');
+        statusT.textContent = 'Round ' + (idx + 1) + ' / ' + rounds.length + ' · score ' + score + ' · Best ' + Math.max(bestOf(), best);
+        while (optsG.firstChild) optsG.removeChild(optsG.firstChild);
+        btns = []; lbls = [];
+        var ys = [178, 216, 254, 292];
+        for (var i = 0; i < 4; i++) {
+          var y = ys[i];
+          var rect = document.createElementNS(svgns, 'rect');
+          rect.setAttribute('x', 40); rect.setAttribute('y', y); rect.setAttribute('width', 320); rect.setAttribute('height', 30); rect.setAttribute('rx', 6);
+          rect.setAttribute('fill', '#12121c'); rect.setAttribute('stroke', '#2a3240'); rect.setAttribute('stroke-width', '1.5'); rect.style.cursor = 'pointer';
+          var t = document.createElementNS(svgns, 'text');
+          t.setAttribute('x', 60); t.setAttribute('y', y + 20); t.setAttribute('fill', '#f4f4f5'); t.setAttribute('font-size', '12'); t.style.pointerEvents = 'none';
+          t.textContent = (i + 1) + '.  ' + r.o[i];
+          (function (k) { rect.addEventListener('click', function () { choose(k); }); })(i);
+          optsG.appendChild(rect); optsG.appendChild(t);
+          btns[i] = rect; lbls[i] = t;
+        }
+        answered = false;
+      }
+
+      function choose(i) {
+        if (answered) return; answered = true;
+        var r = rounds[idx];
+        queryT.textContent = r.q.replace('___', r.o[i]);
+        if (i === r.a) {
+          score++; btns[i].setAttribute('stroke', '#3FCF8E'); lbls[i].setAttribute('fill', '#3FCF8E'); queryT.setAttribute('fill', '#3FCF8E');
+        } else {
+          btns[i].setAttribute('stroke', '#c0431e'); lbls[i].setAttribute('fill', '#c0431e'); queryT.setAttribute('fill', '#c0431e');
+          btns[r.a].setAttribute('stroke', '#3FCF8E');
+        }
+        statusT.textContent = 'Round ' + (idx + 1) + ' / ' + rounds.length + ' · score ' + score + ' · Best ' + Math.max(bestOf(), best);
+        setTimeout(function () {
+          idx = (idx + 1) % rounds.length;
+          if (idx === 0) {
+            var newBest = score > best;
+            if (newBest) { var oldBest = best; best = score; lsSet(LS_BEST, String(best)); ph('best_broken', { game: GAME, old_best: oldBest, new_best: best, score: score }); }
+            var isDaily = score >= DAILY_TARGET && !dailyFired;
+            if (isDaily) { dailyFired = true; markDaily(); }
+            showCTA(newBest || isDaily);
+            ph('game_over', { game: GAME, score: score, new_best: newBest, daily_done: !!isDaily });
+            score = 0;
+          }
+          render();
+        }, 1200);
+      }
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'r' || e.key === 'R') { idx = 0; score = 0; dailyFired = false; showCTA(false); render(); return; }
+        if (answered) return;
+        var n = parseInt(e.key, 10);
+        if (n >= 1 && n <= 4) choose(n - 1);
+      });
+
+      wireCTA();
+      best = bestOf();
+      ph('game_started', { game: GAME });
+      render();
+    })();
+  ]]></script>
+</svg>

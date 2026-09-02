@@ -1,20 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 400 440" preserveAspectRatio="xMidYMid meet" style="background:#0a0a12;touch-action:none" font-family="'Fira Code','SF Mono',Menlo,monospace">
   <rect width="400" height="440" fill="#0a0a12"/>
-  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">FUNNEL DROP</text>
-  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">CVR 0% · caught 0 · missed 0</text>
-
-  <rect x="30" y="78" width="340" height="30" fill="#17212b" stroke="#2a3240" stroke-width="1.5" rx="4"/>
-  <text x="40" y="97" fill="#ffbe99" font-size="11" font-weight="bold">SIGNUP</text>
-  <rect x="70" y="118" width="260" height="30" fill="#251712" stroke="#8a2e15" stroke-width="1.5" rx="4"/>
-  <text x="80" y="137" fill="#ffbe99" font-size="11" font-weight="bold">ACTIVE</text>
-  <rect x="115" y="158" width="170" height="30" fill="#211511" stroke="#c0431e" stroke-width="1.5" rx="4"/>
-  <text x="125" y="177" fill="#ffbe99" font-size="11" font-weight="bold">PAY</text>
-
-  <rect x="30" y="200" width="340" height="200" fill="#12121c" stroke="#2a3240" stroke-width="1.5" rx="6"/>
+  <text x="200" y="28" text-anchor="middle" fill="#ff6643" font-size="16" font-weight="bold" letter-spacing="3">COHORT CATCH</text>
+  <text id="status" x="200" y="52" text-anchor="middle" fill="#f4f4f5" font-size="12">Retention 0% · kept 0 · lost 0</text>
+  <text x="30" y="72" fill="#ffbe99" font-size="10">D0 cohort &gt;&gt; D1 · D7 · D30</text>
+  <rect x="20" y="80" width="360" height="298" fill="#12121c" stroke="#2a3240" stroke-width="1.5" rx="6"/>
   <g id="dots"></g>
-  <rect id="paddle" x="120" y="385" width="80" height="10" rx="5" fill="#f4f4f5"/>
-
-  <text x="200" y="425" text-anchor="middle" fill="#666" font-size="10">Drag or ← → · catch users to convert</text>
+  <rect id="paddle" x="145" y="382" width="100" height="10" rx="5" fill="#f4f4f5"/>
+  <text x="200" y="410" text-anchor="middle" fill="#666" font-size="10">arrows / drag · catch Returning (green), avoid Churned (grey)</text>
   <g id="cta" style="display:none">
     <rect x="50" y="222" width="300" height="58" rx="8" fill="#12121c" stroke="#ff6643" stroke-width="1"/>
     <text x="200" y="240" text-anchor="middle" fill="#f4f4f5" font-size="11">🎉 Best run! Want games/analytics like this?</text>
@@ -23,14 +15,14 @@
   </g>
   <script type="text/javascript"><![CDATA[
     (function () {
-      var dotsG = document.getElementById('dots');
-      var paddle = document.getElementById('paddle');
-      var statusT = document.getElementById('status');
-      var dots = [], caught = 0, missed = 0, px = 160, keys = {};
+      var svgns = 'http://www.w3.org/2000/svg';
+      var dotsG = document.getElementById('dots'), paddle = document.getElementById('paddle'), statusT = document.getElementById('status');
+      var dots = [], kept = 0, lost = 0, px = 195, keys = {};
       var best = 0, dailyFired = false;
+      var labels = ['D1', 'D7', 'D30'];
 
       // —— retention + contact (shared pattern) ——
-      var GAME = 'funnel', DAILY_TARGET = 25;
+      var GAME = 'cohort', DAILY_TARGET = 25;
       var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
       var LS_BEST = 'arcade_best_' + GAME;
       var cta = document.getElementById('cta');
@@ -73,41 +65,44 @@
       }
       // —— /retention ——
 
-      function spawn() { dots.push({x: 40 + Math.random() * 320, y: 42, s: 1.6 + Math.random() * 1.2}); }
+      function spawn() { dots.push({x: 40 + Math.random() * 320, y: 92, s: 1.4 + Math.random() * 1.0, ret: Math.random() < 0.55, lbl: labels[Math.floor(Math.random() * 3)]}); }
 
       function draw() {
         while (dotsG.firstChild) dotsG.removeChild(dotsG.firstChild);
         for (var i = 0; i < dots.length; i++) {
-          var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          c.setAttribute('cx', dots[i].x);
-          c.setAttribute('cy', dots[i].y);
-          c.setAttribute('r', 6);
-          c.setAttribute('fill', '#ff6643');
+          var d = dots[i];
+          var c = document.createElementNS(svgns, 'circle');
+          c.setAttribute('cx', d.x); c.setAttribute('cy', d.y); c.setAttribute('r', 9);
+          c.setAttribute('fill', d.ret ? '#3FCF8E' : '#c9c2a8');
           dotsG.appendChild(c);
+          var t = document.createElementNS(svgns, 'text');
+          t.setAttribute('x', d.x); t.setAttribute('y', d.y + 3); t.setAttribute('text-anchor', 'middle');
+          t.setAttribute('fill', '#0a0a12'); t.setAttribute('font-size', '7'); t.setAttribute('font-weight', 'bold');
+          t.textContent = d.lbl; dotsG.appendChild(t);
         }
       }
 
       function step() {
         if (keys['ArrowLeft'] || keys['a'] || keys['A']) px -= 6;
         if (keys['ArrowRight'] || keys['d'] || keys['D']) px += 6;
-        px = Math.max(40, Math.min(360, px));
-        paddle.setAttribute('x', px - 40);
+        px = Math.max(50, Math.min(350, px));
+        paddle.setAttribute('x', px - 50);
         var newBest = false;
         for (var i = dots.length - 1; i >= 0; i--) {
           var d = dots[i];
           d.y += d.s;
-          if (d.y + 6 >= 375 && d.y - 6 <= 405 && Math.abs(d.x - px) < 46) {
-            caught++; dots.splice(i, 1);
-            if (caught > best) { var oldBest = best; best = caught; lsSet(LS_BEST, String(best)); newBest = true; ph('best_broken', { game: GAME, old_best: oldBest, new_best: best, score: caught }); }
-          }
-          else if (d.y > 425) { missed++; dots.splice(i, 1); }
+          if (d.y + 9 >= 372 && d.y - 9 <= 395 && Math.abs(d.x - px) < 56) {
+            if (d.ret) kept++; else lost++;
+            dots.splice(i, 1);
+            if (kept > best) { var oldBest = best; best = kept; lsSet(LS_BEST, String(best)); newBest = true; ph('best_broken', { game: GAME, old_best: oldBest, new_best: best, score: kept }); }
+          } else if (d.y > 395) { if (d.ret) lost++; dots.splice(i, 1); }
         }
-        var cvr = caught + missed ? Math.round(caught / (caught + missed) * 100) : 0;
-        statusT.textContent = 'CVR ' + cvr + '% · caught ' + caught + ' · missed ' + missed + ' · Best ' + Math.max(bestOf(), best);
-        if (newBest || (caught >= DAILY_TARGET && !dailyFired)) {
-          if (caught >= DAILY_TARGET && !dailyFired) { dailyFired = true; markDaily(); }
+        var total = kept + lost, ret = total ? Math.round(kept / total * 100) : 0;
+        statusT.textContent = 'Retention ' + ret + '% · kept ' + kept + ' · lost ' + lost + ' · Best ' + Math.max(bestOf(), best);
+        if (newBest || (kept >= DAILY_TARGET && !dailyFired)) {
+          if (kept >= DAILY_TARGET && !dailyFired) { dailyFired = true; markDaily(); }
           showCTA(true);
-          ph('milestone', { game: GAME, caught: caught, best: Math.max(bestOf(), best), daily_done: caught >= DAILY_TARGET });
+          ph('milestone', { game: GAME, kept: kept, best: Math.max(bestOf(), best), daily_done: kept >= DAILY_TARGET });
         }
         draw();
       }
@@ -116,15 +111,15 @@
       document.addEventListener('keyup', function (e) { keys[e.key] = false; });
       document.addEventListener('mousemove', function (e) {
         var rect = document.documentElement.getBoundingClientRect();
-        px = (e.clientX - rect.left) * (400 / rect.width) - 30;
-        px = Math.max(40, Math.min(360, px));
+        px = (e.clientX - rect.left) * (400 / rect.width);
+        px = Math.max(50, Math.min(350, px));
       });
 
       // --- Touch controls (mobile) ---
       function touchPaddleX(clientX) {
         var rect = document.documentElement.getBoundingClientRect();
-        px = (clientX - rect.left) * (400 / rect.width) - 30;
-        px = Math.max(40, Math.min(360, px));
+        px = (clientX - rect.left) * (400 / rect.width);
+        px = Math.max(50, Math.min(350, px));
       }
       document.addEventListener('touchstart', function (e) { e.preventDefault(); touchPaddleX(e.touches[0].clientX); }, {passive: false});
       document.addEventListener('touchmove', function (e) { e.preventDefault(); touchPaddleX(e.touches[0].clientX); }, {passive: false});
@@ -135,7 +130,7 @@
       for (var i = 0; i < 3; i++) spawn();
       setInterval(step, 16);
       function scheduleSpawn() {
-        setTimeout(function () { spawn(); scheduleSpawn(); }, Math.max(350, 700 - caught * 4));
+        setTimeout(function () { spawn(); scheduleSpawn(); }, Math.max(400, 820 - kept * 3));
       }
       scheduleSpawn();
       draw();

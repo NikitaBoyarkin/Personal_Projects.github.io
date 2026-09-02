@@ -27,7 +27,7 @@
 
       // —— retention + contact (shared pattern) ——
       var GAME = '2048', DAILY_TARGET = 512;
-      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel'];
+      var DAILY_GAMES = ['snake', '2048', 'pong', 'abtest', 'funnel', 'cohort', 'sql', 'metric', 'retention', 'bottleneck'];
       var LS_BEST = 'arcade_best_' + GAME;
       var cta = document.getElementById('cta');
       var IS_LOCAL = /^(localhost|127\.0\.0\.1|::1|0\.0\.0\.0)$/.test(window.location.hostname);
@@ -56,13 +56,24 @@
         ph('daily_completed', { game: GAME, streak: streak });
       }
       function showCTA(on) { if (cta) cta.style.display = on ? 'block' : 'none'; }
+      function wireCTA() {
+        if (!cta) return;
+        var links = cta.querySelectorAll('a');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            var href = this.getAttribute('href') || '';
+            var channel = href.indexOf('linkedin') !== -1 ? 'linkedin' : (href.indexOf('t.me') !== -1 ? 'telegram' : 'other');
+            ph('contact_click', { location: 'game_over', channel: channel, game: GAME });
+          });
+        }
+      }
       var winFired = false, overFired = false;
       function finish(kind) {
         if (kind === 'over') { if (overFired) return; overFired = true; }
         if (kind === 'win') { if (winFired) return; winFired = true; }
         var best = bestOf();
         var newBest = score > best;
-        if (newBest) lsSet(LS_BEST, String(score));
+        if (newBest) { lsSet(LS_BEST, String(score)); ph('best_broken', { game: GAME, old_best: best, new_best: score, score: score }); }
         var isDaily = todayGame() === GAME && maxTile >= DAILY_TARGET;
         if (isDaily) markDaily();
         showCTA(newBest || kind === 'win');
@@ -192,6 +203,7 @@
         else move(dy > 0 ? 'down' : 'up');
       }, {passive: false});
 
+      wireCTA();
       empty(); spawn(); spawn(); draw();
     })();
   ]]></script>
