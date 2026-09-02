@@ -33,6 +33,17 @@ const t = {
   colorMode: isEn ? 'Switch node colors: track/category or community' : 'Переключить цвет узлов: трек/категория или комьюнити',
   arrows: isEn ? 'Arrows' : 'Стрелки',
   arrowsLabel: isEn ? 'Show link direction' : 'Показать направление ссылок',
+  focus: isEn ? 'Focus' : 'Фокус',
+  focusLabel: isEn ? 'Highlight 1-hop neighbors on click (Esc clears)' : 'Подсветить соседей по клику (Esc снимает)',
+  edges: isEn ? 'Edges' : 'Рёбра',
+  edgesLabel: isEn ? 'Filter by link type' : 'Фильтр по типу связей',
+  edgeType: {
+    related: isEn ? 'Explicit' : 'Явные',
+    children: isEn ? 'Volta' : 'Volta',
+    topic: isEn ? 'Thematic' : 'Тематические',
+    shared: isEn ? 'Lateral' : 'Латеральные',
+    core: isEn ? 'Hubs' : 'Хабы',
+  } as Record<string, string>,
 };
 
 // Both layouts ran at build time. The SVG ships the group layout (so every
@@ -111,6 +122,19 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     <div class="kg-controls" role="group" aria-label={isEn ? 'Graph controls' : 'Управление графом'}>
       <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-color" aria-pressed="false" aria-label={t.colorMode} title={t.colorByGroup} data-label-group={t.colorByGroup} data-label-community={t.colorByCommunity}>{t.colorByGroup}</button>
       <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-arrows" aria-pressed="false" aria-label={t.arrowsLabel} title={t.arrowsLabel}>{t.arrows}</button>
+      <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-focus" aria-pressed="false" aria-label={t.focusLabel} title={t.focusLabel}>{t.focus}</button>
+      <div class="kg-popover">
+        <button type="button" class="kg-btn kg-btn-toggle" data-kg-action="toggle-edge-panel" aria-haspopup="true" aria-expanded="false" aria-label={t.edgesLabel} title={t.edgesLabel}>{t.edges}</button>
+        <div id="kg-edge-panel" class="kg-edge-panel" role="group" aria-label={t.edgesLabel} hidden>
+          {(['related', 'children', 'topic', 'shared', 'core'] as const).map((ty) => (
+            <label class="kg-edge-toggle">
+              <span class="kg-edge-swatch" data-kg-swatch={ty}></span>
+              <input type="checkbox" data-kg-type={ty} checked />
+              {t.edgeType[ty]}
+            </label>
+          ))}
+        </div>
+      </div>
       <button type="button" class="kg-btn" data-kg-action="zoom-in" aria-label={t.zoomIn} title={t.zoomIn}>+</button>
       <button type="button" class="kg-btn" data-kg-action="zoom-out" aria-label={t.zoomOut} title={t.zoomOut}>−</button>
       <button type="button" class="kg-btn" data-kg-action="reset" aria-label={t.reset} title={t.reset}>⟲</button>
@@ -194,12 +218,24 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
   let hiddenCommunities = new Set<string | number>();
   const hiddenSet = () => (mode === 'community' ? hiddenCommunities : hiddenGroups);
   const keyOf = (n: any) => (mode === 'community' ? (n.community ?? 0) : n.group);
+  // Edge-type filter (mode-independent): hidden link types, kept in the URL.
+  let hiddenEdgeTypes = new Set<string>();
+  // Focus mode: clicking a node keeps its 1-hop neighborhood highlighted.
+  let focusMode = false;
+  let focusedId: string | null = null;
 
   const nodes: any[] = data.nodes;
   const links: any[] = data.links;
   const nodeById = new Map(nodes.map((n: any) => [n.id, n]));
   const nodeEls = Array.from(svg.querySelectorAll<SVGGElement>('g[tabindex]'));
   const edgeEls = Array.from(svg.querySelectorAll<SVGLineElement>('.kg-edge'));
+  // Per-type edge color, sampled from the server-rendered lines so the filter
+  // panel swatches always match the SSR edge styling.
+  const edgeColor = new Map<string, string>();
+  edgeEls.forEach((e, i) => {
+    const ty = links[i].type;
+    if (!edgeColor.has(ty)) edgeColor.set(ty, e.getAttribute('stroke') || 'var(--text-muted)');
+  });
   // Build-time positions per mode — reset restores these (node drag is
   // cosmetic). `groupPos` starts where the SSR rendered; `communityPos` is the
   // second layout embedded in the data blob. `pristine` snapshots both so reset
@@ -262,6 +298,13 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
       : groupList.map((g) => ({ key: g, label: g, color: GRAPH_GROUP_COLORS[g] }));
     const hidden = hiddenSet();
     const total = items.length;
+    // Per-chip node counts, so the legend shows how much each group/community
+    // contributes to the graph (counted across all nodes).
+    const counts = new Map<string | number, number>();
+    for (const n of nodes) {
+      const k = isCommunity ? (n.community ?? 0) : n.group;
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    }
     for (const it of items) {
       const span = document.createElement('span');
       span.className = 'kg-legend-item';
@@ -292,13 +335,18 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
         syncURL();
       });
       label.appendChild(cb);
-      label.appendChild(document.createTextNode(it.label));
+      label.appendChild(document.createTextNode(`${it.label} `));
+      const count = document.createElement('span');
+      count.className = 'kg-legend-count';
+      count.textContent = String(counts.get(it.key) ?? 0);
+      label.appendChild(count);
       span.appendChild(label);
       legendEl.appendChild(span);
     }
   }
 
-  /** Obsidian "Tags" filter: hide/show whole groups (or communities) and their edges. */
+  /** Obsidian "Tags"-style filter: hide whole groups (or communities) and edges —
+   *  either those touching a hidden group or of a hidden edge type. */
   function applyFilter() {
     const hidden = hiddenSet();
     nodes.forEach((n, i) => {
@@ -321,6 +369,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
         mode,
         hiddenGroups: [...hiddenGroups] as string[],
         hiddenCommunities: [...hiddenCommunities].map(Number),
+        hiddenEdges: [...hiddenEdgeTypes],
       },
       window.location.search,
     );
@@ -351,6 +400,11 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
   let hoveredId: string | null = null;
   function clearHighlight() {
     hoveredId = null;
+    // A persistent 1-hop focus survives the transient hover fading.
+    if (focusMode && focusedId) {
+      highlight(focusedId);
+      return;
+    }
     nodes.forEach((_, i) => nodeEls[i].style.opacity = '');
     edgeEls.forEach((e) => (e.style.opacity = ''));
   }
@@ -460,12 +514,31 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
       if (g) g.style.cursor = 'pointer';
       dragging = null;
       dragStart = null;
-      if (wasClick) navigateTo(n);
+      if (wasClick) {
+        if (focusMode) {
+          // Focus mode: click toggles a persistent 1-hop highlight instead of
+          // navigating; clicking the focused node again (or Esc) clears it.
+          if (focusedId === n.id) {
+            focusedId = null;
+            clearHighlight();
+          } else {
+            focusedId = n.id;
+            highlight(n.id);
+          }
+        } else {
+          navigateTo(n);
+        }
+      }
       return;
     }
     if (panning) {
       panning = null;
       svg.style.cursor = '';
+      // Clicking or dragging the empty canvas dismisses a focus.
+      if (focusMode && focusedId) {
+        focusedId = null;
+        clearHighlight();
+      }
     }
   }
 
@@ -490,12 +563,23 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     if (!stillIn) clearHighlight();
   });
 
-  // Keyboard: Enter/Space on a focused node navigates.
+  // Keyboard: Enter/Space on a focused node navigates — or, in focus mode,
+  // toggles the 1-hop highlight.
   nodeEls.forEach((g, i) => {
     g.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        navigateTo(nodes[i]);
+        if (focusMode) {
+          if (focusedId === nodes[i].id) {
+            focusedId = null;
+            clearHighlight();
+          } else {
+            focusedId = nodes[i].id;
+            highlight(nodes[i].id);
+          }
+        } else {
+          navigateTo(nodes[i]);
+        }
       }
     });
   });
@@ -646,6 +730,41 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     });
   }
 
+  // --- Edge-type filter panel: swatches sampled from the SSR edge strokes,
+  // checked state synced from hiddenEdgeTypes at init, closes on outside
+  // pointerdown or Esc. ---
+  const edgePanel = document.getElementById('kg-edge-panel') as HTMLDivElement | null;
+  if (edgePanel) {
+    edgePanel.querySelectorAll<HTMLInputElement>('input[data-kg-type]').forEach((cb) => {
+      const ty = cb.dataset.kgType!;
+      const swatch = edgePanel.querySelector<HTMLElement>(`[data-kg-swatch="${ty}"]`);
+      if (swatch) swatch.style.color = edgeColor.get(ty) ?? 'var(--text-muted)';
+      cb.addEventListener('change', () => {
+        if (cb.checked) hiddenEdgeTypes.delete(ty);
+        else hiddenEdgeTypes.add(ty);
+        applyFilter();
+        syncURL();
+      });
+    });
+    document.addEventListener('pointerdown', (e) => {
+      if (edgePanel.hidden) return;
+      const t = e.target as Node;
+      if (edgePanel.contains(t)) return;
+      if ((t as Element | null)?.closest?.('[data-kg-action="toggle-edge-panel"]')) return;
+      edgePanel.hidden = true;
+      root
+        .querySelector<HTMLButtonElement>('[data-kg-action="toggle-edge-panel"]')
+        ?.setAttribute('aria-expanded', 'false');
+    });
+  }
+  /** Reflect hiddenEdgeTypes in the panel checkboxes (called at init after
+   *  the URL state is restored). */
+  function syncEdgePanel() {
+    edgePanel?.querySelectorAll<HTMLInputElement>('input[data-kg-type]').forEach((cb) => {
+      cb.checked = !hiddenEdgeTypes.has(cb.dataset.kgType!);
+    });
+  }
+
   // Control buttons.
   const fsBtn = root.querySelector<HTMLButtonElement>('[data-kg-action="fullscreen"]');
   root.querySelectorAll<HTMLButtonElement>('[data-kg-action]').forEach((btn) => {
@@ -695,6 +814,17 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
             e.removeAttribute('marker-end');
           }
         });
+      } else if (action === 'toggle-focus') {
+        focusMode = !focusMode;
+        btn.setAttribute('aria-pressed', String(focusMode));
+        if (!focusMode) {
+          focusedId = null;
+          clearHighlight();
+        }
+      } else if (action === 'toggle-edge-panel') {
+        const wasHidden = edgePanel ? edgePanel.hidden : true;
+        if (edgePanel) edgePanel.hidden = !wasHidden;
+        btn.setAttribute('aria-expanded', String(wasHidden));
       }
     });
   });
@@ -729,7 +859,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     if (e.key !== 'Tab') return;
     const focusables = Array.from(
       root.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), g[tabindex]'),
-    );
+    ).filter((el) => el.checkVisibility?.() ?? true);
     if (!focusables.length) return;
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
@@ -742,12 +872,29 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     }
   });
 
+  // --- Esc clears a focus and closes the edge panel. (The fullscreen trap
+  // above handles its own Escape while fullscreen; this listener runs always.)
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (focusMode && focusedId) {
+      focusedId = null;
+      clearHighlight();
+    }
+    if (edgePanel && !edgePanel.hidden) {
+      edgePanel.hidden = true;
+      root
+        .querySelector<HTMLButtonElement>('[data-kg-action="toggle-edge-panel"]')
+        ?.setAttribute('aria-expanded', 'false');
+    }
+  });
+
   // --- Init: restore any shared/URL state (the SVG ships the group layout;
   // community mode repositions nodes and recolors), then wire up the viewport.
   const urlState = decodeGraphState(window.location.search);
   mode = urlState.mode;
   hiddenGroups = new Set(urlState.hiddenGroups);
   hiddenCommunities = new Set(urlState.hiddenCommunities);
+  hiddenEdgeTypes = new Set(urlState.hiddenEdges);
   const restoredCommunity = mode === 'community';
   const colorBtn = root.querySelector<HTMLButtonElement>('[data-kg-action="toggle-color"]');
   if (colorBtn) {
@@ -759,6 +906,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
   }
   if (restoredCommunity) applyModeLayout();
   renderLegend();
+  syncEdgePanel();
   applyFilter();
   resetViewport();
 </script>
@@ -984,5 +1132,51 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     outline: 2px solid var(--text-accent);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
+  }
+  .kg-popover {
+    position: relative;
+  }
+  .kg-edge-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: var(--z-panel);
+    background: var(--background-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.25);
+    padding: 0.5rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 160px;
+  }
+  /* The explicit display overrides the UA `[hidden]` rule, so re-hide it. */
+  .kg-edge-panel[hidden] {
+    display: none;
+  }
+  .kg-edge-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: var(--text-normal);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .kg-edge-toggle input {
+    accent-color: var(--text-accent);
+    cursor: pointer;
+  }
+  .kg-edge-swatch {
+    width: 20px;
+    height: 0;
+    border-top: 3px solid;
+    border-radius: 2px;
+  }
+  .kg-legend-count {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.75rem;
   }
 </style>

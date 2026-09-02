@@ -1,7 +1,7 @@
 // URL state for the knowledge graph: the color mode (taxonomy groups vs
-// emergent communities) and the per-mode hidden sets, so a filtered or
-// community view survives reload and can be shared as a link, e.g.
-//   /graph/?mode=community&hideGroups=topic&hideC=2,3
+// emergent communities), the per-mode hidden sets and the hidden edge types, so
+// a filtered or community view survives reload and can be shared as a link,
+// e.g. /graph/?mode=community&hideGroups=topic&hideC=2,3&hideEdges=topic,shared
 // Pure string functions — no DOM — so they're unit-testable in vitest.
 export interface GraphUrlState {
   mode: 'group' | 'community';
@@ -9,11 +9,14 @@ export interface GraphUrlState {
   hiddenGroups: string[];
   /** Hidden community ids (applies in community mode). */
   hiddenCommunities: number[];
+  /** Edge types hidden by the "Edges" filter (mode-independent). */
+  hiddenEdges: string[];
 }
 
 const MODE_PARAM = 'mode';
 const HIDE_GROUPS_PARAM = 'hideGroups';
 const HIDE_COMMUNITIES_PARAM = 'hideC';
+const HIDE_EDGES_PARAM = 'hideEdges';
 
 /** Serialize state into a query string (leading `?`, or `''` when every value
  *  is the default). Merges into `existing` search so unrelated params (e.g.
@@ -26,6 +29,8 @@ export function encodeGraphState(state: GraphUrlState, existing: string = ''): s
   else p.delete(HIDE_GROUPS_PARAM);
   if (state.hiddenCommunities.length) p.set(HIDE_COMMUNITIES_PARAM, state.hiddenCommunities.join(','));
   else p.delete(HIDE_COMMUNITIES_PARAM);
+  if (state.hiddenEdges.length) p.set(HIDE_EDGES_PARAM, state.hiddenEdges.join(','));
+  else p.delete(HIDE_EDGES_PARAM);
   const q = p.toString();
   return q ? `?${q}` : '';
 }
@@ -46,5 +51,9 @@ export function decodeGraphState(search: string): GraphUrlState {
     .filter(Boolean)
     .map(Number)
     .filter((n) => Number.isFinite(n));
-  return { mode, hiddenGroups, hiddenCommunities };
+  const hiddenEdges = (p.get(HIDE_EDGES_PARAM) ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return { mode, hiddenGroups, hiddenCommunities, hiddenEdges };
 }
