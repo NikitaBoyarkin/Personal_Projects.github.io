@@ -558,12 +558,58 @@ export function buildGraph(opts: {
   // Runs on the explicit structure (related/children/topic) only: lateral
   // `shared` edges and hub `core` edges add connectivity for the layout, but
   // on a graph this small they would collapse the taxonomy into one cluster if
-  // they drove the clustering too. They still appear in the layout — just
-  // don't shape it. (Cores become singleton communities as a result.)
+  // they drove the clustering too. Topic edges to the ubiquitous tool hubs
+  // (sql, python) are excluded as well — they appear in nearly every project
+  // and would otherwise sweep half the graph into a single cluster. They still
+  // appear in the layout — just don't shape it. (Cores become singleton
+  // communities as a result.)
+  const isToolTopicEdge = (l: GraphLink): boolean => {
+    if (l.type !== "topic") return false;
+    const topicId = l.source.startsWith("topic:") ? l.source : l.target;
+    return TOOL_TOPICS.has(topicId.slice("topic:".length));
+  };
   const explicitLinks = links.filter(
-    (l) => l.type !== "shared" && l.type !== "core",
+    (l) => l.type !== "shared" && l.type !== "core" && !isToolTopicEdge(l),
   );
   const communities = detectCommunities(nodesWithSize, explicitLinks);
+
+  // Topic nodes that land in a singleton community (their topic edges to the
+  // tool hubs were excluded from clustering) get absorbed into the community
+  // of their majority topic-neighbor, so they don't read as separate one-node
+  // clusters in community mode.
+  const communitySize = new Map<number, number>();
+  for (const n of nodesWithSize) {
+    const c = communities.get(n.id) ?? 0;
+    communitySize.set(c, (communitySize.get(c) ?? 0) + 1);
+  }
+  const topicNeighbors = new Map<string, string[]>();
+  for (const l of links) {
+    if (l.type !== "topic") continue;
+    const topicId = l.source.startsWith("topic:") ? l.source : l.target;
+    const other = l.source.startsWith("topic:") ? l.target : l.source;
+    if (!topicNeighbors.has(topicId)) topicNeighbors.set(topicId, []);
+    topicNeighbors.get(topicId)!.push(other);
+  }
+  for (const n of nodesWithSize) {
+    if (!n.id.startsWith("topic:")) continue;
+    const c = communities.get(n.id) ?? 0;
+    if ((communitySize.get(c) ?? 0) > 1) continue;
+    const votes = new Map<number, number>();
+    for (const nb of topicNeighbors.get(n.id) ?? []) {
+      const nc = communities.get(nb);
+      if (nc === undefined) continue;
+      votes.set(nc, (votes.get(nc) ?? 0) + 1);
+    }
+    let best = -1;
+    let bestN = 0;
+    for (const [nc, count] of votes) {
+      if (count > bestN) {
+        best = nc;
+        bestN = count;
+      }
+    }
+    if (best >= 0) communities.set(n.id, best);
+  }
 
   // Resolve per-locale community labels by representative node: find which
   // community each representative landed in, then label every node in it.

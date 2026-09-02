@@ -100,6 +100,22 @@ function invariants(name: string, getGraph: () => GraphData) {
       expect(g.nodes.length).toBeGreaterThan(0);
       expect(g.links.length).toBeGreaterThan(0);
     });
+
+    it('keeps every topic node in a non-singleton community', () => {
+      // Tool-topic edges (sql/python) are excluded from clustering, so their
+      // topic nodes would land in one-node communities — the absorb step must
+      // fold them back into their majority-neighbor cluster.
+      const g = getGraph();
+      const sizes = new Map<number, number>();
+      for (const n of g.nodes) {
+        const c = n.community ?? 0;
+        sizes.set(c, (sizes.get(c) ?? 0) + 1);
+      }
+      for (const n of g.nodes) {
+        if (!n.id.startsWith('topic:')) continue;
+        expect(sizes.get(n.community ?? 0), `topic ${n.id} is a singleton`).toBeGreaterThan(1);
+      }
+    });
   });
 }
 

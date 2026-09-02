@@ -222,10 +222,11 @@ const t = {
   const EDGE_COLOR: Record<string, string> = {
     related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
     children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
-    topic: 'color-mix(in srgb, var(--text-muted) 45%, transparent)',
+    // Thematic and hub edges are deliberately faint — they carry the layout
+    // but shouldn't compete with the explicit related links for attention.
+    topic: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
     shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
-    // Hub spokes: solid but muted so the cores read as anchors, not noise.
-    core: 'color-mix(in srgb, var(--text-accent) 40%, transparent)',
+    core: 'color-mix(in srgb, var(--text-accent) 25%, transparent)',
   };
 
   function rebuild(data: any) {
@@ -338,6 +339,10 @@ const t = {
       txt.setAttribute('x', String(r + 6));
       txt.setAttribute('y', '4');
       txt.setAttribute('class', 'kg-label');
+      // Post labels are hover/focus-only: with ~50 nodes always-on labels
+      // read as a text cloud. Projects, topics, cores and Volta parts stay
+      // labeled — they're the graph's anchors.
+      if (n.id.startsWith('post:')) txt.classList.add('kg-label-hover');
       txt.textContent = n.label;
       g.appendChild(c);
       g.appendChild(txt);
@@ -1009,6 +1014,16 @@ const t = {
        Driven by --kg-text-fade (set from TEXT_FADE_THRESHOLD on the svg). */
     opacity: calc(1 - var(--kg-text-fade, 0));
     transition: opacity 120ms ease;
+  }
+  /* Post labels are hover/focus-only (see rebuild): with ~50 nodes always-on
+     labels read as a text cloud. Projects, topics, cores and Volta parts stay
+     labeled. */
+  .kg-label-hover {
+    opacity: 0;
+  }
+  .kg-root :is(g[tabindex]:hover) .kg-label-hover,
+  .kg-root :is(g[tabindex]:focus) .kg-label-hover {
+    opacity: 1;
   }
   .kg-root :is(g[tabindex]) {
     outline: none;
