@@ -8,7 +8,7 @@
 // deterministic rings, forces are deterministic, and the tick loop runs a fixed
 // alpha-decay schedule. The same input always produces the same layout, which
 // keeps the SSR SVG and the /graph.json endpoints in agreement across builds.
-import type { GraphData, GraphNode } from "./graph";
+import type { GraphData, GraphNode, LinkType } from "./graph";
 
 export interface LayoutOptions {
   /** World width in viewBox units. */
@@ -17,6 +17,9 @@ export interface LayoutOptions {
   height?: number;
   /** Hard cap on simulation ticks (alpha decay usually stops first). */
   maxFrames?: number;
+  /** Which grouping the layout clusters: the explicit taxonomy groups
+   *  (default) or the emergent communities. */
+  groupBy?: "group" | "community";
 }
 
 /** Cores (group hubs) are pulled toward the world center much harder than
@@ -37,24 +40,30 @@ export function layoutGraph(graph: GraphData, opts: LayoutOptions = {}): GraphDa
   const width = opts.width ?? 900;
   const height = opts.height ?? 560;
   const world = { w: width, h: height };
+  const isCommunity = opts.groupBy === "community";
+  // Bucket key: taxonomy group by default, emergent community id otherwise.
+  const keyOf = (n: SimNode) => (isCommunity ? (n.community ?? 0) : n.group);
 
-  // --- Initial positions: ring per group around the center, cores at the hub.
-  // The force loop below only has to refine a near-converged layout instead of
-  // pulling a random scatter together (which is what made the old client
-  // simulation run ~15s and visibly shake).
+  // --- Initial positions: ring per bucket (group or community) around the
+  // center, cores at the hub. The force loop below only has to refine a
+  // near-converged layout instead of pulling a random scatter together (which
+  // is what made the old client simulation run ~15s and visibly shake).
   const nodes: SimNode[] = graph.nodes.map((n) => ({ ...n, x: 0, y: 0, vx: 0, vy: 0 }));
-  const groups: Record<string, SimNode[]> = {};
-  for (const n of nodes) (groups[n.group] = groups[n.group] || []).push(n);
-  const groupKeys = Object.keys(groups);
+  const buckets: Record<string, SimNode[]> = {};
+  for (const n of nodes) {
+    const k = String(keyOf(n));
+    (buckets[k] = buckets[k] || []).push(n);
+  }
+  const bucketKeys = Object.keys(buckets);
   const cx = world.w / 2;
   const cy = world.h / 2;
   const ringRadius = Math.min(world.w, world.h) * 0.35;
-  groupKeys.forEach((gk, gi) => {
-    const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
+  bucketKeys.forEach((bk, bi) => {
+    const ga = (bucketKeys.length === 1 ? 0 : (bi / bucketKeys.length) * 2 * Math.PI) - Math.PI / 2;
     const gx = cx + Math.cos(ga) * ringRadius;
     const gy = cy + Math.sin(ga) * ringRadius;
-    groups[gk].forEach((n, ni) => {
-      const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
+    buckets[bk].forEach((n, ni) => {
+      const a = (ni / Math.max(1, buckets[bk].length)) * 2 * Math.PI;
       const r = 30 + ni * 10;
       n.x = gx + Math.cos(a) * r;
       n.y = gy + Math.sin(a) * r;
@@ -75,16 +84,23 @@ export function layoutGraph(graph: GraphData, opts: LayoutOptions = {}): GraphDa
       source: idx.get(l.source),
       target: idx.get(l.target),
       weight: typeof l.weight === "number" ? l.weight : 1,
+      type: l.type,
     }))
     .filter(
-      (l): l is { source: SimNode; target: SimNode; weight: number } =>
-        Boolean(l.source && l.target),
+      (l): l is { source: SimNode; target: SimNode; weight: number; type: LinkType } =>
+        // In community mode the group-hub springs (hub -> members) would fight
+        // the community pull, dragging members back toward their taxonomy hub.
+        Boolean(l.source && l.target) && !(isCommunity && l.type === "core"),
     );
 
   // --- Force simulation (same constants as the old client renderer).
   const N = Math.max(1, nodes.length);
   const charge = 2200 * Math.sqrt(N); // repulsion grows with N
   const gravity = 0.004 + 0.001 * Math.sqrt(N); // pull-to-center grows mildly
+  // Community mode clusters members around their centroid; stronger than the
+  // center gravity so clusters stay coherent, weak enough for the pairwise
+  // repulsion to spread members inside a cluster.
+  const communityGravity = gravity * 4;
   const damp = 0.86;
   const margin = Math.min(80, 60 + N * 0.5);
   // Alpha-based settling (d3-force style): every force scales with `alpha`,
@@ -125,6 +141,24 @@ export function layoutGraph(graph: GraphData, opts: LayoutOptions = {}): GraphDa
       l.source.vy += fy;
       l.target.vx -= fx;
       l.target.vy -= fy;
+    }
+    // Community mode: pull each node toward its community's centroid so the
+    // cluster reads as one blob (the group-hub springs are excluded above).
+    if (isCommunity) {
+      const centroids = new Map<number, { x: number; y: number; n: number }>();
+      for (const n of nodes) {
+        const c = n.community ?? 0;
+        const acc = centroids.get(c) || { x: 0, y: 0, n: 0 };
+        acc.x += n.x;
+        acc.y += n.y;
+        acc.n++;
+        centroids.set(c, acc);
+      }
+      for (const n of nodes) {
+        const acc = centroids.get(n.community ?? 0)!;
+        n.vx += (acc.x / acc.n - n.x) * communityGravity * alpha;
+        n.vy += (acc.y / acc.n - n.y) * communityGravity * alpha;
+      }
     }
     // Center gravity + integration.
     for (const n of nodes) {

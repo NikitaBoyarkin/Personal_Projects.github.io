@@ -4,7 +4,7 @@
 // thin layer that only wires up zoom/pan, cosmetic node drag, hover, search,
 // legend, color/arrow toggles and fullscreen. No fetch, no simulation.
 import { withBase } from '../lib/path';
-import { getGraphData } from '../lib/graph-data';
+import { getGraphLayouts } from '../lib/graph-data';
 import { GRAPH_GROUP_COLORS, type GraphLink, type GraphNode } from '../lib/graph';
 
 interface Props {
@@ -35,10 +35,13 @@ const t = {
   arrowsLabel: isEn ? 'Show link direction' : 'Показать направление ссылок',
 };
 
-// The layout ran at build time, so every node carries a concrete x/y.
-const data = await getGraphData(lang);
-const nodes = data.nodes as (GraphNode & { x: number; y: number })[];
-const links = data.links;
+// Both layouts ran at build time. The SVG ships the group layout (so every
+// node carries a concrete x/y); the community layout is embedded for the
+// client's color toggle, which swaps positions along with the colors.
+const { group, community } = await getGraphLayouts(lang);
+const nodes = group.nodes as (GraphNode & { x: number; y: number })[];
+const communityNodes = community.nodes as (GraphNode & { x: number; y: number })[];
+const links = group.links;
 const nodeById = new Map(nodes.map((n) => [n.id, n]));
 
 // Obsidian-style graph settings (match the vault's graph view).
@@ -80,6 +83,9 @@ function edgeEndpoints(l: GraphLink) {
 const clientData = {
   nodes: nodes.map((n) => ({ ...n, href: withBase(n.url) })),
   links,
+  // Parallel to `nodes`: the community-mode build-time positions, so the
+  // client can swap layouts without running any simulation.
+  communityPos: communityNodes.map((n) => ({ x: n.x, y: n.y })),
 };
 const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
 ---
@@ -165,6 +171,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
 <script>
   import { GRAPH_GROUP_COLORS, GRAPH_COMMUNITY_COLORS, isDirected } from '../lib/graph';
   import { clampZoom, viewBoxOf, zoomAt, panBy, centerOn } from '../lib/graph-zoom';
+  import { decodeGraphState, encodeGraphState } from '../lib/graph-url';
 
   const rootEl = document.getElementById('kg-root');
   const svgEl = document.getElementById('kg-svg');
@@ -181,16 +188,30 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
   let mode: 'group' | 'community' = 'group';
   // Obsidian "Arrows": show link direction on directed edge types.
   let showArrows = false;
-  // Obsidian "Tags" filter: groups hidden via legend checkboxes.
-  let hiddenGroups = new Set<string>();
+  // Obsidian "Tags" filter: per-mode hidden sets (groups in group mode,
+  // communities in community mode), preserved across mode switches.
+  let hiddenGroups = new Set<string | number>();
+  let hiddenCommunities = new Set<string | number>();
+  const hiddenSet = () => (mode === 'community' ? hiddenCommunities : hiddenGroups);
+  const keyOf = (n: any) => (mode === 'community' ? (n.community ?? 0) : n.group);
 
   const nodes: any[] = data.nodes;
   const links: any[] = data.links;
   const nodeById = new Map(nodes.map((n: any) => [n.id, n]));
   const nodeEls = Array.from(svg.querySelectorAll<SVGGElement>('g[tabindex]'));
   const edgeEls = Array.from(svg.querySelectorAll<SVGLineElement>('.kg-edge'));
-  // SSR positions — reset restores these (node drag is cosmetic).
-  const initialPos = nodes.map((n: any) => ({ x: n.x, y: n.y }));
+  // Build-time positions per mode — reset restores these (node drag is
+  // cosmetic). `groupPos` starts where the SSR rendered; `communityPos` is the
+  // second layout embedded in the data blob. `pristine` snapshots both so reset
+  // always returns to the untouched build-time layout, and `posFor` points at
+  // the live array for the current mode.
+  const groupPos = nodes.map((n: any) => ({ x: n.x, y: n.y }));
+  const communityPos: { x: number; y: number }[] = data.communityPos;
+  const pristine = {
+    group: groupPos.map((p: any) => ({ ...p })),
+    community: communityPos.map((p: any) => ({ ...p })),
+  };
+  const posFor = (m: 'group' | 'community') => (m === 'community' ? communityPos : groupPos);
 
   const communities = [...new Set(nodes.map((n: any) => n.community ?? 0))].sort((a, b) => a - b);
   const communityLabels = new Map<number, string>();
@@ -202,6 +223,20 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     mode === 'community'
       ? GRAPH_COMMUNITY_COLORS[(n.community ?? 0) % GRAPH_COMMUNITY_COLORS.length]
       : GRAPH_GROUP_COLORS[n.group] || 'var(--text-muted)';
+
+  /** Move every node onto the current mode's build-time positions and recolor
+   *  (used by the color toggle and by URL restore — the SVG ships the group
+   *  layout, so community mode has to relocate nodes). */
+  function applyModeLayout() {
+    const incoming = posFor(mode);
+    nodes.forEach((n, i) => {
+      n.x = incoming[i].x;
+      n.y = incoming[i].y;
+      nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`);
+      const circle = nodeEls[i].querySelector('circle');
+      if (circle) circle.setAttribute('fill', colorFor(n));
+    });
+  }
 
   // Adjacency for hover highlighting.
   const adjacency = new Map<string, Set<string>>();
@@ -220,10 +255,13 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     const isCommunity = mode === 'community';
     const items = isCommunity
       ? communities.map((c) => ({
-          key: communityLabels.get(c) ?? `#${c}`,
+          key: c,
+          label: communityLabels.get(c) ?? `#${c}`,
           color: GRAPH_COMMUNITY_COLORS[c % GRAPH_COMMUNITY_COLORS.length],
         }))
-      : groupList.map((g) => ({ key: g, color: GRAPH_GROUP_COLORS[g] }));
+      : groupList.map((g) => ({ key: g, label: g, color: GRAPH_GROUP_COLORS[g] }));
+    const hidden = hiddenSet();
+    const total = items.length;
     for (const it of items) {
       const span = document.createElement('span');
       span.className = 'kg-legend-item';
@@ -231,49 +269,62 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
       const i = document.createElement('i');
       i.style.background = it.color;
       span.appendChild(i);
-      if (isCommunity) {
-        span.appendChild(document.createTextNode(it.key));
-      } else {
-        // Obsidian "Tags" filter: checkbox chips show/hide a whole group.
-        const label = document.createElement('label');
-        label.className = 'kg-legend-toggle';
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.checked = !hiddenGroups.has(it.key);
-        cb.setAttribute('aria-label', it.key);
-        cb.addEventListener('change', () => {
-          if (cb.checked) {
-            hiddenGroups.delete(it.key);
-          } else {
-            // Never hide the last visible group — an empty graph is noise.
-            if (hiddenGroups.size + 1 >= groupList.length) {
-              cb.checked = true;
-              return;
-            }
-            hiddenGroups.add(it.key);
+      // Obsidian "Tags" filter: checkbox chips show/hide a whole group
+      // (or community in community mode).
+      const label = document.createElement('label');
+      label.className = 'kg-legend-toggle';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !hidden.has(it.key);
+      cb.setAttribute('aria-label', it.label);
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          hidden.delete(it.key);
+        } else {
+          // Never hide the last visible group — an empty graph is noise.
+          if (hidden.size + 1 >= total) {
+            cb.checked = true;
+            return;
           }
-          applyGroupFilter();
-        });
-        label.appendChild(cb);
-        label.appendChild(document.createTextNode(it.key));
-        span.appendChild(label);
-      }
+          hidden.add(it.key);
+        }
+        applyFilter();
+        syncURL();
+      });
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(it.label));
+      span.appendChild(label);
       legendEl.appendChild(span);
     }
   }
 
-  /** Obsidian "Tags" filter: hide/show whole groups (and their edges). */
-  function applyGroupFilter() {
+  /** Obsidian "Tags" filter: hide/show whole groups (or communities) and their edges. */
+  function applyFilter() {
+    const hidden = hiddenSet();
     nodes.forEach((n, i) => {
-      nodeEls[i].style.display = hiddenGroups.has(n.group) ? 'none' : '';
+      nodeEls[i].style.display = hidden.has(keyOf(n)) ? 'none' : '';
     });
     edgeEls.forEach((e, i) => {
       const l = links[i];
       const s = nodeById.get(l.source);
       const t = nodeById.get(l.target);
       e.style.display =
-        hiddenGroups.has(s?.group) || hiddenGroups.has(t?.group) ? 'none' : '';
+        (s && hidden.has(keyOf(s))) || (t && hidden.has(keyOf(t))) ? 'none' : '';
     });
+  }
+
+  /** Keep the view shareable: mode + hidden sets live in the URL query string,
+   *  updated in place (no history spam) and merged with any existing params. */
+  function syncURL() {
+    const q = encodeGraphState(
+      {
+        mode,
+        hiddenGroups: [...hiddenGroups] as string[],
+        hiddenCommunities: [...hiddenCommunities].map(Number),
+      },
+      window.location.search,
+    );
+    history.replaceState(null, '', `${window.location.pathname}${q}${window.location.hash}`);
   }
 
   // --- Viewport ---
@@ -379,11 +430,13 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
       const dx = p.x - (dragStart?.x ?? p.x);
       const dy = p.y - (dragStart?.y ?? p.y);
       if (dx * dx + dy * dy > 9) moved = true;
-      // Cosmetic drag: move the node and remember the position so search
-      // centers on where the user actually put it.
+      // Cosmetic drag: move the node and remember the position (in the active
+      // mode's layout) so search centers on where the user actually put it.
       dragging.x = p.x;
       dragging.y = p.y;
-      const g = nodeEls[nodes.indexOf(dragging)];
+      const di = nodes.indexOf(dragging);
+      if (di >= 0) posFor(mode)[di] = { x: p.x, y: p.y };
+      const g = nodeEls[di];
       if (g) g.setAttribute('transform', `translate(${p.x},${p.y})`);
       return;
     }
@@ -523,11 +576,14 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
   function centerOnNode(id: string) {
     const n = nodes.find((x) => x.id === id);
     if (!n) return;
-    // Un-hide the node's group so a search hit is always visible.
-    if (hiddenGroups.has(n.group)) {
-      hiddenGroups.delete(n.group);
+    // Un-hide the node's group/community so a search hit is always visible.
+    const hidden = hiddenSet();
+    const key = keyOf(n);
+    if (hidden.has(key)) {
+      hidden.delete(key);
       renderLegend();
-      applyGroupFilter();
+      applyFilter();
+      syncURL();
     }
     // Recenter the viewport on the node's current position with a comfortable zoom.
     vp = centerOn(vp, { x: n.x, y: n.y }, Math.max(1.5, vp.k), world);
@@ -604,12 +660,16 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
         applyViewport();
       } else if (action === 'reset') {
         resetViewport();
-        // Restore the SSR layout positions (drag is cosmetic).
+        // Restore the active mode's untouched build-time positions (drag is
+        // cosmetic); the other mode's layout is left alone but stays pristine.
+        const pristinePos = pristine[mode];
         nodes.forEach((n, i) => {
-          n.x = initialPos[i].x;
-          n.y = initialPos[i].y;
+          n.x = pristinePos[i].x;
+          n.y = pristinePos[i].y;
           nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`);
         });
+        const live = posFor(mode);
+        for (let i = 0; i < live.length; i++) live[i] = { ...pristinePos[i] };
       } else if (action === 'fullscreen') {
         toggleFullscreen();
       } else if (action === 'toggle-color') {
@@ -618,15 +678,12 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
         btn.setAttribute('aria-pressed', String(isCommunity));
         btn.textContent = isCommunity ? btn.dataset.labelCommunity! : btn.dataset.labelGroup!;
         btn.title = btn.textContent;
-        // Community mode has no group chips — reset the filter so nothing
-        // stays hidden when switching back.
-        hiddenGroups.clear();
-        nodes.forEach((n, i) => {
-          const circle = nodeEls[i].querySelector('circle');
-          if (circle) circle.setAttribute('fill', colorFor(n));
-        });
+        // Each mode has its own build-time layout and its own filter, so the
+        // switch swaps in the incoming mode's positions, colors and hidden set.
+        applyModeLayout();
         renderLegend();
-        applyGroupFilter();
+        applyFilter();
+        syncURL();
       } else if (action === 'toggle-arrows') {
         showArrows = !showArrows;
         btn.setAttribute('aria-pressed', String(showArrows));
@@ -685,8 +742,24 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     }
   });
 
-  // --- Init: the SVG is already server-rendered; just wire up the viewport ---
+  // --- Init: restore any shared/URL state (the SVG ships the group layout;
+  // community mode repositions nodes and recolors), then wire up the viewport.
+  const urlState = decodeGraphState(window.location.search);
+  mode = urlState.mode;
+  hiddenGroups = new Set(urlState.hiddenGroups);
+  hiddenCommunities = new Set(urlState.hiddenCommunities);
+  const restoredCommunity = mode === 'community';
+  const colorBtn = root.querySelector<HTMLButtonElement>('[data-kg-action="toggle-color"]');
+  if (colorBtn) {
+    colorBtn.setAttribute('aria-pressed', String(restoredCommunity));
+    colorBtn.textContent = restoredCommunity
+      ? colorBtn.dataset.labelCommunity!
+      : colorBtn.dataset.labelGroup!;
+    colorBtn.title = colorBtn.textContent;
+  }
+  if (restoredCommunity) applyModeLayout();
   renderLegend();
+  applyFilter();
   resetViewport();
 </script>
 
