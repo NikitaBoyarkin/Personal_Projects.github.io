@@ -79,14 +79,11 @@ const t = {
   const TEXT_FADE_THRESHOLD = 0.0; // 0.00 → labels always visible, never fade on zoom
   const NODE_SIZE = 1.06;         // node radius multiplier
   const LINK_THICKNESS = 0.1;     // link width multiplier (hairline links)
-  // Cores (the "00" hub nodes) anchor the layout: each is pulled to its own
-  // target near the center, and its members cluster around it via weight-1
-  // edges. Targets are symmetric around the world center.
-  const coreTargets = (w: { w: number; h: number }): Record<string, { x: number; y: number }> => ({
-    'core:projects': { x: w.w * 0.35, y: w.h * 0.5 },
-    'core:posts': { x: w.w * 0.65, y: w.h * 0.5 },
-  });
+  // Single center: the whole graph pools around the world center — no
+  // left/right split between projects and posts. Cores are still pulled
+  // much harder than regular nodes so they sit at the hub of the graph.
   const CORE_GRAVITY = 5;
+  const isCore = (id: string) => id.startsWith('core:');
 
   const rootEl = document.getElementById('kg-root');
   const svgEl = document.getElementById('kg-svg');
@@ -283,15 +280,14 @@ const t = {
         n.y = gy + Math.sin(a) * r;
       });
     });
-    // Cores start at their gravity targets so the simulation refines a
-    // hub-and-spoke layout instead of dragging them in from the ring.
-    const targets = coreTargets(world);
+    // Cores start at the center so the layout refines as a hub-and-spoke;
+    // a small ring keeps the two cores from overlapping at rest.
+    let coreI = 0;
     nodes.forEach((n) => {
-      const t = targets[n.id];
-      if (t) {
-        n.x = t.x;
-        n.y = t.y;
-      }
+      if (!isCore(n.id)) return;
+      const a = (coreI++ / 2) * 2 * Math.PI;
+      n.x = world.w / 2 + Math.cos(a) * 42;
+      n.y = world.h / 2 + Math.sin(a) * 42;
     });
     const idx = new Map(nodes.map((n) => [n.id, n]));
     links = data.links
@@ -391,16 +387,16 @@ const t = {
     const groupKeys = Object.keys(groups);
     const radius = Math.min(world.w, world.h) * 0.38;
     const pos: Record<string, { x: number; y: number }> = {};
-    const targets = coreTargets(world);
+    let coreI = 0;
     groupKeys.forEach((gk, gi) => {
       const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
       const gx = cx + Math.cos(ga) * radius;
       const gy = cy + Math.sin(ga) * radius;
       groups[gk].forEach((n, ni) => {
-        // Cores sit at their gravity targets (center anchors), not on the ring.
-        const t = targets[n.id];
-        if (t) {
-          pos[n.id] = { x: t.x, y: t.y };
+        // Cores start at the single center, not on the group ring.
+        if (isCore(n.id)) {
+          const ca = (coreI++ / 2) * 2 * Math.PI;
+          pos[n.id] = { x: cx + Math.cos(ca) * 42, y: cy + Math.sin(ca) * 42 };
           return;
         }
         const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
@@ -429,7 +425,6 @@ const t = {
 
   function renderForce(data: any) {
     rebuild(data);
-    const targets = coreTargets(world);
 
     // Scale simulation constants with node count so the layout stays sparse
     // and readable whether the graph has 10 or 200 nodes.
@@ -470,14 +465,11 @@ const t = {
       });
       nodes.forEach((n) => {
         if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
-        // Cores are pulled to their own targets (near the center) much more
-        // strongly than regular nodes, so they anchor their group's cluster.
-        const t = targets[n.id];
-        const gx = t ? t.x : world.w / 2;
-        const gy = t ? t.y : world.h / 2;
-        const g = t ? gravity * CORE_GRAVITY : gravity;
-        n.vx += (gx - n.x) * g * alpha;
-        n.vy += (gy - n.y) * g * alpha;
+        // Cores are pulled toward the single center much more strongly than
+        // regular nodes, so they sit at the hub of the whole graph.
+        const g = isCore(n.id) ? gravity * CORE_GRAVITY : gravity;
+        n.vx += (world.w / 2 - n.x) * g * alpha;
+        n.vy += (world.h / 2 - n.y) * g * alpha;
         n.vx *= damp; n.vy *= damp;
         n.x += n.vx; n.y += n.vy;
         n.x = Math.max(margin, Math.min(world.w - margin, n.x));
