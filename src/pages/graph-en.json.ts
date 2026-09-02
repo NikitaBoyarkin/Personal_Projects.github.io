@@ -4,20 +4,10 @@
 // untranslated posts appear with their RU title and link to the RU page.
 // Emitted at /graph-en.json.
 import type { APIContext } from "astro";
-import { getCollection } from "astro:content";
-import { buildGraph, mergePostsForLocale } from "../lib/graph";
-import { TOPICS } from "../lib/topics";
+import { getGraphData } from "../lib/graph-data";
 
 export async function GET(_context: APIContext) {
-  const [projects, postsEn, parts, postsRu] = await Promise.all([
-    getCollection("projects-en", (p) => !p.data.draft),
-    getCollection("posts-en", (p) => !p.data.draft),
-    getCollection("volta-parts-en", (p) => !p.data.draft),
-    getCollection("posts", (p) => !p.data.draft),
-  ]);
-
-  const posts = mergePostsForLocale(postsRu, postsEn);
-  const data = buildGraph({ projects, posts, parts, topics: TOPICS, lang: "en" });
+  const data = await getGraphData("en");
 
   return new Response(JSON.stringify(data), {
     headers: { "content-type": "application/json" },

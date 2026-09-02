@@ -14,17 +14,31 @@ import { withBase } from '../../lib/path';
 >
   <section class="container reveal">
     <h1 class="page-title">Content graph</h1>
-    <p style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 64ch;">
+    <p class="graph-intro">
       The portfolio's content graph: projects, posts, topics and the Volta modules, linked by actual
-      references (<code>related</code>, tags, Volta's composition). Node color = project track or post
-      category; a button switches to community — clusters the algorithm finds on top of the taxonomy.
-      Node size = connection count (hubs are bigger), edge thickness = link strength, solid edges = explicit
-      links, dashed edges = thematic and lateral (shared topics/tags/tools). The "Arrows" button shows link
-      direction; legend checkboxes hide groups. Built from the content collections at
-      build time, so it is always current.
-      Mouse wheel — zoom, drag — pan (on the canvas) and move nodes, double-click restarts the
-      simulation, the ⛶ button toggles fullscreen.
+      references (<code>related</code>, tags, Volta's composition).
     </p>
+
+    <dl class="graph-legend">
+      <div class="graph-legend-item">
+        <dt>Color</dt>
+        <dd>project track or post category; the button switches to community</dd>
+      </div>
+      <div class="graph-legend-item">
+        <dt>Size</dt>
+        <dd>connection count — hubs are bigger</dd>
+      </div>
+      <div class="graph-legend-item">
+        <dt>Edges</dt>
+        <dd>thickness — link strength; solid — explicit links, dashed — thematic and lateral</dd>
+      </div>
+      <div class="graph-legend-item">
+        <dt>Controls</dt>
+        <dd>Arrows — link direction; checkboxes — hide groups; wheel — zoom; drag — pan and move nodes; ⛶ — fullscreen</dd>
+      </div>
+    </dl>
+
+    <p class="graph-note">Built from the content collections at build time — always current.</p>
 
     <KnowledgeGraph lang="en" />
 

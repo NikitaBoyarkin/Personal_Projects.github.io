@@ -2547,3 +2547,48 @@ button:focus-visible {
 .kanban-column .project .project-grip:active {
   cursor: grabbing;
 }
+
+/* Knowledge graph page: intro + legend grid under the heading. */
+.graph-intro {
+  color: var(--text-muted);
+  margin-bottom: var(--space-6);
+  max-width: 64ch;
+}
+
+.graph-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-8);
+  margin: 0 0 var(--space-8);
+  max-width: 76ch;
+}
+
+.graph-legend-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.graph-legend-item dt {
+  font-weight: 600;
+  color: var(--text-normal);
+  white-space: nowrap;
+}
+
+.graph-legend-item dd {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.graph-note {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-8);
+}
+
+@media (max-width: 640px) {
+  .graph-legend {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,21 +1,17 @@
 ---
-// Dependency-free force-directed knowledge graph island.
-// Reads graph.json / graph-en.json (base-path aware via data-src) and renders
-// an SVG simulation. Fullscreen toggle + wheel/pinch zoom + drag pan/zoom.
-// Nodes are clickable (navigate to their page); hover highlights neighbors.
-// Edge weight (0..1) drives spring length; edge type drives line style.
-// Starts when scrolled into view; honors prefers-reduced-motion (static radial).
+// Server-rendered knowledge graph. The force layout runs at build time
+// (src/lib/graph-layout.ts) so the SVG ships static; the client script is a
+// thin layer that only wires up zoom/pan, cosmetic node drag, hover, search,
+// legend, color/arrow toggles and fullscreen. No fetch, no simulation.
 import { withBase } from '../lib/path';
+import { getGraphData } from '../lib/graph-data';
+import { GRAPH_GROUP_COLORS, type GraphLink, type GraphNode } from '../lib/graph';
 
 interface Props {
   lang?: 'ru' | 'en';
 }
 const { lang = 'ru' } = Astro.props;
 const isEn = lang === 'en';
-const caption =
-  isEn
-    ? 'Content graph of the portfolio: projects, posts, topics and the Volta modules, linked by actual references. Built from the content collections at build time.'
-    : 'Граф контента портфолио: проекты, записи, темы и модули Volta, связанные реальными ссылками. Собирается из коллекций контента на build-time.';
 const ariaLabel = isEn
   ? 'Knowledge graph of portfolio content'
   : 'Граф контента портфолио';
@@ -38,9 +34,57 @@ const t = {
   arrows: isEn ? 'Arrows' : 'Стрелки',
   arrowsLabel: isEn ? 'Show link direction' : 'Показать направление ссылок',
 };
+
+// The layout ran at build time, so every node carries a concrete x/y.
+const data = await getGraphData(lang);
+const nodes = data.nodes as (GraphNode & { x: number; y: number })[];
+const links = data.links;
+const nodeById = new Map(nodes.map((n) => [n.id, n]));
+
+// Obsidian-style graph settings (match the vault's graph view).
+const NODE_SIZE = 1.06;         // node radius multiplier
+const LINK_THICKNESS = 0.1;     // link width multiplier (hairline links)
+
+const EDGE_STYLE: Record<string, string> = {
+  related: '',
+  children: '',
+  topic: '6 4',
+  shared: '2 3',
+  core: '',
+};
+const EDGE_COLOR: Record<string, string> = {
+  related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
+  children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
+  // Thematic and hub edges are deliberately faint — they carry the layout
+  // but shouldn't compete with the explicit related links for attention.
+  topic: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
+  shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
+  core: 'color-mix(in srgb, var(--text-accent) 25%, transparent)',
+};
+
+/** Stop each line at the target's edge so arrowheads (and lines) don't hide
+ *  under the node circle. */
+function edgeEndpoints(l: GraphLink) {
+  const a = nodeById.get(l.source);
+  const b = nodeById.get(l.target);
+  if (!a || !b) return null;
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const d = Math.sqrt(dx * dx + dy * dy) || 1;
+  const r = (b.size || 6) + 2;
+  return { x1: a.x, y1: a.y, x2: b.x - (dx / d) * r, y2: b.y - (dy / d) * r };
+}
+
+// Client data: nodes get an absolute href (base-prefixed) for navigation; the
+// rest is the raw graph so search/legend/hover can read it from the DOM.
+const clientData = {
+  nodes: nodes.map((n) => ({ ...n, href: withBase(n.url) })),
+  links,
+};
+const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
 ---
 
-<div id="kg-root" class="kg-root" data-src={withBase(isEn ? 'graph-en.json' : 'graph.json')} data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'} data-search-reset={isEn ? 'Clear search' : 'Очистить поиск'}>
+<div id="kg-root" class="kg-root" data-search-empty={isEn ? 'No matches' : 'Ничего не найдено'} data-search-reset={isEn ? 'Clear search' : 'Очистить поиск'}>
   <div class="kg-topbar">
     <div class="kg-search" role="search">
       <input
@@ -67,35 +111,71 @@ const t = {
       <button type="button" class="kg-btn" data-kg-action="fullscreen" aria-label={t.fullscreen} title={t.fullscreen} data-label-fs={t.fullscreen} data-label-fs-exit={t.fullscreenExit}>⛶</button>
     </div>
   </div>
-  <svg id="kg-svg" class="kg-svg" role="img" aria-label={ariaLabel}></svg>
-  <p class="kg-caption">{caption}</p>
+  <svg id="kg-svg" class="kg-svg" viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label={ariaLabel}>
+    <defs>
+      <marker id="kg-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"></path>
+      </marker>
+    </defs>
+    <g class="kg-edges">
+      {links.map((l) => {
+        const e = edgeEndpoints(l);
+        if (!e) return null;
+        const dash = EDGE_STYLE[l.type];
+        return (
+          <line
+            class="kg-edge"
+            x1={e.x1}
+            y1={e.y1}
+            x2={e.x2}
+            y2={e.y2}
+            stroke={EDGE_COLOR[l.type] || EDGE_COLOR.related}
+            stroke-dasharray={dash || undefined}
+            style={`stroke-width:${LINK_THICKNESS * (0.6 + 1.6 * (l.weight || 1)) + 0.4}`}
+          />
+        );
+      })}
+    </g>
+    <g class="kg-nodes">
+      {nodes.map((n) => {
+        const r = (n.size || 6) * NODE_SIZE;
+        // Post labels are hover/focus-only: with ~50 nodes always-on labels
+        // read as a text cloud. Projects, topics, cores and Volta parts stay
+        // labeled — they're the graph's anchors.
+        const labelClass = n.id.startsWith('post:') ? 'kg-label kg-label-hover' : 'kg-label';
+        return (
+          <g
+            tabindex="0"
+            role="link"
+            aria-label={n.label}
+            transform={`translate(${n.x},${n.y})`}
+            style="cursor:pointer"
+          >
+            <circle r={r} fill={GRAPH_GROUP_COLORS[n.group] || 'var(--text-muted)'} />
+            <text x={r + 6} y="4" class={labelClass}>{n.label}</text>
+          </g>
+        );
+      })}
+    </g>
+  </svg>
 </div>
+
+<script is:inline type="application/json" id="kg-data" set:html={json}></script>
 
 <script>
   import { GRAPH_GROUP_COLORS, GRAPH_COMMUNITY_COLORS, isDirected } from '../lib/graph';
   import { clampZoom, viewBoxOf, zoomAt, panBy, centerOn } from '../lib/graph-zoom';
 
-  // Obsidian-style graph settings (match the vault's graph view).
-  const TEXT_FADE_THRESHOLD = 0.0; // 0.00 → labels always visible, never fade on zoom
-  const NODE_SIZE = 1.06;         // node radius multiplier
-  const LINK_THICKNESS = 0.1;     // link width multiplier (hairline links)
-  // Single center: the whole graph pools around the world center — no
-  // left/right split between projects and posts. Cores are still pulled
-  // much harder than regular nodes so they sit at the hub of the graph.
-  const CORE_GRAVITY = 5;
-  const isCore = (id: string) => id.startsWith('core:');
-
   const rootEl = document.getElementById('kg-root');
   const svgEl = document.getElementById('kg-svg');
-  const src = rootEl?.dataset.src;
-  if (!rootEl || !svgEl || !src) throw new Error('kg-root / kg-svg not found');
+  const dataEl = document.getElementById('kg-data');
+  if (!rootEl || !svgEl || !dataEl) throw new Error('kg-root / kg-svg / kg-data not found');
   const root = rootEl as HTMLElement;
   const svg = svgEl as unknown as SVGSVGElement;
-  // Obsidian "Text fade threshold" 0.00 → labels always visible. The CSS
-  // reads this custom property: opacity = 1 - threshold.
-  svg.style.setProperty('--kg-text-fade', String(TEXT_FADE_THRESHOLD));
+  const data = JSON.parse(dataEl.textContent || '{}');
 
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // World size must match the SSR viewBox (see the template above).
+  const world = { w: 900, h: 560 };
   const groupList = Object.keys(GRAPH_GROUP_COLORS);
   // Color mode: fixed track/category taxonomy vs emergent communities.
   let mode: 'group' | 'community' = 'group';
@@ -103,12 +183,36 @@ const t = {
   let showArrows = false;
   // Obsidian "Tags" filter: groups hidden via legend checkboxes.
   let hiddenGroups = new Set<string>();
-  let communities: number[] = [];
-  let communityLabels = new Map<number, string>();
+
+  const nodes: any[] = data.nodes;
+  const links: any[] = data.links;
+  const nodeById = new Map(nodes.map((n: any) => [n.id, n]));
+  const nodeEls = Array.from(svg.querySelectorAll<SVGGElement>('g[tabindex]'));
+  const edgeEls = Array.from(svg.querySelectorAll<SVGLineElement>('.kg-edge'));
+  // SSR positions — reset restores these (node drag is cosmetic).
+  const initialPos = nodes.map((n: any) => ({ x: n.x, y: n.y }));
+
+  const communities = [...new Set(nodes.map((n: any) => n.community ?? 0))].sort((a, b) => a - b);
+  const communityLabels = new Map<number, string>();
+  for (const n of nodes) {
+    const c = n.community ?? 0;
+    if (!communityLabels.has(c)) communityLabels.set(c, n.communityLabel ?? `#${c}`);
+  }
   const colorFor = (n: any) =>
     mode === 'community'
       ? GRAPH_COMMUNITY_COLORS[(n.community ?? 0) % GRAPH_COMMUNITY_COLORS.length]
       : GRAPH_GROUP_COLORS[n.group] || 'var(--text-muted)';
+
+  // Adjacency for hover highlighting.
+  const adjacency = new Map<string, Set<string>>();
+  for (const l of links) {
+    if (!adjacency.has(l.source)) adjacency.set(l.source, new Set());
+    if (!adjacency.has(l.target)) adjacency.set(l.target, new Set());
+    adjacency.get(l.source)!.add(l.target);
+    adjacency.get(l.target)!.add(l.source);
+  }
+
+  // --- Legend ---
   const legendEl = document.getElementById('kg-legend') as HTMLDivElement | null;
   function renderLegend() {
     if (!legendEl) return;
@@ -163,34 +267,17 @@ const t = {
     nodes.forEach((n, i) => {
       nodeEls[i].style.display = hiddenGroups.has(n.group) ? 'none' : '';
     });
-    edges.forEach((e, i) => {
+    edgeEls.forEach((e, i) => {
       const l = links[i];
+      const s = nodeById.get(l.source);
+      const t = nodeById.get(l.target);
       e.style.display =
-        hiddenGroups.has(l.source.group) || hiddenGroups.has(l.target.group) ? 'none' : '';
+        hiddenGroups.has(s?.group) || hiddenGroups.has(t?.group) ? 'none' : '';
     });
   }
-  const NS = 'http://www.w3.org/2000/svg';
-  const el = (name: string) => document.createElementNS(NS, name);
-  // Base path derived from the data URL (e.g. /Personal_Projects.github.io/graph.json).
-  const base = src.slice(0, src.lastIndexOf('/')) + '/';
 
-  let world = { w: 600, h: 460 };
+  // --- Viewport ---
   let vp = { x: 0, y: 0, k: 1 };
-  let nodes: any[] = [];
-  let nodeEls: SVGGElement[] = [];
-  let links: { source: any; target: any; weight: number; type: string }[] = [];
-  let edges: SVGLineElement[] = [];
-  let running = false;
-  let frames = 0;
-  let restart: (() => void) | null = null;
-  let dragging: any = null;
-  let dragStart: { x: number; y: number } | null = null;
-  let moved = false;
-  let hoveredId: string | null = null;
-  let panning: { startX: number; startY: number; vpX: number; vpY: number } | null = null;
-  let pinch: { startDist: number; vp0: typeof vp; mid0: { x: number; y: number } } | null = null;
-  const pointers = new Map<number, { x: number; y: number }>();
-
   function applyViewport() {
     const vb = viewBoxOf(vp, world);
     svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`);
@@ -209,153 +296,12 @@ const t = {
     return { x: pt.x, y: pt.y };
   }
 
-  const EDGE_STYLE: Record<string, string> = {
-    related: '',
-    children: '',
-    topic: '6 4',
-    shared: '2 3',
-    core: '',
-  };
-  const EDGE_COLOR: Record<string, string> = {
-    related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
-    children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
-    // Thematic and hub edges are deliberately faint — they carry the layout
-    // but shouldn't compete with the explicit related links for attention.
-    topic: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
-    shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
-    core: 'color-mix(in srgb, var(--text-accent) 25%, transparent)',
-  };
-
-  function rebuild(data: any) {
-    svg.replaceChildren();
-    world = { w: svg.clientWidth || 600, h: 460 };
-
-    // Arrowhead marker for directed edges (Obsidian "Arrows" display option).
-    const defs = el('defs');
-    const marker = el('marker');
-    marker.setAttribute('id', 'kg-arrow');
-    marker.setAttribute('viewBox', '0 0 10 10');
-    marker.setAttribute('refX', '8');
-    marker.setAttribute('refY', '5');
-    marker.setAttribute('markerWidth', '6');
-    marker.setAttribute('markerHeight', '6');
-    // Constant arrowhead size regardless of edge stroke-width (the default
-    // markerUnits="strokeWidth" would scale arrows with link thickness).
-    marker.setAttribute('markerUnits', 'userSpaceOnUse');
-    marker.setAttribute('orient', 'auto-start-reverse');
-    const arrowPath = el('path');
-    arrowPath.setAttribute('d', 'M 0 0 L 10 5 L 0 10 z');
-    arrowPath.setAttribute('fill', 'var(--text-muted)');
-    marker.appendChild(arrowPath);
-    defs.appendChild(marker);
-    svg.appendChild(defs);
-
-    nodes = data.nodes.map((n: any) => ({
-      ...n,
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-    }));
-    // Initial positions: ring per group around the center (same idea as the
-    // reduced-motion radial layout below). The force simulation then only has
-    // to refine a near-converged layout instead of pulling a random scatter
-    // together — which is what made it run ~15s and visibly shake.
-    const groups: Record<string, any[]> = {};
-    nodes.forEach((n) => {
-      (groups[n.group] = groups[n.group] || []).push(n);
-    });
-    const groupKeys = Object.keys(groups);
-    const cx = world.w / 2;
-    const cy = world.h / 2;
-    const ringRadius = Math.min(world.w, world.h) * 0.35;
-    groupKeys.forEach((gk, gi) => {
-      const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
-      const gx = cx + Math.cos(ga) * ringRadius;
-      const gy = cy + Math.sin(ga) * ringRadius;
-      groups[gk].forEach((n, ni) => {
-        const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
-        const r = 30 + ni * 10;
-        n.x = gx + Math.cos(a) * r;
-        n.y = gy + Math.sin(a) * r;
-      });
-    });
-    // Cores start at the center so the layout refines as a hub-and-spoke;
-    // a small ring keeps the two cores from overlapping at rest.
-    let coreI = 0;
-    nodes.forEach((n) => {
-      if (!isCore(n.id)) return;
-      const a = (coreI++ / 2) * 2 * Math.PI;
-      n.x = world.w / 2 + Math.cos(a) * 42;
-      n.y = world.h / 2 + Math.sin(a) * 42;
-    });
-    const idx = new Map(nodes.map((n) => [n.id, n]));
-    links = data.links
-      .map((l: any) => ({
-        source: idx.get(l.source),
-        target: idx.get(l.target),
-        weight: typeof l.weight === 'number' ? l.weight : 1,
-        type: l.type || 'related',
-      }))
-      .filter((l: any) => l.source && l.target);
-
-    const edgeLayer = el('g');
-    svg.appendChild(edgeLayer);
-    edges = links.map((l) => {
-      const line = el('line');
-      line.setAttribute('class', 'kg-edge');
-      line.setAttribute('stroke', EDGE_COLOR[l.type] || EDGE_COLOR.related);
-      const dash = EDGE_STYLE[l.type];
-      if (dash) line.setAttribute('stroke-dasharray', dash);
-      // Obsidian "Link thickness": 0.10 multiplier on the base width → hairline
-      // links. A small additive floor keeps sub-pixel strokes visible on
-      // low-DPI screens while preserving the weight gradient.
-      line.style.strokeWidth = String(LINK_THICKNESS * (0.6 + 1.6 * (l.weight || 1)) + 0.4);
-      if (showArrows && isDirected(l.type)) {
-        line.setAttribute('marker-end', 'url(#kg-arrow)');
-      }
-      edgeLayer.appendChild(line);
-      return line as SVGLineElement;
-    });
-
-    const nodeLayer = el('g');
-    svg.appendChild(nodeLayer);
-    nodeEls = nodes.map((n) => {
-      const g = el('g');
-      g.setAttribute('tabindex', '0');
-      g.setAttribute('role', 'link');
-      g.setAttribute('aria-label', n.label);
-      g.style.cursor = 'pointer';
-      // Obsidian "Node size": 1.06 multiplier on the hub-scaled radius.
-      const r = (n.size || 6) * NODE_SIZE;
-      const c = el('circle');
-      c.setAttribute('r', String(r));
-      c.setAttribute('fill', colorFor(n));
-      const txt = el('text');
-      txt.setAttribute('x', String(r + 6));
-      txt.setAttribute('y', '4');
-      txt.setAttribute('class', 'kg-label');
-      // Post labels are hover/focus-only: with ~50 nodes always-on labels
-      // read as a text cloud. Projects, topics, cores and Volta parts stay
-      // labeled — they're the graph's anchors.
-      if (n.id.startsWith('post:')) txt.classList.add('kg-label-hover');
-      txt.textContent = n.label;
-      g.appendChild(c);
-      g.appendChild(txt);
-      nodeLayer.appendChild(g);
-      return g as SVGGElement;
-    });
-
-    resetViewport();
-  }
-
   // --- Hover: highlight neighbors; the label appears via CSS on hover/focus ---
-  const adjacency = new Map<string, Set<string>>();
-
+  let hoveredId: string | null = null;
   function clearHighlight() {
     hoveredId = null;
     nodes.forEach((_, i) => nodeEls[i].style.opacity = '');
-    edges.forEach((e) => (e.style.opacity = ''));
+    edgeEls.forEach((e) => (e.style.opacity = ''));
   }
 
   function highlight(id: string) {
@@ -364,155 +310,25 @@ const t = {
     nodes.forEach((n, i) => {
       nodeEls[i].style.opacity = neighbors.has(n.id) ? '1' : '0.12';
     });
-    edges.forEach((e, i) => {
+    edgeEls.forEach((e, i) => {
       const l = links[i];
-      const on = l.source.id === id || l.target.id === id;
+      const on = l.source === id || l.target === id;
       e.style.opacity = on ? String(Math.min(1, (l.weight || 1) * 0.9 + 0.2)) : '0.05';
     });
   }
 
   function navigateTo(n: any) {
-    if (n?.url) window.location.href = `${base}${n.url}`;
+    if (n?.href) window.location.href = n.href;
   }
-
-  function renderStatic(data: any) {
-    rebuild(data);
-    // Radial layout by group, centered.
-    const groups: Record<string, any[]> = {};
-    nodes.forEach((n) => {
-      (groups[n.group] = groups[n.group] || []).push(n);
-    });
-    const cx = world.w / 2;
-    const cy = world.h / 2;
-    const groupKeys = Object.keys(groups);
-    const radius = Math.min(world.w, world.h) * 0.38;
-    const pos: Record<string, { x: number; y: number }> = {};
-    let coreI = 0;
-    groupKeys.forEach((gk, gi) => {
-      const ga = (groupKeys.length === 1 ? 0 : (gi / groupKeys.length) * 2 * Math.PI) - Math.PI / 2;
-      const gx = cx + Math.cos(ga) * radius;
-      const gy = cy + Math.sin(ga) * radius;
-      groups[gk].forEach((n, ni) => {
-        // Cores start at the single center, not on the group ring.
-        if (isCore(n.id)) {
-          const ca = (coreI++ / 2) * 2 * Math.PI;
-          pos[n.id] = { x: cx + Math.cos(ca) * 42, y: cy + Math.sin(ca) * 42 };
-          return;
-        }
-        const a = (ni / Math.max(1, groups[gk].length)) * 2 * Math.PI;
-        const r = 34 + ni * 12;
-        pos[n.id] = { x: gx + Math.cos(a) * r, y: gy + Math.sin(a) * r };
-      });
-    });
-    links.forEach((l, i) => {
-      const a = pos[l.source.id], b = pos[l.target.id];
-      if (!a || !b) return;
-      const dx = b.x - a.x, dy = b.y - a.y;
-      const d = Math.sqrt(dx * dx + dy * dy) || 1;
-      // Stop the line at the target's edge so arrowheads (and lines) don't
-      // hide under the node circle.
-      const r = (l.target.size || 6) + 2;
-      edges[i].setAttribute('x1', String(a.x));
-      edges[i].setAttribute('y1', String(a.y));
-      edges[i].setAttribute('x2', String(b.x - (dx / d) * r));
-      edges[i].setAttribute('y2', String(b.y - (dy / d) * r));
-    });
-    nodes.forEach((n, i) => {
-      const p = pos[n.id];
-      if (p) nodeEls[i].setAttribute('transform', `translate(${p.x},${p.y})`);
-    });
-  }
-
-  function renderForce(data: any) {
-    rebuild(data);
-
-    // Scale simulation constants with node count so the layout stays sparse
-    // and readable whether the graph has 10 or 200 nodes.
-    const N = Math.max(1, nodes.length);
-    const charge = 2200 * Math.sqrt(N);          // repulsion grows with N
-    const gravity = 0.004 + 0.001 * Math.sqrt(N); // pull-to-center grows mildly
-    const damp = 0.86;
-    const margin = Math.min(80, 60 + N * 0.5);
-    // Alpha-based settling (d3-force style): every force scales with `alpha`,
-    // which decays exponentially each tick, so the layout converges and stops
-    // on its own (~2–3s) instead of running a fixed frame count and shaking.
-    const alphaDecay = Math.max(0.015, 0.03 - 0.001 * Math.sqrt(N));
-    const alphaMin = 0.01;
-    const maxFrames = Math.max(400, N * 10);      // safety cap; alpha stops first
-    let alpha = 1;
-
-    function tick() {
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const a = nodes[i], b = nodes[j];
-          let dx = a.x - b.x, dy = a.y - b.y;
-          let d2 = dx * dx + dy * dy || 1;
-          let d = Math.sqrt(d2);
-          const f = (charge / d2) * alpha;
-          a.vx += (dx / d) * f; a.vy += (dy / d) * f;
-          b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
-        }
-      }
-      links.forEach((l) => {
-        const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        // Stronger edges pull closer: ideal length shrinks with weight.
-        const ideal = 60 + 80 * (1 - (l.weight || 1));
-        const f = (d - ideal) * 0.04 * (0.5 + 0.5 * (l.weight || 1)) * alpha;
-        const fx = (dx / d) * f, fy = (dy / d) * f;
-        l.source.vx += fx; l.source.vy += fy;
-        l.target.vx -= fx; l.target.vy -= fy;
-      });
-      nodes.forEach((n) => {
-        if (n.fx != null) { n.x = n.fx; n.y = n.fy; n.vx = 0; n.vy = 0; return; }
-        // Cores are pulled toward the single center much more strongly than
-        // regular nodes, so they sit at the hub of the whole graph.
-        const g = isCore(n.id) ? gravity * CORE_GRAVITY : gravity;
-        n.vx += (world.w / 2 - n.x) * g * alpha;
-        n.vy += (world.h / 2 - n.y) * g * alpha;
-        n.vx *= damp; n.vy *= damp;
-        n.x += n.vx; n.y += n.vy;
-        n.x = Math.max(margin, Math.min(world.w - margin, n.x));
-        n.y = Math.max(margin, Math.min(world.h - margin, n.y));
-      });
-      links.forEach((l, i) => {
-        const dx = l.target.x - l.source.x, dy = l.target.y - l.source.y;
-        const d = Math.sqrt(dx * dx + dy * dy) || 1;
-        // Stop the line at the target's edge so arrowheads (and lines) don't
-        // hide under the node circle.
-        const r = (l.target.size || 6) + 2;
-        edges[i].setAttribute('x1', String(l.source.x));
-        edges[i].setAttribute('y1', String(l.source.y));
-        edges[i].setAttribute('x2', String(l.target.x - (dx / d) * r));
-        edges[i].setAttribute('y2', String(l.target.y - (dy / d) * r));
-      });
-      nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
-    }
-
-    function loop() {
-      if (!running) return;
-      tick();
-      frames++;
-      alpha *= 1 - alphaDecay;  // exponential decay → natural settle
-      if (alpha < alphaMin || frames > maxFrames) running = false;
-      requestAnimationFrame(loop);
-    }
-
-    restart = () => {
-      running = true;
-      frames = 0;
-      alpha = 1;
-      loop();
-    };
-    restart();
-  }
-
-  svg.addEventListener('dblclick', () => {
-    if (reduced || !restart) return;
-    restart();
-  });
 
   // --- Pointer handling: node drag (click = navigate), canvas pan, pinch ---
+  let dragging: any = null;
+  let dragStart: { x: number; y: number } | null = null;
+  let moved = false;
+  let panning: { startX: number; startY: number; vpX: number; vpY: number } | null = null;
+  let pinch: { startDist: number; vp0: typeof vp; mid0: { x: number; y: number } } | null = null;
+  const pointers = new Map<number, { x: number; y: number }>();
+
   function handlePointerDown(e: PointerEvent) {
     svg.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -538,8 +354,6 @@ const t = {
       dragging = n;
       dragStart = { x: p.x, y: p.y };
       moved = false;
-      n.fx = p.x;
-      n.fy = p.y;
       target.style.cursor = 'grabbing';
       return;
     }
@@ -565,8 +379,12 @@ const t = {
       const dx = p.x - (dragStart?.x ?? p.x);
       const dy = p.y - (dragStart?.y ?? p.y);
       if (dx * dx + dy * dy > 9) moved = true;
-      dragging.fx = p.x;
-      dragging.fy = p.y;
+      // Cosmetic drag: move the node and remember the position so search
+      // centers on where the user actually put it.
+      dragging.x = p.x;
+      dragging.y = p.y;
+      const g = nodeEls[nodes.indexOf(dragging)];
+      if (g) g.setAttribute('transform', `translate(${p.x},${p.y})`);
       return;
     }
 
@@ -585,8 +403,6 @@ const t = {
     if (dragging) {
       const n = dragging;
       const wasClick = !moved;
-      n.fx = null;
-      n.fy = null;
       const g = nodeEls[nodes.indexOf(n)];
       if (g) g.style.cursor = 'pointer';
       dragging = null;
@@ -788,7 +604,12 @@ const t = {
         applyViewport();
       } else if (action === 'reset') {
         resetViewport();
-        if (restart) restart();
+        // Restore the SSR layout positions (drag is cosmetic).
+        nodes.forEach((n, i) => {
+          n.x = initialPos[i].x;
+          n.y = initialPos[i].y;
+          nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`);
+        });
       } else if (action === 'fullscreen') {
         toggleFullscreen();
       } else if (action === 'toggle-color') {
@@ -809,7 +630,7 @@ const t = {
       } else if (action === 'toggle-arrows') {
         showArrows = !showArrows;
         btn.setAttribute('aria-pressed', String(showArrows));
-        edges.forEach((e, i) => {
+        edgeEls.forEach((e, i) => {
           const l = links[i];
           if (showArrows && isDirected(l.type)) {
             e.setAttribute('marker-end', 'url(#kg-arrow)');
@@ -864,52 +685,9 @@ const t = {
     }
   });
 
-  // --- Load ---
-  function load() {
-    const url = src as string;
-    fetch(url)
-      .then((r) => r.json())
-      .then((data) => {
-        const rawNodes: any[] = (data as any).nodes ?? [];
-        const communityIds = new Set<number>();
-        communityLabels = new Map<number, string>();
-        for (const n of rawNodes) {
-          const c = (n as any).community ?? 0;
-          communityIds.add(c);
-          if (!communityLabels.has(c)) {
-            communityLabels.set(c, (n as any).communityLabel ?? `#${c}`);
-          }
-        }
-        communities = [...communityIds].sort((a, b) => a - b);
-        renderLegend();
-        // Build adjacency once before rendering.
-        adjacency.clear();
-        for (const l of data.links) {
-          if (!adjacency.has(l.source)) adjacency.set(l.source, new Set());
-          if (!adjacency.has(l.target)) adjacency.set(l.target, new Set());
-          adjacency.get(l.source)!.add(l.target);
-          adjacency.get(l.target)!.add(l.source);
-        }
-        reduced ? renderStatic(data) : renderForce(data);
-      })
-      .catch(() => {
-        const isEn = document.documentElement.lang === 'en';
-        svg.textContent = isEn ? 'Graph unavailable' : 'Граф недоступен';
-      });
-  }
-
-  // Start when visible (lazy).
-  if (reduced) {
-    load();
-  } else {
-    const io = new IntersectionObserver((entries) => {
-      if (entries.some((e) => e.isIntersecting)) {
-        io.disconnect();
-        load();
-      }
-    }, { threshold: 0.15 });
-    io.observe(root);
-  }
+  // --- Init: the SVG is already server-rendered; just wire up the viewport ---
+  renderLegend();
+  resetViewport();
 </script>
 
 <style>
@@ -939,7 +717,7 @@ const t = {
   }
   .kg-svg {
     width: 100%;
-    height: 460px;
+    height: auto;
     display: block;
     touch-action: none;
     cursor: grab;
@@ -1002,14 +780,11 @@ const t = {
     stroke-opacity: 0.95;
     stroke-linejoin: round;
     pointer-events: none;
-    /* Text fade threshold 0.00 → labels are always visible, never fade on zoom.
-       Driven by --kg-text-fade (set from TEXT_FADE_THRESHOLD on the svg). */
-    opacity: calc(1 - var(--kg-text-fade, 0));
     transition: opacity 120ms ease;
   }
-  /* Post labels are hover/focus-only (see rebuild): with ~50 nodes always-on
-     labels read as a text cloud. Projects, topics, cores and Volta parts stay
-     labeled. */
+  /* Post labels are hover/focus-only (see the SSR template): with ~50 nodes
+     always-on labels read as a text cloud. Projects, topics, cores and Volta
+     parts stay labeled. */
   .kg-label-hover {
     opacity: 0;
   }
@@ -1136,11 +911,5 @@ const t = {
     outline: 2px solid var(--text-accent);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
-  }
-  .kg-caption {
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    margin-top: var(--space-3);
-    text-align: center;
   }
 </style>

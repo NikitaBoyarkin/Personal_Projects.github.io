@@ -23,6 +23,10 @@ export interface GraphNode {
   community?: number;
   /** Human-readable community name (per-locale), e.g. "Аналитический тулкит". */
   communityLabel?: string;
+  /** Layout position in world (viewBox) units. Filled by `layoutGraph` at build
+   *  time so the SVG can be server-rendered; absent before layout. */
+  x?: number;
+  y?: number;
 }
 
 export type LinkType = "related" | "children" | "topic" | "shared" | "core";
