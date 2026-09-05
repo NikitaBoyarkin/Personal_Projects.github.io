@@ -52,7 +52,7 @@ const projects = [
     summary:
       'Разработал Telegram-бота для автоматизации еженедельного отчета → сократил время на сбор данных с 2 часов до 5 минут, что увеличило эффективность команды.',
     highlights: [],
-    github: 'https://github.com/NikitaBoyarkin/telegram_bot_public',
+    github: 'https://github.com/NikitaBoyarkin/telegram_bot',
   },
 ];
 
@@ -91,6 +91,7 @@ const year = new Date().getFullYear();
       <a href={withBase('/')} class="cv-back">← Back to portfolio</a>
       <span class="cv-toolbar-actions">
         <a href={withBase('CV-Nikita-Boyarkin.pdf')} class="cv-print" data-analytics="cv_download_pdf">Download PDF</a>
+        <a href="https://github.com/NikitaBoyarkin/cv" class="cv-source-link" target="_blank" rel="noopener noreferrer" data-analytics="cv_source_github">Source (GitHub)</a>
         <button type="button" class="cv-print" onclick="window.print()">Print</button>
       </span>
     </div>
@@ -227,6 +228,14 @@ const year = new Date().getFullYear();
         font-weight: 500;
         cursor: pointer;
       }
+      .cv-source-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.5rem 0.25rem;
+      }
+      .cv-source-link:hover { text-decoration: underline; }
       .cv {
         max-width: 820px;
         margin: 0 auto;
