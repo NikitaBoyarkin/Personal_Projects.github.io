@@ -1,0 +1,93 @@
+---
+title: Browser Mini-Games — Analytics Arcade
+description: "10 playable mini-games as self-contained SVGs: 7 analytics (A/B until p<0.05, funnel drop, cohort catch, SQL tokens, metric match, retention day, funnel bottleneck) + 3 arcade (snake, pong, 2048). One file = the whole game, zero-dependency, no build step. Works on phone and desktop."
+track: experiments
+hero: images/games.svg
+impact:
+  - "10 games: 7 analytics + 3 arcade, each a self-contained SVG"
+  - "Analytics concepts → game mechanics: p<0.05, retention day, funnel bottleneck"
+  - "Zero-dependency: HTML+CSS+JS in one file, no build or server"
+  - "Phone (swipe/tap) + desktop (keyboard/mouse), 3 themes"
+  - "PostHog tracking (game_selected) + CTA → contact"
+tools:
+  - SVG
+  - JavaScript
+  - Astro
+  - Playwright
+github: https://github.com/NikitaBoyarkin/browser-mini-games
+demo: games/
+related:
+  - /en/projects/ab/
+  - /en/projects/cohort/
+  - /en/projects/sql/
+  - /en/posts/cohort-triangles-retention/
+caseStudy:
+  problem: "Analytics concepts — p-values, retention, funnels — are abstract: a recruiter or student can't 'feel' them from text, and passive dashboards don't provide an interactive experience."
+  approach: "Each game is a self-contained SVG: HTML, CSS and JS in one file, zero-dependency, no build step. Analytics games turn concepts into mechanics: A/B Test — collect data until p < 0.05; Funnel Drop — catch falling users; Cohort Catch — catch Returning, dodge Churned; SQL Query — pick the token that completes the query; Retention Day — pick the right retention day. Hub on Astro, dark/light/cyberpunk themes, PostHog tracking."
+  result: "10 games work on phone (swipe/tap) and desktop (keyboard/mouse), open from a single file with no server. Analytics games are a learning tool: concept → mechanic → intuition. Portfolio sync is automatic (sync_games.py), smoke tests on Playwright."
+  metrics:
+    - label: "Games"
+      value: "10"
+    - label: "Analytics"
+      value: "7"
+    - label: "Dependencies"
+      value: "0"
+    - label: "Platforms"
+      value: "phone + desktop"
+---
+
+# Browser Mini-Games — Analytics Arcade
+
+## Business Context
+
+Analytics concepts — p-values, retention, funnels — are abstract. Typical demos are passive dashboards. Mini-games turn concepts into mechanics: you play, and you 'feel' why p < 0.05 matters, what a retention day is, and where the funnel bottleneck sits.
+
+## Games
+
+| Game | Type | Mechanic |
+|------|------|----------|
+| 🐍 Snake | arcade | eat, grow, don't crash |
+| 🏓 Pong | arcade | beat the CPU — first to 11 |
+| 🔢 2048 | arcade | merge tiles to reach 2048 |
+| 🧪 A/B Test | analytics | collect data until p < 0.05 |
+| 🔻 Funnel Drop | analytics | catch falling users, convert |
+| 📊 Cohort Catch | analytics | catch Returning, dodge Churned |
+| 🧩 SQL Query | analytics | pick the token that completes the SQL |
+| 🃏 Metric Match | analytics | match metric pairs in fewest moves |
+| 📅 Retention Day | analytics | pick the right retention day |
+| 🔍 Funnel Bottleneck | analytics | find the biggest funnel drop |
+
+## Architecture
+
+Each game is a **self-contained SVG**: HTML, CSS and JS in one file. One file = the whole game, zero-dependency, no build step. The hub is Astro (static), deployed to GitHub Pages. Dark/light/cyberpunk themes via `data-theme` + `localStorage`.
+
+## Analytics & Conversion
+
+- `game_selected` — PostHog event on game pick.
+- In-game CTA → contact (Telegram deep-link), `contact_click` event.
+- Portfolio sync: `sync_games.py` copies `dist/` → `public/games/` (drift check via `--check`).
+
+## Testing
+
+Playwright smoke tests (pytest): each game loads from `public/` and is checked for functionality.
+
+## Run
+
+```bash
+npm install
+npm run dev          # dev server
+npm run build        # production build → dist/
+python3 sync_games.py --dry-run   # preview sync to portfolio
+```
+
+## Impact
+
+- **10 games, 7 analytics** — concepts → mechanics → intuition.
+- **Zero-dependency** — one file = the whole game, no build or server.
+- **Phone + desktop** — swipe/tap and keyboard/mouse, 3 themes.
+- **Tracking & conversion** — `game_selected` + CTA → contact.
+
+## Documentation
+
+- [GitHub → browser-mini-games](https://github.com/NikitaBoyarkin/browser-mini-games)
+- [Live demo → /games/](https://nikitaboyarkin.github.io/Personal_Projects.github.io/games/)

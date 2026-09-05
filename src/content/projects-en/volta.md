@@ -1,6 +1,6 @@
 ---
 title: Volta Neobank — Product Analytics
-description: End-to-end neobank analytics narrative — funnel, A/B test, retention, segmentation. Four sequential projects on synthetic fintech data with reproducible seeded pipelines and ship-gated statistical methodology.
+description: "End-to-end neobank analytics narrative — 17 projects across 12 analytical domains + Market & Jobs: funnel, A/B, retention, segmentation, churn, RFM, CLV, attribution, anomaly, spend, NPS, JTBD, unit economics, upsell, referral. Synthetic fintech data, reproducible seeded pipelines, ship-gated statistical methodology."
 track: experiments
 hero: images/volta.svg
 impact:
@@ -63,6 +63,26 @@ caseStudy:
 | 3 | **Retention & Cohort** | Did the effect hold? | +9.2pp M3 retention, +€227K/yr LTV |
 | 4 | **User Segmentation** | Who are the users, how to monetize? | 4 segments, per-segment strategy |
 
+## Repository Expansion
+
+The repo has grown from 4 core projects to **17** (12 analytical domains + Market & Jobs). Additional projects:
+
+| # | Project | Key finding |
+|---|---|---|
+| 5 | **Churn Prediction** | RF +0.03 ROC-AUC over LR; top driver = inactivity |
+| 6 | **RFM Analysis** | 6 lifecycle segments |
+| 7 | **CLV Modeling** | 3 methods: historical / retention-curve / Gamma-Gamma |
+| 8 | **Marketing Attribution** | First/last/linear/Shapley — referral leads |
+| 9 | **Anomaly Detection** | Z-score/IQR/Isolation Forest, scored vs ground truth |
+| 10 | **Spend Analysis** | Category/channel breakdown, decline rate, monthly trend |
+| 11 | **Support & Churn** | Churn by tickets, unresolved, CSAT band |
+| 12 | **NPS Trends** | Monthly NPS, drivers, promoter mix |
+| 13 | **JTBD × Cohorts** | Dormant = UX friction (Digital Newcomers 45+), not "no job" |
+| 14 | **Unit Economics** | Travelers lose €/tx; break-even needs FX cost 1.0%→0.55% |
+| 15 | **Premium Upsell** | Anchor 17% vs Digital Newcomers 45+ 2% — value prop doesn't land |
+| 16 | **45+ KYC Deep-Dive** | 45+ lift +0.6pp (ns) vs 35-44 +10pp — friction is trust, not UX |
+| 17 | **Referral Segments** | Anchor 29.6% vs Digital Newcomers 4.8% — value prop doesn't transfer |
+
 ## Data & Method
 
 **Data:** synthetic, seeded generators (`generate_*.py`) → reproducible CSVs. The funnel dataset is committed; the rest are generated on demand.
@@ -86,6 +106,7 @@ The four-project loop is more valuable than isolated analyses: the KYC fix found
 - **M3 retention +9.2pp** → **+€227K/yr** incremental LTV from the KYC fix.
 - **4 segments** with per-segment strategy and up to **+€310K/yr** monetization via migration.
 - **Reproducible methodology** — CUPED, AA-test, Bonferroni, sensitivity at MDE; 4 recommended A/B tests to validate the strategy.
+- **17 projects** — 12 analytical domains + Market & Jobs (JTBD): from funnel to referral segments.
 
 ## Documentation
 
