@@ -51,7 +51,7 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   add(`- [Skill taxonomy](${abs("topics/")}): Junior/Middle/Senior topics with case studies per topic.`);
   add(`- [Start here](${abs("start/")}): how to read the portfolio.`);
   add(`- [Knowledge graph](${abs("graph/")}): product-analytics domain map.`);
-  add(`- [Games](${abs("games/")}): playable A/B-test and funnel-drop mini-games.`);
+  add(`- [Games](${abs("games/")}): playable analytics arcade — 10 zero-dependency SVG mini-games (A/B test, funnel drop, cohort catch, SQL, retention, metric match) + arcade (snake, pong, 2048). Phone + desktop.`);
   add();
 
   add("## Featured project");
