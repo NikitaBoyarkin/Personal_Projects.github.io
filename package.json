@@ -21,7 +21,7 @@
     "@paper-design/shaders": "^0.0.78",
     "astro": "^7.2.9",
     "morphicons": "^1.7.0",
-    "posthog-js": "^1.417.1"
+    "posthog-js": "^1.422.5"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
