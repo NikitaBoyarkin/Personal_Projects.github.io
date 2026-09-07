@@ -1,0 +1,83 @@
+---
+import Base from '../../layouts/Base.astro';
+import { withBase } from '../../lib/path';
+
+// Telegram deep-link: pre-fills the message so the first contact carries context.
+const tgDeepLink = `https://t.me/lofinibo?text=${encodeURIComponent('Hi! I read your whois — let\'s talk analytics.')}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Nikita Boyarkin',
+    jobTitle: 'Data Analyst / Product Analyst',
+    sameAs: [
+      'https://github.com/NikitaBoyarkin',
+      'https://www.linkedin.com/in/nikita-boyarkin',
+    ],
+  },
+};
+---
+
+<Base
+  title="Who I am | Nikita Boyarkin"
+  description="Who I am — Nikita Boyarkin, data/product analyst. How I work, what I enjoy, collaboration format."
+  canonical={withBase('en/whois/')}
+  activeNav="whois"
+  lang="en"
+  counterpartHref={withBase('whois/')}
+  jsonLd={jsonLd}
+>
+  <section class="container reveal">
+    <h1>Who I am</h1>
+    <p class="whois-sub">A living business card — no marketing, just facts.</p>
+
+    <div class="whois-grid">
+      <div class="board-card">
+        <h2>👤 Who I am</h2>
+        <p>Nikita, data / product analyst, 4+ years. Focus — experiments, retention, segmentation.</p>
+      </div>
+      <div class="board-card">
+        <h2>🔧 How I work</h2>
+        <p>From hypothesis to metric. I prefer reproducible analytics: code + SQL + visualization, so the conclusion can be re-checked.</p>
+      </div>
+      <div class="board-card">
+        <h2>🎮 What I enjoy</h2>
+        <p>Product metrics, A/B methodology, browser mini-games as a learning tool (10 games, zero-dep, phone + desktop).</p>
+      </div>
+      <div class="board-card">
+        <h2>📍 Where I live / format</h2>
+        <p>Remote / hybrid — in practice. Middle+.</p>
+        <!-- PENDING: specify city -->
+      </div>
+    </div>
+
+    <p class="cta-row">
+      <a class="button" href={tgDeepLink} data-analytics="whois_cta" target="_blank" rel="noopener noreferrer">Message me on Telegram →</a>
+      <a class="button button-secondary" href={withBase('en/value/')}>How I can help</a>
+    </p>
+  </section>
+
+  <style>
+    .whois-sub {
+      color: var(--text-muted);
+      margin-top: -0.5rem;
+    }
+    .whois-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    .whois-grid h2 {
+      margin: 0 0 var(--space-3);
+      font-size: 1.05rem;
+    }
+    .whois-grid p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+  </style>
+</Base>

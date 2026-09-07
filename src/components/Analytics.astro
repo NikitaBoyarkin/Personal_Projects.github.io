@@ -64,6 +64,13 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
           locale: isEnPath ? 'en' : 'ru',
         });
       }
+      // Personal-layer pages (Phase 6): whois / value / work-with-me.
+      const personalMatch = path.match(/^\/(?:en\/)?(whois|value|work-with-me)\/?$/);
+      if (personalMatch) {
+        posthog.capture(`${personalMatch[1]}_viewed`, {
+          locale: isEnPath ? 'en' : 'ru',
+        });
+      }
 
       // Delegated click capture for any element carrying `data-analytics`.
       // `lang_switch_<target>` maps to a structured `lang_switched` event;

@@ -47,6 +47,9 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   add(`- [Home (RU)](${abs("")}): intro, featured project (Volta neobank analytics), skill taxonomy.`);
   add(`- [Home (EN)](${abs("en/")}): English mirror.`);
   add(`- [About](${abs("about/")}): background and focus.`);
+  add(`- [Who I am](${abs("whois/")}): living business card — who I am, how I work, what I enjoy, collaboration format.`);
+  add(`- [How I work](${abs("work-with-me/")}): relationship manual — values, working style, feedback norms, meetings.`);
+  add(`- [How I can help](${abs("value/")}): offers (hiring + collaboration) with quantified proof — A/B, retention, RFM, automation.`);
   add(`- [Writing](${abs("writing/")}): articles on SQL, A/B testing, retention, segmentation, automation.`);
   add(`- [Skill taxonomy](${abs("topics/")}): Junior/Middle/Senior topics with case studies per topic.`);
   add(`- [Start here](${abs("start/")}): how to read the portfolio.`);

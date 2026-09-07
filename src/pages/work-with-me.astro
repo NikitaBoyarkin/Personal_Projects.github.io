@@ -1,0 +1,111 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/path';
+
+// Telegram deep-link: pre-fills the message so the first contact carries context.
+const tgDeepLink = `https://t.me/lofinibo?text=${encodeURIComponent('Привет! Прочитал «Как со мной работать» — обсудим формат.')}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Nikita Boyarkin',
+    jobTitle: 'Data Analyst / Product Analyst',
+    sameAs: [
+      'https://github.com/NikitaBoyarkin',
+      'https://www.linkedin.com/in/nikita-boyarkin',
+    ],
+  },
+};
+---
+
+<Base
+  title="Как со мной работать | Nikita Boyarkin"
+  description="Как со мной работать — ценности, стиль работы, фидбек-нормы, встречи. Relationship manual для коллег и нанимающих."
+  canonical={withBase('work-with-me/')}
+  activeNav="work-with-me"
+  lang="ru"
+  counterpartHref={withBase('en/work-with-me/')}
+  jsonLd={jsonLd}
+>
+  <section class="container reveal">
+    <h1>Как со мной работать</h1>
+    <p class="wwm-sub">Relationship manual — чтобы не тратить время на выяснение формата.</p>
+
+    <div class="board-card wwm-block">
+      <h2>Ценности</h2>
+      <ul>
+        <li><b>Честность с данными</b> — если цифры против гипотезы, меняем гипотезу, а не цифры.</li>
+        <li><b>Reproducibility</b> — вывод можно перепроверить: код + SQL + метрики.</li>
+        <li><b>Скорость обучения</b> — быстро пробуем, быстро учимся, фиксируем результат.</li>
+        <li><b>Прямой фидбек</b> — без эвфемизмов и «мне кажется».</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Стиль работы</h2>
+      <ul>
+        <li>Люблю контекст перед запросом: зачем, для кого, какое решение примем по результату.</li>
+        <li>Задаю уточняющие вопросы — лучше 5 вопросов в начале, чем переделка в конце.</li>
+        <li>Предпочитаю метрики впечатлениям: «выросло на 6pp» вместо «стало лучше».</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Фидбек-нормы</h2>
+      <ul>
+        <li>Прямой, конкретный, с предложением: что не так, почему, как исправить.</li>
+        <li>Открыт к критике — считаю её бесплатным ускорением.</li>
+        <li>Фидбек по работе, не по личности.</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Встречи</h2>
+      <ul>
+        <li>Адженда для встреч от 3 человек — иначе это не встреча, а чат.</li>
+        <li>Предпочитаю async: документ + комментарии вместо созвона ради созвона.</li>
+        <li>Готов к созвонам с целью: решение, ревью, синк по эксперименту.</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Что мне важно в команде</h2>
+      <ul>
+        <li>Data-driven решения — метрики как язык, а не украшение.</li>
+        <li>Владение метриками — команда знает, что и зачем измеряет.</li>
+        <li>Экспериментальная культура — гипотезы проверяются, а не обсуждаются.</li>
+      </ul>
+    </div>
+
+    <p class="cta-row">
+      <a class="button" href={tgDeepLink} data-analytics="work_with_me_cta" target="_blank" rel="noopener noreferrer">Обсудить формат →</a>
+      <a class="button button-secondary" href={withBase('whois/')}>Кто я</a>
+    </p>
+  </section>
+
+  <style>
+    .wwm-sub {
+      color: var(--text-muted);
+      margin-top: -0.5rem;
+    }
+    .wwm-block {
+      margin-top: var(--space-4);
+      max-width: 60ch;
+    }
+    .wwm-block h2 {
+      margin: 0 0 var(--space-3);
+      font-size: 1.05rem;
+    }
+    .wwm-block ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  </style>
+</Base>

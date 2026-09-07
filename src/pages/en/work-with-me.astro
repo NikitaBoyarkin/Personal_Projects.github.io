@@ -1,0 +1,111 @@
+---
+import Base from '../../layouts/Base.astro';
+import { withBase } from '../../lib/path';
+
+// Telegram deep-link: pre-fills the message so the first contact carries context.
+const tgDeepLink = `https://t.me/lofinibo?text=${encodeURIComponent('Hi! I read "How I work" — let\'s discuss the format.')}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Nikita Boyarkin',
+    jobTitle: 'Data Analyst / Product Analyst',
+    sameAs: [
+      'https://github.com/NikitaBoyarkin',
+      'https://www.linkedin.com/in/nikita-boyarkin',
+    ],
+  },
+};
+---
+
+<Base
+  title="How I work | Nikita Boyarkin"
+  description="How I work — values, working style, feedback norms, meetings. A relationship manual for colleagues and hiring managers."
+  canonical={withBase('en/work-with-me/')}
+  activeNav="work-with-me"
+  lang="en"
+  counterpartHref={withBase('work-with-me/')}
+  jsonLd={jsonLd}
+>
+  <section class="container reveal">
+    <h1>How I work</h1>
+    <p class="wwm-sub">A relationship manual — so we don't waste time figuring out the format.</p>
+
+    <div class="board-card wwm-block">
+      <h2>Values</h2>
+      <ul>
+        <li><b>Honesty with data</b> — if the numbers contradict the hypothesis, we change the hypothesis, not the numbers.</li>
+        <li><b>Reproducibility</b> — the conclusion can be re-checked: code + SQL + metrics.</li>
+        <li><b>Speed of learning</b> — try fast, learn fast, record the result.</li>
+        <li><b>Direct feedback</b> — no euphemisms, no "I feel like".</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Working style</h2>
+      <ul>
+        <li>I like context before a request: why, for whom, what decision the result will drive.</li>
+        <li>I ask clarifying questions — 5 questions up front beat rework at the end.</li>
+        <li>I prefer metrics over impressions: "up 6pp" instead of "it got better".</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Feedback norms</h2>
+      <ul>
+        <li>Direct, specific, with a proposal: what's wrong, why, how to fix it.</li>
+        <li>Open to criticism — I treat it as free acceleration.</li>
+        <li>Feedback about the work, not the person.</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>Meetings</h2>
+      <ul>
+        <li>An agenda for any meeting with 3+ people — otherwise it's a chat, not a meeting.</li>
+        <li>I prefer async: a document + comments over a call for the sake of a call.</li>
+        <li>Ready for calls with a purpose: a decision, a review, an experiment sync.</li>
+      </ul>
+    </div>
+
+    <div class="board-card wwm-block">
+      <h2>What matters to me in a team</h2>
+      <ul>
+        <li>Data-driven decisions — metrics as the language, not decoration.</li>
+        <li>Metric ownership — the team knows what it measures and why.</li>
+        <li>An experimentation culture — hypotheses get tested, not debated.</li>
+      </ul>
+    </div>
+
+    <p class="cta-row">
+      <a class="button" href={tgDeepLink} data-analytics="work_with_me_cta" target="_blank" rel="noopener noreferrer">Discuss the format →</a>
+      <a class="button button-secondary" href={withBase('en/whois/')}>Who I am</a>
+    </p>
+  </section>
+
+  <style>
+    .wwm-sub {
+      color: var(--text-muted);
+      margin-top: -0.5rem;
+    }
+    .wwm-block {
+      margin-top: var(--space-4);
+      max-width: 60ch;
+    }
+    .wwm-block h2 {
+      margin: 0 0 var(--space-3);
+      font-size: 1.05rem;
+    }
+    .wwm-block ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+  </style>
+</Base>

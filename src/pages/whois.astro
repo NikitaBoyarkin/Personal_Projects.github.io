@@ -1,0 +1,83 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/path';
+
+// Telegram deep-link: pre-fills the message so the first contact carries context.
+const tgDeepLink = `https://t.me/lofinibo?text=${encodeURIComponent('Привет! Прочитал whois — обсудим аналитику.')}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Nikita Boyarkin',
+    jobTitle: 'Data Analyst / Product Analyst',
+    sameAs: [
+      'https://github.com/NikitaBoyarkin',
+      'https://www.linkedin.com/in/nikita-boyarkin',
+    ],
+  },
+};
+---
+
+<Base
+  title="Кто я | Nikita Boyarkin"
+  description="Кто я — Никита Бояркин, data/product analyst. Как работаю, чем увлекаюсь, формат сотрудничества."
+  canonical={withBase('whois/')}
+  activeNav="whois"
+  lang="ru"
+  counterpartHref={withBase('en/whois/')}
+  jsonLd={jsonLd}
+>
+  <section class="container reveal">
+    <h1>Кто я</h1>
+    <p class="whois-sub">Живая визитка — без маркетинга, по факту.</p>
+
+    <div class="whois-grid">
+      <div class="board-card">
+        <h2>👤 Кто я</h2>
+        <p>Никита, data / product analyst, 4+ года. Фокус — эксперименты, retention, сегментация.</p>
+      </div>
+      <div class="board-card">
+        <h2>🔧 Как работаю</h2>
+        <p>От гипотезы до метрики. Предпочитаю reproducible-аналитику: код + SQL + визуализация, чтобы вывод можно было перепроверить.</p>
+      </div>
+      <div class="board-card">
+        <h2>🎮 Чем увлекаюсь</h2>
+        <p>Продуктовые метрики, A/B-методология, browser-мини-игры как обучающий инструмент (10 игр, zero-dep, phone + desktop).</p>
+      </div>
+      <div class="board-card">
+        <h2>📍 Где живу / формат</h2>
+        <p>Удалёнка / гибрид — по факту. Middle+.</p>
+        <!-- PENDING: уточнить город -->
+      </div>
+    </div>
+
+    <p class="cta-row">
+      <a class="button" href={tgDeepLink} data-analytics="whois_cta" target="_blank" rel="noopener noreferrer">Написать в Telegram →</a>
+      <a class="button button-secondary" href={withBase('value/')}>Чем могу быть полезен</a>
+    </p>
+  </section>
+
+  <style>
+    .whois-sub {
+      color: var(--text-muted);
+      margin-top: -0.5rem;
+    }
+    .whois-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-4);
+      margin-top: var(--space-6);
+    }
+    .whois-grid h2 {
+      margin: 0 0 var(--space-3);
+      font-size: 1.05rem;
+    }
+    .whois-grid p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+  </style>
+</Base>
