@@ -50,20 +50,52 @@ caseStudy:
 
 # Volta Neobank — Product Analytics
 
-## Business Context
+## The Case
 
-«Volta» is a fictional neobank. Four projects drive a single product loop **discover → validate → measure → optimize**: where the leak is, whether the fix works, whether the effect holds, and how to monetize it. All data is synthetic, generated deterministically (seed), and reproduced from code.
+«Volta» is a fictional neobank that was losing users during onboarding. Marketing saw traffic, product saw activation, support saw tickets. Every team had its own number — and none of them explained where the money was leaking. We started with one question: **which onboarding step is critical?**
 
-## The Narrative
+We answered it with four projects wired into a single **discover → validate → measure → optimize** loop. Each project is a piece of evidence that narrows the case. All data is synthetic, generated deterministically (seed), and reproduced from code: any conclusion can be re-checked by re-running, not taken on faith.
 
-| # | Project | Question | Key finding |
-|---|---|---|---|
-| 1 | **Funnel Analysis** | Where does onboarding leak? | KYC is the critical bottleneck |
-| 2 | **A/B Testing** | Does a progress bar fix KYC? | +6.24pp lift, p<0.0001 → ship |
-| 3 | **Retention & Cohort** | Did the effect hold? | +9.2pp M3 retention, +€227K/yr LTV |
-| 4 | **User Segmentation** | Who are the users, how to monetize? | 4 segments, per-segment strategy |
+## Evidence #1 — Funnel: where the leak is
 
-## Repository Expansion
+The first piece of evidence is the onboarding funnel down to the first productive action. The main leak was in **KYC** — the verification step: the largest relative drop-off (56.6% step conversion). Registration loses more in absolute terms (2,682 users, 73.2% step conv), but KYC is more expensive: the user has already made it halfway and still leaves.
+
+Hypothesis: the form is too long and there is no intermediate confirmation.
+
+→ [Funnel Analysis — case file](/projects/volta/funnel/)
+
+## Evidence #2 — A/B: does the fix work
+
+A snapshot is not proof: we validated the funnel finding as an experiment, not a slice. Hypothesis: split KYC into steps with a progress bar.
+
+Test design:
+
+- **CUPED** with "sessions before the test" as covariate — removed part of the noise, the sample did not grow
+- **AA-test** before launch: Type I error = 0.050 — the method does not imagine significance
+- **Bonferroni** across multiple metrics — multiplicity control
+- **Ship-gate**: ship only if significance ∧ lift ≥ MDE ∧ no SRM
+
+Verdict: control 55.8% → treatment 62.1%, **+6.24pp**, p < 0.0001, 95% CI [+4.26%, +8.16%], above the +5pp MDE → **ship**. At a realistic audience this is ≈ **€716K/yr** at 48× ROI.
+
+→ [A/B Testing — case file](/projects/volta/ab/)
+
+## Evidence #3 — Retention: does the effect hold
+
+Shipping is not the end: we checked the effect on retention with cohort triangles (signup month × age) instead of "the average across everyone". Along the diagonal: cohorts with the new onboarding hold **M3 retention at +9.2pp** over older cohorts → **+€227K/yr incremental LTV**. The new onboarding improves both the first week (faster time-to-value) and month 3 (less churn after the "honeymoon"). Without triangles, this conclusion would hide behind the average.
+
+→ [Retention & Cohort — case file](/projects/volta/retention/)
+
+## Evidence #4 — Segmentation: who pays
+
+The effect held — the remaining question was who these users are and how to monetize them. StandardScaler + KMeans, data-driven K: **4 segments** — Power 12% / Growth 24% / Casual 32% / Dormant 32%. Lorenz: 12% of users drive 41% of revenue; 68% → 92%. Migration scenarios: up to **+€310K/yr**.
+
+→ [User Segmentation — case file](/projects/volta/segmentation/)
+
+## The Verdict
+
+A loop of four projects beats isolated analyses: the KYC fix found in the funnel was validated in the A/B test, confirmed in retention, and translated into money through segmentation. The core is the **three-condition ship-gate** (significance ∧ lift ≥ MDE ∧ no SRM): it protects against shipping statistically-significant but business-insignificant changes. Order matters more than numbers: calibrate the instrument first (AA-test, CUPED), then conclude.
+
+## Case File: repository expansion
 
 The repo has grown from 4 core projects to **17** (12 analytical domains + Market & Jobs). Additional projects:
 
@@ -95,10 +127,6 @@ The repo has grown from 4 core projects to **17** (12 analytical domains + Marke
 4. **Segmentation** — StandardScaler + KMeans, data-driven K (marginal-gain elbow, silhouette plateau K=2–4, collapse at K=5). Segments: Power 12% / Growth 24% / Casual 32% / Dormant 32%. Lorenz: 12% of users → 41% of revenue; 68% → 92%. Migration scenarios: +€26K/mo (€310K/yr).
 
 **Code structure:** shared `utils/common.py` (`setup()`, `print_section()`, `CONSTANTS`, `data_path()`), `functions + main()` — importing a module does not run the analysis. Excel reports via `openpyxl`.
-
-## Insight
-
-The four-project loop is more valuable than isolated analyses: the KYC fix found in the funnel is validated in the A/B test, confirmed in retention, and monetized through segmentation. The key is a ship-gate with three conditions (significance ∧ lift≥MDE ∧ no SRM) that protects against rolling out statistically-significant but business-insignificant changes; CUPED and the AA-test cut variance and verify the error rate before launch.
 
 ## Impact
 
