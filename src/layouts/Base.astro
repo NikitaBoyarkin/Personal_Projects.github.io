@@ -52,9 +52,6 @@ const contactHref = isEn ? withBase('en/contact/') : withBase('contact/');
 const startHref = isEn ? withBase('en/start/') : withBase('start/');
 const graphHref = isEn ? withBase('en/graph/') : withBase('graph/');
 const gamesHref = withBase('games/'); // static page in public/, no EN route
-const whoisHref = isEn ? withBase('en/whois/') : withBase('whois/');
-const valueHref = isEn ? withBase('en/value/') : withBase('value/');
-const workWithMeHref = isEn ? withBase('en/work-with-me/') : withBase('work-with-me/');
 
 // i18n: header / footer chrome labels.
 const t = {
@@ -64,9 +61,6 @@ const t = {
   navWriting: isEn ? 'Writing' : 'Статьи',
   navGraph: isEn ? 'Graph' : 'Граф',
   navAbout: isEn ? 'About' : 'Обо мне',
-  navWhois: isEn ? 'Who I am' : 'Кто я',
-  navValue: isEn ? 'Value' : 'Ценность',
-  navWorkWithMe: isEn ? 'How I work' : 'Формат',
   navContact: isEn ? 'Contact' : 'Контакты',
   footerCv: isEn ? 'CV' : 'Резюме',
   footerWriting: isEn ? 'Writing' : 'Статьи',
@@ -195,9 +189,6 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
         <li><a href={graphHref}>{t.navGraph}</a></li>
         <li><a href={gamesHref}>{isEn ? 'Games' : 'Игры'}</a></li>
         <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>{t.navAbout}</a></li>
-        <li><a href={whoisHref} class={activeNav === 'whois' ? 'active' : ''} aria-current={activeNav === 'whois' ? 'page' : undefined}>{t.navWhois}</a></li>
-        <li><a href={valueHref} class={activeNav === 'value' ? 'active' : ''} aria-current={activeNav === 'value' ? 'page' : undefined}>{t.navValue}</a></li>
-        <li><a href={workWithMeHref} class={activeNav === 'work-with-me' ? 'active' : ''} aria-current={activeNav === 'work-with-me' ? 'page' : undefined}>{t.navWorkWithMe}</a></li>
         <li><a href={contactHref} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>{t.navContact}</a></li>
       </ul>
 
