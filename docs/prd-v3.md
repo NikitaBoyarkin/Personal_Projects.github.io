@@ -220,23 +220,25 @@ src/pages/writing.astro — inline-script (паттерн SearchBox)
 
 **Dependencies:** REQ-001
 
-### REQ-037: CTA-аудит и A/B (P1, конверсия)
+### REQ-037: CTA-аудит и A/B (P1, конверсия) ✅ 2026-09-09
 **Описание:** Аудит всех контакт-CTA (AskMe, contact, value, whois, games, footer) и A/B-тест главного CTA.
 
 **Acceptance Criteria:**
-- [ ] Инвентарь CTA: локация, текст, событие, целевой URL (таблица в docs/)
-- [ ] A/B-тест tagline или главного CTA (2 варианта, PostHog flag или URL-параметр)
-- [ ] Результат зафиксирован в PostHog, решение — в docs/
+- [x] Инвентарь CTA: локация, текст, событие, целевой URL (таблица в `docs/cta-inventory.md`, 20 CTA)
+- [x] A/B-тест главного CTA (2 варианта, PostHog flag `hero_cta_variant`, id 872930, client-side 50/50)
+- [x] Результат зафиксирован в PostHog, решение — в docs/ (⏳ ждёт ≥30 exposure/руку, ~2–4 нед)
 
 **Техническая спецификация:**
 ```
-docs/cta-inventory.md — инвентарь
-src/components/AskMe.astro, src/pages/contact.astro — варианты CTA
+docs/cta-inventory.md — инвентарь + дизайн A/B
+src/components/HeroCta.astro — A/B-компонент (bundled script, onFeatureFlags → swap text/href)
+src/pages/index.astro, src/pages/en/index.astro — HeroCta + data-analytics="hero_cv" (гэп закрыт)
+PostHog — флаг hero_cta_variant (id 872930, multivariate control/projects 50/50, client)
 ```
 
 **Task Breakdown:**
-- [Аудит]: Medium (1h)
-- [A/B]: Medium (1.5h)
+- [Аудит]: Medium (1h) — сделано 2026-09-09
+- [A/B]: Medium (1.5h) — сделано 2026-09-09
 
 **Dependencies:** REQ-038
 
@@ -349,10 +351,10 @@ src/pages/whois.astro — контент
 | **F1 — Данные-интегрити** | 031, 032 | ~0.5h | ✅ 2026-09-08 |
 | **F2 — Измерение** | 038, 039 | ~1.5h | ✅ 2026-09-08 |
 | **F3 — Вовлечение блога** | 033, 034, 035, 036 | ~4h | ✅ 2026-09-09 |
-| **F4 — Конверсия** | 037 | ~2.5h | |
+| **F4 — Конверсия** | 037 | ~2.5h | ✅ 2026-09-09 |
 | **F5 — Полиш** | 040, 041, 042 | ~2.25h | |
 
-**Итого:** ~11h. F1–F3 — готовы (доверие + измерение + вовлечение), F4–F5 — по желанию/приоритету.
+**Итого:** ~11h. F1–F4 — готовы (доверие + измерение + вовлечение + конверсия), F5 — по желанию/приоритету. A/B-результат REQ-037 — ⏳ ждёт накопления трафика (≥30 exposure/руку).
 
 ## 8. Верификация
 

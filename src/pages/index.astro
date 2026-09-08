@@ -10,6 +10,7 @@ import MaterialStrip from '../components/MaterialStrip.astro';
 import AskMe from '../components/AskMe.astro';
 import CapabilitiesGrid from '../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../components/HeroMetrics.astro';
+import HeroCta from '../components/HeroCta.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
 import ArrowMorph from '../components/ArrowMorph.astro';
@@ -92,8 +93,8 @@ const jsonLd = {
         <HeroMetrics lang="ru" />
 
         <p class="cta-row">
-          <a class="button" href={withBase('start/')}>С чего начать</a>
-          <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener">CV</a>
+          <HeroCta lang="ru" />
+          <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener" data-analytics="hero_cv">CV</a>
           <a class="button button-secondary" href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_download_pdf" target="_blank" rel="noopener">Скачать PDF</a>
           <span class="cta-links">
             <a href="https://github.com/NikitaBoyarkin" data-analytics="github_hero">GitHub</a> ·

@@ -1,0 +1,85 @@
+---
+// Hero primary CTA with A/B test (REQ-037). Control: «С чего начать» → /start/.
+// Test variant (PostHog flag `hero_cta_variant` = "projects"): «Смотреть
+// проекты» → /projects/. The flag is evaluated client-side (static site), so
+// no-JS visitors always see the control — progressive enhancement.
+//
+// Tracking is handled here explicitly (hero_cta_exposure / hero_cta_click with
+// the variant), NOT via data-analytics — the delegated capture in Analytics.astro
+// would double-count the click.
+import { withBase } from '../lib/path';
+
+const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+
+interface Props {
+  lang?: 'ru' | 'en';
+}
+const { lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
+const controlLabel = isEn ? 'Start here' : 'С чего начать';
+const testLabel = isEn ? 'See my work' : 'Смотреть проекты';
+const controlHref = isEn ? withBase('en/start/') : withBase('start/');
+const testHref = isEn ? withBase('en/projects/') : withBase('projects/');
+---
+
+<a
+  id="hero-cta-primary"
+  class="button"
+  href={controlHref}
+  data-control-label={controlLabel}
+  data-test-label={testLabel}
+  data-control-href={controlHref}
+  data-test-href={testHref}
+>
+  {controlLabel}
+</a>
+
+{posthogKey && (
+  <script>
+    import { posthog } from 'posthog-js';
+
+    const FLAG = 'hero_cta_variant';
+
+    function init() {
+      const cta = document.getElementById('hero-cta-primary');
+      if (!cta) return;
+      // Non-null local: TS doesn't narrow the hoisted applyVariant closure.
+      const el = cta;
+
+      const controlLabel = el.dataset.controlLabel || '';
+      const testLabel = el.dataset.testLabel || '';
+      const controlHref = el.dataset.controlHref || '';
+      const testHref = el.dataset.testHref || '';
+
+      let appliedVariant = 'control';
+      let exposureSent = false;
+
+      function applyVariant(variant: string) {
+        appliedVariant = variant;
+        const isTest = variant === 'projects';
+        el.textContent = isTest ? testLabel : controlLabel;
+        el.setAttribute('href', isTest ? testHref : controlHref);
+        // Exposure once per page load — onFeatureFlags can re-fire on updates.
+        if (!exposureSent) {
+          exposureSent = true;
+          posthog.capture('hero_cta_exposure', { variant });
+        }
+      }
+
+      // Fires when flags are loaded (or immediately if already cached).
+      posthog.onFeatureFlags(() => {
+        const v = posthog.getFeatureFlag(FLAG);
+        applyVariant(typeof v === 'string' ? v : 'control');
+      });
+
+      el.addEventListener('click', () => {
+        posthog.capture('hero_cta_click', {
+          variant: appliedVariant,
+          path: window.location.pathname,
+        });
+      });
+    }
+
+    init();
+  </script>
+)}
