@@ -9,6 +9,7 @@ Checks:
 - Required assets are present in index.html.
 """
 
+import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
@@ -196,6 +197,37 @@ def check_index_assets() -> int:
     return errors
 
 
+def check_metrics_drift() -> int:
+    """REQ-031: METRICS.portfolio.projects must match the number of project cards.
+
+    Guards against the 2026-09-05 drift (games card added, metric left at 14).
+    Counts .md files in src/content/projects/ and compares with the declared
+    value in src/lib/metrics.ts.
+    """
+    errors = 0
+    projects_dir = ROOT / "src" / "content" / "projects"
+    metrics_file = ROOT / "src" / "lib" / "metrics.ts"
+    if not projects_dir.is_dir() or not metrics_file.is_file():
+        print("  ERROR: src/content/projects/ or src/lib/metrics.ts not found")
+        return 1
+    card_count = len(list(projects_dir.glob("*.md")))
+    text = metrics_file.read_text(encoding="utf-8")
+    m = re.search(r"portfolio:\s*\{\s*projects:\s*(\d+)", text)
+    if not m:
+        print("  ERROR: could not parse METRICS.portfolio.projects from metrics.ts")
+        return 1
+    declared = int(m.group(1))
+    if card_count != declared:
+        print(
+            f"  ERROR: metrics drift — {card_count} project cards in src/content/projects/, "
+            f"METRICS.portfolio.projects = {declared}"
+        )
+        errors += 1
+    else:
+        print(f"  OK    project cards ({card_count}) == METRICS.portfolio.projects ({declared})")
+    return errors
+
+
 def check_graph_assets() -> int:
     errors = 0
     graph_files = ["graph.json", "graph-en.json"]
@@ -220,6 +252,7 @@ def main() -> int:
     errors += check_profile_image()
     errors += check_index_assets()
     errors += check_graph_assets()
+    errors += check_metrics_drift()
 
     print()
     if errors:

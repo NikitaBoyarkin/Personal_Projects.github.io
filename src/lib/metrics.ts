@@ -29,7 +29,7 @@ export const METRICS = {
     minutesAfter: 5,
   },
   portfolio: {
-    projects: 14,
+    projects: 15,
     sqlCases: 10,
   },
 } as const;
