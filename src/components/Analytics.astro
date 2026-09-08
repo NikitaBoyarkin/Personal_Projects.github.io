@@ -85,9 +85,13 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
           posthog.capture('lang_switched', {
             from: window.location.pathname.startsWith(norm + '/en/') ? 'en' : 'ru',
             to: kind.replace('lang_switch_', ''),
+            path,
           });
         } else {
-          posthog.capture(kind);
+          // REQ-038: carry the page path so contact events (cv_download_pdf,
+          // telegram_*, github_footer, …) are attributable to the page they
+          // were clicked on, not just the event name.
+          posthog.capture(kind, { path });
         }
       });
     }
