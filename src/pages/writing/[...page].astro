@@ -1,0 +1,114 @@
+---
+// Writing index with static pagination (REQ-033): page 1 at /writing/, pages
+// 2..N at /writing/N/. Zero-JS by default — each page is a static slice of
+// BlogCards. The full post list is embedded as JSON for the client-side tag
+// filter (REQ-034) and 🎲 random post (REQ-035); keyboard nav (REQ-036) lives
+// in BlogFilter's bundled script.
+import Base from '../../layouts/Base.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import BlogFilter from '../../components/BlogFilter.astro';
+import { estimateReadTime, formatDate } from '../../lib/date';
+import { categoryLabel } from '../../lib/categories';
+import { withBase } from '../../lib/path';
+import { loadPosts, PER_PAGE } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const allPosts = await loadPosts('posts');
+  const totalPages = Math.ceil(allPosts.length / PER_PAGE);
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { page: i + 1, totalPages },
+  }));
+}
+
+const { page, totalPages } = Astro.props;
+const allPosts = await loadPosts('posts');
+const pagePosts = allPosts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+// Tag counts across ALL posts — the filter chips must show totals, not the
+// current page's slice.
+const tagCounts = new Map<string, number>();
+for (const post of allPosts) {
+  for (const tag of post.data.tags ?? []) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+const tags = [...tagCounts.entries()]
+  .map(([tag, count]) => ({ tag, count }))
+  .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+
+// Client-side filter data: pre-formatted labels so the bundled script stays
+// dumb (no date/locale logic in JS). `<` is escaped so a stray `<` in an
+// excerpt can never close the JSON <script> tag early.
+const postsJson = allPosts.map((post) => {
+  const slug = post.id.replace(/\.md$/, '');
+  const readTime = estimateReadTime(post.body ?? '');
+  return {
+    slug,
+    href: withBase(`posts/${slug}/`),
+    title: post.data.title,
+    category: post.data.category,
+    categoryLabel: categoryLabel(post.data.category, 'ru'),
+    dateLabel: formatDate(post.data.date),
+    readTimeLabel: readTime ? ` · ${readTime} мин` : '',
+    excerpt: post.data.excerpt,
+    image: post.data.image ? withBase(post.data.image) : null,
+    tags: post.data.tags ?? [],
+  };
+});
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const pageHref = (n: number) => (n === 1 ? 'writing/' : `writing/${n}/`);
+const prevUrl = page > 1 ? `${siteUrl}${withBase(pageHref(page - 1))}` : undefined;
+const nextUrl = page < totalPages ? `${siteUrl}${withBase(pageHref(page + 1))}` : undefined;
+const canonical = page > 1 ? withBase('writing/') : undefined;
+---
+
+<Base
+  title={page === 1 ? 'Статьи | Nikita Boyarkin' : `Статьи — стр. ${page} | Nikita Boyarkin`}
+  description="Статьи о продуктовой аналитике, A/B-тестировании и работе с данными от Никиты Бояркина."
+  activeNav="writing"
+  lang="ru"
+  canonical={canonical}
+  relPrev={prevUrl}
+  relNext={nextUrl}
+>
+  <h1 class="page-title reveal">Статьи</h1>
+
+  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Всё вместе выше. Можно читать по типу:
+    <a href={withBase('guides/')}>гайды</a> (evergreen-методология) ·
+    <a href={withBase('notes/')}>заметки</a> (decision-логи).
+  </p>
+
+  <BlogFilter lang="ru" tags={tags} />
+
+  <div class="blog-list reveal reveal-delay-2" id="blog-list">
+    {
+      pagePosts.map((post) => (
+        <BlogCard
+          slug={post.id.replace(/\.md$/, '')}
+          title={post.data.title}
+          category={post.data.category}
+          date={post.data.date}
+          image={post.data.image}
+          updated={post.data.updated}
+          excerpt={post.data.excerpt}
+          readTime={estimateReadTime(post.body ?? '')}
+        />
+      ))
+    }
+  </div>
+
+  {
+    totalPages > 1 && (
+      <nav class="pagination reveal" aria-label={page === 1 ? 'Пагинация' : `Пагинация, страница ${page}`}>
+        {page > 1 && <a href={withBase(pageHref(page - 1))} rel="prev">← новее</a>}
+        <span class="pagination-info">Страница {page} из {totalPages}</span>
+        {page < totalPages && <a href={withBase(pageHref(page + 1))} rel="next">старее →</a>}
+      </nav>
+    )
+  }
+
+  <script is:inline type="application/json" id="writing-posts-data" set:html={JSON.stringify(postsJson).replace(/</g, '\\u003c')} />
+</Base>

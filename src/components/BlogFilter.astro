@@ -1,16 +1,33 @@
 ---
+// Writing-page toolbar: category filter (existing) + tag filter with counts
+// (REQ-034) + 🎲 random post (REQ-035) + keyboard nav (REQ-036).
+//
+// Filtering is client-side over the full post list embedded by the page as
+// <script type="application/json" id="writing-posts-data"> — so a tag click
+// shows ALL matching posts across pagination pages, not just the current page.
+// When no filter is active the static (paginated) list is shown as-is, keeping
+// zero-JS-by-default intact.
 import { categoryLabel } from '../lib/categories';
 
 interface Props {
   lang?: 'ru' | 'en';
+  tags: { tag: string; count: number }[];
 }
-const { lang = 'ru' } = Astro.props;
-const allLabel = lang === 'en' ? 'All' : 'Все';
+const { lang = 'ru', tags } = Astro.props;
+const isEn = lang === 'en';
+const allLabel = isEn ? 'All' : 'Все';
 const categoryKeys = ['all', 'decision-log', 'framework', 'guide', 'note'];
 const categories = categoryKeys.map((key) => ({
   key,
   label: key === 'all' ? allLabel : categoryLabel(key, lang),
 }));
+const tagsLabel = isEn ? 'Topics' : 'Темы';
+const moreTagsLabel = isEn ? 'All tags' : 'Все теги';
+const randomLabel = isEn ? 'Random post' : 'Случайный пост';
+// Long-tail tags (used once) stay behind a toggle so the row doesn't dominate
+// the page; the recurring topics are the ones worth filtering by.
+const visibleTags = tags.filter((t) => t.count >= 2);
+const hiddenTags = tags.filter((t) => t.count < 2);
 ---
 
 <div class="filter-row reveal reveal-delay-1">
@@ -26,52 +43,260 @@ const categories = categoryKeys.map((key) => ({
       </button>
     ))
   }
+  <button id="random-post" class="random-post" type="button" hidden>
+    🎲 {randomLabel}
+  </button>
 </div>
+
+{
+  tags.length > 0 && (
+    <div class="tag-row reveal reveal-delay-1">
+      <span class="tag-row-label">{tagsLabel}:</span>
+      {
+        visibleTags.map((t) => (
+          <button class="filter-tag tag-chip" data-tag={t.tag} aria-pressed="false" type="button">
+            {t.tag} <span class="tag-count">{t.count}</span>
+          </button>
+        ))
+      }
+      {
+        hiddenTags.length > 0 && (
+          <button class="filter-tag tag-more" data-tag-more type="button" aria-expanded="false">
+            {moreTagsLabel} ({hiddenTags.length})
+          </button>
+        )
+      }
+      {
+        hiddenTags.map((t) => (
+          <button
+            class="filter-tag tag-chip tag-hidden"
+            data-tag={t.tag}
+            aria-pressed="false"
+            type="button"
+            hidden
+          >
+            {t.tag} <span class="tag-count">{t.count}</span>
+          </button>
+        ))
+      }
+    </div>
+  )
+}
 <span class="visually-hidden" role="status" id="blog-filter-status"></span>
 
 <script>
-  const filterTags = document.querySelectorAll('.filter-tag');
-  const cards = document.querySelectorAll('.blog-card');
-  const statusEl = document.getElementById('blog-filter-status');
-  const isEn = document.documentElement.lang === 'en';
-  const statusText = (n: number, filter: string) =>
-    isEn
-      ? filter === 'all' ? `${n} posts shown` : `${n} posts in ${filter}`
-      : filter === 'all' ? `Показано записей: ${n}` : `Показано записей в «${filter}»: ${n}`;
+  type Post = {
+    slug: string;
+    href: string;
+    title: string;
+    category: string;
+    categoryLabel: string;
+    dateLabel: string;
+    readTimeLabel: string;
+    excerpt: string;
+    image: string | null;
+    tags: string[];
+  };
 
-  function applyFilter(filter: string) {
-    filterTags.forEach((t) => {
-      const isActive = (t as HTMLElement).dataset.filter === filter;
-      t.classList.toggle('active', isActive);
-      t.setAttribute('aria-pressed', String(isActive));
-    });
-    cards.forEach((card) => {
-      const el = card as HTMLElement;
-      el.style.display =
-        filter === 'all' || el.dataset.category === filter ? '' : 'none';
-    });
-    const visible = Array.from(cards).filter((c) => (c as HTMLElement).style.display !== 'none').length;
-    if (statusEl) statusEl.textContent = statusText(visible, filter);
-  }
+  function init() {
+    const filterTags = document.querySelectorAll<HTMLButtonElement>('.filter-tag[data-filter]');
+    const tagChips = document.querySelectorAll<HTMLButtonElement>('.filter-tag[data-tag]');
+    const statusEl = document.getElementById('blog-filter-status');
+    const dataEl = document.getElementById('writing-posts-data');
+    const listEl = document.getElementById('blog-list');
+    const paginationEl = document.querySelector<HTMLElement>('.pagination');
+    const randomBtn = document.getElementById('random-post');
+    const moreBtn = document.querySelector<HTMLButtonElement>('.tag-more');
+    const isEn = document.documentElement.lang === 'en';
 
-  filterTags.forEach((tag) => {
-    const btn = tag as HTMLElement;
-    btn.addEventListener('click', () => {
-      const filter = btn.dataset.filter || 'all';
-      applyFilter(filter);
-      const hash = filter === 'all' ? '' : `#${filter}`;
-      if (location.hash !== hash) {
-        history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+    let allPosts: Post[] = [];
+    if (dataEl) {
+      try {
+        allPosts = JSON.parse(dataEl.textContent || '[]') as Post[];
+      } catch {
+        allPosts = [];
+      }
+    }
+
+    let activeCategory = 'all';
+    let activeTag: string | null = null;
+
+    function escapeHtml(s: string): string {
+      return s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Mirrors BlogCard.astro markup so the client-rendered filtered list looks
+    // identical to the static paginated one.
+    function cardHtml(p: Post): string {
+      return `<a href="${p.href}" class="blog-card" data-category="${p.category}">
+        ${p.image ? `<img class="blog-card-image" src="${p.image}" alt="" width="600" height="200" loading="lazy" />` : ''}
+        <div class="blog-card-body">
+          <span class="blog-card-tag">${p.categoryLabel}</span>
+          <div class="blog-card-title">${escapeHtml(p.title)}</div>
+          <div class="blog-card-meta">${p.dateLabel}${p.readTimeLabel}</div>
+          <div class="blog-card-excerpt">${escapeHtml(p.excerpt)}</div>
+        </div>
+      </a>`;
+    }
+
+    function statusText(n: number, filter: string): string {
+      if (isEn) {
+        return filter === 'all' ? `${n} posts shown` : `${n} posts in ${filter}`;
+      }
+      return filter === 'all' ? `Показано записей: ${n}` : `Показано записей в «${filter}»: ${n}`;
+    }
+
+    function applyFilter() {
+      const filtered = allPosts.filter(
+        (p) =>
+          (activeCategory === 'all' || p.category === activeCategory) &&
+          (activeTag === null || p.tags.includes(activeTag)),
+      );
+
+      filterTags.forEach((t) => {
+        const isActive = t.dataset.filter === activeCategory;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-pressed', String(isActive));
+      });
+      tagChips.forEach((t) => {
+        const isActive = t.dataset.tag === activeTag;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-pressed', String(isActive));
+      });
+
+      const isFiltered = activeCategory !== 'all' || activeTag !== null;
+      if (listEl) listEl.hidden = isFiltered;
+      if (paginationEl) paginationEl.hidden = isFiltered;
+
+      let results = document.getElementById('blog-filter-results');
+      if (isFiltered) {
+        if (!results) {
+          results = document.createElement('div');
+          results.id = 'blog-filter-results';
+          results.className = 'blog-list';
+          listEl?.insertAdjacentElement('afterend', results);
+        }
+        results.innerHTML = filtered.map(cardHtml).join('');
+        if (statusEl) statusEl.textContent = statusText(filtered.length, activeTag ?? activeCategory);
+      } else {
+        results?.remove();
+        const n = listEl ? listEl.querySelectorAll('.blog-card').length : 0;
+        if (statusEl) statusEl.textContent = statusText(n, 'all');
+      }
+    }
+
+    filterTags.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.dataset.filter || 'all';
+        activeTag = null;
+        applyFilter();
+        const hash = activeCategory === 'all' ? '' : `#${activeCategory}`;
+        if (location.hash !== hash) {
+          history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+        }
+      });
+    });
+
+    tagChips.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeTag = btn.dataset.tag || null;
+        activeCategory = 'all';
+        applyFilter();
+        const hash = activeTag ? `#tag-${activeTag}` : '';
+        if (location.hash !== hash) {
+          history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+        }
+      });
+    });
+
+    // Long-tail tags toggle: reveal/hide the single-use chips.
+    if (moreBtn) {
+      moreBtn.addEventListener('click', () => {
+        const hidden = document.querySelectorAll<HTMLElement>('.tag-chip.tag-hidden');
+        const show = moreBtn.getAttribute('aria-expanded') !== 'true';
+        hidden.forEach((c) => {
+          c.hidden = !show;
+        });
+        moreBtn.setAttribute('aria-expanded', String(show));
+        moreBtn.textContent = show
+          ? isEn
+            ? 'Fewer tags'
+            : 'Меньше тегов'
+          : isEn
+            ? `All tags (${hidden.length})`
+            : `Все теги (${hidden.length})`;
+      });
+    }
+
+    // 🎲 Random post (REQ-035). Hidden until JS runs — a no-JS visitor sees a
+    // clean static list, not a dead button (progressive enhancement).
+    if (randomBtn) {
+      randomBtn.hidden = false;
+      randomBtn.addEventListener('click', () => {
+        if (!allPosts.length) return;
+        const pick = allPosts[Math.floor(Math.random() * allPosts.length)];
+        if (window.posthog) {
+          try {
+            window.posthog.capture('random_post_click', {
+              slug: pick.slug,
+              path: window.location.pathname,
+            });
+          } catch {
+            // analytics must never block navigation
+          }
+        }
+        window.location.href = pick.href;
+      });
+    }
+
+    // Keyboard nav (REQ-036): ↑↓ move focus across cards, Enter opens (native
+    // link activation), Esc clears the active filter. Only fires when focus is
+    // on a card, so it never collides with SearchBox's `/` hotkey or its own
+    // ↑↓/Esc handling inside the search panel.
+    document.addEventListener('keydown', (e) => {
+      const active = document.activeElement;
+      if (!active || !active.classList.contains('blog-card')) return;
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.blog-card')).filter(
+        (c) => !c.closest('[hidden]'),
+      );
+      const idx = cards.indexOf(active as HTMLElement);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        cards[(idx + 1) % cards.length]?.focus();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        cards[(idx - 1 + cards.length) % cards.length]?.focus();
+      } else if (e.key === 'Escape') {
+        if (activeCategory !== 'all' || activeTag !== null) {
+          e.preventDefault();
+          activeCategory = 'all';
+          activeTag = null;
+          applyFilter();
+          document.querySelector<HTMLElement>('.filter-tag[data-filter="all"]')?.focus();
+        }
       }
     });
-  });
 
-  // Restore filter from URL hash on load.
-  const initial = location.hash.replace(/^#/, '');
-  if (initial) {
-    const match = Array.from(filterTags).find(
-      (t) => (t as HTMLElement).dataset.filter === initial
-    );
-    if (match) applyFilter(initial);
+    // Restore filter from URL hash on load (#category or #tag-<tag>).
+    const initial = location.hash.replace(/^#/, '');
+    if (initial.startsWith('tag-')) {
+      const tag = initial.slice(4);
+      if (Array.from(tagChips).some((t) => t.dataset.tag === tag)) {
+        activeTag = tag;
+        activeCategory = 'all';
+        applyFilter();
+      }
+    } else if (initial) {
+      if (Array.from(filterTags).some((t) => t.dataset.filter === initial)) {
+        activeCategory = initial;
+        applyFilter();
+      }
+    }
   }
+
+  init();
 </script>

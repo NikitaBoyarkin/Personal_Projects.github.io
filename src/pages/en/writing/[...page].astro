@@ -1,0 +1,110 @@
+---
+// EN writing index — same paginated structure as the RU one (REQ-033). With
+// only 2 EN posts and PER_PAGE=10 this resolves to a single page at /en/writing/.
+import Base from '../../../layouts/Base.astro';
+import BlogCard from '../../../components/BlogCard.astro';
+import BlogFilter from '../../../components/BlogFilter.astro';
+import { estimateReadTime, formatDate } from '../../../lib/date';
+import { categoryLabel } from '../../../lib/categories';
+import { withBase } from '../../../lib/path';
+import { loadPosts, PER_PAGE } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const allPosts = await loadPosts('posts-en');
+  const totalPages = Math.ceil(allPosts.length / PER_PAGE);
+  return Array.from({ length: totalPages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { page: i + 1, totalPages },
+  }));
+}
+
+const { page, totalPages } = Astro.props;
+const allPosts = await loadPosts('posts-en');
+const pagePosts = allPosts.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+const tagCounts = new Map<string, number>();
+for (const post of allPosts) {
+  for (const tag of post.data.tags ?? []) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+const tags = [...tagCounts.entries()]
+  .map(([tag, count]) => ({ tag, count }))
+  .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+
+const postsJson = allPosts.map((post) => {
+  const slug = post.id.replace(/\.md$/, '');
+  const readTime = estimateReadTime(post.body ?? '');
+  return {
+    slug,
+    href: withBase(`en/posts/${slug}/`),
+    title: post.data.title,
+    category: post.data.category,
+    categoryLabel: categoryLabel(post.data.category, 'en'),
+    dateLabel: formatDate(post.data.date),
+    readTimeLabel: readTime ? ` · ${readTime} min` : '',
+    excerpt: post.data.excerpt,
+    image: post.data.image ? withBase(post.data.image) : null,
+    tags: post.data.tags ?? [],
+  };
+});
+
+const siteUrl = (Astro.site?.toString() || 'https://nikitaboyarkin.github.io').replace(/\/$/, '');
+const pageHref = (n: number) => (n === 1 ? 'en/writing/' : `en/writing/${n}/`);
+const prevUrl = page > 1 ? `${siteUrl}${withBase(pageHref(page - 1))}` : undefined;
+const nextUrl = page < totalPages ? `${siteUrl}${withBase(pageHref(page + 1))}` : undefined;
+---
+
+<Base
+  title="Writing | Nikita Boyarkin"
+  description="Articles on product analytics, A/B testing, and working with data by Nikita Boyarkin."
+  canonical={withBase('en/writing/')}
+  activeNav="writing"
+  lang="en"
+  counterpartHref={withBase('writing/')}
+  relPrev={prevUrl}
+  relNext={nextUrl}
+>
+  <h1 class="page-title reveal">Writing</h1>
+
+  <p class="reveal" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+    Articles in English (the Russian archive has more). Filter by type:
+    <a href={withBase('writing/')}>all posts (RU)</a>.
+  </p>
+
+  <BlogFilter lang="en" tags={tags} />
+
+  <div class="blog-list reveal reveal-delay-2" id="blog-list">
+    {
+      pagePosts.length === 0 ? (
+        <p style="color: var(--text-muted);">No English posts yet.</p>
+      ) : (
+        pagePosts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            image={post.data.image}
+            updated={post.data.updated}
+            excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body ?? '')}
+            lang="en"
+          />
+        ))
+      )
+    }
+  </div>
+
+  {
+    totalPages > 1 && (
+      <nav class="pagination reveal" aria-label={page === 1 ? 'Pagination' : `Pagination, page ${page}`}>
+        {page > 1 && <a href={withBase(pageHref(page - 1))} rel="prev">← newer</a>}
+        <span class="pagination-info">Page {page} of {totalPages}</span>
+        {page < totalPages && <a href={withBase(pageHref(page + 1))} rel="next">older →</a>}
+      </nav>
+    )
+  }
+
+  <script is:inline type="application/json" id="writing-posts-data" set:html={JSON.stringify(postsJson).replace(/</g, '\\u003c')} />
+</Base>

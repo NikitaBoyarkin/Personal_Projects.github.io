@@ -14,6 +14,8 @@ interface Props {
   ogType?: 'website' | 'article';
   ogImage?: string;
   canonical?: string;
+  relPrev?: string;
+  relNext?: string;
   activeNav?: 'writing' | 'contact' | 'home' | 'about' | 'projects' | 'whois' | 'value' | 'work-with-me';
   jsonLd?: Record<string, unknown>;
   lang?: 'ru' | 'en';
@@ -27,6 +29,8 @@ const {
   ogType = 'website',
   ogImage = '/images/og/portfolio-banner.png',
   canonical,
+  relPrev,
+  relNext,
   activeNav = 'home',
   jsonLd,
   lang = 'ru',
@@ -94,6 +98,8 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
     <meta name="description" content={description} />
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
     {canonical && <link rel="canonical" href={pageUrl} />}
+    {relPrev && <link rel="prev" href={relPrev} />}
+    {relNext && <link rel="next" href={relNext} />}
 
     {counterpartUrl && ruAltUrl && <link rel="alternate" hreflang="ru" href={ruAltUrl} />}
     {counterpartUrl && enAltUrl && <link rel="alternate" hreflang="en" href={enAltUrl} />}

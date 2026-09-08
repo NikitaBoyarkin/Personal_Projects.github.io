@@ -17,6 +17,8 @@ interface Props {
 
 const { slug, title, category, date, excerpt, image, updated, readTime, lang = 'ru' } = Astro.props;
 const minLabel = lang === 'en' ? 'min' : 'мин';
+// EN posts live at /en/posts/<slug>/ (their own collection); RU at /posts/<slug>/.
+const postHref = lang === 'en' ? withBase(`en/posts/${slug}/`) : withBase(`posts/${slug}/`);
 const updatedText = updated
   ? lang === 'en'
     ? `updated ${formatDate(updated)}`
@@ -24,7 +26,7 @@ const updatedText = updated
   : null;
 ---
 
-<a href={withBase(`posts/${slug}/`)} class="blog-card" data-category={category}>
+<a href={postHref} class="blog-card" data-category={category}>
   {
     image && (
       <img
