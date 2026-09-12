@@ -1,0 +1,19 @@
+{
+  "title": "RED — Portfolio",
+  "schemaVersion": 39,
+  "uid": "red-portfolio",
+  "panels": [
+    { "id": 1, "type": "stat", "title": "Rate (RPS)", "gridPos": {"x":0,"y":0,"w":8,"h":6},
+      "targets": [{"expr": "sum(rate(portfolio_pageviews_total[1m]))", "refId": "A"}] },
+    { "id": 2, "type": "timeseries", "title": "Rate — pageviews by path", "gridPos": {"x":8,"y":0,"w":16,"h":6},
+      "targets": [{"expr": "sum by (path) (rate(portfolio_pageviews_total[5m]))", "refId": "A"}] },
+    { "id": 3, "type": "stat", "title": "Error rate", "gridPos": {"x":0,"y":6,"w":8,"h":6},
+      "targets": [{"expr": "sum(rate(portfolio_js_errors_total[5m])) / clamp_min(sum(rate(portfolio_pageviews_total[5m])), 1)", "refId": "A"}] },
+    { "id": 4, "type": "timeseries", "title": "Errors by path", "gridPos": {"x":8,"y":6,"w":16,"h":6},
+      "targets": [{"expr": "sum by (path) (rate(portfolio_js_errors_total[5m]))", "refId": "A"}] },
+    { "id": 5, "type": "timeseries", "title": "Duration — LCP p75 by path", "gridPos": {"x":0,"y":12,"w":24,"h":8},
+      "targets": [{"expr": "portfolio_lcp_seconds", "refId": "A"}] }
+  ],
+  "time": {"from": "now-1h", "to": "now"},
+  "refresh": "15s"
+}

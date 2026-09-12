@@ -1,0 +1,42 @@
+services:
+  red-exporter:
+    build: ./exporter
+    env_file: .env
+    expose:
+      - "9100"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.0
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+    depends_on:
+      - red-exporter
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - red-exporter
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

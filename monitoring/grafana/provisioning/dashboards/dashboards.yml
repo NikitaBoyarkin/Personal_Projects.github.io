@@ -1,0 +1,6 @@
+apiVersion: 1
+providers:
+  - name: RED
+    folder: ""
+    options:
+      path: /etc/grafana/provisioning/dashboards

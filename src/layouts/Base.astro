@@ -6,6 +6,7 @@ import Analytics from '../components/Analytics.astro';
 import LangSwitch from '../components/LangSwitch.astro';
 import SearchBox from '../components/SearchBox.astro';
 import MorphIcon from 'morphicons/astro';
+import BeaconMetrics from '../components/BeaconMetrics.astro';
 
 interface Props {
   title: string;
@@ -169,6 +170,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
     </script>
 
     <Analytics />
+    <BeaconMetrics />
   </head>
 
   <body>

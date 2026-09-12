@@ -1,0 +1,10 @@
+tunnel: ${CLOUDFLARE_TUNNEL_ID}
+credentials-file: /etc/cloudflared/credentials.json
+ingress:
+  - hostname: ${BEACON_HOSTNAME}
+    path: /beacon
+    service: http://red-exporter:9100
+  - hostname: ${BEACON_HOSTNAME}
+    path: /healthz
+    service: http://red-exporter:9100
+  - service: http_status:404

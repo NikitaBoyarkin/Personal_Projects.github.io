@@ -1,0 +1,17 @@
+---
+const endpoint = import.meta.env.PUBLIC_BEACON_ENDPOINT as string | undefined;
+---
+{endpoint && (
+  <script is:inline define:vars={{ endpoint }}>
+    const k = "red_session_id";
+    function sid(){ let i = sessionStorage.getItem(k); if(!i){ i = crypto.randomUUID(); sessionStorage.setItem(k,i);} return i; }
+    function beacon(type, extra){
+      try {
+        navigator.sendBeacon(endpoint, JSON.stringify({ type, session_id: sid(), ts: Date.now(), path: location.pathname, locale: document.documentElement.lang || "ru", ...extra }));
+      } catch(e){}
+    }
+    beacon("pageview", {});
+    window.addEventListener("error", (e) => beacon("error", { error: { type: "Error", message: e.message }}));
+    window.addEventListener("unhandledrejection", (e) => beacon("error", { error: { type: "PromiseRejection", message: String(e.reason) }}));
+  </script>
+)}
