@@ -150,13 +150,13 @@
 
 | Пара | Dark | Light | Cyberpunk | Class |
 |---|---|---|---|---|
-| text-normal / bg-primary | 11.94:1 | 15.22:1 | 17.27:1 | Verified (hook dark+light / computed cyberpunk) |
-| text-muted / bg-primary | 5.91:1 | 6.64:1 | 5.90:1 | Verified (hook dark+light / computed cyberpunk) |
-| text-accent / bg-secondary | 5.55:1 | 6.66:1 | 7.85:1 | Verified (hook dark+light / computed cyberpunk) |
-| button-ink / button-bg | 6.00:1 | 6.00:1 | 5.44:1 | Verified (hook dark+light / computed cyberpunk) |
-| border-active / bg-primary (3:1) | 6.36:1 | 5.72:1 | 8.27:1 | Verified (hook dark+light / computed cyberpunk) |
+| text-normal / bg-primary | 11.94:1 | 15.22:1 | 17.27:1 | Verified by hook |
+| text-muted / bg-primary | 5.91:1 | 6.64:1 | 5.90:1 | Verified by hook |
+| text-accent / bg-secondary | 5.55:1 | 6.66:1 | 7.85:1 | Verified by hook |
+| button-ink / button-bg | 6.00:1 | 6.00:1 | 5.44:1 | Verified by hook |
+| border-active / bg-primary (3:1) | 6.36:1 | 5.72:1 | 8.27:1 | Verified by hook |
 
-> Числа — WCAG 2.1, та же формула, что в `contrast-gate.js`. Dark+light Verified: hook отработал PostToolUse на правках `global.css` без блокировок (все пары ≥ порогов) + вычислены идентичной формулой. Cyberpunk Verified по вычислению; hook пока не охватывает cyberpunk (Q1 — решён: 5.44:1 проходит AA). TODO: добавить cyberpunk в массив `themes` хука, чтобы замкнуть механизм (см. PENDING).
+> Числа — WCAG 2.1, та же формула, что в `contrast-gate.js`. Все три темы Verified: hook отработал PostToolUse на правках `global.css` без блокировок (exit 0, все пары ≥ порогов) + вычислены идентичной формулой. Cyberpunk теперь охвачен хуком (добавлен в массив `themes` — mechanism closed).
 
 #### REQ-006: Правила применения по компонентам
 **Описание:** Зафиксировать, как роли распределяются по компонентам из DESIGN.md.
@@ -279,7 +279,7 @@
 - **Владелец:** frontend.
 - **Дедлайн:** Phase 1 — закрыто.
 - **Влияние:** Medium → Low.
-- **Примечание:** `contrast-gate.js` пока не охватывает cyberpunk; значение Verified по вычислению. TODO (отдельная задача): добавить cyberpunk в массив `themes` хука.
+- **Примечание:** `contrast-gate.js` теперь охватывает cyberpunk (добавлен в массив `themes`); значение Verified и hook, и вычислением. Механизм замкнут.
 
 ### Risks & Mitigation
 

@@ -100,15 +100,15 @@ Application budget: dominant 55–65% of any screen, secondary 25–35%, accent 
 
 ## Contrast Verification
 
-WCAG AA contrast is verified two ways. Dark (`:root`) and light are bound to a mechanism — `.claude/hooks/contrast-gate.js`, a PostToolUse guard that blocks any edit to `global.css` whose text/accent pair drops below AA (4.5:1 text, 3:1 non-text). Cyberpunk is verified by the same WCAG 2.1 formula (computed, not yet wired to the hook — see PRD REQ-005, Open Question Q1 resolved: cyberpunk button-ink `#1a1a1a` on `#ff2bd6` = 5.44:1, passes AA).
+WCAG AA contrast is bound to a mechanism — `.claude/hooks/contrast-gate.js`, a PostToolUse guard that checks all three themes (`:root` dark, `[data-theme="light"]`, `[data-theme="cyberpunk"]`) and blocks any edit to `global.css` whose text/accent pair drops below AA (4.5:1 text, 3:1 non-text). Hook verified green on the current palette; cyberpunk button-ink `#1a1a1a` on `#ff2bd6` = 5.44:1, passes AA.
 
 | Pair | Dark | Light | Cyberpunk | Gate |
 |---|---|---|---|---|
 | text-normal / bg-primary | 11.94:1 | 15.22:1 | 17.27:1 | hook |
 | text-muted / bg-primary | 5.91:1 | 6.64:1 | 5.90:1 | hook |
-| text-accent / bg-secondary (card) | 5.55:1 | 6.66:1 | 7.85:1 | hook (dark+light) / computed (cyberpunk) |
-| button-ink `#1a1a1a` / button-bg | 6.00:1 | 6.00:1 | 5.44:1 | hook (dark+light) / computed (cyberpunk) |
-| border-active / bg-primary (3:1) | 6.36:1 | 5.72:1 | 8.27:1 | hook (dark+light) / computed (cyberpunk) |
+| text-accent / bg-secondary (card) | 5.55:1 | 6.66:1 | 7.85:1 | hook |
+| button-ink `#1a1a1a` / button-bg | 6.00:1 | 6.00:1 | 5.44:1 | hook |
+| border-active / bg-primary (3:1) | 6.36:1 | 5.72:1 | 8.27:1 | hook |
 
 ## Themes
 
