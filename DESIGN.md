@@ -23,11 +23,14 @@ colors:
   table-header-background: "#234044"
   surface-secondary: "#27272a"
   shadow-color: "rgba(0, 0, 0, 0.4)"
+  text-accent-dataviz: "#4ecdc4"
 typography:
   sans:
     fontFamily: Inter
     fontSize: 16px
     lineHeight: 1.6
+  display:
+    fontFamily: Georgia / Times New Roman / Literata / Noto Serif / PT Serif (system stack)
   mono:
     fontFamily: SF Mono
 rounded:
@@ -58,6 +61,36 @@ components:
 ## Overview
 
 A bilingual (RU/EN) personal portfolio for a product/data analyst, built with Astro and deployed to GitHub Pages. The design language is Obsidian-inspired: a dark-teal default theme with stepped surface roles, a single coral accent reserved for interactive semantics, and two alternate themes (light, cyberpunk) that re-map the same tokens. Projects are presented as a kanban board; content is card-based with sticky-note styling.
+
+## Redesign Pilot (2026-09)
+
+Goal: shift the homepage from a "dashboard-by-numbers" stack to an editorial + bento experience that communicates product-analyst identity in the first 10 seconds.
+
+### Decisions
+
+- **Audience:** hiring managers in product analytics.
+- **Positioning:** "experienced analyst with product taste and technical depth".
+- **Style direction:** editorial + bento, dataviz-first.
+- **Scope (pilot):** Hero + navigation + design tokens only. Projects/About reorganization follows in the next phase.
+- **Theme:** system preference by default, manual toggle in nav, `prefers-reduced-motion` respected.
+- **Typography:** keep self-hosted Inter for UI/body; add a system serif/display stack (`--font-display`) for the hero name and major headings.
+- **Hero:** two-column editorial layout — identity + pitch + metrics + CTAs on the left, animated dataviz panel on the right (reuses `IntroShader` and floating metric cards).
+- **Navigation:** minimal top-bar with name/logo, Projects, About, Notes (RU) / Writing (EN), language switch, search, contact CTA, theme toggle. Start/Graph/Games removed from the main nav but remain reachable via direct URLs and internal links.
+- **Palette:** keep the existing teal/coral base; add a second `--text-accent-dataviz` token for graph/metric highlights so dataviz reads as information, not as a CTA.
+
+### Files touched in pilot
+
+- `src/styles/global.css` — new tokens, editorial hero styles, flatter nav.
+- `src/layouts/Base.astro` — simplified navigation links and labels.
+- `src/pages/index.astro` — new Russian hero layout.
+- `src/pages/en/index.astro` — new English hero layout.
+- `DESIGN.md` — this section.
+
+### Next phase
+
+- Reorganize the rest of `index.astro` into an editorial top (Projects spotlight, About snapshot, Testimonials) + bento bottom (skills, graph, notes, reading).
+- Revisit project card inconsistency flagged in `project-card-title-text-normal.md` and `project-tool-accent-pill.md`.
+- Consider a hosted display serif with full Cyrillic coverage if the system stack feels too generic.
 
 ## Colors
 
@@ -180,9 +213,10 @@ The cyberpunk theme keeps the dark theme's accent so accent-tint recipes (badges
 
 ## Typography
 
-- Inter variable is the only sans face, self-hosted in four subsets covering RU + EN — do not add a second family.
+- Inter variable is the only sans face, self-hosted in four subsets covering RU + EN — do not add a second sans family.
 - Base text is the `sans` scale; code uses the mono stack.
-- Headings use weight contrast and tight letter-spacing rather than size alone; the hero heading is the most extreme of both.
+- Display headings (hero name, page titles) use the `--font-display` serif stack for editorial contrast against Inter. The stack is system-native to avoid an extra font download and Cyrillic gaps in pilot; revisit with a hosted face if needed.
+- Headings use weight contrast and tight letter-spacing rather than size alone; the hero name is the most extreme of both.
 
 ## Layout
 

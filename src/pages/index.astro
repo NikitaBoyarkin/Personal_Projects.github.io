@@ -81,27 +81,50 @@ const jsonLd = {
   counterpartHref={withBase('en/')}
   jsonLd={jsonLd}
 >
-  <!-- HERO -->
+  <!-- HERO — editorial split: identity left, dataviz panel right -->
   <section id="intro">
-    <IntroShader />
-    <div class="intro-container intro-container-slim">
-      <div class="intro-content">
-        <h1>Nikita Boyarkin</h1>
-        <p class="tagline">Гипотеза → эксперимент → метрика → рост.</p>
-        <div class="subtitle">Аналитик данных · SQL · Python · A/B-эксперименты</div>
+    <div class="intro-container hero-editorial">
+      <div class="hero-body">
+        <img
+          class="hero-avatar"
+          src={withBase('images/00_profile.webp')}
+          alt="Nikita Boyarkin"
+          width="72"
+          height="72"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <h1 class="hero-name">Nikita Boyarkin</h1>
+        <p class="hero-role">Аналитик данных · SQL · Python · A/B-эксперименты</p>
+        <p class="hero-pitch">
+          Превращаю сырые данные в измеримые продуктовые решения: от гипотезы до метрики и роста.
+        </p>
 
         <HeroMetrics lang="ru" />
 
         <p class="cta-row">
           <HeroCta lang="ru" />
+          <a class="button button-secondary" href={withBase('projects/')} data-analytics="hero_projects">Проекты</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener" data-analytics="hero_cv">CV</a>
-          <a class="button button-secondary" href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_download_pdf" target="_blank" rel="noopener">Скачать PDF</a>
-          <span class="cta-links">
-            <a href="https://github.com/NikitaBoyarkin" data-analytics="github_hero">GitHub</a> ·
-            <a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_hero">LinkedIn</a> ·
-            <a href={withBase('graph/')}>Граф</a>
-          </span>
         </p>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <IntroShader />
+        <dl class="hero-viz-cards">
+          <div class="hero-viz-card">
+            <dt>KYC-конверсия</dt>
+            <dd>+6.24 pp</dd>
+          </div>
+          <div class="hero-viz-card">
+            <dt>Годовой эффект фикса</dt>
+            <dd>€716K</dd>
+          </div>
+          <div class="hero-viz-card">
+            <dt>Проектов в портфолио</dt>
+            <dd>14</dd>
+          </div>
+        </dl>
       </div>
     </div>
   </section>

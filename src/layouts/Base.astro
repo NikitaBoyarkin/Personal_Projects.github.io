@@ -48,19 +48,15 @@ const isEn = lang === 'en';
 const homeHref = isEn ? withBase('en/') : withBase('/');
 const aboutHref = isEn ? withBase('en/about/') : withBase('about/');
 const projectsHref = isEn ? withBase('en/projects/') : withBase('projects/');
-const writingHref = isEn ? withBase('en/writing/') : withBase('writing/');
+const notesHref = isEn ? withBase('en/writing/') : withBase('notes/');
 const contactHref = isEn ? withBase('en/contact/') : withBase('contact/');
-const startHref = isEn ? withBase('en/start/') : withBase('start/');
-const graphHref = isEn ? withBase('en/graph/') : withBase('graph/');
-const gamesHref = withBase('games/'); // static page in public/, no EN route
+const writingHref = isEn ? withBase('en/writing/') : withBase('writing/');
 
 // i18n: header / footer chrome labels.
 const t = {
   skip: isEn ? 'Skip to content' : 'Перейти к содержимому',
-  navStart: isEn ? 'Start here' : 'С чего начать',
   navProjects: isEn ? 'Projects' : 'Проекты',
-  navWriting: isEn ? 'Writing' : 'Статьи',
-  navGraph: isEn ? 'Graph' : 'Граф',
+  navNotes: isEn ? 'Writing' : 'Заметки',
   navAbout: isEn ? 'About' : 'Обо мне',
   navContact: isEn ? 'Contact' : 'Контакты',
   footerCv: isEn ? 'CV' : 'Резюме',
@@ -182,16 +178,12 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
           <path class="cell" d="M96 50 73 89.8 27 89.8 4 50 27 10.2 73 10.2Z"/>
           <text class="mono" x="50" y="61" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700" letter-spacing="-0.5" text-anchor="middle">NB</text>
         </svg>
-        <b>{isEn ? 'Portfolio' : 'Портфолио'}</b>
+        <b>Nikita Boyarkin</b>
       </a>
       <ul class="links" id="nav-links">
-        <li><a href={startHref}>{t.navStart}</a></li>
         <li><a href={projectsHref} class={activeNav === 'projects' ? 'active' : ''} aria-current={activeNav === 'projects' ? 'page' : undefined}>{t.navProjects}</a></li>
-        <li><a href={writingHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>{t.navWriting}</a></li>
-        <li><a href={graphHref}>{t.navGraph}</a></li>
-        <li><a href={gamesHref}>{isEn ? 'Games' : 'Игры'}</a></li>
         <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>{t.navAbout}</a></li>
-        <li><a href={contactHref} class={activeNav === 'contact' ? 'active' : ''} aria-current={activeNav === 'contact' ? 'page' : undefined}>{t.navContact}</a></li>
+        <li><a href={notesHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>{t.navNotes}</a></li>
       </ul>
 
       <button id="nav-toggle" class="nav-toggle" type="button" aria-label={isEn ? 'Menu' : 'Меню'} aria-expanded="false" aria-controls="nav-links" data-icon-menu={NAV_MENU} data-icon-close={NAV_CLOSE}>
@@ -201,12 +193,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
       <div class="nav-aux">
         {counterpartHref && <LangSwitch locale={lang} counterpartHref={counterpartHref} />}
         <SearchBox lang={lang} />
-        <a class="button nav-cta" href={contactHref}>{isEn ? 'Contact' : 'Написать'}</a>
-        <a class="nav-telegram" href="https://t.me/lofinibo" target="_blank" rel="noopener noreferrer" aria-label="Telegram" data-analytics="telegram_header">
-          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-            <path d="M21.94 4.6 18.9 19.2c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.19c-.25.25-.46.46-.94.46l.33-4.79 8.73-7.89c.38-.34-.08-.53-.59-.19L7.6 13.1 2.97 11.65c-1.01-.31-1.03-1.01.21-1.5l17.4-6.7c.84-.31 1.57.19 1.36 1.15z"/>
-          </svg>
-        </a>
+        <a class="button nav-cta" href={contactHref}>{t.navContact}</a>
         <button id="theme-toggle" class="theme-toggle" aria-label={`${t.themeLabel}dark${t.themeCycle}`} data-theme-label={t.themeLabel} data-theme-cycle={t.themeCycle} type="button" title={t.themeTitle} data-icon-dark={THEME_MOON} data-icon-light={THEME_SUN} data-icon-cyber={THEME_CYBER}>
           <MorphIcon id="theme-icon" icon={THEME_MOON} spring="snappy" reducedMotion="user" size={18} />
         </button>

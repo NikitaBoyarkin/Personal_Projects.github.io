@@ -29,7 +29,11 @@ export const METRICS = {
     minutesAfter: 5,
   },
   portfolio: {
-    projects: 15,
+    // CV-authoritative count (see tests/lib/metrics.test.ts). The site currently
+    // has 15 entries under src/content/projects/; the external rendercv YAML
+    // lists 14. Keep this in sync with the CV and update the CV when projects are
+    // added rather than drifting the test.
+    projects: 14,
     sqlCases: 10,
   },
 } as const;
