@@ -30,7 +30,7 @@ typography:
     fontSize: 16px
     lineHeight: 1.6
   display:
-    fontFamily: Georgia / Times New Roman / Literata / Noto Serif / PT Serif (system stack)
+    fontFamily: Cormorant / Georgia / Times New Roman / Literata / Noto Serif / PT Serif
   mono:
     fontFamily: SF Mono
 rounded:
@@ -95,10 +95,15 @@ Goal: shift the homepage from a "dashboard-by-numbers" stack to an editorial + b
 - Bento grid cells: `CareerSnapshot`, knowledge-graph link, `ReadingBlock`, notes link, arcade link, `Testimonials`.
 - Removed from homepage: `AudienceBar`, `HomeBoard`, `AskMe`, `Manifesto`, `TopicMap`, `ProjectTimeline`, `CollaborationFormats`, `MaterialStrip`, and the inline arcade section. These pages/components remain reachable via direct URLs.
 
+### Phase 3 (completed)
+
+- Self-hosted **Cormorant** display serif with full Cyrillic coverage (variable weight 400–700), replacing the generic system stack.
+- Updated `--font-display` token and preloaded the active-language subsets in `Base.astro` so the LCP heading renders in the final font early.
+- Closed the two open design-plan items (`project-card-title-text-normal.md` and `project-tool-accent-pill.md`) — both were already implemented in commit `29ef020`.
+
 ### Next phase
 
-- Revisit project card inconsistency flagged in `project-card-title-text-normal.md` and `project-tool-accent-pill.md`.
-- Consider a hosted display serif with full Cyrillic coverage if the system stack feels too generic.
+- (none — backlog empty)
 
 ## Colors
 
