@@ -1,25 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
-import HomeBoard from '../components/HomeBoard.astro';
 import IntroShader from '../components/IntroShader.astro';
-import Manifesto from '../components/Manifesto.astro';
-import TopicMap from '../components/TopicMap.astro';
-import ProjectTimeline from '../components/ProjectTimeline.astro';
-import CollaborationFormats from '../components/CollaborationFormats.astro';
-import MaterialStrip from '../components/MaterialStrip.astro';
-import AskMe from '../components/AskMe.astro';
 import CapabilitiesGrid from '../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../components/HeroMetrics.astro';
 import HeroCta from '../components/HeroCta.astro';
-import { getCollection } from 'astro:content';
-import { withBase } from '../lib/path';
-import ArrowMorph from '../components/ArrowMorph.astro';
-import AudienceBar from '../components/AudienceBar.astro';
 import CareerSnapshot from '../components/CareerSnapshot.astro';
 import Testimonials from '../components/Testimonials.astro';
 import ReadingBlock from '../components/ReadingBlock.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/path';
 
 const allProjects = await getCollection('projects', (p) => !p.data.draft);
+const featuredProject =
+  allProjects.find((p) => p.id === 'posthog') || allProjects[0];
 
 const siteUrl = 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/';
 const jsonLd = {
@@ -129,73 +122,102 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- Кто смотрит: переключатель аудитории переупорядочивает стек ниже -->
-  <AudienceBar lang="ru" />
+  <!-- EDITORIAL TOP + BENTO BOTTOM -->
+  <div class="home-layout">
+    <!-- Featured project -->
+    <section class="editorial-section" id="featured-project" aria-labelledby="featured-heading">
+      <h2 id="featured-heading">Избранный проект</h2>
+      <p class="section-lead">
+        Один разбор, который показывает полный цикл: метрика → гипотеза → эксперимент → решение.
+      </p>
 
-  <div class="home-stack">
-    <div class="home-board" data-order-analyst="0" data-order-learner="0">
-      <!-- KANBAN BOARD: Профиль | Проекты | Сейчас в работе -->
-      <HomeBoard lang="ru" />
-    </div>
+      <article class="featured-card">
+        <img
+          class="featured-card-image"
+          src={withBase(featuredProject.data.hero)}
+          alt=""
+          loading="lazy"
+        />
+        <div class="featured-card-body">
+          <h3 class="featured-card-title">{featuredProject.data.title}</h3>
+          <p class="featured-card-description">{featuredProject.data.description}</p>
+          <div class="bento-chip-list">
+            {featuredProject.data.tools?.slice(0, 5).map((tool: string) => (
+              <span class="bento-chip">{tool}</span>
+            ))}
+          </div>
+          <a
+            class="featured-card-link"
+            href={withBase(`projects/${featuredProject.id.replace(/\.md$/, '')}/`)}
+            data-analytics="featured_project"
+          >
+            Разбор проекта →
+          </a>
+        </div>
+      </article>
+    </section>
 
-    <div class="home-career" data-order-analyst="6" data-order-learner="7">
-      <!-- Опыт + Образование: грейд и измеренные результаты -->
-      <CareerSnapshot lang="ru" />
-    </div>
-
-    <div class="home-askme" data-order-analyst="7" data-order-learner="5">
-      <!-- AI-ассистент «Спроси меня» (static, client-side) -->
-      <AskMe lang="ru" />
-    </div>
-
-    <div class="home-caps" data-order-analyst="1" data-order-learner="3">
-      <!-- Capabilities grid: deliverables + measured results -->
+    <!-- Capabilities -->
+    <section class="editorial-section" id="capabilities" aria-labelledby="capabilities-heading">
+      <h2 id="capabilities-heading">Что я делаю</h2>
+      <p class="section-lead">
+        Шесть компетенций — у каждой конкретный результат и измеримый эффект.
+      </p>
       <CapabilitiesGrid lang="ru" />
-    </div>
+    </section>
 
-    <div class="home-manifesto" data-order-analyst="6" data-order-learner="7">
-      <Manifesto />
-    </div>
+    <!-- Bento bottom -->
+    <div class="bento-grid">
+      <!-- Career snapshot -->
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
+        <CareerSnapshot lang="ru" />
+      </div>
 
-    <div class="home-topics" data-order-analyst="4" data-order-learner="2">
-      <TopicMap />
-    </div>
-
-    <div class="home-timeline" data-order-analyst="2" data-order-learner="4">
-      <ProjectTimeline />
-    </div>
-
-    <div class="home-arcade" data-order-analyst="8" data-order-learner="8">
-      <!-- GAMES ARCADE -->
-      <section id="arcade" class="reveal" aria-label="Игры">
-        <h2>🎮 Аркада</h2>
-        <p>
-          Мини-игры в браузере — и про аналитику тоже: A/B Test (догони p &lt; 0.05), Funnel Drop
-          (лови пользователей в воронке), и классические Snake / 2048 / Pong. Работают на телефоне:
-          свайпы, drag, тап.
+      <!-- Knowledge graph -->
+      <div class="bento-cell" tabindex="-1">
+        <h3 class="bento-cell-title">Граф знаний</h3>
+        <p class="bento-cell-heading">Исследуй связи</p>
+        <p class="bento-cell-text">
+          Все заметки, проекты и темы связаны в интерактивный граф. Найди путь от SQL до A/B-теста.
         </p>
-        <p>
-          <a class="button" href={withBase('games/')}>Играть <ArrowMorph /></a>
+        <a class="bento-cell-link" href={withBase('graph/')} data-analytics="bento_graph">
+          Открыть граф →
+        </a>
+      </div>
+
+      <!-- Reading / library -->
+      <div class="bento-cell" tabindex="-1">
+        <ReadingBlock lang="ru" />
+      </div>
+
+      <!-- Notes -->
+      <div class="bento-cell" tabindex="-1">
+        <h3 class="bento-cell-title">Заметки</h3>
+        <p class="bento-cell-heading">Продуктовая аналитика в заметках</p>
+        <p class="bento-cell-text">
+          Разборы методологии, чек-листы и шаблоны для повседневной работы аналитика.
         </p>
-      </section>
-    </div>
+        <a class="bento-cell-link" href={withBase('writing/')} data-analytics="bento_notes">
+          Читать заметки →
+        </a>
+      </div>
 
-    <div class="home-collab" data-order-analyst="5" data-order-learner="6">
-      <CollaborationFormats />
-    </div>
+      <!-- Games / arcade -->
+      <div class="bento-cell" tabindex="-1">
+        <h3 class="bento-cell-title">Аркада</h3>
+        <p class="bento-cell-heading">Игры об аналитике</p>
+        <p class="bento-cell-text">
+          Мини-игры в браузере: A/B Test, Funnel Drop, Snake, 2048, Pong. Работают на телефоне.
+        </p>
+        <a class="bento-cell-link" href={withBase('games/')} data-analytics="bento_arcade">
+          Играть →
+        </a>
+      </div>
 
-    <!-- Testimonials: пуст пока не собраны реальные отзывы (рендер без данных = ничего) -->
-    <div class="home-testimonials" data-order-analyst="7" data-order-learner="9">
-      <Testimonials lang="ru" />
-    </div>
-
-    <!-- Библиотека / сейчас читаю -->
-    <div class="home-library" data-order-analyst="8" data-order-learner="4">
-      <ReadingBlock lang="ru" />
-    </div>
-
-    <div class="home-strip" data-order-analyst="3" data-order-learner="1">
-      <MaterialStrip />
+      <!-- Testimonials -->
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
+        <Testimonials lang="ru" />
+      </div>
     </div>
   </div>
 </Base>

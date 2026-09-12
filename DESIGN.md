@@ -71,24 +71,32 @@ Goal: shift the homepage from a "dashboard-by-numbers" stack to an editorial + b
 - **Audience:** hiring managers in product analytics.
 - **Positioning:** "experienced analyst with product taste and technical depth".
 - **Style direction:** editorial + bento, dataviz-first.
-- **Scope (pilot):** Hero + navigation + design tokens only. Projects/About reorganization follows in the next phase.
+- **Scope:** Hero + navigation + design tokens (Phase 1); homepage restructure into editorial top + bento bottom (Phase 2).
 - **Theme:** system preference by default, manual toggle in nav, `prefers-reduced-motion` respected.
 - **Typography:** keep self-hosted Inter for UI/body; add a system serif/display stack (`--font-display`) for the hero name and major headings.
 - **Hero:** two-column editorial layout — identity + pitch + metrics + CTAs on the left, animated dataviz panel on the right (reuses `IntroShader` and floating metric cards).
 - **Navigation:** minimal top-bar with name/logo, Projects, About, Notes (RU) / Writing (EN), language switch, search, contact CTA, theme toggle. Start/Graph/Games removed from the main nav but remain reachable via direct URLs and internal links.
 - **Palette:** keep the existing teal/coral base; add a second `--text-accent-dataviz` token for graph/metric highlights so dataviz reads as information, not as a CTA.
+- **Homepage structure:** editorial top after hero (featured project spotlight + capabilities grid) and a bento grid bottom (career snapshot, knowledge graph, library, notes, arcade, testimonials).
 
-### Files touched in pilot
+### Files touched
 
-- `src/styles/global.css` — new tokens, editorial hero styles, flatter nav.
+- `src/styles/global.css` — new tokens, editorial hero + bento + featured-card styles, flatter nav.
 - `src/layouts/Base.astro` — simplified navigation links and labels.
-- `src/pages/index.astro` — new Russian hero layout.
-- `src/pages/en/index.astro` — new English hero layout.
+- `src/pages/index.astro` — new Russian hero + editorial/bento layout.
+- `src/pages/en/index.astro` — new English hero + editorial/bento layout.
 - `DESIGN.md` — this section.
+
+### Phase 2 (completed)
+
+- Replaced the long `home-stack`/`AudienceBar` dashboard with a focused editorial top + bento bottom on both language homepages.
+- Featured project spotlight surfaces `posthog.md` as the lead case (full loop: metric → hypothesis → experiment → decision).
+- CapabilitiesGrid remains as the skills editorial block.
+- Bento grid cells: `CareerSnapshot`, knowledge-graph link, `ReadingBlock`, notes link, arcade link, `Testimonials`.
+- Removed from homepage: `AudienceBar`, `HomeBoard`, `AskMe`, `Manifesto`, `TopicMap`, `ProjectTimeline`, `CollaborationFormats`, `MaterialStrip`, and the inline arcade section. These pages/components remain reachable via direct URLs.
 
 ### Next phase
 
-- Reorganize the rest of `index.astro` into an editorial top (Projects spotlight, About snapshot, Testimonials) + bento bottom (skills, graph, notes, reading).
 - Revisit project card inconsistency flagged in `project-card-title-text-normal.md` and `project-tool-accent-pill.md`.
 - Consider a hosted display serif with full Cyrillic coverage if the system stack feels too generic.
 
