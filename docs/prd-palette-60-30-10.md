@@ -150,12 +150,13 @@
 
 | Пара | Dark | Light | Cyberpunk | Class |
 |---|---|---|---|---|
-| text-normal / bg-primary | ~12:1 (verify) | ~16:1 (verify) | ~17:1 (verify) | Verified by hook |
-| text-muted / bg-primary | ~6.5:1 (verify) | ~7:1 (verify) | ~7:1 (verify) | Verified by hook |
-| text-accent / bg-secondary | ~5.5:1 (verify) | ~7:1 (verify) | ~7.5:1 (verify) | Verified by hook |
-| button-ink / button-bg | ~5:1 (verify) | ~5:1 (verify) | ~4.3:1 (verify) | Verified by hook |
+| text-normal / bg-primary | 11.94:1 | 15.22:1 | 17.27:1 | Verified (hook dark+light / computed cyberpunk) |
+| text-muted / bg-primary | 5.91:1 | 6.64:1 | 5.90:1 | Verified (hook dark+light / computed cyberpunk) |
+| text-accent / bg-secondary | 5.55:1 | 6.66:1 | 7.85:1 | Verified (hook dark+light / computed cyberpunk) |
+| button-ink / button-bg | 6.00:1 | 6.00:1 | 5.44:1 | Verified (hook dark+light / computed cyberpunk) |
+| border-active / bg-primary (3:1) | 6.36:1 | 5.72:1 | 8.27:1 | Verified (hook dark+light / computed cyberpunk) |
 
-> Числа помечены «(verify)» — точные значения выдаёт contrast-gate hook; здесь указаны оценки для планирования. Не считать Verified без отчёта hook (см. evidence-ledger).
+> Числа — WCAG 2.1, та же формула, что в `contrast-gate.js`. Dark+light Verified: hook отработал PostToolUse на правках `global.css` без блокировок (все пары ≥ порогов) + вычислены идентичной формулой. Cyberpunk Verified по вычислению; hook пока не охватывает cyberpunk (Q1 — решён: 5.44:1 проходит AA). TODO: добавить cyberpunk в массив `themes` хука, чтобы замкнуть механизм (см. PENDING).
 
 #### REQ-006: Правила применения по компонентам
 **Описание:** Зафиксировать, как роли распределяются по компонентам из DESIGN.md.
@@ -272,12 +273,13 @@
 ## 10. Open Questions & Risks
 
 ### Open Questions
-#### Q1: Cyberpunk button-ink на magenta проходит AA?
-- **Статус:** не измерено точно.
-- **Варианты:** (A) проходит 4.5:1 → ок; (B) только 3:1 → маркировать large-text only; (C) сдвинуть magenta светлее.
+#### Q1: Cyberpunk button-ink на magenta проходит AA? — РЕШЕНО
+- **Статус:** решено (вариант A). `#1a1a1a` на `#ff2bd6` = **5.44:1** — проходит AA normal text.
+- **Варианты:** (A) проходит 4.5:1 ✅; (B) только 3:1; (C) сдвинуть magenta светлее.
 - **Владелец:** frontend.
-- **Дедлайн:** Phase 1.
-- **Влияние:** Medium.
+- **Дедлайн:** Phase 1 — закрыто.
+- **Влияние:** Medium → Low.
+- **Примечание:** `contrast-gate.js` пока не охватывает cyberpunk; значение Verified по вычислению. TODO (отдельная задача): добавить cyberpunk в массив `themes` хука.
 
 ### Risks & Mitigation
 

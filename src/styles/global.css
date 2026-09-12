@@ -37,24 +37,33 @@
 }
 
 :root {
-  /* Obsidian dark theme colors (default) — dark teal */
+  /* Obsidian dark theme (default) — dark teal. Palette = 60-30-10:
+     60% dominant surfaces · 30% neutral text+borders · 10% coral accent.
+     Contrast verified WCAG AA by .claude/hooks/contrast-gate.js. */
+
+  /* 60% — DOMINANT: page / card / nested surfaces (teal family) */
   --background-primary: #0f2a2b;
   --background-secondary: #1a3435;
   --background-tertiary: #234044;
+  --interactive-normal: #234044;            /* alias of tertiary */
+  --interactive-hover: #3f3f46;             /* stepped surface */
+  --code-background: #234044;                /* alias of tertiary */
+  --table-header-background: #234044;        /* alias of tertiary */
+
+  /* 30% — SECONDARY: neutral text + hairlines (zinc) */
   --text-normal: #e4e4e7;
   --text-muted: #a1a1aa;
-  --text-accent: #ff8569;
-  --text-accent-hover: #ffa68a;
-  --button-bg: #ff6643;
-  --button-bg-hover: #e0532f;
-  --interactive-normal: #234044;
-  --interactive-hover: #3f3f46;
   --border-color: #3f3f46;
-  --border-active: #ff8569;
-  --code-background: #234044;
   --blockquote-border: #3f3f46;
   --table-border: #3f3f46;
-  --table-header-background: #234044;
+
+  /* 10% — ACCENT: coral, interactive semantics only */
+  --text-accent: #ff8569;
+  --text-accent-hover: #ffa68a;
+  --button-bg: #ff6643;                      /* coral fill, dark ink text */
+  --button-bg-hover: #e0532f;
+  --border-active: #ff8569;
+
   --shadow-color: rgba(0, 0, 0, 0.4);
   --font-sans:
     "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
@@ -93,23 +102,32 @@
 }
 
 [data-theme="light"] {
+  /* Light theme — warm cream dominant. Same 60-30-10 roles; accent shifts to
+     burnt sienna #a8331a for AA on light surfaces. Verified by contrast-gate. */
+
+  /* 60% — DOMINANT: page / card / nested surfaces */
   --background-primary: #f4efca;
   --background-secondary: #ffffff;
   --background-tertiary: #f4f4f5;
+  --interactive-normal: #f4f4f5;             /* alias of tertiary */
+  --interactive-hover: #e4e4e7;              /* stepped surface */
+  --code-background: #f4f4f5;                /* alias of tertiary */
+  --table-header-background: #f4f4f5;        /* alias of tertiary */
+
+  /* 30% — SECONDARY: neutral text + hairlines (zinc) */
   --text-normal: #18181b;
   --text-muted: #52525b;
-  --text-accent: #a8331a;
-  --text-accent-hover: #8a2a16;
-  --button-bg: #ff6643;
-  --button-bg-hover: #e0532f;
-  --interactive-normal: #f4f4f5;
-  --interactive-hover: #e4e4e7;
   --border-color: #e4e4e7;
-  --border-active: #a8331a;
-  --code-background: #f4f4f5;
   --blockquote-border: #e4e4e7;
   --table-border: #e4e4e7;
-  --table-header-background: #f4f4f5;
+
+  /* 10% — ACCENT: burnt sienna (light-adapted coral) + coral button fill */
+  --text-accent: #a8331a;
+  --text-accent-hover: #8a2a16;
+  --button-bg: #ff6643;                      /* kept coral: dark ink on it passes AA */
+  --button-bg-hover: #e0532f;
+  --border-active: #a8331a;
+
   --shadow-color: rgba(0, 0, 0, 0.08);
 }
 
@@ -1416,28 +1434,37 @@ button:focus-visible {
    in-progress teaser, prev/next nav, generic secondary button)
    ============================================================ */
 
-/* Cyberpunk theme — neon-on-near-black, orange/magenta accents */
+/* Cyberpunk theme — neon-on-near-black, orange/magenta accents.
+   Same 60-30-10 roles; button fill shifts to magenta, text-accent stays coral.
+   Contrast verified manually (contrast-gate.js covers dark + light only —
+   see docs/prd-palette-60-30-10.md REQ-005). */
 [data-theme="cyberpunk"] {
+  /* 60% — DOMINANT: page / card / nested surfaces (near-black indigo) */
   --background-primary: #0a0a12;
   --background-secondary: #11111d;
   --background-tertiary: #1a1a2e;
+  --interactive-normal: #1a1a2e;             /* alias of tertiary */
+  --interactive-hover: #232342;              /* stepped surface */
+  --code-background: #1a1a2e;                /* alias of tertiary */
+  --table-header-background: #1a1a2e;        /* alias of tertiary */
+
+  /* 30% — SECONDARY: neutral text + hairlines (cool zinc) */
   --text-normal: #e6f1ff;
   --text-muted: #8a8aa8;
+  --border-color: #2a2a4a;
+  --blockquote-border: #2a2a4a;
+  --table-border: #2a2a4a;
+
+  /* 10% — ACCENT: coral (interactive) + magenta (button fill) */
   /* #ff8569 (was #ff6643): the darker accent fails 1.4.3 on accent-tinted
      backgrounds (skill-badge, topic-count, search-facet). Matches the dark
      theme's accent so the same tint recipes pass there and here. */
   --text-accent: #ff8569;
   --text-accent-hover: #ffbe99;
-  --button-bg: #ff2bd6;
+  --button-bg: #ff2bd6;                      /* magenta fill, dark ink (5.44:1, AA) */
   --button-bg-hover: #ff5ce0;
-  --interactive-normal: #1a1a2e;
-  --interactive-hover: #232342;
-  --border-color: #2a2a4a;
   --border-active: #ff8569;
-  --code-background: #1a1a2e;
-  --blockquote-border: #2a2a4a;
-  --table-border: #2a2a4a;
-  --table-header-background: #1a1a2e;
+
   --shadow-color: rgba(255, 133, 105, 0.15);
 }
 
