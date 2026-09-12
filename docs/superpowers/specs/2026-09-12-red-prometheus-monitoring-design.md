@@ -32,7 +32,7 @@ site (Pages) ──sendBeacon──▶ red-exporter :9100/beacon ──▶ count
                                   ▼
                                PostHog (web-vitals p75 per path) ──▶ gauges (Duration)
 
-   red-exporter :9101/metrics (только в docker-сети) ──▶ Prometheus scrape 15s
+   red-exporter :9100/metrics (в docker-сети, не published на хост) ──▶ Prometheus scrape 15s
    Grafana ──query──▶ Prometheus
    cloudflared named tunnel: metrics.домен ──▶ red-exporter:9100/beacon
 ```
@@ -41,16 +41,19 @@ site (Pages) ──sendBeacon──▶ red-exporter :9100/beacon ──▶ count
 меньше движущихся частей — один контейнер, один scrape-target, один `/metrics`.
 Beacon-эндпоинт и PostHog-poller — разные ingest-пути в одном процессе.
 
-**Security-граница:** `/beacon` публичен (порт 9100, проброшен через tunnel),
-`/metrics` приватен (порт 9101, только внутри docker-сети, не published на хост).
-Prometheus скрейпит `red-exporter:9101`. Публичный интернет видит только `/beacon`.
+**Security-граница:** один uvicorn-процесс / один порт 9100 (один
+`prometheus_client` registry — иначе beacon-инкременты в процессе A не видны в
+`/metrics` процесса B). Порт 9100 не published на хост; публично доступен только
+через cloudflared, чей ingress фильтрует пути: `/beacon` и `/healthz` → exporter,
+остальное → 404. `/metrics` достижим только внутри docker-сети (Prometheus
+скрейпит `red-exporter:9100/metrics`). Публичный интернет видит только `/beacon` и `/healthz`.
 
 ## 3. Компоненты
 
 ### 3.1 red-exporter (Python, FastAPI + prometheus_client)
 - `POST /beacon` — приём `navigator.sendBeacon`, парсинг JSON, инкремент счётчиков.
 - Фоновый поток PostHog-poller (каждые `POSTHOG_PULL_INTERVAL` сек, по умолчанию 15).
-- `GET /metrics` (на порту 9101) — exposition-формат через `prometheus_client`.
+- `GET /metrics` (порт 9100, приватно в docker-сети) — exposition-формат через `prometheus_client`.
 - `GET /healthz` — liveness.
 - CORS для origin сайта на `/beacon`.
 - In-memory метрики (счётчики/гауги в процессе); рестарт = reset счётчиков —
@@ -195,9 +198,9 @@ SITE_ORIGIN=https://nikitaboyarkin.github.io
 - `make monitor-up` → `docker compose up -d` (prometheus, red-exporter, grafana, cloudflared).
 - `make monitor-down` → `docker compose down`.
 - `make monitor-logs` → `docker compose logs -f red-exporter`.
-- URL-ы: Prometheus `http://localhost:9090`, Grafana `http://localhost:3000`,
-  exporter `/metrics` приватно `red-exporter:9101` (через `docker exec` или
-  `make monitor-metrics` → `curl red-exporter:9101/metrics` из контейнера).
+- URL-ы: Prometheus `http://localhost:9090`, Grafana `http://localhost:3000`.
+  exporter `/metrics` приватно в docker-сети: `make monitor-metrics` →
+  `docker compose exec red-exporter curl -s localhost:9100/metrics`.
 - Named tunnel setup (one-time):
   1. `cloudflared tunnel login` (браузер, CF-аккаунт).
   2. `cloudflared tunnel create red-portfolio`.
