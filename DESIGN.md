@@ -90,6 +90,23 @@ The palette is formalized against the **60-30-10** rule (`docs/prd-palette-60-30
 
 Application budget: dominant 55–65% of any screen, secondary 25–35%, accent ≤15%. The accent is reserved for links, active nav, focus rings, `border-active`, primary button fill, accent bars, and badge pills — never as the fill of a content block.
 
+**Scoped exceptions** (raw hex outside the token system, by technical necessity — not palette drift):
+- `Base.astro` `theme-color` meta + `THEME_COLORS` JS map — meta content cannot be a CSS variable; values mirror the dominant 60% per theme.
+- `IntroShader.astro` — WebGL shader uniforms cannot read CSS variables; palette hexes are duplicated in JS arrays.
+- `graph.ts` — the knowledge graph uses a categorical data-viz palette (~20 hues for node categories), a separate domain from the UI palette.
+- `cv.astro` — a print-only CV page with its own scoped `:root` (`--ink`, `--muted`, `--accent #c63d1f`, `--line`, `--bg`) optimized for print contrast on white. `#c63d1f` is a deliberate print accent, not the UI coral; the scoped `:root` confines it to `/cv`.
+- Hardcoded button ink `#1a1a1a` in `KnowledgeGraph`, `AudienceBar`, `ReadingBlock` — the button-text convention (matches the contrast-gate `BUTTON_INK` constant); `AudienceBar` overrides to `#fff` in light theme for AA on the dark brick accent.
+
+## Palette Swatches — 60-30-10
+
+Bar widths approximate the 60/30/10 proportion (illustrative, not pixel-measured — see Goal 1 for a measured audit):
+
+```
+Dark       60% ▰▰▰▰▰▰▰▰▰▰  #0f2a2b teal       · 30% ▰▰▰▰▰  #e4e4e7 zinc    · 10% ▰▰  #ff8569 coral
+Light      60% ▰▰▰▰▰▰▰▰▰▰  #f4efca cream      · 30% ▰▰▰▰▰  #18181b zinc    · 10% ▰▰  #a8331a sienna
+Cyberpunk  60% ▰▰▰▰▰▰▰▰▰▰  #0a0a12 indigo     · 30% ▰▰▰▰▰  #e6f1ff cool    · 10% ▰▰  #ff8569 coral  (button fill: #ff2bd6 magenta)
+```
+
 ## Color Wheel & Harmony
 
 - **Dominant + accent = near-complementary pair.** Teal (≈180°) and coral (≈15°) sit on opposite sides of the color wheel, giving the 10% accent the tension the rule calls for. The single accent hue is a deliberate constraint: a second accent would dilute the "accent = action" semantics.
