@@ -109,6 +109,26 @@ Light      60% ▰▰▰▰▰▰▰▰▰▰  #f4efca cream      · 30% ▰▰�
 Cyberpunk  60% ▰▰▰▰▰▰▰▰▰▰  #0a0a12 indigo     · 30% ▰▰▰▰▰  #e6f1ff cool    · 10% ▰▰  #ff8569 coral  (button fill: #ff2bd6 magenta)
 ```
 
+## Visual Area Audit — Phase 2
+
+Measured on `/` with `scripts/audit-palette-coverage.mjs` (Playwright + pngjs). Viewport screenshots at desktop/tablet/mobile in all three themes; each sampled pixel classified to the nearest palette hex (Euclidean RGB, threshold 25) into a 60/30/10 bucket. Pixels too far from the palette → `other` (photos, WebGL hero shader, anti-aliased edges). Evidence class: **Verified** (real rendered pixels).
+
+| Theme | Breakpoint | 60% palette | 30% palette | 10% palette | other (screen) | verdict (60/30/10) |
+|---|---|---:|---:|---:|---:|---|
+| dark | desktop | 95.2 | 2.0 | 2.8 | 4.6 | CHECK/CHECK/PASS |
+| dark | tablet | 93.2 | 3.1 | 3.6 | 15.5 | CHECK/CHECK/PASS |
+| dark | mobile | 93.0 | 2.0 | 5.0 | 3.5 | CHECK/CHECK/PASS |
+| light | desktop | 95.8 | 2.0 | 2.2 | 5.2 | CHECK/CHECK/PASS |
+| light | tablet | 94.3 | 2.5 | 3.2 | 9.3 | CHECK/CHECK/PASS |
+| light | mobile | 92.4 | 2.5 | 5.0 | 3.6 | CHECK/CHECK/PASS |
+| cyberpunk | desktop | 96.2 | 1.4 | 2.3 | 5.0 | CHECK/CHECK/PASS |
+| cyberpunk | tablet | 94.7 | 2.1 | 3.2 | 16.4 | CHECK/CHECK/PASS |
+| cyberpunk | mobile | 93.5 | 1.6 | 4.9 | 3.0 | CHECK/CHECK/PASS |
+
+**Result:** the home page does **not** meet the 60-30-10 area budget. The dominant background (full-viewport hero + page surface) covers 92–96% of palette area instead of 55–65%. Secondary (text + borders) is only 1.5–3% vs the 25–35% target. Accent is within the ≤15% cap (2–5%). The gap is structural: the design relies on large dominant-color fields with comparatively small text/border area. Inner pages with denser content cards may balance better; the audit script can be re-run on `/projects`, `/about`, `/contacts` to check.
+
+Screenshots + `summary.json` → `reports/palette-audit/`.
+
 ## Color Wheel & Harmony
 
 - **Dominant + accent = near-complementary pair.** Teal (≈180°) and coral (≈15°) sit on opposite sides of the color wheel, giving the 10% accent the tension the rule calls for. The single accent hue is a deliberate constraint: a second accent would dilute the "accent = action" semantics.

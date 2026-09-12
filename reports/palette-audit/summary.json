@@ -1,0 +1,218 @@
+[
+  {
+    "theme": "dark",
+    "breakpoint": "desktop",
+    "dims": "1440x900",
+    "total_sampled_px": 324000,
+    "palette_px": 309115,
+    "share_of_screen": {
+      "10": 2.6,
+      "30": 1.9,
+      "60": 90.9,
+      "other": 4.6
+    },
+    "share_of_palette": {
+      "10": 2.8,
+      "30": 2,
+      "60": 95.2
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/dark-desktop-1440x900.png"
+  },
+  {
+    "theme": "dark",
+    "breakpoint": "tablet",
+    "dims": "768x1024",
+    "total_sampled_px": 196608,
+    "palette_px": 166082,
+    "share_of_screen": {
+      "10": 3.1,
+      "30": 2.6,
+      "60": 78.8,
+      "other": 15.5
+    },
+    "share_of_palette": {
+      "10": 3.6,
+      "30": 3.1,
+      "60": 93.2
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/dark-tablet-768x1024.png"
+  },
+  {
+    "theme": "dark",
+    "breakpoint": "mobile",
+    "dims": "375x812",
+    "total_sampled_px": 76328,
+    "palette_px": 73674,
+    "share_of_screen": {
+      "10": 4.8,
+      "30": 1.9,
+      "60": 89.8,
+      "other": 3.5
+    },
+    "share_of_palette": {
+      "10": 5,
+      "30": 2,
+      "60": 93
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/dark-mobile-375x812.png"
+  },
+  {
+    "theme": "light",
+    "breakpoint": "desktop",
+    "dims": "1440x900",
+    "total_sampled_px": 324000,
+    "palette_px": 307140,
+    "share_of_screen": {
+      "10": 2.1,
+      "30": 1.9,
+      "60": 90.8,
+      "other": 5.2
+    },
+    "share_of_palette": {
+      "10": 2.2,
+      "30": 2,
+      "60": 95.8
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/light-desktop-1440x900.png"
+  },
+  {
+    "theme": "light",
+    "breakpoint": "tablet",
+    "dims": "768x1024",
+    "total_sampled_px": 196608,
+    "palette_px": 178355,
+    "share_of_screen": {
+      "10": 2.9,
+      "30": 2.3,
+      "60": 85.5,
+      "other": 9.3
+    },
+    "share_of_palette": {
+      "10": 3.2,
+      "30": 2.5,
+      "60": 94.3
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/light-tablet-768x1024.png"
+  },
+  {
+    "theme": "light",
+    "breakpoint": "mobile",
+    "dims": "375x812",
+    "total_sampled_px": 76328,
+    "palette_px": 73581,
+    "share_of_screen": {
+      "10": 4.9,
+      "30": 2.4,
+      "60": 89.1,
+      "other": 3.6
+    },
+    "share_of_palette": {
+      "10": 5,
+      "30": 2.5,
+      "60": 92.4
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/light-mobile-375x812.png"
+  },
+  {
+    "theme": "cyberpunk",
+    "breakpoint": "desktop",
+    "dims": "1440x900",
+    "total_sampled_px": 324000,
+    "palette_px": 307649,
+    "share_of_screen": {
+      "10": 2.2,
+      "30": 1.4,
+      "60": 91.4,
+      "other": 5
+    },
+    "share_of_palette": {
+      "10": 2.3,
+      "30": 1.4,
+      "60": 96.2
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/cyberpunk-desktop-1440x900.png"
+  },
+  {
+    "theme": "cyberpunk",
+    "breakpoint": "tablet",
+    "dims": "768x1024",
+    "total_sampled_px": 196608,
+    "palette_px": 164419,
+    "share_of_screen": {
+      "10": 2.6,
+      "30": 1.8,
+      "60": 79.2,
+      "other": 16.4
+    },
+    "share_of_palette": {
+      "10": 3.2,
+      "30": 2.1,
+      "60": 94.7
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/cyberpunk-tablet-768x1024.png"
+  },
+  {
+    "theme": "cyberpunk",
+    "breakpoint": "mobile",
+    "dims": "375x812",
+    "total_sampled_px": 76328,
+    "palette_px": 74026,
+    "share_of_screen": {
+      "10": 4.8,
+      "30": 1.6,
+      "60": 90.7,
+      "other": 3
+    },
+    "share_of_palette": {
+      "10": 4.9,
+      "30": 1.6,
+      "60": 93.5
+    },
+    "budget_verdict": {
+      "10": "PASS",
+      "30": "CHECK",
+      "60": "CHECK"
+    },
+    "screenshot": "reports/palette-audit/cyberpunk-mobile-375x812.png"
+  }
+]
