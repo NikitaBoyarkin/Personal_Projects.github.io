@@ -62,6 +62,7 @@
   --text-accent-hover: #ffa68a;
   --button-bg: #ff6643;                      /* coral fill, dark ink text */
   --button-bg-hover: #e0532f;
+  --button-ink: #1a1a1a;                     /* dark ink on accent/button fill (AA) */
   --border-active: #ff8569;
 
   --shadow-color: rgba(0, 0, 0, 0.4);
@@ -126,6 +127,7 @@
   --text-accent-hover: #8a2a16;
   --button-bg: #ff6643;                      /* kept coral: dark ink on it passes AA */
   --button-bg-hover: #e0532f;
+  --button-ink: #1a1a1a;                     /* dark ink on coral button (AA) */
   --border-active: #a8331a;
 
   --shadow-color: rgba(0, 0, 0, 0.08);
@@ -188,7 +190,7 @@ p {
   left: var(--space-4);
   z-index: var(--z-top);
   background: var(--text-accent);
-  color: #1a1a1a;
+  color: var(--button-ink);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--space-2);
   text-decoration: none;
@@ -486,7 +488,7 @@ nav ul.links a[aria-current="page"] {
   align-items: center;
   gap: var(--space-2);
   background: var(--button-bg);
-  color: #1a1a1a;
+  color: var(--button-ink);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -596,7 +598,7 @@ nav ul.links a[aria-current="page"] {
    accent color via .button.button-secondary, which would otherwise be overridden here too. */
 .intro-content a.button:not(.button-secondary),
 .intro-content a.button:not(.button-secondary):hover {
-  color: #1a1a1a;
+  color: var(--button-ink);
 }
 
 .intro-content a.button::after {
@@ -831,7 +833,7 @@ nav ul.links a[aria-current="page"] {
   align-items: center;
   gap: var(--space-2);
   background: var(--button-bg);
-  color: #1a1a1a;
+  color: var(--button-ink);
   padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-md);
   text-decoration: none;
@@ -1419,7 +1421,7 @@ html {
 /* Selection color */
 ::selection {
   background: var(--text-accent);
-  color: #1a1a1a;
+  color: var(--button-ink);
 }
 
 /* Focus styles for accessibility */
@@ -1463,6 +1465,7 @@ button:focus-visible {
   --text-accent-hover: #ffbe99;
   --button-bg: #ff2bd6;                      /* magenta fill, dark ink (5.44:1, AA) */
   --button-bg-hover: #ff5ce0;
+  --button-ink: #1a1a1a;                     /* dark ink on magenta button (5.44:1, AA) */
   --border-active: #ff8569;
 
   --shadow-color: rgba(255, 133, 105, 0.15);
@@ -1505,7 +1508,7 @@ button:focus-visible {
   margin-top: var(--space-4);
 }
 .now-teaser-cta a {
-  color: #1a1a1a; /* primary button convention: dark text on --button-bg */
+  color: var(--button-ink); /* primary button convention: dark text on --button-bg */
   text-decoration: none;
   font-weight: 600;
 }
@@ -1902,7 +1905,7 @@ button:focus-visible {
   border: 1px solid color-mix(in srgb, var(--text-accent) 22%, transparent);
 }
 .strip-badge-project {
-  color: #1a1a1a;
+  color: var(--button-ink);
   background: var(--text-accent);
   border-color: var(--text-accent);
 }
