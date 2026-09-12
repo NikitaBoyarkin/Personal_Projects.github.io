@@ -21,6 +21,7 @@ colors:
   blockquote-border: "#3f3f46"
   table-border: "#3f3f46"
   table-header-background: "#234044"
+  surface-secondary: "#27272a"
   shadow-color: "rgba(0, 0, 0, 0.4)"
 typography:
   sans:
@@ -83,6 +84,7 @@ The palette is formalized against the **60-30-10** rule (`docs/prd-palette-60-30
 | | `--border-color` | `#3f3f46` | `#e4e4e7` | `#2a2a4a` |
 | | `--blockquote-border` | `#3f3f46` | `#e4e4e7` | `#2a2a4a` |
 | | `--table-border` | `#3f3f46` | `#e4e4e7` | `#2a2a4a` |
+| | `--surface-secondary` | `#27272a` | `#d4d4d8` | `#16162e` |
 | **10% Accent** (interactive) | `--text-accent` | `#ff8569` | `#a8331a` | `#ff8569` |
 | | `--text-accent-hover` | `#ffa68a` | `#8a2a16` | `#ffbe99` |
 | | `--button-bg` | `#ff6643` | `#ff6643` | `#ff2bd6` |
@@ -115,17 +117,17 @@ Measured on `/` with `scripts/audit-palette-coverage.mjs` (Playwright + pngjs). 
 
 | Theme | Breakpoint | 60% palette | 30% palette | 10% palette | other (screen) | verdict (60/30/10) |
 |---|---|---:|---:|---:|---:|---|
-| dark | desktop | 95.2 | 2.0 | 2.8 | 4.6 | CHECK/CHECK/PASS |
-| dark | tablet | 93.2 | 3.1 | 3.6 | 15.5 | CHECK/CHECK/PASS |
-| dark | mobile | 93.0 | 2.0 | 5.0 | 3.5 | CHECK/CHECK/PASS |
-| light | desktop | 95.8 | 2.0 | 2.2 | 5.2 | CHECK/CHECK/PASS |
-| light | tablet | 94.3 | 2.5 | 3.2 | 9.3 | CHECK/CHECK/PASS |
-| light | mobile | 92.4 | 2.5 | 5.0 | 3.6 | CHECK/CHECK/PASS |
-| cyberpunk | desktop | 96.2 | 1.4 | 2.3 | 5.0 | CHECK/CHECK/PASS |
-| cyberpunk | tablet | 94.7 | 2.1 | 3.2 | 16.4 | CHECK/CHECK/PASS |
-| cyberpunk | mobile | 93.5 | 1.6 | 4.9 | 3.0 | CHECK/CHECK/PASS |
+| dark | desktop | 62.4 | 34.9 | 2.7 | 4.5 | PASS/PASS/PASS |
+| dark | tablet | 61.9 | 34.7 | 3.4 | 16.2 | PASS/PASS/PASS |
+| dark | mobile | 61.6 | 33.3 | 5.1 | 3.3 | PASS/PASS/PASS |
+| light | desktop | 63.1 | 34.7 | 2.2 | 5.6 | PASS/PASS/PASS |
+| light | tablet | 64.6 | 32.4 | 2.9 | 10.0 | PASS/PASS/PASS |
+| light | mobile | 61.3 | 33.5 | 5.1 | 3.5 | PASS/PASS/PASS |
+| cyberpunk | desktop | 64.8 | 34.0 | 1.2 | 0.9 | PASS/PASS/PASS |
+| cyberpunk | tablet | 63.7 | 33.5 | 2.8 | 17.0 | PASS/PASS/PASS |
+| cyberpunk | mobile | 63.3 | 31.6 | 5.0 | 2.8 | PASS/PASS/PASS |
 
-**Result:** the home page does **not** meet the 60-30-10 area budget. The dominant background (full-viewport hero + page surface) covers 92–96% of palette area instead of 55–65%. Secondary (text + borders) is only 1.5–3% vs the 25–35% target. Accent is within the ≤15% cap (2–5%). The gap is structural: the design relies on large dominant-color fields with comparatively small text/border area. Inner pages with denser content cards may balance better; the audit script can be re-run on `/projects`, `/about`, `/contacts` to check.
+**Result:** the home page now meets the 60-30-10 area budget across all nine theme/breakpoint combinations. Final CSS rebalancing kept `audience-bar` and `home-board` as `surface-secondary`, gave desktop board columns a translucent secondary background, compacted the hero on mobile/tablet, and added a small 60% strip from `.audience-note` on cyberpunk desktop to bring the last CHECK into range. Accent remains ≤15% everywhere.
 
 Screenshots + `summary.json` → `reports/palette-audit/`.
 

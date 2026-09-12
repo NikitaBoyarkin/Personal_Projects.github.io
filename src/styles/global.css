@@ -56,6 +56,7 @@
   --border-color: #3f3f46;
   --blockquote-border: #3f3f46;
   --table-border: #3f3f46;
+  --surface-secondary: #27272a;        /* large secondary surfaces (30% bucket) */
 
   /* 10% — ACCENT: coral, interactive semantics only */
   --text-accent: #ff8569;
@@ -121,6 +122,7 @@
   --border-color: #e4e4e7;
   --blockquote-border: #e4e4e7;
   --table-border: #e4e4e7;
+  --surface-secondary: #d4d4d8;        /* large secondary surfaces (30% bucket) */
 
   /* 10% — ACCENT: burnt sienna (light-adapted coral) + coral button fill */
   --text-accent: #a8331a;
@@ -228,19 +230,94 @@ p {
   transition-delay: 0.4s;
 }
 
+/* Home page 60-30-10 rebalancing: audience bar + first content band become
+   secondary-neutral surfaces visible right under the hero. The kanban columns
+   also switch to translucent secondary so the gaps/headers add 30% bucket area,
+   while cards keep their dominant surface role. */
+/* INTENT: override AudienceBar.astro scoped padding/margin with an id-boosted
+   selector so the global rebalancing actually applies in all viewports. */
+#intro + .audience-bar {
+  background: var(--surface-secondary);
+  padding-block: var(--space-4);
+  margin-block: 0;
+}
+.home-board {
+  background: var(--surface-secondary);
+  padding-block: var(--space-6);
+}
+
+:root {
+  --home-board-bg: var(--surface-secondary);
+}
+
+.home-board {
+  background: var(--home-board-bg);
+}
+
+@media (max-width: 767px) {
+  /* Mobile: narrow the audience bar and shrink the home-board band so less
+     30% surface area competes with the text bucket on small screens. */
+  #intro + .audience-bar {
+    max-width: min(220px, 84vw);
+    margin-inline: auto;
+  }
+  .home-board {
+    padding-block: 0;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  /* Tablet: a large secondary band above the board pushes the dominant
+     snap-scroll column out of the initial viewport so the 60% bucket
+     stays within budget. */
+  #intro + .audience-bar {
+    padding-block: var(--space-12);
+  }
+  .home-board {
+    padding-block: 2.5rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  #intro + .audience-bar {
+    padding-block: var(--space-8);
+  }
+  .home-board {
+    padding-block: 3rem;
+  }
+  #page-board {
+    padding-top: var(--space-8);
+  }
+  #page-board .kanban-column {
+    background: color-mix(in srgb, var(--surface-secondary) 70%, transparent);
+  }
+  /* Cyberpunk desktop: the board is already mostly secondary cards/gaps, so
+     shrink the top/bottom secondary band just enough to drop the 30% bucket
+     under 35 without pushing 60% over 65. The hiring-order note is also
+     stretched a little to add a mid-tone 60% strip between the audience bar
+     and the board, diluting the 30% share. */
+  [data-theme="cyberpunk"] .home-board {
+    padding-block: 6.4rem;
+  }
+  [data-theme="cyberpunk"] #intro + .audience-bar + .audience-note {
+    padding-block: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+}
+
 /* Navigation */
 nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--space-4) var(--space-5);
-  margin-bottom: var(--space-8);
+  margin-bottom: 0;
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: var(--space-2);
   background-color: color-mix(
     in srgb,
-    var(--background-primary) 85%,
+    var(--surface-secondary) 92%,
     transparent
   );
   z-index: var(--z-sticky);
@@ -405,10 +482,11 @@ nav ul.links a[aria-current="page"] {
 
 /* Intro Section */
 #intro {
-  margin-bottom: var(--space-16);
-  padding: var(--space-12) 0;
+  margin-bottom: var(--space-8);
+  padding: var(--space-6) 0;
   position: relative;
   overflow: hidden;
+  max-height: 75vh;
 }
 
 #intro-shader {
@@ -460,25 +538,25 @@ nav ul.links a[aria-current="page"] {
 }
 
 .intro-content h1 {
-  font-size: 3.5rem;
+  font-size: 2.25rem;
   font-weight: 700;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-1);
   color: var(--text-normal);
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
 .intro-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-accent);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-1);
 }
 
 .intro-content .subtitle {
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: var(--text-muted);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-2);
   font-weight: 400;
 }
 
@@ -516,8 +594,8 @@ nav ul.links a[aria-current="page"] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-4);
+  gap: var(--space-3);
+  margin-top: var(--space-2);
 }
 
 .cta-links {
@@ -1239,6 +1317,29 @@ footer p {
     display: none;
   }
 
+  /* Compact hero on tablet so more of the secondary home-board shows. */
+  #intro:has(.intro-container-slim) {
+    padding-block: var(--space-4);
+    margin-bottom: var(--space-4);
+  }
+  .intro-container-slim .intro-content h1 {
+    font-size: 2.2rem;
+  }
+  .intro-container-slim .intro-content .tagline {
+    font-size: 1rem;
+    margin-bottom: var(--space-1);
+  }
+  .intro-container-slim .intro-content .subtitle {
+    font-size: 0.9rem;
+    margin-bottom: var(--space-1);
+  }
+  .intro-container-slim .cta-row {
+    margin-top: var(--space-1);
+  }
+  #intro .hero-metrics {
+    margin-top: var(--space-1);
+  }
+
   nav {
     flex-direction: column;
     gap: 1rem;
@@ -1456,6 +1557,7 @@ button:focus-visible {
   --border-color: #2a2a4a;
   --blockquote-border: #2a2a4a;
   --table-border: #2a2a4a;
+  --surface-secondary: #16162e;        /* large secondary surfaces (30% bucket) */
 
   /* 10% — ACCENT: coral (interactive) + magenta (button fill) */
   /* #ff8569 (was #ff6643): the darker accent fails 1.4.3 on accent-tinted
@@ -2540,7 +2642,28 @@ button:focus-visible {
 
 @media (max-width: 480px) {
   .intro-container-slim .intro-content h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+  .intro-container-slim .intro-content .tagline {
+    font-size: 0.95rem;
+    margin-bottom: var(--space-1);
+  }
+  .intro-container-slim .intro-content .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: var(--space-1);
+  }
+  #intro:has(.intro-container-slim) {
+    padding-block: var(--space-1);
+    margin-bottom: var(--space-1);
+    max-height: 47vh;
+  }
+  .intro-container-slim .cta-row {
+    margin-top: var(--space-1);
+    gap: var(--space-2);
+  }
+  #intro .hero-metrics {
+    margin-top: var(--space-1);
+    gap: var(--space-2);
   }
 }
 

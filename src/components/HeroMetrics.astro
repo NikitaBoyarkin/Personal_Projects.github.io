@@ -113,8 +113,8 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
   .hero-metrics {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-6);
-    margin-top: var(--space-8);
+    gap: var(--space-4);
+    margin-top: var(--space-2);
   }
   .hero-metric {
     display: flex;
@@ -123,14 +123,14 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
   }
   .hero-metric-value {
     font-family: var(--font-mono);
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-accent);
     font-variant-numeric: tabular-nums;
     line-height: 1;
   }
   .hero-metric-label {
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
     max-width: 12ch;
     line-height: 1.35;
@@ -138,10 +138,10 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
 
   @media (max-width: 640px) {
     .hero-metrics {
-      gap: var(--space-4);
+      gap: var(--space-3);
     }
     .hero-metric-value {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
     }
   }
 </style>

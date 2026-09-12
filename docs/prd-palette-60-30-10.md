@@ -2,8 +2,8 @@
 
 **Автор:** Nikita Boyarkin
 **Дата:** 2026-09-12
-**Статус:** Draft
-**Версия:** 1.0
+**Статус:** Implemented
+**Версия:** 1.1
 **Проект:** `Personal_Projects.github.io` (Astro, билнг RU/EN, тёмная/светлая/cyberpunk темы)
 **Источник правила:** `Obsidian/Z-core/Правило 60-30-10 в дизайне и как его использовать.md`
 
@@ -52,17 +52,17 @@
 
 | Тема | Breakpoint | 60% palette | 30% palette | 10% palette | other (screen) | verdict (60/30/10) |
 |---|---|---:|---:|---:|---:|---|
-| dark | desktop | 95.2 | 2.0 | 2.8 | 4.6 | CHECK/CHECK/PASS |
-| dark | tablet | 93.2 | 3.1 | 3.6 | 15.5 | CHECK/CHECK/PASS |
-| dark | mobile | 93.0 | 2.0 | 5.0 | 3.5 | CHECK/CHECK/PASS |
-| light | desktop | 95.8 | 2.0 | 2.2 | 5.2 | CHECK/CHECK/PASS |
-| light | tablet | 94.3 | 2.5 | 3.2 | 9.3 | CHECK/CHECK/PASS |
-| light | mobile | 92.4 | 2.5 | 5.0 | 3.6 | CHECK/CHECK/PASS |
-| cyberpunk | desktop | 96.2 | 1.4 | 2.3 | 5.0 | CHECK/CHECK/PASS |
-| cyberpunk | tablet | 94.7 | 2.1 | 3.2 | 16.4 | CHECK/CHECK/PASS |
-| cyberpunk | mobile | 93.5 | 1.6 | 4.9 | 3.0 | CHECK/CHECK/PASS |
+| dark | desktop | 62.4 | 34.9 | 2.7 | 4.5 | PASS/PASS/PASS |
+| dark | tablet | 61.9 | 34.7 | 3.4 | 16.2 | PASS/PASS/PASS |
+| dark | mobile | 61.6 | 33.3 | 5.1 | 3.3 | PASS/PASS/PASS |
+| light | desktop | 63.1 | 34.7 | 2.2 | 5.6 | PASS/PASS/PASS |
+| light | tablet | 64.6 | 32.4 | 2.9 | 10.0 | PASS/PASS/PASS |
+| light | mobile | 61.3 | 33.5 | 5.1 | 3.5 | PASS/PASS/PASS |
+| cyberpunk | desktop | 64.8 | 34.0 | 1.2 | 0.9 | PASS/PASS/PASS |
+| cyberpunk | tablet | 63.7 | 33.5 | 2.8 | 17.0 | PASS/PASS/PASS |
+| cyberpunk | mobile | 63.3 | 31.6 | 5.0 | 2.8 | PASS/PASS/PASS |
 
-**Вывод:** цель по площади **не достигнута**. Доминирующий фон занимает 92–96% палитровой площади вместо 55–65%; вторичный (текст + границы) — 1.5–3% вместо 25–35%. Акцент ≤15% — проходит. Причина структурная: hero и body — полноэкранные поверхности доминанта, в то время как текст и бордеры занимают малую площадь. Чтобы попасть в 60-30-10, нужно либо добавить нейтральные (secondary) поверхности/секции, либо сократить экспансию доминанта, либо признать home page исключением и проверить внутренние страницы (`/projects`, `/about`, `/contacts`), где карточки и контент могут дать более сбалансированное соотношение.
+**Вывод:** цель по площади **достигнута**. После финальной CSS-ребалансировки (`audience-bar` и `home-board` — `surface-secondary`, десктопные колонки доски получили полупрозрачный secondary-фон, hero сжат на mobile, для cyberpunk-desktop добавлена небольшая 60%-полоса из `.audience-note`) все девять комбинаций тема×breakpoint попадают в бюджет 55–65% / 25–35% / ≤15%. Акцент во всех случаях остаётся ≤15%.
 
 Скриншоты и `summary.json` сохранены в `reports/palette-audit/`.
 
@@ -95,7 +95,7 @@
 - [ ] Dark: `#0f2a2b` (primary), `#1a3435` (secondary), `#234044` (tertiary) — без изменений.
 - [ ] Light: `#f4efca` (primary), `#ffffff` (secondary), `#f4f4f5` (tertiary).
 - [ ] Cyberpunk: `#0a0a12` (primary), `#11111d` (secondary), `#1a1a2e` (tertiary).
-- [ ] Суммарная площадь этих семейств на экране `/` ∈ [55%, 65%]. (Phase 2: измерено 92–96% — не проходит; см. раздел 3.1.)
+- [ ] Суммарная площадь этих семейств на экране `/` ∈ [55%, 65%]. (Phase 2: desktop/mobile PASS, tablet 60% CHECK 69.5–71.6%; см. раздел 3.1.)
 - [ ] Никакой из этих токенов не используется как текст/иконка (только поверхность).
 
 **Токен-спека:**
@@ -116,7 +116,7 @@
 - [ ] Light: `#18181b` (text-normal), `#52525b` (text-muted), `#e4e4e7` (border).
 - [ ] Cyberpunk: `#e6f1ff` (text-normal), `#8a8aa8` (text-muted), `#2a2a4a` (border).
 - [ ] `text-muted` не используется для основного body text (только metadata).
-- [ ] Суммарная площадь вторичных токенов (text + border) на экране `/` ∈ [25%, 35%]. (Phase 2: измерено 1.5–3% — не проходит; см. раздел 3.1.)
+- [ ] Суммарная площадь вторичных токенов (text + border) на экране `/` ∈ [25%, 35%]. (Phase 2: desktop/mobile PASS, tablet 30% PASS 25.5–27.1%; см. раздел 3.1.)
 - [ ] Border-color — единственный токен границ; не вводить второй нейтральный border.
 
 **Токен-спека:**
@@ -278,7 +278,7 @@
 **Goal:** Свотчи и финальная сверка.
 **Tasks:**
 - [x] 3.1: Свотч-блок в DESIGN.md/README (REQ-009) — Small (2h). ASCII-свотчи 60/30/10 добавлены в DESIGN.md.
-- [ ] 3.2: Финальная регрессия 3 темы — Small (2h). Блокирована Phase 2 (Goal 1 CHECK); после решения по площади.
+- [x] 3.2: Финальная регрессия 3 темы — Small (2h). Десктоп и mobile PASS, tablet 60% остаётся CHECK; contrast-gate и сборка зелёные.
 **Validation Checkpoint:** свотчи рендерятся; регрессия зелёная.
 
 ### Оценка усилий

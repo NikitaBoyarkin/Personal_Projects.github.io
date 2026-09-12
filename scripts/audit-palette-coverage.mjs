@@ -30,17 +30,17 @@ const STEP = 2;      // sample every Nth pixel per dimension (4x downsample at 2
 const palettes = {
   dark: {
     '60': ['0f2a2b', '1a3435', '234044'],
-    '30': ['e4e4e7', 'a1a1aa', '3f3f46'],
+    '30': ['e4e4e7', 'a1a1aa', '3f3f46', '27272a'],
     '10': ['ff8569', 'ffa68a', 'ff6643', 'e0532f'],
   },
   light: {
     '60': ['f4efca', 'ffffff', 'f4f4f5'],
-    '30': ['18181b', '52525b', 'e4e4e7'],
+    '30': ['18181b', '52525b', 'e4e4e7', 'd4d4d8'],
     '10': ['a8331a', '8a2a16', 'ff6643', 'e0532f'],
   },
   cyberpunk: {
     '60': ['0a0a12', '11111d', '1a1a2e'],
-    '30': ['e6f1ff', '8a8aa8', '2a2a4a'],
+    '30': ['e6f1ff', '8a8aa8', '2a2a4a', '16162e'],
     '10': ['ff8569', 'ffbe99', 'ff2bd6', 'ff5ce0'],
   },
 };
