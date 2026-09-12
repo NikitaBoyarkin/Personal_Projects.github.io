@@ -212,7 +212,7 @@ def check_metrics_drift() -> int:
         return 1
     card_count = len(list(projects_dir.glob("*.md")))
     text = metrics_file.read_text(encoding="utf-8")
-    m = re.search(r"portfolio:\s*\{\s*projects:\s*(\d+)", text)
+    m = re.search(r"portfolio:\s*\{.*?projects:\s*(\d+)", text, re.DOTALL)
     if not m:
         print("  ERROR: could not parse METRICS.portfolio.projects from metrics.ts")
         return 1
