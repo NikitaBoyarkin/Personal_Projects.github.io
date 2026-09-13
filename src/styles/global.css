@@ -1080,6 +1080,28 @@ nav ul.links a[aria-current="page"] {
   line-height: 1.35;
 }
 
+/* Stack groups inside a bento cell: category label + chips. */
+.stack-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.stack-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stack-group-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
 .bento-chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -1187,6 +1209,11 @@ nav ul.links a[aria-current="page"] {
   .bento-cell-wide,
   .bento-cell-full {
     grid-column: span 1;
+  }
+
+  .stack-groups {
+    flex-direction: column;
+    gap: var(--space-3);
   }
 }
 

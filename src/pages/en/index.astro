@@ -22,14 +22,14 @@ const jsonLd = {
       '@type': 'Person',
       name: 'Nikita Boyarkin',
       url: siteUrl,
-      jobTitle: 'Data Analyst / Product Analyst',
+      jobTitle: 'Product Analyst',
       sameAs: [
         'https://github.com/NikitaBoyarkin',
         'https://www.linkedin.com/in/nikita-boyarkin',
       ],
       hasOccupation: {
         '@type': 'Occupation',
-        name: 'Data Analyst / Product Analyst',
+        name: 'Product Analyst',
       },
       alumniOf: {
         '@type': 'CollegeOrUniversity',
@@ -65,8 +65,8 @@ const jsonLd = {
 ---
 
 <Base
-  title="Nikita Boyarkin | Data Analyst / Product Analyst"
-  description="Portfolio of Nikita Boyarkin — Data Analyst / Product Analyst. Projects in SQL, Python, A/B testing, visualization, and customer analytics."
+  title="Nikita Boyarkin | Product Analyst"
+  description="Portfolio of Nikita Boyarkin — product analyst. Turning data into growth: A/B tests, funnels, retention, SQL, and Python."
   ogImage="/images/og/portfolio-banner.png"
   canonical={withBase('en/')}
   activeNav="home"
@@ -87,17 +87,17 @@ const jsonLd = {
           loading="eager"
           fetchpriority="high"
         />
-        <h1 class="hero-name">Nikita Boyarkin</h1>
-        <p class="hero-role">Data / Product Analyst · SQL · Python · A/B testing</p>
+        <h1 class="hero-name">Product Analyst</h1>
+        <p class="hero-role">who turns data into growth</p>
         <p class="hero-pitch tagline">
-          Hypothesis → experiment → metric → growth.
+          Hypothesis → experiment → metric → growth. SQL, Python, A/B testing, and product analytics for teams that ship by evidence.
         </p>
 
         <HeroMetrics lang="en" />
 
         <p class="cta-row">
           <HeroCta lang="en" />
-          <a class="button button-secondary" href={withBase('en/projects/')} data-analytics="hero_projects">Projects</a>
+          <a class="button button-secondary" href={withBase('en/contact/')} data-analytics="hero_contact">Get in touch</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener" data-analytics="hero_cv">CV</a>
         </p>
       </div>
@@ -115,7 +115,7 @@ const jsonLd = {
           </div>
           <div class="hero-viz-card">
             <dt>Portfolio projects</dt>
-            <dd>14</dd>
+            <dd>15</dd>
           </div>
         </dl>
       </div>
@@ -126,7 +126,7 @@ const jsonLd = {
   <div class="home-layout">
     <!-- Featured project -->
     <section class="editorial-section" id="featured-project" aria-labelledby="featured-heading">
-      <h2 id="featured-heading">Featured project</h2>
+      <h2 id="featured-heading">Featured case</h2>
       <p class="section-lead">
         One case that shows the full loop: metric → hypothesis → experiment → decision.
       </p>
@@ -185,6 +185,36 @@ const jsonLd = {
         </a>
       </div>
 
+      <!-- Stack -->
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
+        <h3 class="bento-cell-title">Stack</h3>
+        <p class="bento-cell-heading">Tools and technologies</p>
+        <div class="stack-groups">
+          <div class="stack-group">
+            <span class="stack-group-name">Analysis</span>
+            <span class="bento-chip">SQL</span>
+            <span class="bento-chip">Python</span>
+            <span class="bento-chip">pandas</span>
+            <span class="bento-chip">DuckDB</span>
+          </div>
+          <div class="stack-group">
+            <span class="stack-group-name">Visualization</span>
+            <span class="bento-chip">matplotlib</span>
+            <span class="bento-chip">Plotly</span>
+            <span class="bento-chip">Astro</span>
+          </div>
+          <div class="stack-group">
+            <span class="stack-group-name">Infra</span>
+            <span class="bento-chip">GitHub Actions</span>
+            <span class="bento-chip">Supabase</span>
+            <span class="bento-chip">PostHog</span>
+          </div>
+        </div>
+        <a class="bento-cell-link" href={withBase('en/projects/')} data-analytics="bento_stack">
+          All projects →
+        </a>
+      </div>
+
       <!-- Reading / library -->
       <div class="bento-cell" tabindex="-1">
         <ReadingBlock lang="en" />
@@ -199,18 +229,6 @@ const jsonLd = {
         </p>
         <a class="bento-cell-link" href={withBase('en/writing/')} data-analytics="bento_notes">
           Read notes →
-        </a>
-      </div>
-
-      <!-- Games / arcade -->
-      <div class="bento-cell" tabindex="-1">
-        <h3 class="bento-cell-title">Arcade</h3>
-        <p class="bento-cell-heading">Games about analytics</p>
-        <p class="bento-cell-text">
-          Browser mini-games: A/B Test, Funnel Drop, Snake, 2048, Pong. Works on mobile too.
-        </p>
-        <a class="bento-cell-link" href={withBase('games/')} data-analytics="bento_arcade">
-          Play →
         </a>
       </div>
 
