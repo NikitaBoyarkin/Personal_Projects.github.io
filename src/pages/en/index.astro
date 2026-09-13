@@ -3,7 +3,6 @@ import Base from '../../layouts/Base.astro';
 import HeroMetrics from '../../components/HeroMetrics.astro';
 import HeroCta from '../../components/HeroCta.astro';
 import CareerSnapshot from '../../components/CareerSnapshot.astro';
-import Testimonials from '../../components/Testimonials.astro';
 import ReadingBlock from '../../components/ReadingBlock.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
@@ -170,7 +169,7 @@ const jsonLd = {
       </div>
 
       <!-- Knowledge graph -->
-      <div class="bento-cell" tabindex="-1">
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
         <h3 class="bento-cell-title">Knowledge graph</h3>
         <p class="bento-cell-heading">Explore the connections</p>
         <p class="bento-cell-text">
@@ -182,7 +181,7 @@ const jsonLd = {
       </div>
 
       <!-- Notes -->
-      <div class="bento-cell" tabindex="-1">
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
         <h3 class="bento-cell-title">Notes</h3>
         <p class="bento-cell-heading">Product analytics in writing</p>
         <p class="bento-cell-text">
