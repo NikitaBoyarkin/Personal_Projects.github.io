@@ -305,7 +305,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
               }
             });
           },
-          { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+          { threshold: 0 }
         );
         document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
       })();
