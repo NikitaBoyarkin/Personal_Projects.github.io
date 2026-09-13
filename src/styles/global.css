@@ -97,9 +97,9 @@
   /* 10% — ACCENT: coral, interactive semantics only */
   --text-accent: #ff8569;
   --text-accent-hover: #ffa68a;
-  --button-bg: #ff6643;                      /* coral fill, dark ink text */
-  --button-bg-hover: #e0532f;
-  --button-ink: #1a1a1a;                     /* dark ink on accent/button fill (AA) */
+  --button-bg: #1400c3;                      /* indigo fill, white ink text */
+  --button-bg-hover: #2410e0;                /* stepped indigo */
+  --button-ink: #f8f8fa;                     /* white ink on indigo button (AA) */
   --border-active: #ff8569;
 
   --shadow-color: rgba(0, 0, 0, 0.4);
@@ -169,9 +169,9 @@
   /* 10% — ACCENT: burnt sienna (light-adapted coral) + coral button fill */
   --text-accent: #a8331a;
   --text-accent-hover: #8a2a16;
-  --button-bg: #ff6643;                      /* kept coral: dark ink on it passes AA */
-  --button-bg-hover: #e0532f;
-  --button-ink: #1a1a1a;                     /* dark ink on coral button (AA) */
+  --button-bg: #1400c3;                      /* indigo fill, white ink text */
+  --button-bg-hover: #2410e0;                /* stepped indigo */
+  --button-ink: #f8f8fa;                     /* white ink on indigo button (AA) */
   --border-active: #a8331a;
   --text-accent-dataviz: #0d7377;
 
@@ -235,7 +235,7 @@ p {
   left: var(--space-4);
   z-index: var(--z-top);
   background: var(--text-accent);
-  color: var(--button-ink);
+  color: #1a1a1a; /* dark ink on coral accent surface; button ink is now white */
   padding: var(--space-2) var(--space-4);
   border-radius: var(--space-2);
   text-decoration: none;
@@ -2050,7 +2050,7 @@ html {
 /* Selection color */
 ::selection {
   background: var(--text-accent);
-  color: var(--button-ink);
+  color: #1a1a1a; /* dark ink on accent surface; button ink is now white */
 }
 
 /* Focus styles for accessibility */
@@ -2139,7 +2139,7 @@ button:focus-visible {
   margin-top: var(--space-4);
 }
 .now-teaser-cta a {
-  color: var(--button-ink); /* primary button convention: dark text on --button-bg */
+  color: var(--button-ink); /* primary button convention: white text on indigo --button-bg */
   text-decoration: none;
   font-weight: 600;
 }
@@ -2536,7 +2536,7 @@ button:focus-visible {
   border: 1px solid color-mix(in srgb, var(--text-accent) 22%, transparent);
 }
 .strip-badge-project {
-  color: var(--button-ink);
+  color: #1a1a1a; /* dark ink on accent surface; button ink is now white */
   background: var(--text-accent);
   border-color: var(--text-accent);
 }
