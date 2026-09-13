@@ -12,12 +12,14 @@ import { withBase } from '../../../lib/path';
   lang="en"
   counterpartHref={withBase('projects/')}
 >
-  <h1 class="page-title reveal">Projects</h1>
+  <div class="projects-page">
+    <h1 class="page-title reveal">Projects</h1>
 
-  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
-    Project catalog by category. Drag a card by its three dots to reorder, or hit “Shuffle”.
-    The order is stored locally in your browser.
-  </p>
+    <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+      Project catalog by category. Drag a card by its three dots to reorder, or hit “Shuffle”.
+      The order is stored locally in your browser.
+    </p>
 
-  <ProjectBoard heading="Project catalog" />
+    <ProjectBoard heading="Project catalog" />
+  </div>
 </Base>

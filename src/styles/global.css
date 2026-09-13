@@ -3274,3 +3274,30 @@ button:focus-visible {
     grid-template-columns: 1fr;
   }
 }
+
+/* Compact projects-page header on small screens so the kanban board peeks above the fold. */
+@media (max-width: 640px) {
+  .projects-page .page-title {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .projects-page .page-intro {
+    margin-bottom: var(--space-3) !important;
+  }
+
+  .projects-page #projects > h2 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .projects-page .filter-row,
+  .projects-page .project-board-tools {
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
+  }
+
+  .projects-page #project-list.kanban-board {
+    padding-bottom: 0;
+  }
+}

@@ -11,12 +11,14 @@ import { withBase } from '../../lib/path';
   lang="ru"
   counterpartHref={withBase('en/projects/')}
 >
-  <h1 class="page-title reveal">Проекты</h1>
+  <div class="projects-page">
+    <h1 class="page-title reveal">Проекты</h1>
 
-  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
-    Каталог проектов по категориям. Тяни карточку за три точки, чтобы изменить порядок, или нажми «Перемешать».
-    Порядок сохраняется локально в браузере.
-  </p>
+    <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-4); max-width: 60ch;">
+      Каталог проектов по категориям. Тяни карточку за три точки, чтобы изменить порядок, или нажми «Перемешать».
+      Порядок сохраняется локально в браузере.
+    </p>
 
-  <ProjectBoard heading="Каталог проектов" />
+    <ProjectBoard heading="Каталог проектов" />
+  </div>
 </Base>
