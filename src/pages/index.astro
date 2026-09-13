@@ -1,6 +1,5 @@
 ---
 import Base from '../layouts/Base.astro';
-import IntroShader from '../components/IntroShader.astro';
 import CapabilitiesGrid from '../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../components/HeroMetrics.astro';
 import HeroCta from '../components/HeroCta.astro';
@@ -102,61 +101,38 @@ const jsonLd = {
         </p>
       </div>
 
-      <div class="hero-visual" aria-hidden="true">
-        <IntroShader />
-        <dl class="hero-viz-cards">
-          <div class="hero-viz-card">
-            <dt>KYC-конверсия</dt>
-            <dd>+6.24 pp</dd>
+      <div class="hero-visual">
+        <article class="featured-card featured-card-hero">
+          <img
+            class="featured-card-image"
+            src={withBase(featuredProject.data.hero)}
+            alt=""
+            loading="lazy"
+          />
+          <div class="featured-card-body">
+            <p class="featured-card-eyebrow">Избранный кейс</p>
+            <h3 class="featured-card-title">{featuredProject.data.title}</h3>
+            <p class="featured-card-description">{featuredProject.data.description}</p>
+            <div class="bento-chip-list">
+              {featuredProject.data.tools?.slice(0, 5).map((tool: string) => (
+                <span class="bento-chip">{tool}</span>
+              ))}
+            </div>
+            <a
+              class="featured-card-link"
+              href={withBase(`projects/${featuredProject.id.replace(/\.md$/, '')}/`)}
+              data-analytics="featured_project"
+            >
+              Разбор проекта →
+            </a>
           </div>
-          <div class="hero-viz-card">
-            <dt>Годовой эффект фикса</dt>
-            <dd>€716K</dd>
-          </div>
-          <div class="hero-viz-card">
-            <dt>Проектов в портфолио</dt>
-            <dd>15</dd>
-          </div>
-        </dl>
+        </article>
       </div>
     </div>
   </section>
 
   <!-- EDITORIAL TOP + BENTO BOTTOM -->
   <div class="home-layout">
-    <!-- Featured project -->
-    <section class="editorial-section" id="featured-project" aria-labelledby="featured-heading">
-      <h2 id="featured-heading">Избранный кейс</h2>
-      <p class="section-lead">
-        Один разбор, который показывает полный цикл: метрика → гипотеза → эксперимент → решение.
-      </p>
-
-      <article class="featured-card">
-        <img
-          class="featured-card-image"
-          src={withBase(featuredProject.data.hero)}
-          alt=""
-          loading="lazy"
-        />
-        <div class="featured-card-body">
-          <h3 class="featured-card-title">{featuredProject.data.title}</h3>
-          <p class="featured-card-description">{featuredProject.data.description}</p>
-          <div class="bento-chip-list">
-            {featuredProject.data.tools?.slice(0, 5).map((tool: string) => (
-              <span class="bento-chip">{tool}</span>
-            ))}
-          </div>
-          <a
-            class="featured-card-link"
-            href={withBase(`projects/${featuredProject.id.replace(/\.md$/, '')}/`)}
-            data-analytics="featured_project"
-          >
-            Разбор проекта →
-          </a>
-        </div>
-      </article>
-    </section>
-
     <!-- Capabilities -->
     <section class="editorial-section" id="capabilities" aria-labelledby="capabilities-heading">
       <h2 id="capabilities-heading">Что я делаю</h2>
@@ -166,23 +142,11 @@ const jsonLd = {
       <CapabilitiesGrid lang="ru" />
     </section>
 
-    <!-- Bento bottom -->
-    <div class="bento-grid">
+    <!-- Bento bottom — airy, spaced layout -->
+    <div class="bento-grid bento-spaced">
       <!-- Career snapshot -->
-      <div class="bento-cell bento-cell-wide" tabindex="-1">
+      <div class="bento-cell bento-cell-full" tabindex="-1">
         <CareerSnapshot lang="ru" />
-      </div>
-
-      <!-- Knowledge graph -->
-      <div class="bento-cell" tabindex="-1">
-        <h3 class="bento-cell-title">Граф знаний</h3>
-        <p class="bento-cell-heading">Исследуй связи</p>
-        <p class="bento-cell-text">
-          Все заметки, проекты и темы связаны в интерактивный граф. Найди путь от SQL до A/B-теста.
-        </p>
-        <a class="bento-cell-link" href={withBase('graph/')} data-analytics="bento_graph">
-          Открыть граф →
-        </a>
       </div>
 
       <!-- Stack -->
@@ -215,9 +179,16 @@ const jsonLd = {
         </a>
       </div>
 
-      <!-- Reading / library -->
+      <!-- Knowledge graph -->
       <div class="bento-cell" tabindex="-1">
-        <ReadingBlock lang="ru" />
+        <h3 class="bento-cell-title">Граф знаний</h3>
+        <p class="bento-cell-heading">Исследуй связи</p>
+        <p class="bento-cell-text">
+          Все заметки, проекты и темы связаны в интерактивный граф. Найди путь от SQL до A/B-теста.
+        </p>
+        <a class="bento-cell-link" href={withBase('graph/')} data-analytics="bento_graph">
+          Открыть граф →
+        </a>
       </div>
 
       <!-- Notes -->
@@ -232,8 +203,13 @@ const jsonLd = {
         </a>
       </div>
 
+      <!-- Reading / library -->
+      <div class="bento-cell" tabindex="-1">
+        <ReadingBlock lang="ru" />
+      </div>
+
       <!-- Testimonials -->
-      <div class="bento-cell bento-cell-wide" tabindex="-1">
+      <div class="bento-cell bento-cell-full" tabindex="-1">
         <Testimonials lang="ru" />
       </div>
     </div>

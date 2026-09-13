@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import IntroShader from '../../components/IntroShader.astro';
 import CapabilitiesGrid from '../../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../../components/HeroMetrics.astro';
 import HeroCta from '../../components/HeroCta.astro';
@@ -102,61 +101,38 @@ const jsonLd = {
         </p>
       </div>
 
-      <div class="hero-visual" aria-hidden="true">
-        <IntroShader />
-        <dl class="hero-viz-cards">
-          <div class="hero-viz-card">
-            <dt>KYC conversion</dt>
-            <dd>+6.24 pp</dd>
+      <div class="hero-visual">
+        <article class="featured-card featured-card-hero">
+          <img
+            class="featured-card-image"
+            src={withBase(featuredProject.data.hero)}
+            alt=""
+            loading="lazy"
+          />
+          <div class="featured-card-body">
+            <p class="featured-card-eyebrow">Featured case</p>
+            <h3 class="featured-card-title">{featuredProject.data.title}</h3>
+            <p class="featured-card-description">{featuredProject.data.description}</p>
+            <div class="bento-chip-list">
+              {featuredProject.data.tools?.slice(0, 5).map((tool: string) => (
+                <span class="bento-chip">{tool}</span>
+              ))}
+            </div>
+            <a
+              class="featured-card-link"
+              href={withBase(`en/projects/${featuredProject.id.replace(/\.md$/, '')}/`)}
+              data-analytics="featured_project"
+            >
+              Read the case →
+            </a>
           </div>
-          <div class="hero-viz-card">
-            <dt>Annual fix impact</dt>
-            <dd>€716K</dd>
-          </div>
-          <div class="hero-viz-card">
-            <dt>Portfolio projects</dt>
-            <dd>15</dd>
-          </div>
-        </dl>
+        </article>
       </div>
     </div>
   </section>
 
   <!-- EDITORIAL TOP + BENTO BOTTOM -->
   <div class="home-layout">
-    <!-- Featured project -->
-    <section class="editorial-section" id="featured-project" aria-labelledby="featured-heading">
-      <h2 id="featured-heading">Featured case</h2>
-      <p class="section-lead">
-        One case that shows the full loop: metric → hypothesis → experiment → decision.
-      </p>
-
-      <article class="featured-card">
-        <img
-          class="featured-card-image"
-          src={withBase(featuredProject.data.hero)}
-          alt=""
-          loading="lazy"
-        />
-        <div class="featured-card-body">
-          <h3 class="featured-card-title">{featuredProject.data.title}</h3>
-          <p class="featured-card-description">{featuredProject.data.description}</p>
-          <div class="bento-chip-list">
-            {featuredProject.data.tools?.slice(0, 5).map((tool: string) => (
-              <span class="bento-chip">{tool}</span>
-            ))}
-          </div>
-          <a
-            class="featured-card-link"
-            href={withBase(`en/projects/${featuredProject.id.replace(/\.md$/, '')}/`)}
-            data-analytics="featured_project"
-          >
-            Read the case →
-          </a>
-        </div>
-      </article>
-    </section>
-
     <!-- Capabilities -->
     <section class="editorial-section" id="capabilities" aria-labelledby="capabilities-heading">
       <h2 id="capabilities-heading">What I do</h2>
@@ -166,23 +142,11 @@ const jsonLd = {
       <CapabilitiesGrid lang="en" />
     </section>
 
-    <!-- Bento bottom -->
-    <div class="bento-grid">
+    <!-- Bento bottom — airy, spaced layout -->
+    <div class="bento-grid bento-spaced">
       <!-- Career snapshot -->
-      <div class="bento-cell bento-cell-wide" tabindex="-1">
+      <div class="bento-cell bento-cell-full" tabindex="-1">
         <CareerSnapshot lang="en" />
-      </div>
-
-      <!-- Knowledge graph -->
-      <div class="bento-cell" tabindex="-1">
-        <h3 class="bento-cell-title">Knowledge graph</h3>
-        <p class="bento-cell-heading">Explore the connections</p>
-        <p class="bento-cell-text">
-          All notes, projects, and topics are linked in an interactive graph. Find the path from SQL to A/B testing.
-        </p>
-        <a class="bento-cell-link" href={withBase('graph/')} data-analytics="bento_graph">
-          Open graph →
-        </a>
       </div>
 
       <!-- Stack -->
@@ -215,9 +179,16 @@ const jsonLd = {
         </a>
       </div>
 
-      <!-- Reading / library -->
+      <!-- Knowledge graph -->
       <div class="bento-cell" tabindex="-1">
-        <ReadingBlock lang="en" />
+        <h3 class="bento-cell-title">Knowledge graph</h3>
+        <p class="bento-cell-heading">Explore the connections</p>
+        <p class="bento-cell-text">
+          All notes, projects, and topics are linked in an interactive graph. Find the path from SQL to A/B testing.
+        </p>
+        <a class="bento-cell-link" href={withBase('graph/')} data-analytics="bento_graph">
+          Open graph →
+        </a>
       </div>
 
       <!-- Notes -->
@@ -232,8 +203,13 @@ const jsonLd = {
         </a>
       </div>
 
+      <!-- Reading / library -->
+      <div class="bento-cell" tabindex="-1">
+        <ReadingBlock lang="en" />
+      </div>
+
       <!-- Testimonials -->
-      <div class="bento-cell bento-cell-wide" tabindex="-1">
+      <div class="bento-cell bento-cell-full" tabindex="-1">
         <Testimonials lang="en" />
       </div>
     </div>
