@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import CapabilitiesGrid from '../../components/CapabilitiesGrid.astro';
 import HeroMetrics from '../../components/HeroMetrics.astro';
 import HeroCta from '../../components/HeroCta.astro';
 import CareerSnapshot from '../../components/CareerSnapshot.astro';
@@ -133,15 +132,6 @@ const jsonLd = {
 
   <!-- EDITORIAL TOP + BENTO BOTTOM -->
   <div class="home-layout">
-    <!-- Capabilities -->
-    <section class="editorial-section" id="capabilities" aria-labelledby="capabilities-heading">
-      <h2 id="capabilities-heading">What I do</h2>
-      <p class="section-lead">
-        Six capabilities, each with a concrete deliverable and a measured result.
-      </p>
-      <CapabilitiesGrid lang="en" />
-    </section>
-
     <!-- Bento bottom — airy, spaced layout -->
     <div class="bento-grid bento-spaced">
       <!-- Career snapshot -->
@@ -204,13 +194,8 @@ const jsonLd = {
       </div>
 
       <!-- Reading / library -->
-      <div class="bento-cell" tabindex="-1">
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
         <ReadingBlock lang="en" />
-      </div>
-
-      <!-- Testimonials -->
-      <div class="bento-cell bento-cell-full" tabindex="-1">
-        <Testimonials lang="en" />
       </div>
     </div>
   </div>
