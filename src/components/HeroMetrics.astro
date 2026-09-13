@@ -1,8 +1,7 @@
 ---
 // Animated "live metrics" strip under the hero tagline. Numbers match the
-// HomeBoard metrics but count up once when scrolled into view. Respects
-// prefers-reduced-motion (renders final values, no animation). Bundled
-// type-checked script — same island pattern as SearchBox.
+// agreed Phase 7 message: years, projects, stack, business result.
+// Respects prefers-reduced-motion (renders final values, no animation).
 interface Props {
   lang?: "ru" | "en";
 }
@@ -20,13 +19,12 @@ type Metric = {
 };
 
 const METRICS: Metric[] = [
-  { value: SIG.portfolio.projects, label: isEn ? "projects in portfolio" : "проектов в портфолио" },
-  { value: SIG.portfolio.sqlCases, label: isEn ? "SQL cases on DuckDB" : "SQL-кейсов на DuckDB" },
+  { value: 5, label: isEn ? "years in data" : "лет в данных" },
+  { value: SIG.portfolio.projects, label: isEn ? "portfolio projects" : "проектов в портфолио" },
   { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: "pp", label: isEn ? "KYC conversion" : "KYC-конверсия" },
   { value: SIG.abKyc.annualEurK, prefix: "€", suffix: "K/yr", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
 ];
-// Server-side formatter — mirrors the client `format()` so the HTML carries
-// the final values (no-JS fallback) and the script counts up from 0.
+
 const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(v)));
 ---
 
@@ -78,7 +76,6 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
 
       function frame(now: number) {
         const t = Math.min(1, (now - start) / duration);
-        // easeOutCubic
         const eased = 1 - Math.pow(1 - t, 3);
         cell.textContent = `${prefix}${format(value * eased, decimals)}${suffix}`;
         if (t < 1) requestAnimationFrame(frame);

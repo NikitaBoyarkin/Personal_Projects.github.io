@@ -95,13 +95,15 @@
 
 ## 4. Верификация
 
-- [ ] `npm run build` — проходит, ≥50 страниц.
-- [ ] `npm run check` — astro check 0 ошибок.
-- [ ] `make check` — все внутренние ссылки валидны.
-- [ ] Новые страницы в `dist/`: `/whois/`, `/en/whois/`, `/work-with-me/`, `/en/work-with-me/`, `/value/`, `/en/value/`.
-- [ ] Nav содержит ссылки на новые страницы.
-- [ ] `llms.txt` содержит новые Core pages.
-- [ ] PostHog-события в `Analytics.astro`: `whois_viewed`, `value_viewed`, `work_with_me_viewed`.
+- [x] `npm run build` — проходит, 101 страница.
+- [x] `npm run check` — astro check 0 ошибок.
+- [x] `npm test` — 136/136 тестов.
+- [x] `make check` — все внутренние ссылки валидны.
+- [x] Новые страницы в `dist/`: `/whois/`, `/en/whois/`, `/work-with-me/`, `/en/work-with-me/`, `/value/`, `/en/value/`.
+- [x] Nav содержит ссылки на новые страницы (`Кто я` / `Ценность` / `Формат` и `Who I am` / `Value` / `Format`).
+- [x] `llms.txt` содержит новые Core pages.
+- [x] PostHog-события в `Analytics.astro`: `whois_viewed`, `value_viewed`, `work_with_me_viewed`.
+- [x] Homepage tagline обновлён на `Гипотеза → эксперимент → метрика → рост.` / `Hypothesis → experiment → metric → growth.`
 
 ---
 
@@ -113,4 +115,4 @@
 
 ---
 
-**Готов к утверждению.**
+**Реализовано.**

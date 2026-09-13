@@ -22,14 +22,14 @@ const jsonLd = {
       '@type': 'Person',
       name: 'Nikita Boyarkin',
       url: siteUrl,
-      jobTitle: 'Data Analyst / Product Analyst',
+      jobTitle: 'Product Analyst',
       sameAs: [
         'https://github.com/NikitaBoyarkin',
         'https://www.linkedin.com/in/nikita-boyarkin',
       ],
       hasOccupation: {
         '@type': 'Occupation',
-        name: 'Data Analyst / Product Analyst',
+        name: 'Product Analyst',
       },
       alumniOf: {
         '@type': 'CollegeOrUniversity',
@@ -65,8 +65,8 @@ const jsonLd = {
 ---
 
 <Base
-  title="Nikita Boyarkin | Аналитик данных / продуктовый аналитик"
-  description="Портфолио Никиты Бояркина — Data Analyst / Product Analyst. Проекты по SQL, Python, A/B-тестированию, визуализации и клиентской аналитике."
+  title="Nikita Boyarkin | Продуктовый аналитик"
+  description="Портфолио Никиты Бояркина — продуктовый аналитик. Превращаю данные в рост: A/B-тесты, воронки, retention, SQL и Python."
   ogImage="/images/og/portfolio-banner.png"
   canonical={withBase('/')}
   activeNav="home"
@@ -87,17 +87,17 @@ const jsonLd = {
           loading="eager"
           fetchpriority="high"
         />
-        <h1 class="hero-name">Nikita Boyarkin</h1>
-        <p class="hero-role">Аналитик данных · SQL · Python · A/B-эксперименты</p>
+        <h1 class="hero-name">Продуктовый аналитик</h1>
+        <p class="hero-role">который превращает данные в рост</p>
         <p class="hero-pitch tagline">
-          Гипотеза → эксперимент → метрика → рост.
+          Гипотеза → эксперимент → метрика → рост. SQL, Python, A/B-тесты и продуктовая аналитика для команд, которые принимают решения по фактам.
         </p>
 
         <HeroMetrics lang="ru" />
 
         <p class="cta-row">
           <HeroCta lang="ru" />
-          <a class="button button-secondary" href={withBase('projects/')} data-analytics="hero_projects">Проекты</a>
+          <a class="button button-secondary" href={withBase('contact/')} data-analytics="hero_contact">Связаться</a>
           <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener" data-analytics="hero_cv">CV</a>
         </p>
       </div>
@@ -115,7 +115,7 @@ const jsonLd = {
           </div>
           <div class="hero-viz-card">
             <dt>Проектов в портфолио</dt>
-            <dd>14</dd>
+            <dd>15</dd>
           </div>
         </dl>
       </div>
@@ -126,7 +126,7 @@ const jsonLd = {
   <div class="home-layout">
     <!-- Featured project -->
     <section class="editorial-section" id="featured-project" aria-labelledby="featured-heading">
-      <h2 id="featured-heading">Избранный проект</h2>
+      <h2 id="featured-heading">Избранный кейс</h2>
       <p class="section-lead">
         Один разбор, который показывает полный цикл: метрика → гипотеза → эксперимент → решение.
       </p>
@@ -185,6 +185,36 @@ const jsonLd = {
         </a>
       </div>
 
+      <!-- Stack -->
+      <div class="bento-cell bento-cell-wide" tabindex="-1">
+        <h3 class="bento-cell-title">Стек</h3>
+        <p class="bento-cell-heading">Инструменты и технологии</p>
+        <div class="stack-groups">
+          <div class="stack-group">
+            <span class="stack-group-name">Анализ</span>
+            <span class="bento-chip">SQL</span>
+            <span class="bento-chip">Python</span>
+            <span class="bento-chip">pandas</span>
+            <span class="bento-chip">DuckDB</span>
+          </div>
+          <div class="stack-group">
+            <span class="stack-group-name">Визуализация</span>
+            <span class="bento-chip">matplotlib</span>
+            <span class="bento-chip">Plotly</span>
+            <span class="bento-chip">Astro</span>
+          </div>
+          <div class="stack-group">
+            <span class="stack-group-name">Инфра</span>
+            <span class="bento-chip">GitHub Actions</span>
+            <span class="bento-chip">Supabase</span>
+            <span class="bento-chip">PostHog</span>
+          </div>
+        </div>
+        <a class="bento-cell-link" href={withBase('projects/')} data-analytics="bento_stack">
+          Все проекты →
+        </a>
+      </div>
+
       <!-- Reading / library -->
       <div class="bento-cell" tabindex="-1">
         <ReadingBlock lang="ru" />
@@ -199,18 +229,6 @@ const jsonLd = {
         </p>
         <a class="bento-cell-link" href={withBase('writing/')} data-analytics="bento_notes">
           Читать заметки →
-        </a>
-      </div>
-
-      <!-- Games / arcade -->
-      <div class="bento-cell" tabindex="-1">
-        <h3 class="bento-cell-title">Аркада</h3>
-        <p class="bento-cell-heading">Игры об аналитике</p>
-        <p class="bento-cell-text">
-          Мини-игры в браузере: A/B Test, Funnel Drop, Snake, 2048, Pong. Работают на телефоне.
-        </p>
-        <a class="bento-cell-link" href={withBase('games/')} data-analytics="bento_arcade">
-          Играть →
         </a>
       </div>
 
