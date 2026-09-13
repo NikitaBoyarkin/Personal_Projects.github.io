@@ -101,6 +101,13 @@ Goal: shift the homepage from a "dashboard-by-numbers" stack to an editorial + b
 - Updated `--font-display` token and preloaded the active-language subsets in `Base.astro` so the LCP heading renders in the final font early.
 - Closed the two open design-plan items (`project-card-title-text-normal.md` and `project-tool-accent-pill.md`) — both were already implemented in commit `29ef020`.
 
+### Phase 6 (completed)
+
+- Added personal-layer pages `whois`, `value`, and `work-with-me` in both RU and EN, with `ProfilePage` JSON-LD, Telegram deep-link CTAs, and quantified proof on `value`.
+- Wired the pages into the main nav with short labels (`Кто я` / `Ценность` / `Формат` and `Who I am` / `Value` / `Format`) to keep the bar usable.
+- Updated the homepage hero tagline to the Phase 6 wording: `Гипотеза → эксперимент → метрика → рост.` / `Hypothesis → experiment → metric → growth.`
+- Cross-links already existed in `about.astro`, `contact.astro`; `Analytics.astro` already fired `whois_viewed`, `value_viewed`, `work_with_me_viewed`; `llms.txt` already listed the pages.
+
 ### Next phase
 
 - (none — backlog empty)
