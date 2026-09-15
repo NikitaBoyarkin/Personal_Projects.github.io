@@ -31,6 +31,9 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   );
   const partsSorted = [...voltaParts].sort((a, b) => a.data.order - b.data.order);
 
+  const featuredProject =
+    projectsSorted.find((p) => slugOf(p.id) === "posthog") ?? projectsSorted[0];
+
   const lines: string[] = [];
   const add = (s = "") => lines.push(s);
 
@@ -44,7 +47,7 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   add();
 
   add("## Core pages");
-  add(`- [Home (RU)](${abs("")}): intro, featured project (Volta neobank analytics), skill taxonomy.`);
+  add(`- [Home (RU)](${abs("")}): intro, featured project (${featuredProject?.data.title ?? "Product analytics"}), skill taxonomy.`);
   add(`- [Home (EN)](${abs("en/")}): English mirror.`);
   add(`- [About](${abs("about/")}): background and focus.`);
   add(`- [Who I am](${abs("whois/")}): living business card — who I am, how I work, what I enjoy, collaboration format.`);
