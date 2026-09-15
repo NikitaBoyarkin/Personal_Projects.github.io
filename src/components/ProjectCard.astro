@@ -58,7 +58,7 @@ const i18n = {
       demo && (
         <a
           class="button button-demo"
-          href={withBase(demo)}
+          href={demo.startsWith('http') ? demo : withBase(demo)}
           target="_blank"
           rel="noopener noreferrer"
           style="flex: 1 1 auto; justify-content: center;"
