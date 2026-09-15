@@ -1,7 +1,7 @@
 // CV PDF generator.
 // Renders dist/cv/index.html via headless Chrome --print-to-pdf into
 // public/CV-Nikita-Boyarkin.pdf (so it ships with the static build).
-// Run: npm run build && npm run cv:pdf
+// Run: bun run build && bun run cv:pdf
 // Not wired into the build — run manually when cv.astro changes; commit the PDF.
 
 import { existsSync } from 'node:fs';
@@ -27,7 +27,7 @@ if (!chrome) {
   process.exit(1);
 }
 if (!existsSync(DIST_CV)) {
-  console.error(`Missing ${DIST_CV} — run "npm run build" first.`);
+  console.error(`Missing ${DIST_CV} — run "bun run build" first.`);
   process.exit(1);
 }
 

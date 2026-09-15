@@ -1,5 +1,4 @@
-// @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach } from "bun:test";
 import { buildBeacon, getSessionId } from "../../src/lib/beacon";
 
 describe("beacon", () => {

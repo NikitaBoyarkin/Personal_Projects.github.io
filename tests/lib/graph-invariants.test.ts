@@ -1,7 +1,7 @@
 // Graph invariants against the REAL content collections on disk. These guard
 // against a graph that silently degrades as content grows: orphan nodes,
 // missing URLs, unweighted edges, or duplicate edges.
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from "bun:test";
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, basename } from 'node:path';
 import { parse as parseYaml } from 'yaml';

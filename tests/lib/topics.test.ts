@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { computeTopicRows, groupRowsByLevel, TOPICS } from '../../src/lib/topics';
 
 const post = (tags: string[]) => ({

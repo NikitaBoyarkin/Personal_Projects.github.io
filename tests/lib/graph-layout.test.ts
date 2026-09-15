@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { buildGraph, type GraphNode } from '../../src/lib/graph';
 import { layoutGraph } from '../../src/lib/graph-layout';
 import { TOPICS } from '../../src/lib/topics';

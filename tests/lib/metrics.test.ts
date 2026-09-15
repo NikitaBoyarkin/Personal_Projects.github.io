@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { METRICS } from '../../src/lib/metrics';
 
 // Regression guard for the "single source of truth" claim in src/lib/metrics.ts.

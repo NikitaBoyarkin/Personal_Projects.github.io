@@ -14,25 +14,25 @@ The site is **bilingual (RU / EN)**. Russian is the default; an `en/` page tree 
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Start dev server (default port 4321)
-npm run dev
+bun run dev
 
 # Build for production
-npm run build
+bun run build
 
 # Preview production build locally
-npm run preview
+bun run preview
 
 # Type-check Astro files
-npm run check
+bun run check
 
-# Run lib unit tests (vitest)
-npm test
+# Run lib unit tests (bun:test)
+bun test
 
 # Generate OG images
-npm run og
+bun run og
 
 # Validate the built site
 make check
@@ -92,7 +92,7 @@ make check
 │       └── topics.ts
 ├── scripts/
 │   ├── check_site.py        # validates the dist/ build
-│   └── generate-og.mjs      # OG image generator (npm run og)
+│   └── generate-og.mjs      # OG image generator (bun run og)
 ├── .github/workflows/
 │   └── deploy.yml           # builds, lighthouse CI, deploys dist/ to GitHub Pages
 └── .claude/
@@ -149,12 +149,12 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 2. Set `track` to the kanban column (`experiments` | `analytics` | `product` | `engineering`) — defaults to `analytics` if omitted.
 3. Add the hero image to `public/images/` (the `hero` field is required).
 4. Add the slug to the `PROJECT_ORDER` array in `src/lib/projects.ts` so it sorts as intended (unlisted slugs sort first).
-5. Run `npm run build` and `make check`.
+5. Run `bun run build` and `make check`.
 
 ### Add a blog post
 
 1. Create `src/content/posts/<slug>.md` with the required frontmatter; `category` must be one of `decision-log`, `framework`, `guide`, `note`.
-2. Run `npm run build` and `make check`.
+2. Run `bun run build` and `make check`.
 
 ## CV Source of Truth
 

@@ -1,7 +1,7 @@
 // Per-post branded OG image generator.
 // Reads src/content/posts/*.md frontmatter, renders a 1200x630 branded SVG
 // per post, and converts it to PNG via rsvg-convert into public/images/og/.
-// Run: npm run og
+// Run: bun run og
 // Not wired into the build — run manually when posts change; commit the PNGs.
 
 import { readdirSync, readFileSync, writeFileSync, unlinkSync, mkdirSync, existsSync } from 'node:fs';

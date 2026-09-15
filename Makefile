@@ -1,13 +1,13 @@
 .PHONY: dev build preview check
 
 dev:
-	npm run dev
+	bun run dev
 
 build:
-	npm run build
+	bun run build
 
 preview:
-	npm run preview
+	bun run preview
 
 check:
 	python3 scripts/check_site.py

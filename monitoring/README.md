@@ -15,7 +15,7 @@
    `cloudflared tunnel create red-portfolio`
    `cloudflared tunnel route dns red-portfolio metrics.ваш-домен`
    Вписать `CLOUDFLARE_TUNNEL_TOKEN` (или `CLOUDFLARE_TUNNEL_ID` + credentials) в `.env`.
-3. В корне портфолио `.env` добавить `PUBLIC_BEACON_ENDPOINT=https://metrics.ваш-домен/beacon`; `npm run build`.
+3. В корне портфолио `.env` добавить `PUBLIC_BEACON_ENDPOINT=https://metrics.ваш-домен/beacon`; `bun run build`.
 
 ## Запуск
 `make monitor-up` → Prometheus :9090, Grafana :3000.

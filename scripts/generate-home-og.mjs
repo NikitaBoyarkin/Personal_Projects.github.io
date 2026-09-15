@@ -1,7 +1,7 @@
 // Homepage branded OG banner generator.
 // Renders a 1200x630 branded SVG for the portfolio homepage and converts it
 // to PNG via rsvg-convert into public/images/og/portfolio-banner.png.
-// Run: npm run og:home
+// Run: bun run og:home
 // Not wired into the build — run manually; commit the PNG.
 
 import { writeFileSync, unlinkSync, mkdirSync, existsSync } from 'node:fs';

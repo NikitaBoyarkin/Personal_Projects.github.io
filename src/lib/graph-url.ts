@@ -2,7 +2,7 @@
 // emergent communities), the per-mode hidden sets and the hidden edge types, so
 // a filtered or community view survives reload and can be shared as a link,
 // e.g. /graph/?mode=community&hideGroups=topic&hideC=2,3&hideEdges=topic,shared
-// Pure string functions — no DOM — so they're unit-testable in vitest.
+// Pure string functions — no DOM — so they're unit-testable in bun:test.
 export interface GraphUrlState {
   mode: 'group' | 'community';
   /** Hidden taxonomy group names (applies in group mode). */

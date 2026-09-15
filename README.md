@@ -7,11 +7,12 @@ Built with [Astro](https://astro.build/) v5, TypeScript, and Markdown content co
 ## Development
 
 ```bash
-npm install
-npm run dev      # http://localhost:4321
-npm run build    # static output to dist/
-npm run preview  # preview the build
-npm run check    # astro type check
+bun install
+bun run dev      # http://localhost:4321
+bun run build    # static output to dist/
+bun run preview  # preview the build
+bun run check    # astro type check
+bun test         # lib unit tests (bun:test)
 ```
 
 ## Content

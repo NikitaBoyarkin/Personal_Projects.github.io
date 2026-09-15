@@ -9,11 +9,11 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
-    "test": "vitest run",
-    "og": "node scripts/generate-og.mjs",
-    "og:home": "node scripts/generate-home-og.mjs",
-    "cv:pdf": "node scripts/generate-cv-pdf.mjs"
+    "check": "astro check && tsc --noEmit -p tsconfig.tests.json",
+    "test": "bun test",
+    "og": "bun run scripts/generate-og.mjs",
+    "og:home": "bun run scripts/generate-home-og.mjs",
+    "cv:pdf": "bun run scripts/generate-cv-pdf.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
@@ -25,11 +25,12 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@happy-dom/global-registrator": "^20.14.5",
+    "@types/bun": "^1.4.2",
     "@types/jsdom": "^30.0.0",
     "jsdom": "^30.0.1",
     "playwright": "^1.63.0",
     "pngjs": "^7.0.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.11"
+    "typescript": "^5.9.3"
   }
 }

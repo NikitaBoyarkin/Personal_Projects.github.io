@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { QA_CORPUS, normalizeQuery, scorePair, bestMatch } from '../../src/lib/qa-corpus';

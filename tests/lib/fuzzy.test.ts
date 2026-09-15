@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { ldWithin } from '../../src/lib/fuzzy';
 
 describe('ldWithin', () => {

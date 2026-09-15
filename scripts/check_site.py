@@ -233,7 +233,7 @@ def check_graph_assets() -> int:
     graph_files = ["graph.json", "graph-en.json"]
     for name in graph_files:
         if not (DIST / name).exists():
-            print(f"  ERROR: missing generated {name} (run 'npm run build')")
+            print(f"  ERROR: missing generated {name} (run 'bun run build')")
             errors += 1
         else:
             print(f"  OK    {name}")
@@ -242,7 +242,7 @@ def check_graph_assets() -> int:
 
 def main() -> int:
     if not DIST.exists():
-        print("ERROR: dist/ not found. Run 'npm run build' first.")
+        print("ERROR: dist/ not found. Run 'bun run build' first.")
         return 1
 
     print("=== Portfolio site validation ===\n")

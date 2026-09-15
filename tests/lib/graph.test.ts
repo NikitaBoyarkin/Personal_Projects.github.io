@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "bun:test";
 import { buildGraph, isDirected, mergePostsForLocale, parseRelatedPath, subgraphAround } from '../../src/lib/graph';
 import { TOPICS } from '../../src/lib/topics';
 

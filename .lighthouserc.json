@@ -1,7 +1,7 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "npm run preview",
+      "startServerCommand": "bun run preview",
       "startServerReadyPattern": "localhost",
       "url": [
         "http://localhost:4321/Personal_Projects.github.io/",

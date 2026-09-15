@@ -6,7 +6,7 @@
 //
 // Requires `npm run build` first (reads dist/*.html).
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from "bun:test";
 import { JSDOM } from 'jsdom';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';

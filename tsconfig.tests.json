@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["bun-types"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+  },
+  "include": ["tests/**/*.ts"],
+  "exclude": ["dist"]
+}
