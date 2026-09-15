@@ -31,6 +31,16 @@ bun run check
 # Run lib unit tests (bun:test)
 bun test
 
+# Coverage report (built-in, no extra deps)
+bun run coverage
+
+# Serve the production dist/ with Bun.serve (ETag, content-types)
+bun run serve-dist
+
+# Regenerate OG/CV on change (bun --watch)
+bun run og:watch
+bun run cv:watch
+
 # Generate OG images
 bun run og
 

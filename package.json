@@ -10,10 +10,15 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check && tsc --noEmit -p tsconfig.tests.json",
-    "test": "bun test",
+    "test": "bun test tests/lib",
+    "coverage": "bun test tests/lib --coverage",
+    "serve-dist": "bun run scripts/serve-dist.mjs",
     "og": "bun run scripts/generate-og.mjs",
+    "og:watch": "bun run --watch scripts/generate-og.mjs",
     "og:home": "bun run scripts/generate-home-og.mjs",
-    "cv:pdf": "bun run scripts/generate-cv-pdf.mjs"
+    "og:home:watch": "bun run --watch scripts/generate-home-og.mjs",
+    "cv:pdf": "bun run scripts/generate-cv-pdf.mjs",
+    "cv:watch": "bun run --watch scripts/generate-cv-pdf.mjs"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",

@@ -2,6 +2,10 @@ services:
   red-exporter:
     build: ./exporter
     env_file: .env
+    environment:
+      - BEACON_DB=/data/beacon.sqlite
+    volumes:
+      - beacon-data:/data
     expose:
       - "9100"
     restart: unless-stopped
@@ -40,3 +44,4 @@ services:
 volumes:
   prometheus-data:
   grafana-data:
+  beacon-data:
