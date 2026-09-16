@@ -140,12 +140,16 @@ async function processRepo(repoKey, group, dry) {
   const updated = group[0].fm.updated ? String(group[0].fm.updated).slice(0, 10) : null;
 
   if (meta === null) {
-    // 404: deleted / renamed, or private and unauthenticated.
-    if (!TOKEN && isPrivate) {
-      report.push(`  [ok]  ${repoKey}: репо приватное (${repo}), токена нет — пропускаю`);
+    // 404: deleted / renamed, or private and not accessible with the current
+    // token. For a repo already declared private: true in frontmatter we cannot
+    // distinguish "still private" from "deleted/renamed", and an anonymous call
+    // (or a CI GITHUB_TOKEN scoped to a different repo) always 404s it. So a
+    // declared-private repo is never a hard-error here.
+    if (isPrivate) {
+      report.push(`  [ok]  ${repoKey}: репо помечено приватным (${repo}) — проверка недоступна, пропускаю`);
       return;
     }
-    report.push(`  [ERR] ${repoKey}: репо не найдено (${repo}) — удалено/переименовано${isPrivate ? '' : ' или стало приватным'}`);
+    report.push(`  [ERR] ${repoKey}: репо не найдено (${repo}) — удалено/переименовано`);
     hardDrift = true;
     return;
   }
