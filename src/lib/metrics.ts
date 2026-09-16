@@ -32,7 +32,7 @@ export const METRICS = {
     // Count of .md files in src/content/projects/. Keep this number in sync
     // with the actual project cards; update the rendercv CV when the count
     // changes rather than letting the two drift.
-    projects: 15,
+    projects: 16,
     sqlCases: 10,
   },
 } as const;

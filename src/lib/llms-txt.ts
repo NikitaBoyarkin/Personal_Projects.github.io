@@ -32,7 +32,7 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   const partsSorted = [...voltaParts].sort((a, b) => a.data.order - b.data.order);
 
   const featuredProject =
-    projectsSorted.find((p) => slugOf(p.id) === "posthog") ?? projectsSorted[0];
+    projectsSorted.find((p) => slugOf(p.id) === "volta") ?? projectsSorted[0];
 
   const lines: string[] = [];
   const add = (s = "") => lines.push(s);

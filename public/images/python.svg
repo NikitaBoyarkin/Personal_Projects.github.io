@@ -1,0 +1,68 @@
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Python analytics pipeline: load, clean, EDA, viz, pipeline">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f2a2b"/>
+      <stop offset="1" stop-color="#1a3435"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff8569"/>
+      <stop offset="1" stop-color="#ff6643"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#bg)"/>
+
+  <!-- pipeline boxes: load -> clean -> EDA -> viz -> pipeline -->
+  <g font-family="SF Mono, Monaco, monospace" font-size="16" fill="#0f2a2b" text-anchor="middle" font-weight="bold">
+    <g>
+      <rect x="70" y="220" width="150" height="120" rx="10" fill="url(#accent)"/>
+      <text x="145" y="280">Load</text>
+      <text x="145" y="306" font-size="13" fill="#3b1210">CSV → DF</text>
+    </g>
+    <g>
+      <rect x="290" y="220" width="150" height="120" rx="10" fill="url(#accent)" opacity="0.9"/>
+      <text x="365" y="280">Clean</text>
+      <text x="365" y="306" font-size="13" fill="#3b1210">nulls / dups</text>
+    </g>
+    <g>
+      <rect x="510" y="220" width="150" height="120" rx="10" fill="url(#accent)" opacity="0.8"/>
+      <text x="585" y="280">EDA</text>
+      <text x="585" y="306" font-size="13" fill="#3b1210">stats / corr</text>
+    </g>
+    <g>
+      <rect x="730" y="220" width="150" height="120" rx="10" fill="url(#accent)" opacity="0.7"/>
+      <text x="805" y="280">Viz</text>
+      <text x="805" y="306" font-size="13" fill="#3b1210">hist / heatmap</text>
+    </g>
+    <g>
+      <rect x="950" y="220" width="150" height="120" rx="10" fill="url(#accent)" opacity="0.6"/>
+      <text x="1025" y="280">Pipeline</text>
+      <text x="1025" y="306" font-size="13" fill="#3b1210">end-to-end</text>
+    </g>
+  </g>
+
+  <!-- connector arrows -->
+  <g stroke="#ffa68a" stroke-width="3" fill="none" marker-end="url(#arrow)">
+    <line x1="220" y1="280" x2="280" y2="280"/>
+    <line x1="440" y1="280" x2="500" y2="280"/>
+    <line x1="660" y1="280" x2="720" y2="280"/>
+    <line x1="880" y1="280" x2="940" y2="280"/>
+  </g>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffa68a"/>
+    </marker>
+  </defs>
+
+  <!-- coverage badge below pipeline -->
+  <g font-family="SF Mono, Monaco, monospace" font-size="16" fill="#a1a1aa">
+    <rect x="950" y="400" width="150" height="56" rx="10" fill="none" stroke="#234044" stroke-width="1.5"/>
+    <text x="1025" y="427" text-anchor="middle" fill="#ffa68a">Coverage</text>
+    <text x="1025" y="446" text-anchor="middle" font-size="12" fill="#71717a">≥ 80% pytest</text>
+  </g>
+
+  <!-- dashed link pipeline -> coverage -->
+  <g stroke="#234044" stroke-width="1.5" stroke-dasharray="5 5">
+    <line x1="1025" y1="340" x2="1025" y2="390"/>
+  </g>
+</svg>
