@@ -1,0 +1,150 @@
+{
+  "slug": "ab",
+  "source": "github.com/NikitaBoyarkin/ab_test: numbers re-produced by running scripts/group_sequential.py, scripts/msprt_always_valid.py, scripts/sequential_ab_testing.py and scripts/run_full_pipeline.py under `uv run python` (reproducible; plots/ and outputs/ are gitignored)",
+  "charts": [
+    {
+      "id": "type-i-error-alpha-spending",
+      "type": "bar",
+      "title": {
+        "ru": "Ошибка I рода при промежуточных просмотрах",
+        "en": "Type I error when peeking at interim looks"
+      },
+      "description": {
+        "ru": "Эмпирическая вероятность ложноположительного срабатывания за K=5 промежуточных проверок (40000 симуляций нулевой гипотезы). Наивный повторный z-тест с границей 1.96 на каждом просмотре против Pocock и O'Brien–Fleming, где границы калибруются на суммарный alpha=5%.",
+        "en": "Empirical probability of a false positive across K=5 interim looks (40,000 null simulations). A naive z-test reapplied with a 1.96 boundary at every look, vs Pocock and O'Brien-Fleming boundaries calibrated to a total alpha of 5%."
+      },
+      "xLabel": {
+        "ru": "Дизайн",
+        "en": "Design"
+      },
+      "yLabel": {
+        "ru": "Эмпирическая ошибка I рода, %",
+        "en": "Empirical Type I error, %"
+      },
+      "data": {
+        "categories": ["Naive peeking", "Pocock", "OBF"],
+        "series": [
+          { "name": "Type I error", "values": [14.1, 4.9, 4.9] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Проверка данных на каждом из 5 просмотров с границей 1.96 раздувает ошибку I рода до 14.1% — почти в 3 раза выше номинальных 5%.",
+          "en": "Rechecking with a 1.96 boundary at every one of 5 looks inflates the Type I error to 14.1% — nearly 3x the nominal 5%."
+        },
+        {
+          "ru": "Альфа-спендинг возвращает контроль: и Pocock, и OBF держат ошибку на 4.9%, ниже номинальных 5%.",
+          "en": "Alpha-spending restores control: both Pocock and OBF hold the error at 4.9%, at or below the nominal 5%."
+        }
+      ]
+    },
+    {
+      "id": "msprt-always-valid-peeking",
+      "type": "bar",
+      "title": {
+        "ru": "Ложные срабатывания при непрерывном подглядывании",
+        "en": "False positives under continuous peeking"
+      },
+      "description": {
+        "ru": "Вероятность хоть раз получить p ≤ 0.05 за поток наблюдений t=1..500 при нулевой гипотезе (2000 потоков). Обычный z-тест пересчитывается на каждом шаге; always-valid p-значение mSPRT (Johari et al. 2015) гарантирует корректность в любой момент остановки.",
+        "en": "Probability of ever seeing p <= 0.05 across a stream t=1..500 under the null (2,000 streams). A standard z-test recomputed every step vs the always-valid mSPRT p-value (Johari et al. 2015), valid at any stopping time."
+      },
+      "xLabel": {
+        "ru": "Метод",
+        "en": "Method"
+      },
+      "yLabel": {
+        "ru": "P(хоть раз p ≤ 0.05), %",
+        "en": "P(ever p <= 0.05), %"
+      },
+      "data": {
+        "categories": ["Naive z-test", "mSPRT always-valid"],
+        "series": [
+          { "name": "False-positive rate", "values": [47.8, 3.2] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Пересчёт наивного z-теста на каждом наблюдении даёт ложноположительное срабатывание в 47.8% потоков — это почти каждая вторая «победа» оказывается шумом.",
+          "en": "Recomputing the naive z-test after every observation triggers a false positive in 47.8% of streams — nearly half of 'wins' are pure noise."
+        },
+        {
+          "ru": "Always-valid p-значение mSPRT снижает этот риск до 3.2%, то есть ниже номинальных 5%, и при этом позволяет остановиться в любой момент.",
+          "en": "The mSPRT always-valid p-value cuts that risk to 3.2% — below the nominal 5% — while still letting you stop at any time."
+        }
+      ]
+    },
+    {
+      "id": "sequential-sample-size-vs-fixed",
+      "type": "bar",
+      "title": {
+        "ru": "Средний размер выборки секвенциального теста",
+        "en": "Sequential test's average sample size"
+      },
+      "description": {
+        "ru": "Правило Эвана Миллера (N=808 успехов, отрыв 56) против фиксированного горизонта: средний размер выборки секвенциального теста в % от фиксированного. По 1000 испытаний на кейс, базовый rate 1%, MDE +20%.",
+        "en": "Evan Miller's sequential rule (N=808 successes, lead 56) vs a fixed horizon: the sequential test's average sample size as % of the fixed-sample size. 1,000 trials per case, 1% base rate, +20% MDE."
+      },
+      "xLabel": {
+        "ru": "Тип испытания",
+        "en": "Trial type"
+      },
+      "yLabel": {
+        "ru": "Средний размер выборки, % от фиксированного",
+        "en": "Avg sample size, % of fixed-horizon"
+      },
+      "data": {
+        "categories": ["A/A (0%)", "A/B (+20%)", "Blockbuster (+40%)"],
+        "series": [
+          { "name": "Avg sample size vs fixed", "values": [118.6, 76.3, 41.8] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "При реальном эффекте +20% секвенциальный тест завершается в среднем на 76.3% выборки фиксированного дизайна, а при +40% — всего на 41.8%.",
+          "en": "With a real +20% effect the sequential test finishes at 76.3% of the fixed-horizon sample on average, and at just 41.8% for a +40% effect."
+        },
+        {
+          "ru": "При отсутствии эффекта (A/A) секвенциальный тест в среднем расходует 118.6% выборки — экономия появляется только при реальном эффекте.",
+          "en": "Under the null (A/A) the sequential test spends 118.6% of the sample on average — savings appear only when a real effect exists."
+        }
+      ]
+    },
+    {
+      "id": "sequential-savings-by-mde",
+      "type": "line",
+      "title": {
+        "ru": "Экономия выборки в зависимости от MDE",
+        "en": "Sample savings by minimum detectable effect"
+      },
+      "description": {
+        "ru": "Экономия секвенциального правила по сравнению с фиксированным горизонтом при базовом rate 1% (сетка по MDE, 1000 испытаний на точку). Расчёт: (ожидаемые успехи фиксированного дизайна − средние успехи секвенциального) / фиксированные.",
+        "en": "Sequential rule savings vs a fixed horizon at a 1% base rate (grid over MDE, 1,000 trials per point). Savings = (fixed-horizon expected successes - sequential average successes) / fixed."
+      },
+      "xLabel": {
+        "ru": "Минимальный детектируемый эффект (относительный)",
+        "en": "Minimum detectable effect (relative)"
+      },
+      "yLabel": {
+        "ru": "Экономия выборки, %",
+        "en": "Sample savings, %"
+      },
+      "data": {
+        "categories": ["0.1", "0.2", "0.5"],
+        "series": [
+          { "name": "Savings", "values": [20, 14, 1] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "При MDE 10% секвенциальный тест экономит 20% выборки, при MDE 20% — 14%, а при MDE 50% экономия падает до 1%.",
+          "en": "At a 10% MDE the sequential test saves 20% of the sample, at 20% MDE it saves 14%, and at a 50% MDE savings drop to 1%."
+        },
+        {
+          "ru": "Экономия монотонно убывает с размером эффекта: от 20% при MDE 10% до 1% при MDE 50% — правило выгодно для малых, долгих тестов, а не для крупных эффектов.",
+          "en": "Savings shrink monotonically with effect size, from 20% at a 10% MDE down to 1% at a 50% MDE — the rule pays off for small, long tests rather than for large effects."
+        }
+      ]
+    }
+  ]
+}

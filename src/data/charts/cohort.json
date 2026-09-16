@@ -1,0 +1,165 @@
+{
+  "slug": "cohort",
+  "source": "github.com/NikitaBoyarkin/tableau_cohort_analysis: cohort_data.csv (5,469 user-period rows, 1,000 users, cohorts 2023-01..2023-10) — metrics computed with pandas from the committed CSV artifact: cohort sizes at period 0, retention mean by cohort x period, blended retention by period, cohort LTV = total_revenue / users",
+  "charts": [
+    {
+      "id": "cohort-retention-heatmap",
+      "type": "cohort-heatmap",
+      "title": {
+        "ru": "Матрица удержания когорт",
+        "en": "Cohort retention matrix"
+      },
+      "description": {
+        "ru": "Доля активных пользователей по когорте прихода (строки) и месяцу с регистрации (столбцы). Месяц прихода — 100 % по определению. Полная матрица треугольная: у младших когорт история наблюдения короче. Показан полностью наблюдаемый фрагмент 5 × 6 — все значения реальные.",
+        "en": "Share of active users by join cohort (rows) and months since join (columns). The join month is 100% by definition. The full matrix is triangular — younger cohorts have a shorter observation history. Shown is the fully observed 5 x 6 slice; every value is real."
+      },
+      "xLabel": {
+        "ru": "Месяц с регистрации",
+        "en": "Months since join"
+      },
+      "yLabel": {
+        "ru": "Когорта",
+        "en": "Cohort"
+      },
+      "data": {
+        "cohorts": ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05"],
+        "periods": ["M0", "M1", "M2", "M3", "M4", "M5"],
+        "values": [
+          [100.0, 83.5, 57.7, 39.2, 33.0, 21.6],
+          [100.0, 81.0, 65.5, 45.7, 34.5, 25.9],
+          [100.0, 86.0, 66.3, 48.8, 32.6, 30.2],
+          [100.0, 84.4, 67.5, 44.2, 44.2, 29.9],
+          [100.0, 86.1, 65.2, 49.6, 38.3, 26.1]
+        ],
+        "unit": "percent"
+      },
+      "conclusions": [
+        {
+          "ru": "Удержание через 1 месяц составляет 81.0–86.7 %, через 5 месяцев падает до 21.6–30.2 %.",
+          "en": "Month-1 retention is 81.0–86.7%; after 5 months it falls to 21.6–30.2%."
+        },
+        {
+          "ru": "Самое глубокое падение — у когорты 2023-01: с 83.5 % на M1 до 21.6 % на M5, т.е. −72 % от уровня первого месяца.",
+          "en": "The steepest decline is cohort 2023-01: from 83.5% at M1 to 21.6% at M5 — down 72% from its month-1 level."
+        }
+      ]
+    },
+    {
+      "id": "cohort-sizes",
+      "type": "bar",
+      "title": {
+        "ru": "Размер когорт",
+        "en": "Cohort sizes"
+      },
+      "description": {
+        "ru": "Число уникальных пользователей, зарегистрировавшихся в каждом месяце (учитывается на периоде 0).",
+        "en": "Unique users who joined in each month, counted at period 0."
+      },
+      "xLabel": {
+        "ru": "Когорта",
+        "en": "Cohort"
+      },
+      "yLabel": {
+        "ru": "Пользователи",
+        "en": "Users"
+      },
+      "data": {
+        "categories": ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10"],
+        "series": [
+          {
+            "name": "users",
+            "values": [97, 116, 86, 77, 115, 105, 100, 108, 93, 103]
+          }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Суммарный приток — 1000 пользователей за 10 месяцев, от 77 (2023-04) до 116 (2023-02) в месяц.",
+          "en": "Total inflow is 1,000 users over 10 months, ranging from 77 (2023-04) to 116 (2023-02) per month."
+        },
+        {
+          "ru": "Пиковый приток 116 (февраль 2023) в 1.5 раза выше минимального 77 (апрель 2023).",
+          "en": "Peak inflow of 116 (Feb 2023) is 1.5x the minimum of 77 (Apr 2023)."
+        }
+      ]
+    },
+    {
+      "id": "retention-curve",
+      "type": "line",
+      "title": {
+        "ru": "Кривая удержания (среднее по когортам)",
+        "en": "Blended retention curve"
+      },
+      "description": {
+        "ru": "Средняя доля активных пользователей по всем когортам в зависимости от месяца с регистрации. Период 0 — 100 % по определению.",
+        "en": "Average share of active users across all cohorts by months since join. Period 0 is 100% by definition."
+      },
+      "xLabel": {
+        "ru": "Месяц с регистрации",
+        "en": "Months since join"
+      },
+      "yLabel": {
+        "ru": "Активные, %",
+        "en": "Active, %"
+      },
+      "data": {
+        "categories": ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9"],
+        "series": [
+          {
+            "name": "retention",
+            "values": [100.0, 84.5, 62.3, 47.0, 35.9, 26.5, 19.9, 15.4, 9.9, 9.3]
+          }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Через 3 месяца остаётся 47.0 % пользователей, через 9 месяцев — 9.3 %.",
+          "en": "47.0% of users remain after 3 months; only 9.3% remain after 9."
+        },
+        {
+          "ru": "За первые 3 месяца уходит больше половины: 53.0 % оттока уже на M3.",
+          "en": "More than half churn within the first 3 months: 53.0% churn by M3."
+        }
+      ]
+    },
+    {
+      "id": "ltv-by-cohort",
+      "type": "bar",
+      "title": {
+        "ru": "LTV по когортам",
+        "en": "LTV by cohort"
+      },
+      "description": {
+        "ru": "Суммарная выручка когорты, делённая на её размер. У младших когорт LTV занижен из-за короткой истории наблюдения — сравнивать корректно только когорты равного «возраста».",
+        "en": "Cohort total revenue divided by cohort size. Younger cohorts show lower LTV only because less history is observed — compare cohorts of equal age."
+      },
+      "xLabel": {
+        "ru": "Когорта",
+        "en": "Cohort"
+      },
+      "yLabel": {
+        "ru": "LTV, ед. выручки",
+        "en": "LTV, revenue units"
+      },
+      "data": {
+        "categories": ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10"],
+        "series": [
+          {
+            "name": "ltv",
+            "values": [37.82, 39.47, 39.63, 39.45, 36.53, 34.11, 29.79, 23.2, 18.29, 10.3]
+          }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Максимальный LTV — 39.63 (2023-03), минимальный — 10.30 (2023-10).",
+          "en": "Highest LTV is 39.63 (2023-03); the lowest is 10.30 (2023-10)."
+        },
+        {
+          "ru": "Разрыв между старшей и младшей когортой — 3.8 раза (39.63 против 10.30), что отражает эффект возраста когорты, а не ухудшение качества.",
+          "en": "The 3.8x gap between oldest and newest cohort (39.63 vs 10.30) reflects the cohort-age effect, not worsening quality."
+        }
+      ]
+    }
+  ]
+}

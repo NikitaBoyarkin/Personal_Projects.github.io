@@ -1,0 +1,181 @@
+{
+  "slug": "sales-calls",
+  "source": "github.com/NikitaBoyarkin/sales-calls-dashboard: uv run python -c \"import data_pipeline as dp; df=dp.load_and_process('data/calls_demo.csv')\" (repo pipeline on data/calls_demo.csv, 11486 calls)",
+  "charts": [
+    {
+      "id": "call-conversion-funnel",
+      "type": "funnel",
+      "title": {
+        "ru": "Воронка звонков по шагам бота",
+        "en": "Call funnel by bot script step"
+      },
+      "description": {
+        "ru": "Кумулятивное число звонков, дошедших до каждого шага шаблонного скрипта бота: набор → приветствие и согласие → оффер → встреча → квалификация. Разметка по маркерам реплик бота.",
+        "en": "Cumulative calls that reached each step of the templated bot script: dialed → greeting & consent → offer → meeting → qualification. Steps labeled from bot-script markers."
+      },
+      "xLabel": {
+        "ru": "Шаг воронки",
+        "en": "Funnel step"
+      },
+      "yLabel": {
+        "ru": "Количество звонков",
+        "en": "Call count"
+      },
+      "data": {
+        "stages": [
+          { "label": "Набрано", "value": 11486 },
+          { "label": "Шаг 1 · Приветствие + согласие", "value": 8401 },
+          { "label": "Шаг 2 · Оффер", "value": 373 },
+          { "label": "Шаг 3 · Встреча", "value": 137 },
+          { "label": "Шаг 4 · Квалификация", "value": 32 }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Из 11486 звонков до оффера доходит только 373 (4,4% от диалогов) — главный обрыв на входе в разговор.",
+          "en": "Of 11486 dialed calls only 373 reach the offer (4.4% of dialogs) — the main drop is at the conversation entry."
+        },
+        {
+          "ru": "После согласия воронка течёт нормально: 137 из 373 (36,7%) доходят до встречи, 32 из 137 (23,4%) — до квалификации.",
+          "en": "After consent the funnel flows well: 137 of 373 (36.7%) reach a meeting, 32 of 137 (23.4%) reach qualification."
+        },
+        {
+          "ru": "На входе теряется 3085 звонков (26,9% всех наборов) — почти каждый четвёртый даже не доходит до приветствия.",
+          "en": "3085 calls (26.9% of all dials) never reach the greeting — roughly one in four is lost at entry."
+        }
+      ]
+    },
+    {
+      "id": "step1-drop-breakdown",
+      "type": "bar",
+      "title": {
+        "ru": "Разбор потерь на шаге 1",
+        "en": "Step 1 loss breakdown"
+      },
+      "description": {
+        "ru": "Как распределяются все 11486 звонков по исходу первого шага (приветствие и согласие): мгновенный сброс/автоответчик, сброс на приветствии, молчание, ответ без продвижения и прошедшие дальше.",
+        "en": "How all 11486 calls distribute by first-step outcome (greeting & consent): instant drop/answering machine, drop at greeting, silence, answered but stuck, and those that moved on."
+      },
+      "xLabel": {
+        "ru": "Исход шага 1",
+        "en": "Step 1 outcome"
+      },
+      "yLabel": {
+        "ru": "Количество звонков",
+        "en": "Call count"
+      },
+      "data": {
+        "categories": [
+          "Сброс на приветствии (клиент не ответил)",
+          "Нет диалога (мгновенный сброс/автоответчик)",
+          "Молчание (user: ...)",
+          "Ответил, но сорвался на шаге 1",
+          "Дошёл до оффера и дальше"
+        ],
+        "series": [
+          { "name": "Звонки", "values": [5493, 3085, 1558, 977, 373] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "5493 из 11486 звонков (47,8%) бот завершает сам, так и не дождавшись ответа на приветствие — это главная статья потерь.",
+          "en": "5493 of 11486 calls (47.8%) end with the bot hanging up before any answer to the greeting — the largest loss bucket."
+        },
+        {
+          "ru": "Ещё 3085 (26,9%) — мгновенный сброс или автоответчик без диалога; вместе с молчанием (1558) на «без ответа» приходится 88,3% всех наборов.",
+          "en": "Another 3085 (26.9%) are instant drops or answering machines; together with silence (1558), no-answer cases cover 88.3% of all dials."
+        },
+        {
+          "ru": "Только 977 человек (8,5%) отвечают, но бот теряет их на первом же шаге.",
+          "en": "Only 977 people (8.5%) answer yet the bot loses them on the very first step."
+        }
+      ]
+    },
+    {
+      "id": "calls-by-hour",
+      "type": "line",
+      "title": {
+        "ru": "Звонки по часам дня",
+        "en": "Calls by hour of day"
+      },
+      "description": {
+        "ru": "Распределение 11486 звонков по часу набора. Пик объёма приходится на 17:00, при этом почти весь трафик сконцентрирован в четверг и пятницу (99,9%).",
+        "en": "Distribution of 11486 calls by dialing hour. Volume peaks at 17:00, and nearly all traffic is concentrated on Thursday and Friday (99.9%)."
+      },
+      "xLabel": {
+        "ru": "Час дня",
+        "en": "Hour of day"
+      },
+      "yLabel": {
+        "ru": "Количество звонков",
+        "en": "Call count"
+      },
+      "data": {
+        "categories": ["09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"],
+        "series": [
+          { "name": "Звонков в час", "values": [83, 24, 1083, 1322, 1044, 1376, 751, 731, 3053, 1434, 582, 3] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "На 17:00 приходится 3053 звонка — 26,6% всех наборов, самый массовый час.",
+          "en": "17:00 carries 3053 calls — 26.6% of all dials, the busiest hour."
+        },
+        {
+          "ru": "Дневной «хвост» 11:00–14:00 в сумме даёт 4449 звонков (38,7%) против 5069 (44,1%) в 17:00–18:00.",
+          "en": "The midday tail 11:00–14:00 totals 4449 calls (38.7%) versus 5069 (44.1%) in 17:00–18:00."
+        },
+        {
+          "ru": "Трафик почти полностью упакован в два дня: 5824 звонка в четверг и 5649 в пятницу (вместе 99,9%).",
+          "en": "Traffic is packed into two days: 5824 calls on Thursday and 5649 on Friday (99.9% combined)."
+        }
+      ]
+    },
+    {
+      "id": "avg-duration-by-step",
+      "type": "bar",
+      "title": {
+        "ru": "Средняя длительность по шагу разговора",
+        "en": "Average duration by conversation step"
+      },
+      "description": {
+        "ru": "Средняя длительность звонка (в секундах) в зависимости от максимального шага, до которого дошёл разговор. Длительность — производная от шага: чем дальше клиент, тем дольше диалог.",
+        "en": "Average call duration (seconds) by the deepest step the conversation reached. Duration is a function of step: the further the client goes, the longer the dialog."
+      },
+      "xLabel": {
+        "ru": "Максимальный достигнутый шаг",
+        "en": "Max reached step"
+      },
+      "yLabel": {
+        "ru": "Средняя длительность, сек",
+        "en": "Average duration, sec"
+      },
+      "data": {
+        "categories": [
+          "0 · Без приветствия",
+          "1 · Приветствие + согласие",
+          "2 · Оффер",
+          "3 · Встреча",
+          "4 · Квалификация"
+        ],
+        "series": [
+          { "name": "Средняя длительность, сек", "values": [3.3, 20.1, 71.8, 129.9, 141.4] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Звонки без приветствия в среднем длятся 3,3 сек — мгновенный сброс/автоответчик (3085 звонков).",
+          "en": "Calls without a greeting average 3.3 sec — instant drops/answering machines (3085 calls)."
+        },
+        {
+          "ru": "Переход от шага 1 к офферу удлиняет разговор в 3,6 раза: с 20,1 до 71,8 сек (236 звонков).",
+          "en": "Moving from step 1 to the offer lengthens the call 3.6×: from 20.1 to 71.8 sec (236 calls)."
+        },
+        {
+          "ru": "Диалоги до встречи и квалификации в среднем 129,9 и 141,4 сек — качественный разговор в ~40 раз длиннее «мгновенного сброса».",
+          "en": "Dialogues reaching a meeting or qualification average 129.9 and 141.4 sec — a quality talk is ~40× longer than an instant drop."
+        }
+      ]
+    }
+  ]
+}

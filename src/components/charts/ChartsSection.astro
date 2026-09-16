@@ -1,0 +1,53 @@
+---
+// "Аналитика / Charts" section rendered on a project page after the case study.
+// Reads src/data/charts/<slug>.json; renders nothing when the file is absent.
+import { loadChartFile } from '../../lib/charts';
+import ChartCard from './ChartCard.astro';
+
+interface Props {
+  slug: string;
+  lang?: 'ru' | 'en';
+}
+
+const { slug, lang = 'ru' } = Astro.props;
+const payload = loadChartFile(slug);
+const isEn = lang === 'en';
+---
+
+{
+  payload && (
+    <section class="charts-section reveal" aria-label={isEn ? 'Charts' : 'Аналитика'}>
+      <h2>{isEn ? 'Charts' : 'Аналитика'}</h2>
+      <p class="charts-source">
+        {isEn ? 'Source' : 'Данные'}: {payload.source}
+      </p>
+
+      <div class="charts-grid">
+        {payload.charts.map((chart) => <ChartCard chart={chart} lang={lang} />)}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .charts-section {
+    margin: var(--space-8) 0;
+  }
+  .charts-section h2 {
+    color: var(--text-accent);
+    font-size: 1.4rem;
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 2px solid var(--border-color);
+  }
+  .charts-source {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: var(--space-2) 0 var(--space-5);
+  }
+  .charts-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+</style>

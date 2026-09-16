@@ -1,0 +1,163 @@
+{
+  "slug": "sql",
+  "source": "github.com/NikitaBoyarkin/sql-analytics-case-study: cases/01_funnel_conversion.sql, cases/13_pivot_revenue.sql, cases/18_cohort_revenue_retention.sql, cases/14_recursive_subscription_mrr.sql — each run as-is against data/analytics.duckdb (deterministic, seed=42, regenerated via data/generate_data.py)",
+  "charts": [
+    {
+      "id": "funnel-conversion",
+      "type": "funnel",
+      "title": {
+        "ru": "Конверсия воронки покупки (по сессиям)",
+        "en": "Purchase funnel conversion (session-level)"
+      },
+      "description": {
+        "ru": "Число уникальных сессий, дошедших до каждого шага воронки: app_open → просмотр товара → корзина → чекаут → покупка. Данные из cases/01_funnel_conversion.sql по 80 000 сессий синтетического датасета.",
+        "en": "Unique sessions reaching each funnel step: app_open -> view_item -> add_to_cart -> checkout -> purchase. From cases/01_funnel_conversion.sql across 80,000 sessions of the synthetic dataset."
+      },
+      "xLabel": {
+        "ru": "Шаг воронки",
+        "en": "Funnel step"
+      },
+      "yLabel": {
+        "ru": "Сессии",
+        "en": "Sessions"
+      },
+      "data": {
+        "stages": [
+          { "label": "app_open", "value": 80000 },
+          { "label": "view_item", "value": 65739 },
+          { "label": "add_to_cart", "value": 29641 },
+          { "label": "checkout", "value": 6584 },
+          { "label": "purchase", "value": 928 }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Сквозная конверсия от открытия приложения до покупки — всего 1.16 % (928 из 80 000 сессий).",
+          "en": "End-to-end conversion from app open to purchase is just 1.16% (928 of 80,000 sessions)."
+        },
+        {
+          "ru": "Крупнейший отвал — корзина → чекаут: 54.91 % корзин не доходят до оформления (29 641 → 6 584).",
+          "en": "The biggest drop is add-to-cart -> checkout: 54.91% of carts never proceed (29,641 -> 6,584)."
+        }
+      ]
+    },
+    {
+      "id": "revenue-by-category-month",
+      "type": "bar",
+      "title": {
+        "ru": "Выручка по категориям по месяцам",
+        "en": "Revenue by product category, monthly"
+      },
+      "description": {
+        "ru": "Сумма заказов по категории и месяцу (cases/13_pivot_revenue.sql, PIVOT). Рост через год: суммарная месячная выручка выросла с $2 469.03 в январе до $4 452.48 в июне.",
+        "en": "Order revenue by category and month (cases/13_pivot_revenue.sql, PIVOT). Revenue ramps through the year: total monthly revenue grows from $2,469.03 in January to $4,452.48 in June."
+      },
+      "xLabel": {
+        "ru": "Месяц",
+        "en": "Month"
+      },
+      "yLabel": {
+        "ru": "Выручка, $",
+        "en": "Revenue, $"
+      },
+      "data": {
+        "categories": ["2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06"],
+        "series": [
+          { "name": "beauty", "values": [466.84, 648.97, 611.16, 560.09, 768.52, 869.45] },
+          { "name": "books", "values": [344.01, 664.07, 508.99, 622.41, 532.49, 784.77] },
+          { "name": "clothing", "values": [432.0, 754.6, 930.18, 972.63, 876.49, 779.79] },
+          { "name": "electronics", "values": [385.19, 701.15, 1134.15, 981.57, 946.01, 656.84] },
+          { "name": "home", "values": [385.64, 758.01, 727.85, 753.31, 776.19, 717.07] },
+          { "name": "sports", "values": [455.35, 521.8, 919.15, 718.79, 883.96, 644.56] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Общая выручка выросла в 1.8 раза: с $2 469.03 в январе до $4 452.48 в июне 2024.",
+          "en": "Total revenue grew 1.8x: from $2,469.03 in January to $4,452.48 in June 2024."
+        },
+        {
+          "ru": "Пик категории electronics — $1 134.15 в марте, это максимум по всем категориям и месяцам.",
+          "en": "Electronics peaks at $1,134.15 in March — the single highest category-month value."
+        }
+      ]
+    },
+    {
+      "id": "cohort-revenue-retention",
+      "type": "cohort-heatmap",
+      "title": {
+        "ru": "Выручка когорт по месяцам с регистрации, % от месяца 0",
+        "en": "Cohort revenue retention, % of month 0"
+      },
+      "description": {
+        "ru": "Выручка каждой когорты регистрации (строки) в месяцы с регистрации M0–M2, в процентах от периода 0 (cases/18_cohort_revenue_retention.sql). Показан полностью наблюдаемый фрагмент 4 × 3.",
+        "en": "Revenue of each signup cohort (rows) in months-since-signup M0-M2, as % of period 0 (cases/18_cohort_revenue_retention.sql). Shown is the fully observed 4 x 3 slice."
+      },
+      "xLabel": {
+        "ru": "Месяц с регистрации",
+        "en": "Months since signup"
+      },
+      "yLabel": {
+        "ru": "Когорта",
+        "en": "Cohort"
+      },
+      "data": {
+        "cohorts": ["2024-01", "2024-02", "2024-03", "2024-04"],
+        "periods": ["M0", "M1", "M2"],
+        "values": [
+          [100.0, 85.8, 19.5],
+          [100.0, 80.8, 15.3],
+          [100.0, 67.3, 12.2],
+          [100.0, 87.6, 10.4]
+        ],
+        "unit": "percent"
+      },
+      "conclusions": [
+        {
+          "ru": "Удержание выручки на M1 — 67.3–87.6 %, но на M2 обрушивается до 10.4–19.5 %: выручка «живёт» один месяц после покупки.",
+          "en": "Month-1 revenue retention is 67.3-87.6%, but by M2 it collapses to 10.4-19.5%: revenue effectively lives for one month after purchase."
+        },
+        {
+          "ru": "Слабее всего держит выручку когорта 2024-03: −32.7 п.п. уже на M1 (100 → 67.3 %).",
+          "en": "The 2024-03 cohort holds revenue worst: -32.7pp already by M1 (100 -> 67.3%)."
+        }
+      ]
+    },
+    {
+      "id": "mrr-growth",
+      "type": "line",
+      "title": {
+        "ru": "Рост MRR подписок",
+        "en": "Subscription MRR growth"
+      },
+      "description": {
+        "ru": "Месячная повторяющаяся выручка от подписок (cases/14_recursive_subscription_mrr.sql, рекурсивный CTE: monthly = полная сумма, annual = сумма/12). Активные подписки растут с 18 до 268.",
+        "en": "Monthly recurring revenue from subscriptions (cases/14_recursive_subscription_mrr.sql, recursive CTE: monthly = full amount, annual = amount/12). Active subscriptions grow from 18 to 268."
+      },
+      "xLabel": {
+        "ru": "Месяц",
+        "en": "Month"
+      },
+      "yLabel": {
+        "ru": "MRR, $",
+        "en": "MRR, $"
+      },
+      "data": {
+        "categories": ["2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06"],
+        "series": [
+          { "name": "mrr", "values": [169.86, 522.08, 969.22, 1411.37, 1918.45, 2500.47] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "MRR вырос в 14.7 раза за полгода: с $169.86 в январе до $2 500.47 в июне 2024.",
+          "en": "MRR grew 14.7x in six months: from $169.86 in January to $2,500.47 in June 2024."
+        },
+        {
+          "ru": "Число активных подписок выросло с 18 до 268 — с января по июнь прирост в 14.9 раза.",
+          "en": "Active subscriptions grew from 18 to 268 — a 14.9x increase from January to June."
+        }
+      ]
+    }
+  ]
+}

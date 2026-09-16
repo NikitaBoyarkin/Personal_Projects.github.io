@@ -1,0 +1,156 @@
+---
+// Bar chart (and histogram — same geometry, single "bins" series).
+// Build-time static SVG, themed via CSS variables. Native <title> tooltips.
+import type { ChartObject } from '../../lib/charts';
+import { CHART_PALETTE } from '../../lib/charts';
+import { area, ticksFor, linearScale, fmt } from '../../lib/chart-svg';
+
+interface Props {
+  chart: ChartObject & { type: 'bar' | 'histogram' };
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const data = chart.data;
+const { categories, series } = data;
+const n = categories.length;
+const k = series.length;
+
+const H = n > 1 ? 300 : 240;
+const a = area(640, H, 54, 14, series.length > 1 ? 34 : 18, 54);
+const max = Math.max(0, ...series.flatMap((s) => s.values));
+const ticks = ticksFor(max, 4);
+const top = ticks[ticks.length - 1] || 1;
+const y = linearScale(0, top, a.ml + a.ph, a.ml);
+const gw = a.pw / n;
+const bw = Math.min((gw * 0.66) / k, 44);
+const xc = (i: number) => a.ml + gw * i + gw / 2;
+const totalBars = n * k;
+
+const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
+const showValues = totalBars <= 16;
+const xLabel = chart.xLabel?.[lang];
+const yLabel = chart.yLabel?.[lang];
+---
+
+<svg
+  viewBox={`0 0 ${a.w} ${a.h}`}
+  role="img"
+  aria-label={ariaLabel}
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g class="grid">
+    {ticks.map((t) => (
+      <line
+        x1={a.ml}
+        y1={y(t)}
+        x2={a.w - a.mr}
+        y2={y(t)}
+        class="gridline"
+      />
+    ))}
+  </g>
+
+  <g class="y-axis">
+    {ticks.map((t) => (
+      <text x={a.ml - 8} y={y(t) + 3} text-anchor="end" class="axis-label">
+        {fmt(t)}
+      </text>
+    ))}
+  </g>
+
+  <g class="bars">
+    {series.map((s, j) =>
+      s.values.map((v, i) => {
+        const bx = xc(i) - (k * bw) / 2 + j * bw;
+        const bh = y(0) - y(v);
+        return (
+          <g>
+            <title>{`${categories[i]} — ${s.name}: ${fmt(v)}`}</title>
+            <rect
+              x={bx}
+              y={y(v)}
+              width={bw}
+              height={bh}
+              rx={3}
+              fill={CHART_PALETTE[j % CHART_PALETTE.length]}
+              class="bar"
+            />
+            {showValues && (
+              <text x={bx + bw / 2} y={y(v) - 4} text-anchor="middle" class="value-label">
+                {fmt(v)}
+              </text>
+            )}
+          </g>
+        );
+      }),
+    )}
+  </g>
+
+  <g class="x-axis">
+    {categories.map((c, i) => (
+      <text x={xc(i)} y={a.ml + a.ph + 18} text-anchor="middle" class="axis-label">
+        {c}
+      </text>
+    ))}
+  </g>
+
+  {xLabel && (
+    <text x={a.ml + a.pw / 2} y={a.h - 6} text-anchor="middle" class="axis-caption">
+      {xLabel}
+    </text>
+  )}
+  {yLabel && (
+    <text x={10} y={a.ml + 10} class="axis-caption" transform={`rotate(-90 10 ${a.ml + 10})`}>
+      {yLabel}
+    </text>
+  )}
+
+  {k > 1 && (
+    <g class="legend">
+      {series.map((s, j) => (
+        <g transform={`translate(${a.ml + j * 140}, 12)`}>
+          <rect x={0} y={-7} width={11} height={11} rx={2} fill={CHART_PALETTE[j % CHART_PALETTE.length]} />
+          <text x={16} y={1} class="legend-label">
+            {s.name}
+          </text>
+        </g>
+      ))}
+    </g>
+  )}
+</svg>
+
+<style>
+  .gridline {
+    stroke: var(--border-color);
+    stroke-opacity: 0.45;
+    stroke-width: 1;
+  }
+  .axis-label {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .axis-caption {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .value-label {
+    fill: var(--text-normal);
+    font-size: 10px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+  }
+  .legend-label {
+    fill: var(--text-normal);
+    font-size: 12px;
+    font-family: var(--font-sans);
+  }
+  .bar {
+    transition: opacity 120ms ease;
+  }
+  .bar:hover {
+    opacity: 0.85;
+  }
+</style>

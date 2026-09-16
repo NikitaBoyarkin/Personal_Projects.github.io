@@ -1,0 +1,131 @@
+---
+// Cohort retention heatmap. Rows = cohorts, columns = periods.
+// Cell intensity maps to the dataviz accent; native <title> tooltips.
+import type { ChartObject } from '../../lib/charts';
+import { fmt } from '../../lib/chart-svg';
+
+interface Props {
+  chart: ChartObject & { type: 'cohort-heatmap' };
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const data = chart.data;
+const { cohorts, periods, values, unit } = data;
+const rows = cohorts.length;
+const cols = periods.length;
+
+const ml = 110;
+const mr = 10;
+const mt = 52;
+const mb = 42;
+const W = 640;
+const cellW = (W - ml - mr) / cols;
+const cellH = Math.min(48, (300 - mt - mb) / rows);
+const H = Math.max(240, mt + mb + rows * cellH);
+
+const maxVal = Math.max(0, ...values.flatMap((r) => r));
+const denom = unit === 'percent' ? 100 : maxVal || 1;
+const intensity = (v: number) => Math.min(1, Math.max(0, v / denom));
+const cx = (c: number) => ml + cellW * c + cellW / 2;
+const cy = (r: number) => mt + cellH * r + cellH / 2;
+const showText = cellW >= 32 && cellH >= 24;
+
+const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
+const suffix = unit === 'percent' ? '%' : '';
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  role="img"
+  aria-label={ariaLabel}
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g class="rows">
+    {cohorts.map((c, r) => (
+      <text x={ml - 10} y={cy(r) + 4} text-anchor="end" class="row-label">
+        {c}
+      </text>
+    ))}
+  </g>
+
+  <g class="cols">
+    {periods.map((p, c) => {
+      const rot = cellW < p.length * 6.5;
+      return (
+        <text
+          x={cx(c)}
+          y={mt - 10}
+          text-anchor={rot ? 'end' : 'middle'}
+          transform={rot ? `rotate(-40 ${cx(c)} ${mt - 10})` : undefined}
+          class="col-label"
+        >
+          {p}
+        </text>
+      );
+    })}
+  </g>
+
+  <g class="cells">
+    {values.map((row, r) =>
+      row.map((v, c) => (
+        <g>
+          <title>{`${cohorts[r]} · ${periods[c]}: ${fmt(v)}${suffix}`}</title>
+          <rect
+            x={ml + cellW * c + 1.5}
+            y={mt + cellH * r + 1.5}
+            width={cellW - 3}
+            height={cellH - 3}
+            rx={4}
+            fill="var(--text-accent-dataviz)"
+            fill-opacity={0.1 + 0.9 * intensity(v)}
+            class="cell"
+          />
+          {showText && (
+            <text x={cx(c)} y={cy(r) + 4} text-anchor="middle" class="cell-value">
+              {fmt(v)}{suffix}
+            </text>
+          )}
+        </g>
+      )),
+    )}
+  </g>
+
+  <g class="legend">
+    <rect x={ml} y={H - 24} width={130} height={8} rx={4} fill="var(--text-accent-dataviz)" fill-opacity={0.12} />
+    <rect x={ml + 43} y={H - 24} width={44} height={8} rx={4} fill="var(--text-accent-dataviz)" fill-opacity={0.5} />
+    <rect x={ml + 87} y={H - 24} width={43} height={8} rx={4} fill="var(--text-accent-dataviz)" fill-opacity={1} />
+    <text x={ml} y={H - 8} class="legend-label">0</text>
+    <text x={ml + 130} y={H - 8} text-anchor="end" class="legend-label">{fmt(denom)}{suffix}</text>
+  </g>
+</svg>
+
+<style>
+  .row-label {
+    fill: var(--text-normal);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+  }
+  .col-label {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .cell-value {
+    fill: var(--text-normal);
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    paint-order: stroke;
+    stroke: var(--background-secondary);
+    stroke-width: 3px;
+    stroke-opacity: 0.9;
+    stroke-linejoin: round;
+  }
+  .legend-label {
+    fill: var(--text-muted);
+    font-size: 10px;
+    font-family: var(--font-sans);
+  }
+</style>

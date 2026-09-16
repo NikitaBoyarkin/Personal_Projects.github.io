@@ -1,0 +1,169 @@
+{
+  "slug": "posthog",
+  "source": "github.com/NikitaBoyarkin/posthog-saas-analytics: data/raw/events.jsonl (committed snapshot, 14,764 events / 2,000 users) re-analyzed with `uv run python analysis/report.py` -> reports/posthog_analysis_report.md (funnel, retention, A/B, revenue); daily-active-users computed with pandas from data/raw/events.jsonl",
+  "charts": [
+    {
+      "id": "activation-funnel",
+      "type": "funnel",
+      "title": {
+        "ru": "Воронка активации",
+        "en": "Activation funnel"
+      },
+      "description": {
+        "ru": "Последовательная воронка: каждый шаг считает только пользователей, совершивших его после предыдущего. До активации (ключевое действие) доходит 32.8 % от всех, до апгрейда — 5.3 %.",
+        "en": "Sequential funnel: each step counts only users who performed it after the previous one. 32.8% of signups reach activation (core action) and 5.3% reach upgrade."
+      },
+      "xLabel": {
+        "ru": "Шаг воронки",
+        "en": "Funnel step"
+      },
+      "yLabel": {
+        "ru": "Пользователи",
+        "en": "Users"
+      },
+      "data": {
+        "stages": [
+          { "label": "signup_started", "value": 2000 },
+          { "label": "signup_completed", "value": 1709 },
+          { "label": "onboarding_completed", "value": 1082 },
+          { "label": "core_action_performed", "value": 656 },
+          { "label": "upgrade_completed", "value": 107 }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Самый резкий отвал — на шаге upgrade_completed: конверсия с предыдущего шага 16.3 %, до апгрейда доходит лишь 107 из 2000 пользователей (5.3 %).",
+          "en": "The sharpest drop-off is at upgrade_completed: only 16.3% convert from the previous step, and just 107 of 2,000 users (5.3%) upgrade."
+        },
+        {
+          "ru": "Онбординг теряет 36.7 % прошедших регистрацию (1709 -> 1082), а ключевое действие выполняют 60.6 % завершивших онбординг.",
+          "en": "Onboarding loses 36.7% of users who completed signup (1,709 -> 1,082), and 60.6% of those who finish onboarding perform the core action."
+        }
+      ]
+    },
+    {
+      "id": "cohort-retention-d0-d6",
+      "type": "cohort-heatmap",
+      "title": {
+        "ru": "Удержание когорт по дням (D0–D6)",
+        "en": "Day-N cohort retention (D0–D6)"
+      },
+      "description": {
+        "ru": "Когорта — день регистрации; удержание — доля когорты, совершившая core_action_performed на N-й день. Показаны 14 последних когорт снапшота и первые 7 дней; все значения реальные.",
+        "en": "Cohort = signup day; retained = share of the cohort that fired core_action_performed on day N. Shown are the 14 most recent cohorts over the first 7 days; every value is real."
+      },
+      "xLabel": {
+        "ru": "День с регистрации",
+        "en": "Days since signup"
+      },
+      "yLabel": {
+        "ru": "Когорта",
+        "en": "Cohort"
+      },
+      "data": {
+        "cohorts": ["2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-05", "2026-09-06", "2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14"],
+        "periods": ["D0", "D1", "D2", "D3", "D4", "D5", "D6"],
+        "values": [
+          [32.7, 9.1, 14.5, 10.9, 9.1, 14.5, 12.7],
+          [40.3, 12.9, 12.9, 14.5, 9.7, 16.1, 17.7],
+          [37.9, 18.2, 16.7, 13.6, 10.6, 13.6, 12.1],
+          [37.0, 14.8, 14.8, 20.4, 20.4, 9.3, 13.0],
+          [33.9, 16.1, 7.1, 7.1, 8.9, 8.9, 8.9],
+          [41.5, 18.9, 20.8, 13.2, 18.9, 17.0, 22.6],
+          [34.0, 14.9, 8.5, 8.5, 17.0, 23.4, 10.6],
+          [40.0, 22.2, 22.2, 20.0, 15.6, 8.9, 0.0],
+          [41.4, 12.1, 15.5, 15.5, 20.7, 0.0, 0.0],
+          [41.8, 19.4, 20.9, 13.4, 0.0, 0.0, 0.0],
+          [41.5, 24.5, 17.0, 0.0, 0.0, 0.0, 0.0],
+          [38.9, 22.2, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [33.3, 1.8, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [41.2, 3.9, 0.0, 0.0, 0.0, 0.0, 0.0]
+        ],
+        "unit": "percent"
+      },
+      "conclusions": [
+        {
+          "ru": "Удержание низкое и «прыгучее»: на D0 — 32.7–41.8 %, а на D1 падает до 1.8–24.5 % — активность пользователей нерегулярная, а не ежедневная.",
+          "en": "Retention is low and jittery: D0 runs 32.7–41.8%, but by D1 it falls to 1.8–24.5% — users are active irregularly rather than daily."
+        },
+        {
+          "ru": "На D4–D6 видна треугольная форма матрицы: когорты 2026-09-13 (D1 = 1.8 %) и 2026-09-14 (D1 = 3.9 %) показывают минимум удержания среди последних когорт.",
+          "en": "The matrix is triangular from D4 onward: cohorts 2026-09-13 (D1 = 1.8%) and 2026-09-14 (D1 = 3.9%) show the weakest retention among the newest cohorts."
+        }
+      ]
+    },
+    {
+      "id": "ab-test-onboarding",
+      "type": "bar",
+      "title": {
+        "ru": "A/B-тест онбординга: control vs new_onboarding",
+        "en": "Onboarding A/B test: control vs new_onboarding"
+      },
+      "description": {
+        "ru": "Сокращённый онбординг против контрольной версии. Завершение онбординга считается по когорте начавших: 55.9 % у control против 70.8 % у new_onboarding.",
+        "en": "Shorter onboarding vs control, measured by completion among users who started. Completion is 55.9% for control vs 70.8% for new_onboarding."
+      },
+      "xLabel": {
+        "ru": "Вариант",
+        "en": "Variant"
+      },
+      "yLabel": {
+        "ru": "Пользователи",
+        "en": "Users"
+      },
+      "data": {
+        "categories": ["control", "new_onboarding"],
+        "series": [
+          { "name": "started", "values": [857, 852] },
+          { "name": "completed", "values": [479, 603] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Относительный рост завершения — +26.6 % (55.9 % -> 70.8 %), хи-квадрат 40.10, p = 0.0000 — эффект статистически значим.",
+          "en": "Relative uplift in completion is +26.6% (55.9% -> 70.8%), chi-square 40.10, p = 0.0000 — the effect is statistically significant."
+        },
+        {
+          "ru": "95 % ДИ разницы (new - control) — [8.4, 21.2] п.п., а SRM-проверка сплита проходит (p = 0.9037): выборка не смещена, можно раскатывать вариант.",
+          "en": "The 95% CI for the difference (new - control) is [8.4, 21.2] pp, and the sample-ratio-mismatch check passes (p = 0.9037): the split is balanced, so the variant can be rolled out."
+        }
+      ]
+    },
+    {
+      "id": "daily-active-users",
+      "type": "line",
+      "title": {
+        "ru": "Ежедневно активные пользователи (DAU)",
+        "en": "Daily active users (DAU)"
+      },
+      "description": {
+        "ru": "Уникальные пользователи в день по снапшоту событий за 30 дней трафика. Последние дни (2026-09-14, 2026-09-15) — хвост окна симуляции с неполными сутками.",
+        "en": "Unique users per day across the 30-day traffic snapshot. The final days (2026-09-14, 2026-09-15) are the tail of the simulation window with partial days."
+      },
+      "xLabel": {
+        "ru": "Дата",
+        "en": "Date"
+      },
+      "yLabel": {
+        "ru": "Активные пользователи",
+        "en": "Active users"
+      },
+      "data": {
+        "categories": ["2026-08-16", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21", "2026-08-22", "2026-08-23", "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-29", "2026-08-30", "2026-08-31", "2026-09-01", "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-05", "2026-09-06", "2026-09-07", "2026-09-08", "2026-09-09", "2026-09-10", "2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14"],
+        "series": [
+          { "name": "dau", "values": [69, 63, 74, 86, 90, 92, 114, 134, 125, 137, 147, 150, 161, 164, 170, 198, 179, 180, 217, 215, 200, 229, 227, 236, 230, 242, 271, 284, 267, 70] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "DAU вырос с 69 (2026-08-16) до пика 284 (2026-09-12) — рост в 4.1 раза за 30 дней окна.",
+          "en": "DAU grew from 69 (2026-08-16) to a peak of 284 (2026-09-12) — a 4.1x increase over the 30-day window."
+        },
+        {
+          "ru": "Рост стабилен: медианный прирост между соседними днями +8 %, а дни 2026-09-14 (70) и 2026-09-15 (4) — это неполные сутки хвоста симуляции.",
+          "en": "Growth is steady, with a median day-over-day change of +8%; the final values of 70 (2026-09-14) and 4 (2026-09-15) are a partial-day tail of the simulation."
+        }
+      ]
+    }
+  ]
+}

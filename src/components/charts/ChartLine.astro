@@ -1,0 +1,139 @@
+---
+// Line / multi-series chart. Build-time static SVG with native tooltips.
+import type { ChartObject } from '../../lib/charts';
+import { CHART_PALETTE } from '../../lib/charts';
+import { area, ticksFor, linearScale, fmt } from '../../lib/chart-svg';
+
+interface Props {
+  chart: ChartObject & { type: 'line' };
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const data = chart.data;
+const { categories, series } = data;
+const n = categories.length;
+const k = series.length;
+
+const a = area(640, 300, 54, 14, series.length > 1 ? 34 : 18, 54);
+const allVals = series.flatMap((s) => s.values);
+const dataMin = Math.min(0, ...allVals);
+const dataMax = Math.max(...allVals);
+const max = ticksFor(dataMax, 4)[ticksFor(dataMax, 4).length - 1];
+const min = dataMin < 0 ? -ticksFor(-dataMin, 4)[ticksFor(-dataMin, 4).length - 1] : 0;
+const ticks = ticksFor(max - min, 4).map((t) => min + t);
+const y = linearScale(min, max, a.ml + a.ph, a.ml);
+const gw = a.pw / n;
+const xc = (i: number) => a.ml + gw * i + gw / 2;
+
+const poly = (values: number[]) =>
+  values.map((v, i) => `${i === 0 ? 'M' : 'L'} ${xc(i)} ${y(v)}`).join(' ');
+
+const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
+const xLabel = chart.xLabel?.[lang];
+const yLabel = chart.yLabel?.[lang];
+---
+
+<svg
+  viewBox={`0 0 ${a.w} ${a.h}`}
+  role="img"
+  aria-label={ariaLabel}
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g class="grid">
+    {ticks.map((t) => (
+      <line x1={a.ml} y1={y(t)} x2={a.w - a.mr} y2={y(t)} class="gridline" />
+    ))}
+  </g>
+
+  <g class="y-axis">
+    {ticks.map((t) => (
+      <text x={a.ml - 8} y={y(t) + 3} text-anchor="end" class="axis-label">
+        {fmt(t)}
+      </text>
+    ))}
+  </g>
+
+  {min < 0 && <line x1={a.ml} y1={y(0)} x2={a.w - a.mr} y2={y(0)} class="zero-line" />}
+
+  <g class="lines">
+    {series.map((s, j) => (
+      <g>
+        <title>{s.name}</title>
+        <path d={poly(s.values)} fill="none" stroke={CHART_PALETTE[j % CHART_PALETTE.length]} stroke-width={2.5} stroke-linejoin="round" stroke-linecap="round" />
+        {s.values.map((v, i) => (
+          <g>
+            <title>{`${categories[i]} — ${s.name}: ${fmt(v)}`}</title>
+            <circle cx={xc(i)} cy={y(v)} r={3.2} fill={CHART_PALETTE[j % CHART_PALETTE.length]} class="dot" />
+          </g>
+        ))}
+      </g>
+    ))}
+  </g>
+
+  <g class="x-axis">
+    {categories.map((c, i) => (
+      <text x={xc(i)} y={a.ml + a.ph + 18} text-anchor="middle" class="axis-label">
+        {c}
+      </text>
+    ))}
+  </g>
+
+  {xLabel && (
+    <text x={a.ml + a.pw / 2} y={a.h - 6} text-anchor="middle" class="axis-caption">
+      {xLabel}
+    </text>
+  )}
+  {yLabel && (
+    <text x={10} y={a.ml + 10} class="axis-caption" transform={`rotate(-90 10 ${a.ml + 10})`}>
+      {yLabel}
+    </text>
+  )}
+
+  {k > 1 && (
+    <g class="legend">
+      {series.map((s, j) => (
+        <g transform={`translate(${a.ml + j * 140}, 12)`}>
+          <line x1={0} y1={0} x2={13} y2={0} stroke={CHART_PALETTE[j % CHART_PALETTE.length]} stroke-width={3} />
+          <text x={19} y={3} class="legend-label">
+            {s.name}
+          </text>
+        </g>
+      ))}
+    </g>
+  )}
+</svg>
+
+<style>
+  .gridline {
+    stroke: var(--border-color);
+    stroke-opacity: 0.45;
+    stroke-width: 1;
+  }
+  .zero-line {
+    stroke: var(--text-normal);
+    stroke-opacity: 0.5;
+    stroke-width: 1;
+  }
+  .axis-label {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .axis-caption {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .legend-label {
+    fill: var(--text-normal);
+    font-size: 12px;
+    font-family: var(--font-sans);
+  }
+  .dot {
+    transition: r 120ms ease;
+  }
+  .dot:hover {
+    r: 5;
+  }
+</style>

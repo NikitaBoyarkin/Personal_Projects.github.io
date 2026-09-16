@@ -1,0 +1,166 @@
+{
+  "slug": "rfm",
+  "source": "github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients: uv run python rfm_analysis.py on data/bank_rfm_dataset_10k_fixed.csv (10,000 synthetic transactions → 1,981 active clients); segment & revenue tables read from data/rfm_output.csv (re-run)",
+  "charts": [
+    {
+      "id": "segment-sizes",
+      "type": "bar",
+      "title": {
+        "ru": "Размер RFM-сегментов",
+        "en": "RFM segment sizes"
+      },
+      "description": {
+        "ru": "Число клиентов в каждом RFM-сегменте по итогам анализа 10 000 транзакций банка (1981 активный клиент). Сегменты выделены по комбинации квартилей Recency/Frequency/Monetary.",
+        "en": "Client count per RFM segment from the analysis of 10,000 bank transactions (1,981 active clients). Segments are derived from Recency/Frequency/Monetary quartile combos."
+      },
+      "xLabel": {
+        "ru": "Сегмент",
+        "en": "Segment"
+      },
+      "yLabel": {
+        "ru": "Клиенты",
+        "en": "Clients"
+      },
+      "data": {
+        "categories": ["Чемпионы", "Лояльные", "Потенциально лояльные", "В зоне риска", "Нужно внимание", "Спящие"],
+        "series": [
+          { "name": "Клиенты", "values": [83, 311, 208, 232, 395, 752] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Самый массовый сегмент — «Спящие»: 752 клиента из 1981 (37,96%), почти вдвое больше «Лояльных» (311, 15,70%).",
+          "en": "The largest segment is Hibernating: 752 of 1,981 clients (37.96%), nearly double Loyal (311, 15.70%)."
+        },
+        {
+          "ru": "«Чемпионы» — самые малочисленные: всего 83 клиента (4,19% базы).",
+          "en": "Champions are the smallest: just 83 clients (4.19% of the base)."
+        },
+        {
+          "ru": "Три низкоценностные группы («Спящие», «Нужно внимание», «В зоне риска») вместе охватывают 1379 клиентов — 69,6% базы.",
+          "en": "The three lower-value groups (Hibernating, Need Attention, At Risk) together cover 1,379 clients — 69.6% of the base."
+        }
+      ]
+    },
+    {
+      "id": "revenue-share-by-segment",
+      "type": "bar",
+      "title": {
+        "ru": "Доля выручки по RFM-сегментам",
+        "en": "Revenue share by RFM segment"
+      },
+      "description": {
+        "ru": "Доля каждого сегмента в суммарной выручке клиентов. Коэффициент концентрации = доля выручки / доля клиентов: больше 1 — сегмент переоценивает выручку.",
+        "en": "Each segment's share of total client revenue. Concentration ratio = revenue share / client share: above 1 means the segment over-indexes on revenue."
+      },
+      "xLabel": {
+        "ru": "Сегмент",
+        "en": "Segment"
+      },
+      "yLabel": {
+        "ru": "Доля выручки, %",
+        "en": "Revenue share, %"
+      },
+      "data": {
+        "categories": ["Чемпионы", "Лояльные", "Потенциально лояльные", "В зоне риска", "Нужно внимание", "Спящие"],
+        "series": [
+          { "name": "Доля выручки, %", "values": [11.16, 23.03, 18.37, 16.79, 6.99, 23.66] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "«Чемпионы» дают 11,16% выручки при 4,19% клиентов — коэффициент концентрации 2,66, самый сильный перекос в доходах.",
+          "en": "Champions generate 11.16% of revenue with 4.19% of clients — a concentration ratio of 2.66, the strongest revenue over-index."
+        },
+        {
+          "ru": "«Спящие» держат самую большую долю выручки (23,66%), но недоиндексированы: коэффициент 0,62 при доле клиентов 37,96%.",
+          "en": "Hibernating holds the largest revenue share (23.66%) yet under-indexes: ratio 0.62 on a 37.96% client share."
+        },
+        {
+          "ru": "Четыре сегмента ниже «Чемпионов» в сумме дают 81,9% выручки базы.",
+          "en": "The four segments below Champions together deliver 81.9% of total revenue."
+        }
+      ]
+    },
+    {
+      "id": "avg-monetary-by-segment",
+      "type": "bar",
+      "title": {
+        "ru": "Средняя монетарная ценность по сегментам",
+        "en": "Average monetary value by segment"
+      },
+      "description": {
+        "ru": "Средняя сумма транзакций клиента в сегменте. Показывает, сколько каждый сегмент в среднем приносит выручки и кому выгодно предлагать апселлы.",
+        "en": "Mean transaction sum per client within each segment. Shows how much value each segment contributes on average and who is worth upselling."
+      },
+      "xLabel": {
+        "ru": "Сегмент",
+        "en": "Segment"
+      },
+      "yLabel": {
+        "ru": "Средняя монетарная ценность",
+        "en": "Average monetary value"
+      },
+      "data": {
+        "categories": ["Чемпионы", "Лояльные", "Потенциально лояльные", "В зоне риска", "Нужно внимание", "Спящие"],
+        "series": [
+          { "name": "Средняя ценность", "values": [74641.22, 41097.09, 49029.62, 40172.47, 9815.58, 17459.18] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Средняя ценность «Чемпионов» — 74 641, в 7,6 раза выше «Нужно внимание» (9 816).",
+          "en": "Champions' average monetary value is 74,641 — 7.6× higher than Need Attention (9,816)."
+        },
+        {
+          "ru": "«Потенциально лояльные» (49 030) богаче «Лояльных» (41 097) почти на 20% при меньшей частоте покупок.",
+          "en": "Potential Loyalists (49,030) are almost 20% richer than Loyal (41,097) despite lower purchase frequency."
+        },
+        {
+          "ru": "Средняя ценность «Спящих» — 17 459, вторая снизу, что оправдывает дешёвые win-back-письма вместо дорогих акций.",
+          "en": "Hibernating averages 17,459 — second lowest, justifying cheap win-back emails over expensive campaigns."
+        }
+      ]
+    },
+    {
+      "id": "rfmscore-distribution",
+      "type": "histogram",
+      "title": {
+        "ru": "Распределение RFM-баллов",
+        "en": "RFM score distribution"
+      },
+      "description": {
+        "ru": "Распределение клиентов по сумме квартильных баллов RFMScore (от 3 до 12, где 12 — лучший). Балл = R_Quartile + F_Quartile + M_Quartile.",
+        "en": "Client distribution by summed quartile score RFMScore (3 to 12, where 12 is best). Score = R_Quartile + F_Quartile + M_Quartile."
+      },
+      "xLabel": {
+        "ru": "RFMScore (сумма квартилей)",
+        "en": "RFM score (sum of quartiles)"
+      },
+      "yLabel": {
+        "ru": "Клиенты",
+        "en": "Clients"
+      },
+      "data": {
+        "categories": ["3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
+        "series": [
+          { "name": "Клиенты", "values": [196, 168, 179, 240, 243, 259, 247, 200, 166, 83] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Распределение почти равномерное: пик на 8 баллах — 259 клиентов (13,1% базы).",
+          "en": "The distribution is nearly uniform: the peak at 8 points holds 259 clients (13.1% of the base)."
+        },
+        {
+          "ru": "Хвост из 83 клиентов с максимальными 12 баллами в точности совпадает с сегментом «Чемпионы».",
+          "en": "The tail of 83 clients at the maximum of 12 points exactly matches the Champions segment."
+        },
+        {
+          "ru": "Слабейший балл 3 набрали 196 клиентов (9,9%) — ядро «Спящих».",
+          "en": "The lowest score of 3 counts 196 clients (9.9%) — the core of Hibernating."
+        }
+      ]
+    }
+  ]
+}

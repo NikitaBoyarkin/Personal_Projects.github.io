@@ -1,0 +1,110 @@
+---
+// Scatter plot. Build-time static SVG with native <title> tooltips.
+import type { ChartObject } from '../../lib/charts';
+import { area, ticksFor, linearScale, fmt } from '../../lib/chart-svg';
+
+interface Props {
+  chart: ChartObject & { type: 'scatter' };
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const data = chart.data;
+const points = data.points;
+
+const a = area(640, 300, 54, 14, 18, 54);
+const xs = points.map((p) => p.x);
+const ys = points.map((p) => p.y);
+const padX = (Math.max(...xs) - Math.min(...xs)) * 0.08 || 1;
+const padY = (Math.max(...ys) - Math.min(...ys)) * 0.08 || 1;
+const xMin = Math.min(...xs) - padX;
+const xMax = Math.max(...xs) + padX;
+const yMin = Math.min(...ys) - padY;
+const yMax = Math.max(...ys) + padY;
+
+const xTicks = ticksFor(xMax - xMin, 4).map((t) => xMin + t);
+const yTicks = ticksFor(yMax - yMin, 4).map((t) => yMin + t);
+const sx = linearScale(xMin, xMax, a.ml, a.ml + a.pw);
+const sy = linearScale(yMin, yMax, a.ml + a.ph, a.ml);
+
+const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
+const xLabel = chart.xLabel?.[lang];
+const yLabel = chart.yLabel?.[lang];
+---
+
+<svg
+  viewBox={`0 0 ${a.w} ${a.h}`}
+  role="img"
+  aria-label={ariaLabel}
+  preserveAspectRatio="xMidYMid meet"
+>
+  <g class="v-grid">
+    {xTicks.map((t) => (
+      <line x1={sx(t)} y1={a.ml} x2={sx(t)} y2={a.ml + a.ph} class="gridline" />
+    ))}
+  </g>
+  <g class="h-grid">
+    {yTicks.map((t) => (
+      <line x1={a.ml} y1={sy(t)} x2={a.ml + a.pw} y2={sy(t)} class="gridline" />
+    ))}
+  </g>
+
+  <g class="x-axis">
+    {xTicks.map((t) => (
+      <text x={sx(t)} y={a.ml + a.ph + 18} text-anchor="middle" class="axis-label">
+        {fmt(t)}
+      </text>
+    ))}
+  </g>
+  <g class="y-axis">
+    {yTicks.map((t) => (
+      <text x={a.ml - 8} y={sy(t) + 3} text-anchor="end" class="axis-label">
+        {fmt(t)}
+      </text>
+    ))}
+  </g>
+
+  <g class="points">
+    {points.map((p) => (
+      <g>
+        <title>{`${p.label ?? ''} x=${fmt(p.x)}, y=${fmt(p.y)}`}</title>
+        <circle cx={sx(p.x)} cy={sy(p.y)} r={4.5} fill="var(--text-accent-dataviz)" class="dot" />
+      </g>
+    ))}
+  </g>
+
+  {xLabel && (
+    <text x={a.ml + a.pw / 2} y={a.h - 6} text-anchor="middle" class="axis-caption">
+      {xLabel}
+    </text>
+  )}
+  {yLabel && (
+    <text x={10} y={a.ml + 10} class="axis-caption" transform={`rotate(-90 10 ${a.ml + 10})`}>
+      {yLabel}
+    </text>
+  )}
+</svg>
+
+<style>
+  .gridline {
+    stroke: var(--border-color);
+    stroke-opacity: 0.4;
+    stroke-width: 1;
+  }
+  .axis-label {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .axis-caption {
+    fill: var(--text-muted);
+    font-size: 11px;
+    font-family: var(--font-sans);
+  }
+  .dot {
+    transition: r 120ms ease;
+  }
+  .dot:hover {
+    r: 6;
+  }
+</style>

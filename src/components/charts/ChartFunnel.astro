@@ -1,0 +1,75 @@
+---
+// Horizontal funnel. Bar width ∝ stage value; value printed at the bar's end.
+// Step conversion is left to the conclusions (kept out of the SVG).
+import type { ChartObject } from '../../lib/charts';
+import { fmt } from '../../lib/chart-svg';
+
+interface Props {
+  chart: ChartObject & { type: 'funnel' };
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const data = chart.data;
+const stages = data.stages;
+const max = Math.max(0, ...stages.map((s) => s.value));
+const top = max || 1;
+
+const W = 640;
+const ml = 16;
+const mr = 84;
+const rowH = 56;
+const H = 26 + stages.length * rowH + 14;
+const pw = W - ml - mr;
+const barW = (v: number) => Math.max(pw * 0.22, (pw * 0.86 * v) / top);
+const barX = (w: number) => ml + (pw - w) / 2;
+const rowY = (i: number) => 26 + i * rowH;
+const barH = 26;
+
+const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
+---
+
+<svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} preserveAspectRatio="xMidYMid meet">
+  <g class="stages">
+    {stages.map((s, i) => {
+      const w = barW(s.value);
+      const x = barX(w);
+      const y = rowY(i);
+      const pct = Math.round((s.value / top) * 1000) / 10;
+      return (
+        <g>
+          <title>{`${s.label}: ${fmt(s.value)} (${fmt(pct)}% от макс.)`}</title>
+          <rect x={x} y={y} width={w} height={barH} rx={5} fill="var(--text-accent-dataviz)" class="bar" />
+          <text x={x + 10} y={y + barH / 2 + 4} class="stage-label">
+            {s.label}
+          </text>
+          <text x={x + w + 10} y={y + barH / 2 + 4} class="stage-value">
+            {fmt(s.value)}
+          </text>
+        </g>
+      );
+    })}
+  </g>
+</svg>
+
+<style>
+  .bar {
+    transition: opacity 120ms ease;
+  }
+  .bar:hover {
+    opacity: 0.85;
+  }
+  .stage-label {
+    fill: var(--background-primary);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+    pointer-events: none;
+  }
+  .stage-value {
+    fill: var(--text-normal);
+    font-size: 13px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+  }
+</style>

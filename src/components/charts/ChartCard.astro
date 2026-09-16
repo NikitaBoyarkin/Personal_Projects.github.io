@@ -1,0 +1,108 @@
+---
+// One chart card on a project page. Structure is fixed:
+//   title → description (ABOVE the chart) → SVG chart → conclusions (BELOW).
+import type { ChartObject } from '../../lib/charts';
+import ChartBar from './ChartBar.astro';
+import ChartLine from './ChartLine.astro';
+import ChartCohort from './ChartCohort.astro';
+import ChartFunnel from './ChartFunnel.astro';
+import ChartScatter from './ChartScatter.astro';
+
+interface Props {
+  chart: ChartObject;
+  lang: 'ru' | 'en';
+}
+
+const { chart, lang } = Astro.props;
+const isEn = lang === 'en';
+---
+
+<section class="chart-card" id={`chart-${chart.id}`}>
+  <h3 class="chart-title">{chart.title[lang]}</h3>
+  <p class="chart-description">{chart.description[lang]}</p>
+
+  {
+    (chart.type === 'bar' || chart.type === 'histogram') && <ChartBar chart={chart} lang={lang} />
+  }
+  {chart.type === 'line' && <ChartLine chart={chart} lang={lang} />}
+  {chart.type === 'cohort-heatmap' && <ChartCohort chart={chart} lang={lang} />}
+  {chart.type === 'funnel' && <ChartFunnel chart={chart} lang={lang} />}
+  {chart.type === 'scatter' && <ChartScatter chart={chart} lang={lang} />}
+
+  <div class="chart-conclusions">
+    <span class="chart-conclusions-label">
+      {isEn ? 'Key takeaways' : 'Выводы'}
+    </span>
+    <ul>
+      {chart.conclusions.map((c) => (
+        <li>{c[lang]}</li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .chart-card {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+  .chart-title {
+    color: var(--text-accent);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-2);
+  }
+  .chart-description {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: var(--space-4);
+  }
+  .chart-card > svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--background-primary);
+    padding: var(--space-2);
+  }
+  .chart-conclusions {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-color);
+  }
+  .chart-conclusions-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: var(--text-accent);
+    background: color-mix(in srgb, var(--text-accent) 10%, transparent);
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-2);
+  }
+  .chart-conclusions ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .chart-conclusions li {
+    position: relative;
+    padding-left: 1.15rem;
+    color: var(--text-normal);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .chart-conclusions li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--text-accent-dataviz);
+    font-weight: 700;
+  }
+</style>

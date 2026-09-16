@@ -1,0 +1,178 @@
+{
+  "slug": "streamlit",
+  "source": "github.com/NikitaBoyarkin/streamlit-app: data.py — deterministic synthetic SaaS dataset (seed=42; 8,000 users, 2024-01..2025-06); metrics computed by re-running the repo's own helpers (generate / funnel_counts / cohort_retention_matrix / mrr_series / conversion_by_channel) via `uv sync && uv run python data.py`",
+  "charts": [
+    {
+      "id": "aarrr-funnel",
+      "type": "funnel",
+      "title": {
+        "ru": "Воронка активации и оплаты",
+        "en": "Activation & payment funnel"
+      },
+      "description": {
+        "ru": "Уникальные пользователи на каждом шаге: app_open → signup → activate → start_trial → subscribe. Шаги app_open и signup совпадают по построению датасета.",
+        "en": "Unique users at each step: app_open → signup → activate → start_trial → subscribe. app_open and signup coincide by construction of the dataset."
+      },
+      "xLabel": {
+        "ru": "Шаг воронки",
+        "en": "Funnel step"
+      },
+      "yLabel": {
+        "ru": "Пользователи",
+        "en": "Users"
+      },
+      "data": {
+        "stages": [
+          { "label": "app_open", "value": 8000 },
+          { "label": "signup", "value": 8000 },
+          { "label": "activate", "value": 5478 },
+          { "label": "start_trial", "value": 3025 },
+          { "label": "subscribe", "value": 1086 }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Из 8000 зарегистрированных до активации доходят 5478 (68.5 %), до подписки — 1086 (13.6 %).",
+          "en": "Of 8,000 signups, 5,478 (68.5%) reach activation and 1,086 (13.6%) reach subscription."
+        },
+        {
+          "ru": "Самый большой провал — на шаге start_trial→subscribe: теряются 1939 пользователей (64.1 % запустивших триал), конверсия шага — 35.9 %.",
+          "en": "The largest drop is start_trial→subscribe: 1,939 users are lost (64.1% of trialers); the step converts at 35.9%."
+        }
+      ]
+    },
+    {
+      "id": "cohort-retention-heatmap",
+      "type": "cohort-heatmap",
+      "title": {
+        "ru": "Матрица удержания когорт",
+        "en": "Cohort retention matrix"
+      },
+      "description": {
+        "ru": "Доля активных пользователей по когорте регистрации (строки) и месяцу с регистрации (столбцы, M0–M12). Матрица треугольная: у младших когорт наблюдение короче, хвост — нули. M0 не равен 100 %, т.к. активность моделируется отдельно от регистрации.",
+        "en": "Share of active users by signup cohort (rows) and months since signup (columns, M0–M12). The matrix is triangular — younger cohorts have shorter observation history (trailing zeros). M0 is not 100% because activity is modeled separately from signup."
+      },
+      "xLabel": {
+        "ru": "Месяц с регистрации",
+        "en": "Months since signup"
+      },
+      "yLabel": {
+        "ru": "Когорта регистрации",
+        "en": "Signup cohort"
+      },
+      "data": {
+        "cohorts": ["2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06"],
+        "periods": ["M0", "M1", "M2", "M3", "M4", "M5", "M6", "M7", "M8", "M9", "M10", "M11", "M12"],
+        "values": [
+          [88.9, 79.7, 59.9, 43.3, 34.8, 29.3, 22.8, 18.4, 13.8, 13.4, 9.4, 6.7, 6.7],
+          [88.5, 80.1, 55.2, 44.4, 34.9, 28.0, 23.8, 15.7, 16.1, 11.3, 9.3, 8.4, 6.4],
+          [89.7, 80.9, 59.3, 45.1, 33.3, 27.2, 18.7, 18.9, 13.8, 13.6, 10.3, 8.6, 8.6],
+          [91.6, 79.3, 53.5, 39.8, 31.9, 24.9, 20.0, 18.8, 15.1, 11.2, 10.0, 8.6, 6.3],
+          [91.2, 76.3, 54.5, 40.5, 28.7, 25.0, 19.4, 12.7, 11.2, 8.0, 8.0, 6.9, 3.9],
+          [90.5, 80.9, 57.6, 46.4, 33.0, 27.9, 21.6, 16.8, 16.8, 12.2, 9.9, 9.9, 6.5],
+          [89.5, 80.2, 57.4, 43.8, 36.4, 30.5, 23.1, 16.2, 11.4, 13.3, 8.3, 6.9, 0.0],
+          [89.9, 82.4, 57.8, 41.7, 35.3, 29.7, 21.1, 16.3, 14.0, 10.5, 9.0, 0.0, 0.0],
+          [90.2, 80.6, 60.3, 46.9, 36.2, 27.5, 20.5, 15.8, 14.1, 11.2, 0.0, 0.0, 0.0],
+          [92.3, 79.5, 58.3, 41.1, 32.1, 26.8, 23.0, 18.1, 13.0, 0.0, 0.0, 0.0, 0.0],
+          [91.3, 78.0, 56.7, 41.4, 31.0, 24.8, 22.0, 16.5, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [92.0, 78.4, 54.5, 44.4, 32.9, 26.5, 23.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [87.8, 78.2, 58.5, 45.8, 36.9, 28.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [89.6, 78.5, 58.7, 48.3, 35.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [91.4, 76.5, 58.1, 40.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [91.2, 77.8, 57.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [90.8, 78.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+          [93.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        ],
+        "unit": "percent"
+      },
+      "conclusions": [
+        {
+          "ru": "Через 1 месяц активны 76.3–82.4 % когорты, через 6 месяцев — 24.9–29.3 %, через 12 месяцев — лишь 3.9–8.6 %.",
+          "en": "After 1 month 76.3–82.4% of a cohort is still active; after 6 months 24.9–29.3%; after 12 months only 3.9–8.6%."
+        },
+        {
+          "ru": "Когорта 2024-01 падает с 79.7 % на M1 до 6.7 % на M12 — отток 73.0 п.п. за год.",
+          "en": "Cohort 2024-01 falls from 79.7% at M1 to 6.7% at M12 — a 73.0 pp decline over a year."
+        }
+      ]
+    },
+    {
+      "id": "mrr-growth",
+      "type": "line",
+      "title": {
+        "ru": "Рост MRR",
+        "en": "MRR growth"
+      },
+      "description": {
+        "ru": "Суммарный месячный MRR по активным подпискам, январь 2024 — июнь 2025. На конец периода активны подписки 1086 пользователей.",
+        "en": "Total monthly recurring revenue from active subscriptions, Jan 2024 – Jun 2025. 1,086 user subscriptions are active at period end."
+      },
+      "xLabel": {
+        "ru": "Месяц",
+        "en": "Month"
+      },
+      "yLabel": {
+        "ru": "MRR, $",
+        "en": "MRR, $"
+      },
+      "data": {
+        "categories": ["2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06"],
+        "series": [
+          {
+            "name": "mrr",
+            "values": [4564, 10512, 17452, 25646, 32453, 36003, 46290, 49454, 58050, 62800, 65660, 69173, 70577, 75337, 81433, 84280, 89003, 94312]
+          }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "MRR вырос с $4564 в январе 2024 до $94312 в июне 2025 — в 20.7 раза за 18 месяцев.",
+          "en": "MRR grew from $4,564 in Jan 2024 to $94,312 in Jun 2025 — 20.7x over 18 months."
+        },
+        {
+          "ru": "На конец периода вклад планов: enterprise $35964 (38.1 %), pro $33075 (35.1 %), business $25273 (26.8 %).",
+          "en": "At period end: enterprise contributes $35,964 (38.1%) of MRR, pro $33,075 (35.1%), business $25,273 (26.8%)."
+        }
+      ]
+    },
+    {
+      "id": "conversion-by-channel",
+      "type": "bar",
+      "title": {
+        "ru": "Конверсия signup→paid по каналам",
+        "en": "Signup→paid conversion by channel"
+      },
+      "description": {
+        "ru": "Доля пользователей канала, дошедших до подписки: платящие / пользователи канала × 100 %.",
+        "en": "Share of a channel's users that reached subscription: paid / channel users × 100%."
+      },
+      "xLabel": {
+        "ru": "Канал привлечения",
+        "en": "Acquisition channel"
+      },
+      "yLabel": {
+        "ru": "Конверсия, %",
+        "en": "Conversion, %"
+      },
+      "data": {
+        "categories": ["email", "organic", "paid_search", "referral", "social"],
+        "series": [
+          {
+            "name": "conversion",
+            "values": [12.1, 13.2, 14.6, 11.7, 14.8]
+          }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Конверсия выше всего у social (14.8 %) и paid_search (14.6 %), ниже всего — у referral (11.7 %) и email (12.1 %).",
+          "en": "Conversion is highest for social (14.8%) and paid_search (14.6%); lowest for referral (11.7%) and email (12.1%)."
+        },
+        {
+          "ru": "Organic даёт больше всего платящих в абсолюте: 427 из 1086 (39.3 % всех платящих) при 3223 пользователях канала.",
+          "en": "Organic contributes the most paying users in absolute terms: 427 of 1,086 (39.3% of all paid users) from 3,223 channel users."
+        }
+      ]
+    }
+  ]
+}
