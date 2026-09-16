@@ -15,6 +15,7 @@ tools:
   - Jupyter Notebook
   - Tableau (Hyper API)
 github: https://github.com/NikitaBoyarkin/tableau_cohort_analysis
+updated: 2026-09-04
 related:
   - /posts/cohort-retention-guide/
 ---

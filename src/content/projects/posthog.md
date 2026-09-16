@@ -18,6 +18,7 @@ tools:
   - pytest / ruff
   - Docker
 github: https://github.com/NikitaBoyarkin/posthog-saas-analytics
+updated: 2026-09-15
 private: true
 related:
   - /projects/supabase/

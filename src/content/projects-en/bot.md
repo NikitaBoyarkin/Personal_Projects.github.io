@@ -15,6 +15,7 @@ tools:
   - cron scheduler
   - Tableau
 github: https://github.com/NikitaBoyarkin/telegram_bot_public
+updated: 2025-06-19
 related:
   - /posts/telegram-reporting-bot/
 ---

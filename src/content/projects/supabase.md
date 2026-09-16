@@ -15,6 +15,7 @@ tools:
   - SQL
   - supabase-py
 github: https://github.com/NikitaBoyarkin/supabase-product-analytics
+updated: 2026-09-15
 private: true
 related:
   - /projects/streamlit/

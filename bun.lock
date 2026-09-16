@@ -11,6 +11,7 @@
         "astro": "^7.2.9",
         "morphicons": "^1.7.0",
         "posthog-js": "^1.422.5",
+        "yaml": "^2.9.0",
       },
       "devDependencies": {
         "@astrojs/check": "^0.9.10",

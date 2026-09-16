@@ -16,6 +16,7 @@ tools:
   - Matplotlib / Seaborn
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
+updated: 2026-09-05
 date: 2026-08-11
 faq:
   - question: "Где отток в онбординге?"

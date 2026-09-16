@@ -1,0 +1,55 @@
+name: Sync GitHub metadata
+
+on:
+  schedule:
+    - cron: '17 3 * * 1' # weekly, Monday 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-github
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          cache: bun
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Apply GitHub metadata sync
+        run: bun run sync:gh:apply
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Open PR if changed
+        run: |
+          if git diff --quiet; then
+            echo "No drift — project metadata is in sync with GitHub."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b sync/github-metadata
+          git add src/content
+          git commit -m "chore: sync project metadata from GitHub API"
+          git push origin sync/github-metadata
+          gh pr create --base master --head sync/github-metadata \
+            --title "chore: sync project metadata from GitHub API" \
+            --body "Automated sync of \`updated:\` / \`private:\` frontmatter from the GitHub API (weekly)."
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

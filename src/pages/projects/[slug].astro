@@ -5,6 +5,7 @@ import InnerTOC from '../../components/InnerTOC.astro';
 import CaseStudy from '../../components/CaseStudy.astro';
 import ProjectGraph from '../../components/ProjectGraph.astro';
 import { withBase } from '../../lib/path';
+import { formatDate } from '../../lib/date';
 import { buildGraph, subgraphAround } from '../../lib/graph';
 import { TOPICS } from '../../lib/topics';
 
@@ -171,6 +172,9 @@ const pageJsonLd = {
             </a>
             {project.data.private && (
               <span class="repo-private-note" style="display:block;font-size:.85rem;color:var(--text-normal);opacity:.75;margin-top:.25rem;">Репозиторий приватный — доступ по запросу</span>
+            )}
+            {project.data.updated && (
+              <span class="repo-updated-note" style="display:block;font-size:.85rem;color:var(--text-normal);opacity:.75;margin-top:.25rem;">Обновлено: {formatDate(project.data.updated)}</span>
             )}
           </div>
         )

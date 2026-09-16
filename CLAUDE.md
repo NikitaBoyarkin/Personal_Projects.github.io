@@ -160,6 +160,20 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 3. Add the hero image to `public/images/` (the `hero` field is required).
 4. Add the slug to the `PROJECT_ORDER` array in `src/lib/projects.ts` so it sorts as intended (unlisted slugs sort first).
 5. Run `bun run build` and `make check`.
+6. Run `bun run sync:gh:apply` (with a GitHub token available) to set the initial `updated:` date from the repo's last push.
+
+### GitHub ↔ portfolio sync
+
+`scripts/sync-github-projects.mjs` keeps the `updated:` (last push) and `private:` frontmatter fields in sync with the live GitHub API. It reads the `github:` URL from every project file (RU + EN), queries the API once per repo, and updates both twin files.
+
+- `bun run sync:gh` — **check** mode (default). Reports drift; **exit 1** on hard drift (repo deleted/renamed, or became private without `private: true`). Runs in CI (`.github/workflows/deploy.yml`) before the build.
+- `bun run sync:gh:apply` — writes `updated:` and `private:` back into frontmatter. **Never touches the `date:` field** — that's the authored publication date (JSON-LD `datePublished`); `updated:` is the repo freshness shown on project pages.
+- `bun run sync:gh --apply --dry-run` — preview without writing.
+- `bun run sync:gh --candidates` — lists public non-fork account repos not yet featured (candidates for new projects).
+
+Auth: `GITHUB_TOKEN`/`GH_TOKEN` env (higher rate limit, sees private repos). Unauthenticated works for public repos (~60 req/hr — enough for 16 projects). `.github/workflows/sync-github.yml` runs the apply weekly and opens a PR with changes.
+
+`updated:` is optional in the schema (`src/content.config.ts`); the page renders «Обновлено» only when present.
 
 ### Add a blog post
 

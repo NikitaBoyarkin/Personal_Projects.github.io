@@ -14,6 +14,7 @@ tools:
   - Streamlit
   - pandas / NumPy
 github: https://github.com/NikitaBoyarkin/streamlit-app
+updated: 2026-08-14
 private: true
 related:
   - /projects/supabase/

@@ -15,6 +15,7 @@ tools:
   - pytest
   - uv
 github: https://github.com/NikitaBoyarkin/python
+updated: 2026-09-03
 date: 2026-09-03
 related:
   - /posts/eda-python-template/

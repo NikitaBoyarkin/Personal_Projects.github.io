@@ -16,6 +16,7 @@ tools:
   - pytest
   - uv
 github: https://github.com/NikitaBoyarkin/ml
+updated: 2026-08-22
 date: 2026-08-22
 related:
   - /posts/reproducible-data-pipelines/

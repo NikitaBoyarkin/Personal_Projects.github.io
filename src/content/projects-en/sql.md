@@ -16,6 +16,7 @@ tools:
   - pandas / NumPy
   - pytest
 github: https://github.com/NikitaBoyarkin/sql-analytics-case-study
+updated: 2026-09-15
 demo: https://nikitaboyarkin.github.io/sql-analytics-case-study/
 ---
 

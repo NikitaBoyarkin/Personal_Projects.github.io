@@ -12,6 +12,7 @@ tools:
   - SQL
   - Tableau
 github: https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients
+updated: 2026-08-21
 demo: demos/rfm/index.html
 related:
   - /posts/rfm-segmentation-practical/

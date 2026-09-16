@@ -15,6 +15,7 @@ tools:
   - pytest
   - uv
 github: https://github.com/NikitaBoyarkin/ab_test
+updated: 2026-09-07
 related:
   - /projects/volta/
 caseStudy:

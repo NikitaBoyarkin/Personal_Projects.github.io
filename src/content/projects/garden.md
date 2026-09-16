@@ -14,6 +14,7 @@ tools:
   - Markdown
   - Obsidian
 github: https://github.com/NikitaBoyarkin/digital_garden
+updated: 2026-08-12
 related:
   - /projects/site/
   - /projects/scrolly/

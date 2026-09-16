@@ -14,6 +14,7 @@ tools:
   - Streamlit
   - pandas
 github: https://github.com/NikitaBoyarkin/sales-calls-dashboard
+updated: 2026-06-16
 related:
   - /projects/streamlit/
 caseStudy:
