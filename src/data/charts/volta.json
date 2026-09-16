@@ -1,0 +1,184 @@
+{
+  "slug": "volta",
+  "source": "github.com/NikitaBoyarkin/volta-banking: onboarding funnel counts from committed data/volta_funnel_data.csv (10,000 users); channel end-to-end conversion computed from the same CSV; A/B (KYC progress bar), retention and segmentation figures follow the published project narrative (README + part pages)",
+  "charts": [
+    {
+      "id": "onboarding-funnel",
+      "type": "funnel",
+      "title": {
+        "ru": "Воронка онбординга Volta",
+        "en": "Volta onboarding funnel"
+      },
+      "description": {
+        "ru": "Сквозная воронка онбординга от установки приложения до первой транзакции (10 000 установок). Ширина ступени пропорциональна числу дошедших. KYC Complete — самый низкий step conversion, Registration — самая большая абсолютная потеря.",
+        "en": "End-to-end onboarding funnel from app install to first transaction (10,000 installs). Bar width is proportional to the number of users who reached each stage. KYC Complete has the lowest step conversion; Registration loses the most users in absolute terms."
+      },
+      "data": {
+        "stages": [
+          { "label": "App Install", "value": 10000 },
+          { "label": "Registration", "value": 7318 },
+          { "label": "KYC Start", "value": 4917 },
+          { "label": "KYC Complete", "value": 2781 },
+          { "label": "Card Ordered", "value": 1993 },
+          { "label": "First TX", "value": 1269 }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "KYC Complete — критическое бутылочное горло: step conversion 56.6% (2 781 из 4 917) — наибольший относительный отток на одном шаге.",
+          "en": "KYC Complete is the critical bottleneck: 56.6% step conversion (2,781 of 4,917) — the largest relative drop-off at a single stage."
+        },
+        {
+          "ru": "Registration теряет больше всего в абсолютных числах: 2 682 пользователя при 73.2% step conversion — кандидат на точечный фикс онбординга.",
+          "en": "Registration loses the most in absolute terms: 2,682 users at 73.2% step conversion — a candidate for a targeted onboarding fix."
+        }
+      ]
+    },
+    {
+      "id": "channel-end-to-end-conversion",
+      "type": "bar",
+      "title": {
+        "ru": "Сквозная конверсия по каналам привлечения",
+        "en": "End-to-end conversion by acquisition channel"
+      },
+      "description": {
+        "ru": "Доля пользователей канала, дошедших от установки до первой транзакции (first_tx). Referral конвертирует лучше всех, paid social — хуже всех. iOS обгоняет Android на каждом шаге воронки.",
+        "en": "Share of each channel's users who progressed from install to first transaction (first_tx). Referral converts best, paid social worst. iOS outpaces Android at every funnel stage."
+      },
+      "xLabel": {
+        "ru": "Канал",
+        "en": "Channel"
+      },
+      "yLabel": {
+        "ru": "Сквозная конверсия, %",
+        "en": "End-to-end conversion, %"
+      },
+      "data": {
+        "categories": ["Referral", "Email", "Organic", "App Store", "Paid Social"],
+        "series": [
+          { "name": "first_tx", "values": [17.8, 16.1, 14.6, 8.2, 6.1] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Referral конвертирует на +11.7pp лучше paid social (17.8% vs 6.1%) — приоритет канала для роста очевиден.",
+          "en": "Referral converts +11.7pp better than paid social (17.8% vs 6.1%) — the channel-growth priority is clear."
+        },
+        {
+          "ru": "iOS опережает Android end-to-end: 13.6% vs 11.7% — стабильный отрыв на каждом шаге воронки.",
+          "en": "iOS leads Android end-to-end: 13.6% vs 11.7% — a consistent gap at every funnel stage."
+        }
+      ]
+    },
+    {
+      "id": "kyc-ab-conversion",
+      "type": "bar",
+      "title": {
+        "ru": "A/B: конверсия KYC control vs treatment",
+        "en": "A/B: KYC conversion, control vs treatment"
+      },
+      "description": {
+        "ru": "Первичная метрика эксперимента — завершение KYC (KYC Start → KYC Complete). Гипотеза: разбить KYC на шаги с прогресс-баром. MDE = +5pp; ship-gate: значимость ∧ lift ≥ MDE ∧ no SRM.",
+        "en": "Primary metric of the experiment — KYC completion (KYC Start → KYC Complete). Hypothesis: split KYC into steps with a progress bar. MDE = +5pp; ship-gate: significance ∧ lift ≥ MDE ∧ no SRM."
+      },
+      "xLabel": {
+        "ru": "Группа",
+        "en": "Group"
+      },
+      "yLabel": {
+        "ru": "Завершение KYC, %",
+        "en": "KYC completion, %"
+      },
+      "data": {
+        "categories": ["Control", "Treatment"],
+        "series": [
+          { "name": "kyc_completed", "values": [55.8, 62.1] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Контроль 55.8% → лечение 62.1%: +6.24pp (Z=6.35, p<0.0001), 95% CI [+4.26%, +8.16%] — превышает MDE +5pp → ship.",
+          "en": "Control 55.8% → treatment 62.1%: +6.24pp (Z=6.35, p<0.0001), 95% CI [+4.26%, +8.16%] — above the +5pp MDE → ship."
+        },
+        {
+          "ru": "Методология защищает от ложных срабатываний: CUPED (control-only θ), AA-test (type-I = 0.050), Bonferroni оставляет 4/11 сегментов значимыми.",
+          "en": "The methodology guards against false positives: CUPED (control-only θ), AA-test (type-I = 0.050), Bonferroni keeps 4/11 segments significant."
+        }
+      ]
+    },
+    {
+      "id": "retention-pre-post",
+      "type": "line",
+      "title": {
+        "ru": "Удержание: когорты до и после KYC-фикса",
+        "en": "Retention: cohorts before and after the KYC fix"
+      },
+      "description": {
+        "ru": "Среднее удержание когорт до фикса (2024-01..2024-08) против когорт после (2024-09..2024-12). Пост-фикс когорты держат более высокую кривую от M1 до M6 — эффект не выцветает.",
+        "en": "Average retention of pre-fix cohorts (2024-01..2024-08) vs post-fix cohorts (2024-09..2024-12). Post-fix cohorts hold a higher curve from M1 to M6 — the effect does not fade."
+      },
+      "xLabel": {
+        "ru": "Месяц с регистрации",
+        "en": "Months since signup"
+      },
+      "yLabel": {
+        "ru": "Удержание, %",
+        "en": "Retention, %"
+      },
+      "data": {
+        "categories": ["M1", "M2", "M3", "M4", "M5", "M6"],
+        "series": [
+          { "name": "Pre-fix", "values": [51.8, 38.1, 30.7, 25.3, 22.5, 19.9] },
+          { "name": "Post-fix", "values": [63.6, 48.5, 39.9, 35.7, 32.3, 32.1] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "M3-удержание: 30.7% → 39.9% (+9.2pp) — эффект KYC-фикса сохраняется, а не схлопывается после «медового месяца».",
+          "en": "M3 retention: 30.7% → 39.9% (+9.2pp) — the KYC-fix effect holds rather than collapsing after the honeymoon period."
+        },
+        {
+          "ru": "Разрыв растёт с возрастом когорты: на M6 пост-фикс держат 32.1% против 19.9% у пре-фикс — удержание выше и стабильнее.",
+          "en": "The gap widens with cohort age: at M6 post-fix cohorts hold 32.1% vs 19.9% pre-fix — higher and more stable retention."
+        }
+      ]
+    },
+    {
+      "id": "segmentation-size-vs-revenue",
+      "type": "bar",
+      "title": {
+        "ru": "Сегменты: доля пользователей vs доля выручки",
+        "en": "Segments: user share vs revenue share"
+      },
+      "description": {
+        "ru": "KMeans-сегментация (StandardScaler + data-driven K=4). Сравнение доли пользователей и доли месячной выручки по сегментам. Power Users — 12% пользователей, но ~41% выручки.",
+        "en": "KMeans segmentation (StandardScaler + data-driven K=4). Comparing each segment's share of users vs share of monthly revenue. Power Users — 12% of users but ~41% of revenue."
+      },
+      "xLabel": {
+        "ru": "Сегмент",
+        "en": "Segment"
+      },
+      "yLabel": {
+        "ru": "Доля, %",
+        "en": "Share, %"
+      },
+      "data": {
+        "categories": ["Power", "Growth", "Casual", "Dormant"],
+        "series": [
+          { "name": "Users", "values": [12.0, 24.0, 32.0, 32.0] },
+          { "name": "Revenue", "values": [40.5, 32.9, 18.8, 7.8] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Power Users — 12% пользователей и 40.5% выручки: концентрация почти 3.4× — самые ценные для premium- и upsell-стратегий.",
+          "en": "Power Users — 12% of users and 40.5% of revenue: ~3.4x concentration — the most valuable segment for premium and upsell strategies."
+        },
+        {
+          "ru": "Lorenz-концентрация: 12% пользователей дают 41% выручки, 68% — 92%: сценарии миграции между сегментами оцениваются до +€310K/yr.",
+          "en": "Lorenz concentration: 12% of users drive 41% of revenue, 68% drive 92%: cross-segment migration scenarios are worth up to +€310K/yr."
+        }
+      ]
+    }
+  ]
+}

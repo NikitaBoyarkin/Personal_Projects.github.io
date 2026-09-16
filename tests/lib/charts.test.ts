@@ -4,7 +4,7 @@ import { readdirSync } from 'node:fs';
 import path from 'node:path';
 
 const CHARTS_DIR = path.join(process.cwd(), 'src/data/charts');
-const CHART_ENABLED_SLUGS = ['ab', 'cohort', 'rfm', 'sql', 'posthog', 'sales-calls', 'streamlit', 'ml'];
+const CHART_ENABLED_SLUGS = ['ab', 'cohort', 'rfm', 'sql', 'posthog', 'sales-calls', 'streamlit', 'ml', 'volta'];
 
 describe('charts payloads (src/data/charts/*.json)', () => {
   it('validates every payload against the schema — invalid files throw', () => {
