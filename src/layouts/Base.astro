@@ -17,7 +17,7 @@ interface Props {
   canonical?: string;
   relPrev?: string;
   relNext?: string;
-  activeNav?: 'writing' | 'contact' | 'home' | 'about' | 'projects' | 'whois' | 'value' | 'work-with-me';
+  activeNav?: 'writing' | 'contact' | 'home' | 'about' | 'projects' | 'value';
   jsonLd?: Record<string, unknown>;
   lang?: 'ru' | 'en';
   counterpartHref?: string;
@@ -51,9 +51,7 @@ const projectsHref = isEn ? withBase('en/projects/') : withBase('projects/');
 const notesHref = isEn ? withBase('en/writing/') : withBase('notes/');
 const contactHref = isEn ? withBase('en/contact/') : withBase('contact/');
 const writingHref = isEn ? withBase('en/writing/') : withBase('writing/');
-const whoisHref = isEn ? withBase('en/whois/') : withBase('whois/');
 const valueHref = isEn ? withBase('en/value/') : withBase('value/');
-const workWithMeHref = isEn ? withBase('en/work-with-me/') : withBase('work-with-me/');
 
 // i18n: header / footer chrome labels.
 const t = {
@@ -61,9 +59,7 @@ const t = {
   navProjects: isEn ? 'Projects' : 'Проекты',
   navNotes: isEn ? 'Writing' : 'Заметки',
   navAbout: isEn ? 'About' : 'Обо мне',
-  navWhois: isEn ? 'Who I am' : 'Кто я',
   navValue: isEn ? 'Value' : 'Ценность',
-  navWorkWithMe: isEn ? 'Format' : 'Формат',
   navContact: isEn ? 'Contact' : 'Контакты',
   footerCv: isEn ? 'CV' : 'Резюме',
   footerWriting: isEn ? 'Writing' : 'Статьи',
@@ -193,9 +189,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
       <ul class="links" id="nav-links">
         <li><a href={projectsHref} class={activeNav === 'projects' ? 'active' : ''} aria-current={activeNav === 'projects' ? 'page' : undefined}>{t.navProjects}</a></li>
         <li><a href={aboutHref} class={activeNav === 'about' ? 'active' : ''} aria-current={activeNav === 'about' ? 'page' : undefined}>{t.navAbout}</a></li>
-        <li><a href={whoisHref} class={activeNav === 'whois' ? 'active' : ''} aria-current={activeNav === 'whois' ? 'page' : undefined}>{t.navWhois}</a></li>
         <li><a href={valueHref} class={activeNav === 'value' ? 'active' : ''} aria-current={activeNav === 'value' ? 'page' : undefined}>{t.navValue}</a></li>
-        <li><a href={workWithMeHref} class={activeNav === 'work-with-me' ? 'active' : ''} aria-current={activeNav === 'work-with-me' ? 'page' : undefined}>{t.navWorkWithMe}</a></li>
         <li><a href={notesHref} class={activeNav === 'writing' ? 'active' : ''} aria-current={activeNav === 'writing' ? 'page' : undefined}>{t.navNotes}</a></li>
       </ul>
 
@@ -344,27 +338,6 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
         });
       })();
 
-      // Audience router — reorder the homepage stack for the active audience.
-      // Runs at end of body, before first paint, so there is no layout flash.
-      // Each .home-stack child carries data-order-<audience>="{rank}"; blocks
-      // without a rank for the active audience keep their DOM order at the end.
-      window.__reorderHomeStack = function (aud) {
-        const stack = document.querySelector('.home-stack');
-        if (!stack || !aud || aud === 'recruiter') return;
-        const key = 'data-order-' + aud;
-        const items = Array.prototype.slice.call(stack.children);
-        if (!items.length) return;
-        const rank = (el) => {
-          const n = Number(el.getAttribute(key));
-          return Number.isFinite(n) ? n : Number.MAX_SAFE_INTEGER;
-        };
-        items.sort((a, b) => rank(a) - rank(b));
-        items.forEach((el) => stack.appendChild(el));
-      };
-      (function () {
-        const aud = document.documentElement.getAttribute('data-audience') || 'recruiter';
-        window.__reorderHomeStack(aud);
-      })();
     </script>
 
     <slot name="scripts" />

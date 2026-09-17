@@ -14,7 +14,7 @@ tools:
   - SQL
   - cron scheduler
   - Tableau
-github: https://github.com/NikitaBoyarkin/telegram_bot_public
+private: true
 updated: 2025-06-19
 related:
   - /posts/telegram-reporting-bot/
@@ -58,4 +58,4 @@ Key insight: delivery stability matters more than report polish. If the bot fail
 
 ## Documentation
 
-- [GitHub → telegram_bot_public](https://github.com/NikitaBoyarkin/telegram_bot_public)
+- The repository is private — available on request. No public code; the card does not link an empty/stub repository.

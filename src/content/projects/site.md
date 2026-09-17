@@ -1,10 +1,10 @@
 ---
 title: This Portfolio Site
-description: The portfolio you are looking at — built with Astro v5, TypeScript, and Markdown content collections. Static output, dark/light theme, RSS, sitemap, JSON-LD, and a base-path-aware URL helper for GitHub Pages.
+description: The portfolio you are looking at — built with Astro 7, TypeScript, and Markdown content collections. Static output, dark/light theme, RSS, sitemap, JSON-LD, and a base-path-aware URL helper for GitHub Pages.
 track: engineering
 hero: images/site.svg
 impact:
-  - Astro v5 + TypeScript + Markdown content collections
+  - Astro 7 + TypeScript + Markdown content collections
   - Dark/light theme with no-flash inline script
   - RSS, sitemap, robots, JSON-LD, OG/Twitter meta
   - Base-path-aware URLs for GitHub Pages subpath hosting
@@ -33,7 +33,7 @@ related:
 
 ## Data & Method
 
-**Стек:** Astro v5, TypeScript, Markdown content collections (`src/content/{projects,posts}/`), Zod-схемы в `src/content/config.ts`.
+**Стек:** Astro 7, TypeScript, Markdown content collections (`src/content/{projects,posts}/`), Zod-схемы в `src/content/config.ts`.
 
 **Архитектура:**
 - **Content collections** — каждый проект/пост = Markdown + frontmatter; Zod валидирует поля на сборке.
@@ -50,7 +50,7 @@ Astro content collections с Zod — это контракт между конт
 
 ## Impact
 
-- **Astro v5 + TypeScript + Markdown content collections** — контент редактируется в `.md`, валидируется Zod.
+- **Astro 7 + TypeScript + Markdown content collections** — контент редактируется в `.md`, валидируется Zod.
 - **Dark/light тема без flash** — inline-скрипт до первого paints.
 - **SEO-полный** — RSS, sitemap, robots, JSON-LD, OG/Twitter meta, canonical.
 - **Base-path-aware URLs** — `withBase()` для GitHub Pages subpath, без хардкода.

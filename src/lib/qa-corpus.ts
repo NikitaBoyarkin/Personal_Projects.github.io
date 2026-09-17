@@ -33,13 +33,13 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Кто ты?",
       answer:
-        "Я Никита Бояркин — Data Analyst / Product Analyst. 4+ года превращаю данные в решения: клиентская аналитика, A/B-тесты, дашборды и пайплайны. Специализация — SQL, Python и воспроизводимая статистическая методология (CUPED, AA-тесты, ship-gates).",
+        "Я Никита Бояркин — Data Analyst / Product Analyst. Портфолио воспроизводимых аналитических проектов — эксперименты, retention, сегментация — с полной методологией и кодом. Создано из проектной работы, а не из найма. Специализация — SQL, Python и воспроизводимая статистическая методология (CUPED, AA-тесты, ship-gates).",
       links: [{ label: "Обо мне", href: "about/" }],
     },
     en: {
       question: "Who are you?",
       answer:
-        "I'm Nikita Boyarkin — a Data Analyst / Product Analyst. 4+ years turning data into decisions: customer analytics, A/B tests, dashboards and pipelines. Specialized in SQL, Python and reproducible statistical methodology (CUPED, AA-tests, ship-gates).",
+        "I'm Nikita Boyarkin — a Data Analyst / Product Analyst. Portfolio of reproducible analytics projects — experimentation, retention, segmentation — with full methodology and code. Built from project work, not from employment. Specialized in SQL, Python and reproducible statistical methodology (CUPED, AA-tests, ship-gates).",
       links: [{ label: "About me", href: "en/about/" }],
     },
   },
@@ -65,12 +65,12 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Сколько у тебя опыта?",
       answer:
-        "4+ года на стыке продукта, данных и экспериментов. Данные в портфолио синтетические, но методология боевая: каждый кейс воспроизводим и откалиброван симуляцией.",
+        "Портфолио воспроизводимых аналитических проектов — эксперименты, retention, сегментация — с полной методологией и кодом. Создано из проектной работы, а не из найма. Данные в портфолио синтетические, но методология боевая: каждый кейс воспроизводим и откалиброван симуляцией.",
     },
     en: {
       question: "How much experience do you have?",
       answer:
-        "4+ years at the intersection of product, data and experimentation. The portfolio data is synthetic, but the methodology is production-grade: every case is reproducible and calibrated by simulation.",
+        "Portfolio of reproducible analytics projects — experimentation, retention, segmentation — with full methodology and code. Built from project work, not from employment. The portfolio data is synthetic, but the methodology is production-grade: every case is reproducible and calibrated by simulation.",
     },
   },
   {
@@ -220,18 +220,18 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Как устроено портфолио?",
       answer:
-        "Начни со страницы «С чего начать» — там маршрут. Проекты сгруппированы по трекам (эксперименты / аналитика / продукт / инженерия), есть статьи, граф знаний и аркада мини-игр. Поиск открывается клавишей «/».",
+        "Начни со страницы «Обо мне» — там jump-nav с маршрутом по портфолио. Проекты сгруппированы по трекам (эксперименты / аналитика / продукт / инженерия), есть статьи, граф знаний и аркада мини-игр. Поиск открывается клавишей «/».",
       links: [
-        { label: "С чего начать", href: "start/" },
+        { label: "Обо мне", href: "about/" },
         { label: "Проекты", href: "projects/" },
       ],
     },
     en: {
       question: "How is the portfolio organized?",
       answer:
-        "Start with the «Start here» page — it has the route. Projects are grouped by track (experiments / analytics / product / engineering), plus writing, a knowledge graph and a mini-game arcade. Search opens with «/».",
+        "Start with the «About» page — it has a jump nav with a route through the portfolio. Projects are grouped by track (experiments / analytics / product / engineering), plus writing, a knowledge graph and a mini-game arcade. Search opens with «/».",
       links: [
-        { label: "Start here", href: "en/start/" },
+        { label: "About", href: "en/about/" },
         { label: "Projects", href: "en/projects/" },
       ],
     },

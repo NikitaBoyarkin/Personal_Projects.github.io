@@ -107,4 +107,6 @@ lhci-reports/
 .claude/
 .claude/hooks/
 
+# Build cache (graphify-out) — generated, must not be tracked
+src/graphify-out/cache/
 

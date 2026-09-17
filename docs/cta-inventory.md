@@ -18,8 +18,8 @@
 | 10 | contact.astro | «CV (PDF)» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
 | 11 | value.astro | «Написать в Telegram →» | `value_cta` | tg deep-link |
 | 12 | value.astro | «GitHub →» | `value_github` | `github.com/NikitaBoyarkin` |
-| 13 | work-with-me.astro | «Обсудить формат →» | `work_with_me_cta` | tg deep-link |
-| 14 | whois.astro | «Написать в Telegram →» | `whois_cta` | tg deep-link |
+| 13 | about.astro (#work) | «Обсудить формат →» | `work_with_me_cta` | tg deep-link |
+| 14 | about.astro (links footer) | «Написать в Telegram →» | `whois_cta` | tg deep-link |
 | 15 | cv.astro | «Download PDF» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
 | 16 | cv.astro | «Source (GitHub)» | `cv_source_github` | `github.com/NikitaBoyarkin/cv` |
 | 17 | games (`/games/`) | LinkedIn / Telegram (contact-секция) | `contact_click` (channel) | внешние |
@@ -33,7 +33,7 @@
 |---|---|
 | Hero-CTA «С чего начать» и «CV» не имели трекинга | ✅ закрыт 2026-09-09: `hero_cta_click`/`hero_cta_exposure` (A/B) + `hero_cv` |
 | Ссылки внутри панели AskMe не трекаются (только `ask_me_open`) | ⏳ опционально: `ask_me_link_<label>` |
-| `start.astro` — маршрутизатор без CTA-событий (ссылки на CV/Volta/contact) | ⏳ опционально: `start_<target>` |
+| `start.astro` — удалён (S1.4); маршрутизация перенесена в jump-nav на `/about` | ✅ закрыт 2026-09-18 |
 
 ## A/B-тест главного CTA
 
@@ -49,3 +49,32 @@
 **Решение:** зафиксировать в PostHog (insight по `hero_cta_click` с breakdown по variant) после накопления ≥30 exposure на руку (~2–4 недели при текущем трафике). Победитель — по CTR с учётом SRM (проверка распределения exposure 50/50).
 
 **Реализация:** `src/components/HeroCta.astro` (bundled script, `posthog.onFeatureFlags` → swap text/href, no-JS = control). Трекинг явный, без `data-analytics` (иначе двойной счёт через delegated capture в Analytics.astro).
+
+## S1.2/S1.4 Consolidation mapping (2026-09-18)
+
+The about-cluster (`whois`, `work-with-me`, `now`, `start`) collapsed into `/about` + `/value`.
+Redirects in `astro.config.mjs`:
+
+| Old route | Redirect target |
+|---|---|
+| `/whois/` | `/about/#who` |
+| `/work-with-me/` | `/about/#work` |
+| `/now/` | `/about/#now` |
+| `/start/` | `/about/#start` |
+| `/en/whois/` | `/en/about/#who` |
+| `/en/work-with-me/` | `/en/about/#work` |
+| `/en/start/` | `/en/about/#start` |
+
+(`en/now.astro` never existed — no `/en/now/` redirect.)
+
+**Analytics event preservation (G14 funnel):**
+
+| Event | Old host | New host | Status |
+|---|---|---|---|
+| `whois_cta` | `whois.astro` (deleted) | `about.astro` links-footer CTA | preserved |
+| `work_with_me_cta` | `work-with-me.astro` (deleted) | `about.astro` #work section CTA | preserved |
+| `value_cta` | `value.astro` | `value.astro` (unchanged) | preserved |
+| `value_github` | `value.astro` | `value.astro` (unchanged) | preserved |
+
+No wired event was dropped. `start.astro` carried no `data-analytics` event, so its deletion
+removes no funnel signal.

@@ -49,13 +49,10 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   add("## Core pages");
   add(`- [Home (RU)](${abs("")}): intro, featured project (${featuredProject?.data.title ?? "Product analytics"}), skill taxonomy.`);
   add(`- [Home (EN)](${abs("en/")}): English mirror.`);
-  add(`- [About](${abs("about/")}): background and focus.`);
-  add(`- [Who I am](${abs("whois/")}): living business card — who I am, how I work, what I enjoy, collaboration format.`);
-  add(`- [How I work](${abs("work-with-me/")}): relationship manual — values, working style, feedback norms, meetings.`);
+  add(`- [About](${abs("about/")}): background and focus — who I am, how I work, what I enjoy, collaboration format.`);
   add(`- [How I can help](${abs("value/")}): offers (hiring + collaboration) with quantified proof — A/B, retention, RFM, automation.`);
   add(`- [Writing](${abs("writing/")}): articles on SQL, A/B testing, retention, segmentation, automation.`);
   add(`- [Skill taxonomy](${abs("topics/")}): Junior/Middle/Senior topics with case studies per topic.`);
-  add(`- [Start here](${abs("start/")}): how to read the portfolio.`);
   add(`- [Knowledge graph](${abs("graph/")}): product-analytics domain map.`);
   add(`- [Games](${abs("games/")}): playable analytics arcade — 10 zero-dependency SVG mini-games (A/B test, funnel drop, cohort catch, SQL, retention, metric match) + arcade (snake, pong, 2048). Phone + desktop.`);
   add();

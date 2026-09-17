@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import BlogCard from '../../components/BlogCard.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/path';
+import { estimateReadTime } from '../../lib/date';
+
+// S1.3 (PRD v6): notes + guides merged into one parameterised route.
+//   /notes/          → note + decision-log  (was /notes/)
+//   /notes/guides/   → guide + framework     (was /guides/, now redirected here)
+// RU-only — no EN mirror (confirmed: src/pages/en has no notes/guides pages).
+export async function getStaticPaths() {
+  return [
+    { params: { filter: undefined } },
+    { params: { filter: 'guides' } },
+  ];
+}
+
+const filter = Astro.params.filter;
+
+const allPosts = (await getCollection('posts', (p) => !p.data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const isGuides = filter === 'guides';
+const posts = isGuides
+  ? allPosts.filter((p) => ['guide', 'framework'].includes(p.data.category))
+  : allPosts.filter((p) => ['note', 'decision-log'].includes(p.data.category));
+
+const title = isGuides ? 'Гайды | Nikita Boyarkin' : 'Заметки | Nikita Boyarkin';
+const description = isGuides
+  ? 'Evergreen-гайды по product-аналитике: когортный анализ, RFM-сегментация, SQL, статистика.'
+  : 'Короткие заметки и decision-логи: почему перешли на Bayesian A/B, автоматизация отчётов, чек-листы.';
+const h1 = isGuides ? 'Гайды' : 'Заметки';
+const intro = isGuides
+  ? 'Методологические руководства — то, что остаётся актуальным: когортный анализ, RFM, статистика экспериментов.'
+  : 'Decision-логи и короткие заметки — почему приняли решение и что из этого вышло.';
+const emptyText = isGuides ? 'Пока нет гайдов.' : 'Пока нет заметок.';
+const canonical = isGuides ? withBase('notes/guides/') : withBase('notes/');
+---
+
+<Base
+  title={title}
+  description={description}
+  canonical={canonical}
+  activeNav="writing"
+  lang="ru"
+>
+  <h1 class="page-title reveal">{h1}</h1>
+  <p class="reveal page-intro" style="color: var(--text-muted); margin-bottom: var(--space-8); max-width: 60ch;">
+    {intro}
+  </p>
+
+  <div class="blog-list reveal reveal-delay-1">
+    {
+      posts.length === 0 ? (
+        <p style="color: var(--text-muted);">{emptyText}</p>
+      ) : (
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id.replace(/\.md$/, '')}
+            title={post.data.title}
+            category={post.data.category}
+            date={post.data.date}
+            image={post.data.image}
+            updated={post.data.updated}
+            excerpt={post.data.excerpt}
+            readTime={estimateReadTime(post.body ?? '')}
+          />
+        ))
+      )
+    }
+  </div>
+
+  <p style="margin-top: var(--space-8);">
+    {isGuides ? (
+      <a href={withBase('notes/')}>Заметки и decision-логи →</a>
+    ) : (
+      <a href={withBase('notes/guides/')}>Методологические гайды →</a>
+    )}
+    {' · '}
+    <a href={withBase('writing/')}>Всё статьи →</a>
+  </p>
+</Base>

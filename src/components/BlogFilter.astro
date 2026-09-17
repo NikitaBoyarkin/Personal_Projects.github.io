@@ -239,9 +239,10 @@ const hiddenTags = tags.filter((t) => t.count < 2);
       randomBtn.addEventListener('click', () => {
         if (!allPosts.length) return;
         const pick = allPosts[Math.floor(Math.random() * allPosts.length)];
-        if (window.posthog) {
+        const ph = (window as { posthog?: { capture: (n: string, p: Record<string, unknown>) => void } }).posthog;
+        if (ph) {
           try {
-            window.posthog.capture('random_post_click', {
+            ph.capture('random_post_click', {
               slug: pick.slug,
               path: window.location.pathname,
             });

@@ -2,7 +2,7 @@
 
 Static portfolio site for Nikita Boyarkin — Data / Product Analyst.
 
-Built with [Astro](https://astro.build/) v5, TypeScript, and Markdown content collections.
+Built with [Astro](https://astro.build/) 7, TypeScript, and Markdown content collections.
 
 ## Development
 

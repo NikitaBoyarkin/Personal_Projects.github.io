@@ -14,7 +14,7 @@ tools:
   - SQL
   - cron scheduler
   - Tableau
-github: https://github.com/NikitaBoyarkin/telegram_bot_public
+private: true
 updated: 2025-06-19
 demo: demos/telegram/index.html
 related:
@@ -72,4 +72,4 @@ caseStudy:
 
 ## Documentation
 
-- [GitHub → telegram_bot_public](https://github.com/NikitaBoyarkin/telegram_bot_public)
+- Репозиторий приватный — доступ по запросу. Публичного кода нет; карточка не ведёт на пустой/stub-репозиторий.

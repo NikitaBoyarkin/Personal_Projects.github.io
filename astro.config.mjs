@@ -18,6 +18,19 @@ export default defineConfig({
   build: {
     format: "directory",
   },
+  // Deep-link redirects for the consolidated about-cluster (S1.2/S1.4).
+  // Old routes collapse into /about anchors; /start becomes the in-page jump nav.
+  redirects: {
+    "/whois/": "/about/#who",
+    "/work-with-me/": "/about/#work",
+    "/now/": "/about/#now",
+    "/start/": "/about/#start",
+    "/en/whois/": "/en/about/#who",
+    "/en/work-with-me/": "/en/about/#work",
+    "/en/start/": "/en/about/#start",
+    // S1.3 (PRD v6): /guides/ merged into the parameterised /notes/ route.
+    "/guides/": "/notes/guides/",
+  },
   integrations: [
     sitemap({
       i18n: {

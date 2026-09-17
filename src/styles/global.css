@@ -277,13 +277,6 @@ p {
    secondary-neutral surfaces visible right under the hero. The kanban columns
    also switch to translucent secondary so the gaps/headers add 30% bucket area,
    while cards keep their dominant surface role. */
-/* INTENT: override AudienceBar.astro scoped padding/margin with an id-boosted
-   selector so the global rebalancing actually applies in all viewports. */
-#intro + .audience-bar {
-  background: var(--surface-secondary);
-  padding-block: var(--space-4);
-  margin-block: 0;
-}
 .home-board {
   background: var(--surface-secondary);
   padding-block: var(--space-6);
@@ -969,8 +962,7 @@ nav ul.links a[aria-current="page"] {
 .editorial-section > .capabilities,
 .editorial-section > .career,
 .bento-cell > .career,
-.bento-cell > .library,
-.bento-cell > .testimonials {
+.bento-cell > .library {
   margin: 0;
 }
 

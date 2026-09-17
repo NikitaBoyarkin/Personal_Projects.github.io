@@ -29,7 +29,7 @@ const barH = 26;
 const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
 ---
 
-<svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={ariaLabel} preserveAspectRatio="xMidYMid meet">
+<svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label={ariaLabel} preserveAspectRatio="xMidYMid meet">
   <g class="stages">
     {stages.map((s, i) => {
       const w = barW(s.value);
