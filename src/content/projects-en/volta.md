@@ -17,6 +17,7 @@ tools:
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
 updated: 2026-09-05
+demo: demos/bayesian/index.html
 date: 2026-08-11
 faq:
   - question: "Where is the onboarding drop-off?"
@@ -51,6 +52,13 @@ caseStudy:
 
 # Volta Neobank — Product Analytics
 
+## The 30-second version
+
+- **Problem:** KYC was the onboarding bottleneck — the largest relative drop-off (56.6% step conversion).
+- **Fix:** a KYC progress bar lifted conversion **+6.24pp** (p < 0.0001), above the +5pp MDE.
+- **Money:** **€716K/yr** business impact at 48× ROI.
+- **Retention:** the effect held — **+9.2pp** M3 retention, **+€227K/yr** incremental LTV.
+
 ## The Case
 
 «Volta» is a fictional neobank that was losing users during onboarding. Marketing saw traffic, product saw activation, support saw tickets. Every team had its own number — and none of them explained where the money was leaking. We started with one question: **which onboarding step is critical?**
@@ -63,7 +71,7 @@ The first piece of evidence is the onboarding funnel down to the first productiv
 
 Hypothesis: the form is too long and there is no intermediate confirmation.
 
-→ [Funnel Analysis — case file](/projects/volta/funnel/)
+→ [Funnel Analysis — case file](funnel/)
 
 ## Evidence #2 — A/B: does the fix work
 
@@ -78,19 +86,19 @@ Test design:
 
 Verdict: control 55.8% → treatment 62.1%, **+6.24pp**, p < 0.0001, 95% CI [+4.26%, +8.16%], above the +5pp MDE → **ship**. At a realistic audience this is ≈ **€716K/yr** at 48× ROI.
 
-→ [A/B Testing — case file](/projects/volta/ab/)
+→ [A/B Testing — case file](ab/)
 
 ## Evidence #3 — Retention: does the effect hold
 
 Shipping is not the end: we checked the effect on retention with cohort triangles (signup month × age) instead of "the average across everyone". Along the diagonal: cohorts with the new onboarding hold **M3 retention at +9.2pp** over older cohorts → **+€227K/yr incremental LTV**. The new onboarding improves both the first week (faster time-to-value) and month 3 (less churn after the "honeymoon"). Without triangles, this conclusion would hide behind the average.
 
-→ [Retention & Cohort — case file](/projects/volta/retention/)
+→ [Retention & Cohort — case file](retention/)
 
 ## Evidence #4 — Segmentation: who pays
 
 The effect held — the remaining question was who these users are and how to monetize them. StandardScaler + KMeans, data-driven K: **4 segments** — Power 12% / Growth 24% / Casual 32% / Dormant 32%. Lorenz: 12% of users drive 41% of revenue; 68% → 92%. Migration scenarios: up to **+€310K/yr**.
 
-→ [User Segmentation — case file](/projects/volta/segmentation/)
+→ [User Segmentation — case file](segmentation/)
 
 ## The Verdict
 
@@ -123,8 +131,11 @@ The repo has grown from 4 core projects to **17** (12 analytical domains + Marke
 **Per-project methodology:**
 
 1. **Funnel** — step conversion, absolute/relative drop-off, Chi-square test across channels. Registration loses the most users in absolute terms (2,682, 73.2% step conv); KYC Complete has the largest relative drop-off (56.6% step conv). Referral converts 11.7pp better than paid social; iOS beats Android at every step (13.6% vs 11.7% end-to-end).
+
 2. **A/B (KYC progress bar)** — sample size calculation, SRM check (p=1.00), bootstrap CI, multiple-comparison correction (Bonferroni/Holm/BH), AA-test under H₀ (type-I = 0.050), CUPED (control-only θ), sensitivity at MDE. Control 55.8% → treatment 62.1%, **+6.24pp**, 95% CI [+4.26%, +8.16%], exceeds the +5pp MDE. Ship-gate: p<0.05 ∧ lift≥MDE ∧ no SRM → ship. 9/11 naively-significant segments, 4/11 after Bonferroni.
+
 3. **Retention** — cohort curves, pre/post Welch t-test + Cohen's d, plan-specific LTV (ARPU × retention decomposition). M1 retention +10pp step-change, M3 +9.2pp.
+
 4. **Segmentation** — StandardScaler + KMeans, data-driven K (marginal-gain elbow, silhouette plateau K=2–4, collapse at K=5). Segments: Power 12% / Growth 24% / Casual 32% / Dormant 32%. Lorenz: 12% of users → 41% of revenue; 68% → 92%. Migration scenarios: +€26K/mo (€310K/yr).
 
 **Code structure:** shared `utils/common.py` (`setup()`, `print_section()`, `CONSTANTS`, `data_path()`), `functions + main()` — importing a module does not run the analysis. Excel reports via `openpyxl`.

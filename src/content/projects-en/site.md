@@ -23,7 +23,7 @@ related:
 
 # This Portfolio Site
 
-## Business Context
+## Context
 
 A static portfolio was needed where content (projects, posts) is edited in Markdown rather than component markup. Hosting is GitHub Pages under a subpath (`/Personal_Projects.github.io/`). Deploy is push-triggered, with no manual build.
 
@@ -36,6 +36,7 @@ If we take Astro with content collections and a Zod frontmatter schema, content 
 **Stack:** Astro 7, TypeScript, Markdown content collections (`src/content/{projects,posts}/`), Zod schemas in `src/content/config.ts`.
 
 **Architecture:**
+
 - **Content collections** — each project/post = Markdown + frontmatter; Zod validates fields at build.
 - **Base path** — `withBase()` from `src/lib/path.ts` applies `base: '/Personal_Projects.github.io'` to all internal links and images.
 - **Theme** — an inline `<head>` script reads `localStorage`/`prefers-color-scheme` and sets `data-theme` before first paint (no flash); CSS custom properties are reactive.
@@ -44,7 +45,7 @@ If we take Astro with content collections and a Zod frontmatter schema, content 
 
 **Validation:** `scripts/check_site.py` checks required pages, internal links, the profile image, and assets in `index.html`.
 
-## Insight
+## Findings
 
 Astro content collections with Zod are a contract between content and presentation: invalid frontmatter breaks the build, not the deploy. `withBase()` encapsulates the GitHub Pages subpath — no link hardcodes the base. The "content = `.md`, presentation = `.astro`" split means adding a project requires no code changes.
 

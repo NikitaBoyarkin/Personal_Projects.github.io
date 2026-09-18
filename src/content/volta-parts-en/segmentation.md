@@ -17,7 +17,7 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — User Segmentation
 
-## Business Context
+## Context
 
 The fourth project in the **optimize** loop: who are the users and how do we monetize each segment? Turning analytics into money.
 
@@ -31,7 +31,7 @@ Users split into a small number of homogeneous segments with distinct monetizati
 - Data-driven K: marginal-gain elbow, silhouette plateau **K = 2–4**, collapse at **K = 5**.
 - Lorenz-curve analysis of revenue concentration.
 
-## Insight
+## Findings
 
 - **4 segments**: Power **12%** / Growth **24%** / Casual **32%** / Dormant **32%**.
 - **Lorenz**: 12% of users → **41%** of revenue; 68% → **92%**.

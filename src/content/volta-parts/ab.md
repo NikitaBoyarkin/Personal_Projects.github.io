@@ -17,15 +17,15 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — A/B Testing (KYC progress bar)
 
-## Business Context
+## Контекст
 
 Второй проект петли **validate**: лечит ли progress bar в KYC проблему, найденную в funnel? Ship-gated методология защищает от rollout'а статистически-значимых, но бизнес-незначимых изменений.
 
-## Hypothesis
+## Гипотеза
 
 Progress bar в KYC поднимает конверсию завершения KYC минимум на +5pp (MDE) без SRM.
 
-## Data & Method
+## Данные и метод
 
 - Расчёт размера выборки под MDE = +5pp.
 - SRM-проверка (sample ratio mismatch): **p = 1.00** → баланс выборок.
@@ -34,17 +34,17 @@ Progress bar в KYC поднимает конверсию завершения K
 - **CUPED** (control-only θ): сокращение дисперсии, sensitivity at MDE.
 - Ship-gate: **p<0.05 ∧ lift ≥ MDE ∧ no SRM → ship**.
 
-## Insight
+## Что нашли
 
 - Контроль **55.8%** → лечение **62.1%**, **+6.24pp**, 95% CI **[+4.26%, +8.16%]**.
 - Превышает MDE (+5pp), p<0.0001 (Z = 6.35).
 - **9/11** наивно-значимых сегментов → **4/11** после Bonferroni (коррекция убирает ложные срабатывания).
 
-## Impact
+## Эффект
 
 - **KYC conversion +6.24pp** → бизнес-импакт **€716K/yr** (48× ROI на €15K dev cost).
 - Методология (CUPED + AA-test + Bonferroni + ship-gate) переиспользуема для следующих экспериментов.
 
-## Documentation
+## Документация
 
 - [GitHub → volta-banking](https://github.com/NikitaBoyarkin/volta-banking)

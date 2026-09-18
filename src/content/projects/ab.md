@@ -35,11 +35,13 @@ caseStudy:
 
 # A/B Testing Methodology Toolkit
 
-## Business Context
+## Контекст
 
 Метод A/B-теста настолько же хорош, насколько хороши его ошибки первого рода под нулевой гипотезой и мощность под реальным эффектом. Вместо того чтобы доверять асимптотическим обещаниям, каждый модуль этого тулкита симулирует пайплайн end-to-end и сообщает эмпирические частоты.
 
-## Modules
+## Данные и метод
+
+### Модули
 
 | Модуль | Метод | Что показывает демо |
 |--------|-------|---------------------|
@@ -59,11 +61,11 @@ caseStudy:
 | `switchback.py` | Cluster & switchback | cluster-robust SE; carryover bias |
 | `test_simulator.py` | Generic calibration | любой DGP + тест → эмпирические Type I и power |
 
-## End-to-end pipeline
+### Сквозной пайплайн
 
 `scripts/run_full_pipeline.py` связывает модули в один реалистичный сценарий на синтетических данных: SRM check → CUPED → delta-method CTR test → per-segment ATE с BH-коррекцией → novelty check → markdown-отчёт в `outputs/report.md`.
 
-## Testing Philosophy
+### Философия тестирования
 
 Тестовый набор перепрогоняет каждую калибровку с ассертами:
 
@@ -73,7 +75,7 @@ caseStudy:
 - наивный per-unit SE для ratio-метрик неточен, delta-method точен;
 - корректность на known-answer фикстурах (SRM splits, сегментные uplift-ы).
 
-## Run
+### Запуск
 
 ```bash
 uv sync --all-groups
@@ -81,13 +83,13 @@ uv run pytest                 # calibration test suite
 uv run python scripts/run_full_pipeline.py   # end-to-end demo → outputs/report.md
 ```
 
-## Impact
+## Эффект
 
 - **15 калиброванных модулей** — от SRM до switchback, каждый с A/A-проверкой.
 - **Числа проверены** — Type I ≈ α, coverage ≈ 95%, контроль peeking.
 - **Ratio-метрики без смещения** — delta-method вместо наивного per-unit t-test.
 - **Связный pipeline** — от SRM-проверки до сегментных ATE и novelty check.
 
-## Documentation
+## Документация
 
 - [GitHub → ab_test](https://github.com/NikitaBoyarkin/ab_test)

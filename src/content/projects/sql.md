@@ -35,11 +35,11 @@ caseStudy:
 
 # SQL Analytics Case Study
 
-## Business Context
+## Контекст
 
 Take-home–формат: 25 end-to-end SQL-кейсов на синтетическом продуктовом датасете. Каждый кейс — один самодостаточный `.sql` файл с вопросом и подходом в leading-комментарии. Без сервера, без кредов — одна команда строит данные и базу DuckDB.
 
-## Data & Method
+## Данные и метод
 
 **Модель данных** (синтетическая, seed=42, детерминированная):
 
@@ -84,7 +84,7 @@ Take-home–формат: 25 end-to-end SQL-кейсов на синтетиче
 | 24 | Daily revenue anomaly detection | robust MAD z-score, rolling baseline |
 | 25 | Purchase → subscription conversion | join к subscriptions, time-to-convert |
 
-## Quick start
+### Запуск
 
 ```bash
 uv run python data/generate_data.py   # data/analytics.duckdb
@@ -97,11 +97,18 @@ uv run python scripts/report.py # reports/index.html
 
 Runner печатает вопрос кейса, выполняет SQL против `data/analytics.duckdb`, рендерит результат таблицей. Отчёт с графиками публикуется на GitHub Pages автоматически при push.
 
-## Insight
+## Что нашли
 
-Каждый кейс покрывает конкретный оконно-функциональный паттерн. Ключевые находки честные, а не подогнанные: repeat rate всего 3.5% (896 покупателей, 31 повторный) — это one-and-done purchase engine; RFM вырождается в recency-историю; топ-дециль даёт лишь 22% выручки (нет «китов»); лого-churn растёт до ~15%/мес при растущем MRR. Расхождение вопрос/подход в одном файле + regression-инварианты делают кейсы самопроверяемыми.
+Каждый кейс покрывает конкретный оконно-функциональный паттерн. Ключевые находки честные, а не подогнанные:
 
-## Impact
+- repeat rate всего 3.5% (896 покупателей, 31 повторный) — это one-and-done purchase engine;
+- RFM вырождается в recency-историю;
+- топ-дециль даёт лишь 22% выручки (нет «китов»);
+- лого-churn растёт до ~15%/мес при растущем MRR.
+
+Расхождение вопрос/подход в одном файле + regression-инварианты делают кейсы самопроверяемыми.
+
+## Эффект
 
 - **25 самодостаточных SQL-кейсов** — от funnel до RFM, каждый со своим оконным паттерном.
 - **Sessionization с валидацией** — 30-min gap воспроизводит 80k pre-assigned sessions с точностью 99.6%.
@@ -110,7 +117,7 @@ Runner печатает вопрос кейса, выполняет SQL прот
 - **Regression-тесты на кейс** — 41 тест: инварианты + golden-answers держат `cases.md` и код в синхроне.
 - **Живой отчёт** — GitHub Pages обновляется на каждый push.
 
-## Documentation
+## Документация
 
 - [Live report → nikitaboyarkin.github.io/sql-analytics-case-study](https://nikitaboyarkin.github.io/sql-analytics-case-study/)
 - [GitHub → sql-analytics-case-study](https://github.com/NikitaBoyarkin/sql-analytics-case-study)

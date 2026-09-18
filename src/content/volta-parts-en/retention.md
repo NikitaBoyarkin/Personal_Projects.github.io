@@ -16,7 +16,7 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — Retention & Cohort
 
-## Business Context
+## Context
 
 The third project in the **measure** loop: did the KYC fix's effect hold over time? In-the-moment conversion is not enough — retention is required.
 
@@ -30,7 +30,7 @@ The MDE-exceeding lift in KYC conversion persists as +retention at M1 and M3.
 - **Welch t-test** + **Cohen's d** for the cohort difference.
 - Plan-specific LTV via **ARPU × retention decomposition**.
 
-## Insight
+## Findings
 
 - **M1 retention: +10pp** step-change.
 - **M3 retention: +9.2pp** — the effect does not fade.

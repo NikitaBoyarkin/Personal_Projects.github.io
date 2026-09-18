@@ -39,11 +39,13 @@ caseStudy:
 
 # Browser Mini-Games — Analytics Arcade
 
-## Business Context
+## Context
 
 Analytics concepts — p-values, retention, funnels — are abstract. Typical demos are passive dashboards. Mini-games turn concepts into mechanics: you play, and you 'feel' why p < 0.05 matters, what a retention day is, and where the funnel bottleneck sits.
 
-## Games
+## Data & Method
+
+### Games
 
 | Game | Type | Mechanic |
 |------|------|----------|
@@ -58,21 +60,21 @@ Analytics concepts — p-values, retention, funnels — are abstract. Typical de
 | 📅 Retention Day | analytics | pick the right retention day |
 | 🔍 Funnel Bottleneck | analytics | find the biggest funnel drop |
 
-## Architecture
+### Architecture
 
 Each game is a **self-contained SVG**: HTML, CSS and JS in one file. One file = the whole game, zero-dependency, no build step. The hub is Astro (static), deployed to GitHub Pages. Dark/light/cyberpunk themes via `data-theme` + `localStorage`.
 
-## Analytics & Conversion
+### Analytics & Conversion
 
 - `game_selected` — PostHog event on game pick.
 - In-game CTA → contact (Telegram deep-link), `contact_click` event.
 - Portfolio sync: `sync_games.py` copies `dist/` → `public/games/` (drift check via `--check`).
 
-## Testing
+### Testing
 
 Playwright smoke tests (pytest): each game loads from `public/` and is checked for functionality.
 
-## Run
+### Run
 
 ```bash
 npm install

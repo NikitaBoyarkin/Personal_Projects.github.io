@@ -17,7 +17,7 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — A/B Testing (KYC progress bar)
 
-## Business Context
+## Context
 
 The second project in the **validate** loop: does a progress bar in KYC fix the problem found in the funnel? A ship-gated methodology protects against rolling out statistically-significant but business-insignificant changes.
 
@@ -34,7 +34,7 @@ A KYC progress bar raises KYC completion conversion by at least +5pp (MDE) with 
 - **CUPED** (control-only θ): variance reduction, sensitivity at MDE.
 - Ship-gate: **p<0.05 ∧ lift ≥ MDE ∧ no SRM → ship**.
 
-## Insight
+## Findings
 
 - Control **55.8%** → treatment **62.1%**, **+6.24pp**, 95% CI **[+4.26%, +8.16%]**.
 - Exceeds MDE (+5pp), p<0.0001 (Z = 6.35).

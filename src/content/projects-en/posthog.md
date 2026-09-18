@@ -39,11 +39,13 @@ caseStudy:
 
 # TaskFlow — PostHog Product Analytics Pipeline
 
-## Business Context
+## Context
 
 Most analytics portfolios start with a ready-made CSV. This project starts earlier — with instrumenting an application — and goes through the whole cycle: generate traffic, capture events, analyze, dashboard, and deploy.
 
-## Pipeline
+## Data & Method
+
+### Pipeline
 
 ```
 app/                Demo SaaS (FastAPI + Jinja2): routes + server-side capture
@@ -53,7 +55,7 @@ analysis/           funnel · cohort · A/B · revenue/LTV · time-to-convert ·
 dashboard/          interactive Streamlit dashboard
 ```
 
-## What it demonstrates
+### What it demonstrates
 
 - **Instrumentation:** a typed event catalog as the single source of truth; server-side capture; PII scrubbing.
 - **A/B:** feature flag → onboarding variant; chi-square, uplift, Wilson CI, SRM check.
@@ -61,7 +63,7 @@ dashboard/          interactive Streamlit dashboard
 - **SQL mirror:** the same metrics as SQL — a reference for BI and interviews.
 - **Engineering:** pytest + ruff in CI, Dockerfile, render.yaml for one-click deploy.
 
-## Insight
+## Findings
 
 The value is in the completeness of the cycle. The typed event catalog and PII scrubbing are the discipline that separates production instrumentation from a demo: events are defined in one place, PII does not leak, and the metrics reproduce in both Python and SQL.
 

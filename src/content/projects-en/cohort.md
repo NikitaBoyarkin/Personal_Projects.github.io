@@ -16,13 +16,14 @@ tools:
   - Tableau (Hyper API)
 github: https://github.com/NikitaBoyarkin/tableau_cohort_analysis
 updated: 2026-09-04
+demo: demos/cohort/index.html
 related:
   - /posts/cohort-retention-guide/
 ---
 
 # Cohort Analysis Dashboard
 
-## Business Context
+## Context
 
 Cohort retention and LTV analysis on synthetic data: user retention, churn curves, and revenue/LTV by acquisition cohort. A Python pipeline (pandas + matplotlib/seaborn) plus an export ready to load into Tableau. Data is synthetic, deterministic (seed=42), reproduced from code.
 
@@ -60,7 +61,7 @@ If we split users into cohorts by first-activation month and build a retention m
 
 **Tableau heatmap:** Columns = `period`, Rows = `cohort_label`, Marks = Square, Color = AVG(`is_active`), Text = `% of Total` per row.
 
-## Insight
+## Findings
 
 The cohort view matters more than average retention: it shows not only churn speed but also monetization compared to retention. LTV of younger cohorts is understated due to short history — compare LTV correctly only at equal cohort "age." Key improvements: `cohort_month` is derived from `join_date` (not a separate random field), period 0 = 100% by convention, and NaNs are masked in the heatmap instead of rendering `nan%`.
 

@@ -36,11 +36,13 @@ caseStudy:
 
 # Product Analytics + A/B on Supabase
 
-## Business Context
+## Контекст
 
 Аналитическое портфолио чаще всего показывает метрики на чистом CSV. Этот проект закрывает другой сценарий — как аналитика встраивается в реальный multi-tenant продукт: авторизация, изоляция данных по организациям, путь инжеста событий и эксперимент, результат которого считается в базе, а не в ноутбуке.
 
-## Архитектура
+## Данные и метод
+
+### Архитектура
 
 ```
 Client/seed  ── POST /functions/v1/ingest (x-api-key) ──►  Edge Function (Deno)
@@ -54,21 +56,21 @@ dashboard        (supabase-py, anon key)                      analytics + experi
 - **A/B в БД:** `experiments.v_results` считает по варианту assigned/converted/conversion; χ²-тест запускается поверх в дашборде.
 - **Ingest:** Edge Function валидирует API-ключ (SHA-256 hash, не plaintext) и вставляет событие через `security definer` функцию.
 
-## Модель безопасности (RLS)
+### Модель безопасности (RLS)
 
 На каждой таблице включён Row Level Security. Пользователь видит только строки своей организации — дашборд безопасно открывать реальным пользователям, а не только запускать локально.
 
-## Insight
+## Что нашли
 
 Соль проекта — аналитика считается там же, где лежат данные. SQL-views и `v_results` означают, что метрики и экспериментальные результаты согласованы между любым клиентом, который подключается к базе: дашборд, BI-инструмент или ad-hoc SQL-запрос видят одни и те же цифры.
 
-## Impact
+## Эффект
 
 - **Full-stack путь** — instrument → ingest → isolate → analyze → experiment в одном репозитории.
 - **Завершённый A/B** — control 32.1% vs treatment 37.2%, **p = 0.0034** (χ²), +5.1pp lift.
 - **RLS на всех таблицах** — дашборд безопасно показывать реальным пользователям.
 - **Переиспользованный UI** — слой презентации взят из streamlit-app; заменён только слой данных.
 
-## Documentation
+## Документация
 
 - [GitHub → supabase-product-analytics](https://github.com/NikitaBoyarkin/supabase-product-analytics)

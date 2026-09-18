@@ -39,11 +39,13 @@ caseStudy:
 
 # Browser Mini-Games — Analytics Arcade
 
-## Business Context
+## Контекст
 
 Аналитические концепции — p-value, retention, воронки — абстрактны. Обычные демо — пассивные дашборды. Мини-игры превращают концепции в механику: играешь — и «чувствуешь», почему p < 0.05, что такое retention day и где бутылочное горлышко воронки.
 
-## Games
+## Данные и метод
+
+### Игры
 
 | Игра | Тип | Механика |
 |------|-----|----------|
@@ -58,21 +60,21 @@ caseStudy:
 | 📅 Retention Day | аналитика | выбери правильный день удержания |
 | 🔍 Funnel Bottleneck | аналитика | найди самый большой провал воронки |
 
-## Architecture
+### Архитектура
 
 Каждая игра — **self-contained SVG**: HTML, CSS и JS в одном файле. Один файл = вся игра, zero-dependency, без сборки. Хаб — Astro (static), деплой на GitHub Pages. Темы dark/light/cyberpunk через `data-theme` + `localStorage`.
 
-## Analytics & Conversion
+### Аналитика и конверсия
 
 - `game_selected` — PostHog-событие при выборе игры.
 - CTA в играх → контакт (Telegram deep-link), событие `contact_click`.
 - Синк в портфолио: `sync_games.py` копирует `dist/` → `public/games/` (drift-check через `--check`).
 
-## Testing
+### Тестирование
 
 Smoke-тесты на Playwright (pytest): каждая игра загружается из `public/` и проверяется на работоспособность.
 
-## Run
+### Запуск
 
 ```bash
 npm install
@@ -81,14 +83,14 @@ npm run build        # production build → dist/
 python3 sync_games.py --dry-run   # preview sync to portfolio
 ```
 
-## Impact
+## Эффект
 
 - **10 игр, 7 аналитических** — концепции → механика → интуиция.
 - **Zero-dependency** — один файл = вся игра, без сборки и сервера.
 - **Phone + desktop** — swipe/tap и keyboard/mouse, 3 темы.
 - **Трекинг и конверсия** — `game_selected` + CTA → контакт.
 
-## Documentation
+## Документация
 
 - [GitHub → browser-mini-games](https://github.com/NikitaBoyarkin/browser-mini-games)
 - [Live demo → /games/](https://nikitaboyarkin.github.io/Personal_Projects.github.io/games/)

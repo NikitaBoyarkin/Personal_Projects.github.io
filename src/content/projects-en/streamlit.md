@@ -35,11 +35,15 @@ caseStudy:
 
 # Product Analytics Dashboard (Streamlit)
 
-## Business Context
+## Context
 
 An analytics portfolio should show the whole AARRR cycle on one consistent dataset, not one metric in isolation. This dashboard is a self-contained app: data is generated deterministically, and the metrics reproduce across runs.
 
-## Pages
+## Data & Method
+
+**Data:** a synthetic SaaS dataset, 8,000 users, Jan 2024 – Jun 2025. Generated in-memory with a deterministic seed = 42 and cached via `@st.cache_data` — the dataset is identical across runs and shared across pages within a session.
+
+### Pages
 
 | Page | What it shows |
 |------|---------------|
@@ -49,18 +53,14 @@ An analytics portfolio should show the whole AARRR cycle on one consistent datas
 | Revenue | MRR growth, MRR by plan, ARPU, logo churn |
 | Segments | Distributions + conversion + ARPU by segment / channel / country / device |
 
-## Data & Method
-
-**Data:** a synthetic SaaS dataset, 8,000 users, Jan 2024 – Jun 2025. Generated in-memory with a deterministic seed = 42 and cached via `@st.cache_data` — the dataset is identical across runs and shared across pages within a session.
-
-**Run:**
+### Run
 
 ```bash
 uv sync
 uv run streamlit run app.py
 ```
 
-## Insight
+## Findings
 
 One consistent base for every AARRR question is the whole point. The deterministic seed means Funnel, Retention, Revenue, and Segments all talk about the same users, and the numbers can be checked. The same UI later became the presentation layer for the Supabase full-stack project — only the data layer changed.
 

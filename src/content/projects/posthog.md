@@ -39,11 +39,13 @@ caseStudy:
 
 # TaskFlow — PostHog Product Analytics Pipeline
 
-## Business Context
+## Контекст
 
 Большинство аналитических портфолио начинаются с готового CSV. Этот проект начинается раньше — с инструментирования приложения — и проходит весь цикл: генерация трафика, захват событий, анализ, дашборд и деплой.
 
-## Pipeline
+## Данные и метод
+
+### Пайплайн
 
 ```
 app/                Demo SaaS (FastAPI + Jinja2): routes + server-side capture
@@ -53,7 +55,7 @@ analysis/           funnel · cohort · A/B · revenue/LTV · time-to-convert ·
 dashboard/          interactive Streamlit dashboard
 ```
 
-## What it demonstrates
+### Что демонстрирует
 
 - **Инструментирование:** типизированный каталог событий как единый источник правды; server-side capture; скрабинг PII.
 - **A/B:** feature-flag → вариант онбординга; chi-square, uplift, Wilson CI, проверка SRM.
@@ -61,17 +63,17 @@ dashboard/          interactive Streamlit dashboard
 - **SQL-зеркало:** те же метрики как SQL — референс для BI и собеседований.
 - **Инженерка:** pytest + ruff в CI, Dockerfile, render.yaml для one-click deploy.
 
-## Insight
+## Что нашли
 
 Ценность — в полноте цикла. Типизированный каталог событий и скрабинг PII — это та дисциплина, которая отличает production-инструментацию от демо: события определены в одном месте, PII не утекает, а метрики воспроизводимы и в Python, и в SQL.
 
-## Impact
+## Эффект
 
 - **Полный lifecycle** — instrument → generate → analyze → dashboard → deploy в одном репо.
 - **7 анализов** — funnel, cohort, A/B, revenue/LTV, time-to-convert, feature-usage, SQL-зеркало.
 - **A/B с SRM-check** — chi-square + uplift + Wilson CI.
 - **Production-готовность** — CI, Docker, render.yaml.
 
-## Documentation
+## Документация
 
 - [GitHub → posthog-saas-analytics](https://github.com/NikitaBoyarkin/posthog-saas-analytics)

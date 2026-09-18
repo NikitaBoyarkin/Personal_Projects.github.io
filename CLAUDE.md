@@ -151,6 +151,27 @@ Sub-projects of the Volta neobank narrative: `funnel`, `ab`, `retention`, `segme
 | `related` / `keywords` | Optional arrays; `related` may contain `/posts/<slug>/`, `/projects/<slug>/` or absolute URLs (external) |
 | `draft` | If `true`, omitted from the build |
 
+### Readability conventions (RU + EN)
+
+All project and post copy follows a shared spec — see `docs/prd-readability.md`.
+
+**Project skeleton** (H2 order; the four core sections are required, `Гипотеза`/`Что нашли` are optional and appear only where the project has that content):
+
+- RU: `Контекст → Гипотеза? → Данные и метод → Что нашли? → Эффект → Документация`
+- EN: `Context → Hypothesis? → Data & Method → Findings? → Impact → Documentation`
+- `volta` is the exception: it keeps its narrative (`Дело → Улики → Вердикт` / `The Case → Evidence → The Verdict`) plus a `## Итог в 30 секундах` / `## The 30-second version` TL;DR.
+- Fold one-off sections (`Modules`, `Pages`, `Architecture`, `Run`, `Testing`, …) under `Данные и метод`; demote to `###` when the block stays distinct. No prose paragraph over ~500 characters.
+
+**Project `description:` spec** — the field feeds the card, meta/OG/Twitter, JSON-LD and `MaterialStrip` (which truncates at 72 chars):
+
+- 1–2 sentences, result + number first, 120–200 characters; the first 72 characters must stand alone.
+- RU files: Russian (Cyrillic); EN files: English. Author each language independently — meaning parity, not a literal translation.
+- Keep hiring keywords (`A/B-тест`, `retention`, `SQL`, `Python`, `LTV`); gloss or move exotics (`CUPED`, `mSPRT`, `AUUC`) into the body.
+
+**Numbers are frozen.** A readability rewrite changes presentation, never a metric. `bun run audit:content` diffs every numeric token in `src/content/**` against `docs/content-baseline.json` and exits 1 on any added or removed value (the `description:` field and markdown list markers are excluded). Run `bun run audit:content:snapshot` only to accept an intentional change.
+
+**`related:` is locale-neutral** — use `/projects/<slug>/` and `/posts/<slug>/` in both RU and EN files; the EN page resolver prefixes `en/`. Do **not** write `/en/projects/...` in `related:` — the resolver drops it silently (posts resolve to the RU route by design).
+
 ## Adding Content
 
 ### Add a project

@@ -18,11 +18,24 @@ tools:
 github: https://github.com/NikitaBoyarkin/sql-analytics-case-study
 updated: 2026-09-15
 demo: https://nikitaboyarkin.github.io/sql-analytics-case-study/
+caseStudy:
+  problem: "An analyst needs to show SQL skill on product tasks, but there is no production data, and textbook exercises do not demonstrate systems thinking. How do you prove SQL is a working tool rather than a set of memorised syntax?"
+  approach: "25 end-to-end cases on a synthetic dataset (seed=42, ~183k events, 20k signups): each case is one self-contained .sql file with the question and approach in a leading comment. DuckDB builds the data and the database in one command, with no server or credentials. Regression tests with deterministic invariants protect the SQL from regressions. A second batch (churn, refunds, Pareto, anomaly detection, upsell conversion) was added on a separate RNG stream (seed=43) — the first 20 cases' numbers did not change."
+  result: "25 cases from funnel to RFM: sessionization validated against ground truth (99.6%), lifecycle composition, a revenue-retention triangle, an in-SQL z-test for A/B, and MAD anomaly analysis. The cases are self-checking: pytest confirms the SQL keeps returning the expected metrics after any data change. The report is published to GitHub Pages automatically."
+  metrics:
+    - label: "SQL cases"
+      value: "25"
+    - label: "Dataset events"
+      value: "~183k"
+    - label: "Signups"
+      value: "20k"
+    - label: "Regression tests"
+      value: "41"
 ---
 
 # SQL Analytics Case Study
 
-## Business Context
+## Context
 
 A take-home format: 25 end-to-end SQL cases on a synthetic product dataset. Each case is one self-contained `.sql` file with the question and approach in a leading comment. No server, no credentials — a single command builds the data and a DuckDB database.
 
@@ -71,7 +84,7 @@ Schema: `data/schema.sql`. Generator: `data/generate_data.py`. Engagement decays
 | 24 | Daily revenue anomaly detection | robust MAD z-score, rolling baseline |
 | 25 | Purchase → subscription conversion | join to subscriptions, time-to-convert |
 
-## Quick start
+### Quick start
 
 ```bash
 uv run python data/generate_data.py   # data/analytics.duckdb
@@ -84,9 +97,16 @@ uv run python scripts/report.py # reports/index.html
 
 The runner prints the case question, executes the SQL against `data/analytics.duckdb`, and renders the result as a table. The charted report is published to GitHub Pages automatically on every push.
 
-## Insight
+## Findings
 
-Each case covers a specific window-function pattern that shows up in real product tasks. The findings are honest rather than engineered: the repeat rate is just 3.5% (896 buyers, 31 repeat) — this is a one-and-done purchase engine; RFM degenerates into a recency story; the top decile delivers only 22% of revenue (no whales); logo churn climbs to ~15%/month even as MRR compounds. Splitting question and SQL in one file plus regression invariants makes the cases self-checking.
+Each case covers a specific window-function pattern that shows up in real product tasks. The findings are honest rather than engineered:
+
+- the repeat rate is just 3.5% (896 buyers, 31 repeat) — this is a one-and-done purchase engine;
+- RFM degenerates into a recency story;
+- the top decile delivers only 22% of revenue (no whales);
+- logo churn climbs to ~15%/month even as MRR compounds.
+
+Splitting question and SQL in one file plus regression invariants makes the cases self-checking.
 
 ## Impact
 

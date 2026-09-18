@@ -17,21 +17,21 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — Funnel Analysis
 
-## Business Context
+## Контекст
 
 Первый проект петли **discover**: найти, где необанк «Volta» теряет пользователей в онбординге. Данные синтетические, seeded-генератор → воспроизводимые CSV.
 
-## Hypothesis
+## Гипотеза
 
 Узкое место онбординга — этап KYC: наибольший относительный отток среди шагов воронки.
 
-## Data & Method
+## Данные и метод
 
 - Step conversion и absolute/relative drop-off по каждому шагу воронки (Sign-up → KYC → Funded → Active).
 - Chi-square тест различий каналов привлечения.
 - Сравнение платформ (iOS vs Android) и каналов (referral vs paid social) на каждом шаге.
 
-## Insight
+## Что нашли
 
 - **KYC Complete** — наибольший относительный отток: **56.6% step conversion** (теряет больше всего доли на одном шаге).
 - **Registration** — наибольший абсолютный отток: **2 682 пользователя, 73.2% step conv**.
@@ -40,11 +40,11 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 KYC — критическое узкое место. Этот вывод передаёт эстафету следующему проекту — A/B-тесту progress bar для KYC.
 
-## Impact
+## Эффект
 
 - Локализовано узкое место онбординга (KYC) — основа для A/B-эксперимента.
 - Количественная база по каналам и платформам для приоритизации роста.
 
-## Documentation
+## Документация
 
 - [GitHub → volta-banking](https://github.com/NikitaBoyarkin/volta-banking)

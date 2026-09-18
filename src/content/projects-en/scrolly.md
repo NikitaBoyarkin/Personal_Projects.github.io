@@ -23,9 +23,11 @@ related:
 
 # Scrolly English Speaking
 
-## Business Context
+## Context
 
-Workplace conversations in English (standups, syncs, interviews) are a weak spot for many Russian-speaking specialists at A2–B1: the grammar is there, but coherent speech and real-time reactions stall. A textbook doesn't help much: no context, no visuals, no link between phrases and situation. The task is to build not an article but an interactive guide, where a narrative leads the reader through workplace-conversation scenes and visualizations show how the workflow, tools, and progress metrics are structured.
+Workplace conversations in English (standups, syncs, interviews) are a weak spot for many Russian-speaking specialists at A2–B1: the grammar is there, but coherent speech and real-time reactions stall. A textbook doesn't help much: no context, no visuals, no link between phrases and situation.
+
+The task is to build not an article but an interactive guide, where a narrative leads the reader through workplace-conversation scenes and visualizations show how the workflow, tools, and progress metrics are structured.
 
 ## Hypothesis
 
@@ -36,6 +38,7 @@ If we deliver the material as scrollytelling — text in the left column, visual
 **Stack:** Astro 6 (`output: static`) + MDX + Tailwind v4 (via `@tailwindcss/vite`), D3 v7 for visualizations, Shiki (`nord` theme) for code, `@astrojs/sitemap`. Deploy to GitHub Pages subpath, Node 22.
 
 **Architecture:**
+
 - `src/layouts/ScrollyLayout.astro` — single template: hero, 2-column scrolly, viz panels, head meta.
 - `src/posts/scrolly/*.mdx` — narrative (section text) with `<ScrollySection>` blocks.
 - `src/scrolly/data/*.ts` — `configId` + sections + viz props + theme. Trusted HTML source: hero/footer always come from the data module, never from frontmatter — injection guard.
@@ -43,7 +46,7 @@ If we deliver the material as scrollytelling — text in the left column, visual
 
 **Content model:** MDX frontmatter (`configId`, `metadata`, `theme`) is safely merged on top of the trusted data module. Hero/footer HTML always from `data/*.ts`, never from frontmatter.
 
-## Insight
+## Findings
 
 The power of scrollytelling is synchronizing narrative and visualization: the reader reaches a paragraph and at that moment the chart on the right changes. This holds attention better than a static article with pictures. Splitting MDX and data modules solves the core pain of static sites — mixing text and logic: the narrative stays editable in Markdown, and the visualizations stay typed in TypeScript.
 

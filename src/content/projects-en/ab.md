@@ -35,11 +35,13 @@ caseStudy:
 
 # A/B Testing Methodology Toolkit
 
-## Business Context
+## Context
 
 An A/B testing method is only as good as its Type I error under the null and its power under a real effect. Rather than trusting asymptotic promises, each module simulates the pipeline end-to-end and reports the empirical rates.
 
-## Modules
+## Data & Method
+
+### Modules
 
 | Module | Method | What the demo shows |
 |--------|--------|---------------------|
@@ -59,11 +61,11 @@ An A/B testing method is only as good as its Type I error under the null and its
 | `switchback.py` | Cluster & switchback designs | cluster-robust SE; naive over-/under-rejects; carryover bias |
 | `test_simulator.py` | Generic test calibration | plug any DGP + test → empirical Type I and power curve |
 
-## End-to-end pipeline
+### End-to-end pipeline
 
 `scripts/run_full_pipeline.py` ties the modules into one realistic flow on synthetic data: SRM check → CUPED → delta-method CTR test → per-segment ATE with BH correction → novelty check → a markdown report in `outputs/report.md`.
 
-## Testing Philosophy
+### Testing Philosophy
 
 The `tests/` suite re-runs every calibration with assertions:
 
@@ -73,7 +75,7 @@ The `tests/` suite re-runs every calibration with assertions:
 - the naive per-unit ratio SE is inaccurate, the delta-method SE is accurate;
 - correctness on known-answer fixtures (SRM splits, segment uplifts, etc.).
 
-## Run
+### Run
 
 ```bash
 uv sync --all-groups

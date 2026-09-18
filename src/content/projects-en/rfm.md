@@ -13,13 +13,14 @@ tools:
   - Tableau
 github: https://github.com/NikitaBoyarkin/rfm-analysis-of-bank-clients
 updated: 2026-08-21
+demo: demos/rfm/index.html
 related:
   - /posts/rfm-segmentation-practical/
 ---
 
 # RFM Analysis of Bank Clients
 
-## Business Context
+## Context
 
 The bank accumulates client transaction data, but marketing campaigns ran "flat": the same offer for everyone. The task is to split the client base into homogeneous segments to personalize communication and concentrate resources on the most valuable clients.
 
@@ -42,7 +43,7 @@ If we segment clients along three dimensions — **Recency** (when the last purc
 
 **Tools:** Python (Pandas, Scikit-learn), SQL, Tableau.
 
-## Insight
+## Findings
 
 Four key groups emerged:
 

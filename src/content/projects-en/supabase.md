@@ -36,11 +36,13 @@ caseStudy:
 
 # Product Analytics + A/B on Supabase
 
-## Business Context
+## Context
 
 Most analytics portfolios show metrics on a clean CSV. This project closes a different gap — how analytics embeds into a real multi-tenant product: auth, per-org data isolation, an event ingest path, and an experiment whose result is computed in the database, not in a notebook.
 
-## Architecture
+## Data & Method
+
+### Architecture
 
 ```
 Client/seed  ── POST /functions/v1/ingest (x-api-key) ──►  Edge Function (Deno)
@@ -54,11 +56,11 @@ dashboard        (supabase-py, anon key)                      analytics + experi
 - **A/B in the DB:** `experiments.v_results` computes per-variant assigned/converted/conversion; the chi-square test runs on top in the dashboard.
 - **Ingest:** the Edge Function validates an API key (SHA-256 hash, never plaintext) and inserts the event via a `security definer` function.
 
-## Security model (RLS)
+### Security model (RLS)
 
 Every table has Row Level Security enabled. A user only ever sees rows of their organization — the dashboard is safe to expose to real users, not just to run locally.
 
-## Insight
+## Findings
 
 The key point: analytics is computed where the data lives. SQL views and `v_results` mean metrics and experiment results are consistent across any client that connects to the database — dashboard, BI tool, or ad-hoc SQL all see the same numbers.
 

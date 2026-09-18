@@ -17,31 +17,31 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — User Segmentation
 
-## Business Context
+## Контекст
 
 Четвёртый проект петли **optimize**: кто пользователи и как монетизировать каждый сегмент? Перевод аналитики в деньги.
 
-## Hypothesis
+## Гипотеза
 
 Пользователи разбиваются на небольшое число однородных сегментов с разными monetization-паттернами.
 
-## Data & Method
+## Данные и метод
 
 - **StandardScaler + KMeans**.
 - Data-driven K: marginal-gain elbow, силуэтный plateau **K = 2–4**, коллапс при **K = 5**.
 - Lorenz-curve анализ концентрации выручки.
 
-## Insight
+## Что нашли
 
 - **4 сегмента**: Power **12%** / Growth **24%** / Casual **32%** / Dormant **32%**.
 - **Lorenz**: 12% пользователей → **41%** выручки; 68% → **92%**.
 - Сценарии миграции (Casual → Growth, Growth → Power) дают **+€26K/mo**.
 
-## Impact
+## Эффект
 
 - **+€310K/yr** через миграцию между сегментами.
 - Per-segment стратегия монетизации вместо усреднённого подхода.
 
-## Documentation
+## Документация
 
 - [GitHub → volta-banking](https://github.com/NikitaBoyarkin/volta-banking)

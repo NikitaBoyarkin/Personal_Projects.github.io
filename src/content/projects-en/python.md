@@ -24,7 +24,7 @@ related:
 
 # Python Analytics Playground
 
-## Business Context
+## Context
 
 In product analytics, most tasks start the same way: load an export, clean it, look at distributions and correlations, show charts. This project turns that routine into reusable modules — so every new analysis starts not from scratch, but from a tested foundation.
 
@@ -40,7 +40,7 @@ In product analytics, most tasks start the same way: load an export, clean it, l
 
 Each module covers a single requirement from the PRD (`docs/prd.md`), and the tests in `tests/` check exactly those requirements — coverage ≥80%.
 
-## Run
+### Run
 
 ```bash
 uv sync --all-groups
@@ -48,7 +48,7 @@ uv run pytest                          # tests + coverage (≥80%)
 uv run python -m python_analytics      # end-to-end pipeline
 ```
 
-## Insight
+## Findings
 
 The key difference from one-off analysis scripts is **structure and testability**: modules are small and single-purpose, requirements are documented in a PRD, and tests keep coverage ≥80%. This makes the tool "product-grade": you can hand it to teammates, extend it, and not fear breaking it.
 

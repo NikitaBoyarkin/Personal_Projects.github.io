@@ -38,7 +38,7 @@ draft: false
 - [Подсказки](#подсказки)
 - [На практике](#на-практике)
 - [На собеседовании](#на-собеседовании)
-- [Ресурсы](#ресурсы)
+- [Ссылки](#ссылки)
 
 ## Пример
 
@@ -224,7 +224,7 @@ Retention — доля пользователей, вернувшихся в п�
 — Nikita Boyarkin
 </details>
 
-## Ресурсы
+## Ссылки
 
 - **[Cohort Analysis with Python](https://github.com/NikitaBoyarkin/volta-banking)** — полный код когортной матрицы + визуализация в проекте volta-banking.
 - **[Cohort Analysis — Wikipedia](https://en.wikipedia.org/wiki/Cohort_analysis)** — базовая терминология и история метода.

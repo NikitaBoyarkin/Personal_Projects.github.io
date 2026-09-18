@@ -26,7 +26,9 @@ draft: false
 
 Фича выпущена на 100 % пользователей, A/B-тест не проводился, а продакт-менеджер спрашивает: «она дала что-нибудь?» Обычный ответ — посмотреть adoption rate и retention тех, кто фичей воспользовался. Это и есть self-selection bias: пользователи, которые нашли и включили фичу сами, почти всегда сильнее вовлечены, чем те, кто не включил. Разница в retention — это не эффект фичи, это разница между двумя типами пользователей.
 
-Feature Impact Analysis — это методологический фреймворк, который разделяет причинный эффект фичи и смещение отбора. Когда чистый A/B невозможен (фича уже в проде, есть network effects, этические или юридические ограничения на рандомизацию), на сцену выходят методы causal inference: CUPED для повышения чувствительности метрик, propensity matching для балансировки групп, difference-in-differences для staggered rollout, synthetic control для geo-экспериментов, uplift modeling для гетерогенных эффектов. Ниже — как выбрать метод под кейс и какие ловушки ждут на каждом шаге.
+Feature Impact Analysis — это методологический фреймворк, который разделяет причинный эффект фичи и смещение отбора.
+
+Когда чистый A/B невозможен (фича уже в проде, есть network effects, этические или юридические ограничения на рандомизацию), на сцену выходят методы causal inference: CUPED для повышения чувствительности метрик, propensity matching для балансировки групп, difference-in-differences для staggered rollout, synthetic control для geo-экспериментов, uplift modeling для гетерогенных эффектов. Ниже — как выбрать метод под кейс и какие ловушки ждут на каждом шаге.
 
 ## Зачем нужен causal-фреймворк
 
@@ -49,7 +51,9 @@ Feature Impact Analysis — это методологический фреймв
 | Guardrail metrics | Revenue, latency, SRM, NPS | Неделя | Platform/Trust |
 | Counter metrics | Support tickets, chargebacks | Месяц | Ops/Finance |
 
-Чувствительность метрики можно поднять ещё до выбора метода. CUPED (Controlled-experiment Using Pre-Experiment Data) уменьшает дисперсию за счёт ковариат из pre-period: если ρ — корреляция ковариата с метрикой, дисперсия эффекта падает в `(1 − ρ²)` раз. При ρ = 0.7 SE сокращается примерно на 29 % — эквивалентно двойному объёму выборки без её роста. MLRATE (Meta) делает то же через ML-based regression adjustment, а learned composite metrics (ShareChat/Moj, KDD 2024) дают до 78 % прироста power относительно delayed North Star. Triggered analysis (LinkedIn XLNT) ограничивает анализ только реально exposed пользователями, отсекая шум от тех, до кого фича не дошла.
+Чувствительность метрики можно поднять ещё до выбора метода. CUPED (Controlled-experiment Using Pre-Experiment Data) уменьшает дисперсию за счёт ковариат из pre-period: если ρ — корреляция ковариата с метрикой, дисперсия эффекта падает в `(1 − ρ²)` раз. При ρ = 0.7 SE сокращается примерно на 29 % — эквивалентно двойному объёму выборки без её роста.
+
+MLRATE (Meta) делает то же через ML-based regression adjustment, а learned composite metrics (ShareChat/Moj, KDD 2024) дают до 78 % прироста power относительно delayed North Star. Triggered analysis (LinkedIn XLNT) ограничивает анализ только реально exposed пользователями, отсекая шум от тех, до кого фича не дошла.
 
 ## Дерево выбора метода
 

@@ -22,7 +22,7 @@ related:
 
 # Digital Garden
 
-## Business Context
+## Context
 
 Knowledge as chronological posts ages quickly and loses connections. A digital garden is the opposite of a blog: notes are not ordered by date but linked with `[[wikilinks]]`, have maturity stages (seedling → evergreen), and evolve over time. The task: publish a personal Zettelkasten as a static site with a link graph.
 
@@ -41,7 +41,7 @@ If we publish notes through Quartz v4 with backlinks, graph view, and full-text 
 - Full-text search, popover preview on `[[wikilink]]` hover.
 - Static output — host on GitHub Pages, no server.
 
-## Insight
+## Findings
 
 The power of a digital garden is in the links, not the individual notes. Backlinks turn a note into a "node" and show which contexts include it. The graph turns note accumulation into a navigable structure: topic clusters and isolated islands are visible. A chronological blog answers "when"; a garden answers "how is this connected."
 

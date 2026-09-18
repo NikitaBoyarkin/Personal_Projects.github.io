@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Phase 0 + Phase 1 executed 2026-09-18. Phases 2–4 pending. |
+| Status | Phases 0–4 executed 2026-09-18 (see §10). |
 | Date | 2026-09-18 |
 | Owner | Nikita Boyarkin |
 | Scope | `src/content/**` copy + structure; one typographic measure; incidental link/parity fixes. No redesign. |
@@ -138,7 +138,7 @@ not new work — but they live in the files this PRD touches, so they are fixed 
 |---|---|---|
 | G1 | Every project + volta-part description is on-language (RU Cyrillic on RU pages) | grep on `^description:` |
 | G2 | Every description follows the spec: result-first, 120–200 chars, first 72 self-contained | char count `[V]`; first-72 legibility manual |
-| G3 | One skeleton across the 16 non-volta projects and all volta-parts; `volta` narrative + TL;DR | H2 set equality check |
+| G3 | One skeleton across the 16 non-volta projects and all volta-parts; `volta` narrative + TL;DR | H2 in-order subset check |
 | G4 | No post paragraph >500 chars; every post has a `## Кратко`; one closing-section name for links | script/spot-check |
 | G5 | Zero numeric drift across the whole rewrite | `bun run audit:content` exits 0 |
 | G6 | P5 drift repaired: no EN file links a RU route; RU/EN parity restored | grep |
@@ -170,7 +170,7 @@ not new work — but they live in the files this PRD touches, so they are fixed 
 | D8 | **Deliverable is an execution PRD in the repo**, at `docs/prd-readability.md`. | Lives with the code and the build; ships in the same PR as the edits |
 | D9 | **Register boundary:** plain in description + card + a page-opening TL;DR; technical from `Данные и метод` onward. | Gives the recruiter an exit ramp without diluting the method |
 | D10 | **Jargon policy:** keep hiring keywords (`A/B-тест`, `retention`, `SQL`, `Python`, `LTV`); gloss or move exotics (`CUPED`, `mSPRT`, AUUC/Qini, `ship-gate`, Bonferroni). | Keywords carry SEO and recruiter recognition; exotics are noise in a 72-char window |
-| D11 | **Skeleton:** RU `Контекст → Гипотеза (опц.) → Данные и метод → Что нашли → Эффект → Документация`; EN `Context → Hypothesis (opt.) → Data & Method → Findings → Impact → Documentation`. | Six slots cover every current body; existing one-off sections fold under `Данные и метод`. English headings leave Russian bodies |
+| D11 | **Skeleton:** RU `Контекст → Гипотеза (опц.) → Данные и метод → Что нашли (опц.) → Эффект → Документация`; EN `Context → Hypothesis (opt.) → Data & Method → Findings (opt.) → Impact → Documentation`. The four core sections are required; `Гипотеза` and `Что нашли` appear only when the project has that content. | Five slots cover every current body; existing one-off sections fold under `Данные и метод`. English headings leave Russian bodies. `Что нашли` is optional because toolkit/demo projects (`ab`, `games`, `sales-calls`) carry their results inside `Данные и метод` + `Эффект` and a separate findings section would duplicate them |
 | D12 | **Description spec:** 1–2 sentences, result + number first, 120–200 chars, first 72 self-contained. | Satisfies all six consumers in §1.2 at once |
 | D13 | **RU and EN descriptions authored independently** (meaning parity, not a word-for-word translation). | Literal translations of a 12-character-budgeted line read as machine output |
 | D14 | **`volta` TL;DR** heading `## Итог в 30 секундах` (EN `## The 30-second version`), 4 bullets, existing numbers only. | Gives the flagship a scannable entry without losing its narrative |
@@ -235,8 +235,7 @@ in the same pass (D7).
 **Order suggestion:** one project end-to-end (RU+EN) as a template, get it reviewed, then the rest.
 
 **Acceptance:**
-- Every non-volta project body's H2 set equals the skeleton (optional `Гипотеза`/`Hypothesis`);
-  `volta` keeps its narrative plus the TL;DR `[V]`
+- Every non-volta project body's H2 set is an in-order subset of `Контекст → Гипотеза? → Данные и метод → Что нашли? → Эффект → Документация` (the four core sections required; `Гипотеза` and `Что нашли` present only where the project has that content); `volta` keeps its narrative plus the TL;DR `[V]`
 - No project body contains a paragraph over ~500 characters `[V]`
 - `rg "Business Context|Data & Method|Insight|Impact>" src/content/projects src/content/volta-parts`
   returns **no English headings inside RU files** `[V]`
@@ -280,7 +279,7 @@ Add the skeleton and description spec to `CLAUDE.md` under the content-collectio
 | G1 — off-language descriptions | 18 (14 projects + 4 volta-parts) | **0** |
 | G2 — descriptions outside 120–200 chars | 42 (unbounded) | **0** |
 | G3 — distinct skeletons (non-volta) | 9 | **1** |
-| G4 — posts with a paragraph >500 chars | 4 | **0** |
+| G4 — posts with a prose paragraph >500 chars (lists/code/tables excluded) | 4 | **0** |
 | G4 — posts missing `## Кратко` | 3 | **0** |
 | G4 — distinct names for the links section | 3 (`Ссылки`/`Ресурсы`/`Ссылки`-via-`Результат`) | **1** |
 | G5 — numeric drift | n/a | **0** (`audit:content` green) |
@@ -358,3 +357,20 @@ Paths: `src/content.config.ts` (schemas), `src/components/ProjectCard.astro:41`,
 `src/components/MaterialStrip.astro:51,72`, `src/components/CaseStudy.astro`,
 `src/pages/projects/[slug].astro:69,114`, `src/layouts/Base.astro:91,124,131`,
 `src/styles/blog.css:212`, `src/components/InnerTOC.astro`.
+
+---
+
+## 10. Execution log (2026-09-18)
+
+| Phase | Result |
+|---|---|
+| 0 | `docs/prd-readability.md`, `scripts/content-drift-audit.mjs`, `docs/content-baseline.json` created; `audit:content` / `audit:content:snapshot` wired in `package.json`. Two scope refinements recorded: `description:` excluded from the frozen set (D20); markdown ordered-list markers stripped as formatting. |
+| 1 | All **42** descriptions (17+17 projects, 4+4 volta-parts) rewritten to the 120–200-char result-first spec — verified on-language (RU Cyrillic / EN Latin) and in range; frontmatter diff limited to the `description:` line. |
+| 2 | **16** projects + **8** volta-parts moved to the shared skeleton; `volta` kept its narrative and gained the `Итог в 30 секундах` / `The 30-second version` TL;DR; all RU English headings removed; no prose paragraph >500 chars. Incidental (D7): 9 EN files with `/en/`-prefixed `related:` fixed to the locale-neutral form; RU/EN `caseStudy`/`demo` parity restored for `bot`, `sql`, `volta`, `cohort`, `rfm`; the 4 `volta` body links made relative (they were missing the base path and pointed at RU routes). |
+| 3 | Links section normalised (`## Ресурсы` → `## Ссылки` incl. the manual TOC; `## Результат` → `## Выводы`); `## Кратко` added to `bayesian-ab-testing`, `data-analyst-portfolio-checklist`, `telegram-reporting-bot`; every post prose paragraph >500 chars split — **0** remain. |
+| 4 | Skeleton, description spec, frozen-numbers rule and the `related:` convention documented in `CLAUDE.md`. |
+
+**Verification:** `bun run audit:content` exits 0; `bun run build` → 98 pages; `bun run check` → 0 errors/warnings; G3 skeleton (in-order subset) 0 failures; G4 (Кратко, links naming, prose >500) pass; G6 `related:`/parity pass.
+
+**Baseline re-snapshots (intentional, per D20):** `volta` TL;DR repeats existing numbers plus the heading token `30`; EN `bot`/`sql` gained their RU-parity `caseStudy` numbers. No file lost a numeric token at any point.
+

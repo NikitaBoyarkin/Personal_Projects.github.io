@@ -16,30 +16,30 @@ github: https://github.com/NikitaBoyarkin/volta-banking
 
 # Volta — Retention & Cohort
 
-## Business Context
+## Контекст
 
 Третий проект петли **measure**: продержался ли эффект KYC-фикса во времени? Конверсия в моменте — недостаточно; нужно удержание.
 
-## Hypothesis
+## Гипотеза
 
 MDE-превышающий lift в KYC-конверсии сохраняется как +retention на M1 и M3.
 
-## Data & Method
+## Данные и метод
 
 - Когортные кривые удержания pre/post.
 - **Welch t-test** + **Cohen's d** для разницы когорт.
 - Plan-specific LTV через **ARPU × retention decomposition**.
 
-## Insight
+## Что нашли
 
 - **M1 retention: +10pp** step-change.
 - **M3 retention: +9.2pp** — эффект не выцветает.
 - LTV растёт за счёт retention-decomposition, не только ARPU.
 
-## Impact
+## Эффект
 
 - **+€227K/yr** incremental LTV от KYC-фикса — эффект валидирован во времени, не только в моменте A/B.
 
-## Documentation
+## Документация
 
 - [GitHub → volta-banking](https://github.com/NikitaBoyarkin/volta-banking)
