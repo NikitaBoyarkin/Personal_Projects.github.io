@@ -4,6 +4,7 @@ import HeroMetrics from '../components/HeroMetrics.astro';
 import HeroCta from '../components/HeroCta.astro';
 import CareerSnapshot from '../components/CareerSnapshot.astro';
 import ReadingBlock from '../components/ReadingBlock.astro';
+import MaterialStrip from '../components/MaterialStrip.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/path';
 
@@ -132,7 +133,10 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- EDITORIAL TOP + BENTO BOTTOM -->
+  <!-- EDITORIAL TOP — latest writing (with dates) + project breadth -->
+  <MaterialStrip lang="ru" />
+
+  <!-- BENTO BOTTOM -->
   <div class="home-layout">
     <!-- Bento bottom — airy, spaced layout -->
     <div class="bento-grid bento-spaced">

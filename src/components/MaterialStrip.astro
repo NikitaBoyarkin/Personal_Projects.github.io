@@ -1,9 +1,9 @@
 ---
 // "New materials" strip — horizontal scroll-snap of thumbnail cards (latest
 // posts + the featured Volta project), inspired by podbiratel's material
-// strip. Replaces the text-only blog list on the homepage.
-// `lang="en"` pulls the EN project collection + EN labels; posts stay RU (no
-// EN posts yet) — matches the pre-existing EN-home behaviour.
+// strip. This is the homepage "editorial top" (editorial top + bento bottom).
+// `lang` selects the locale's post + project collections; EN uses the (small)
+// posts-en collection until more posts are translated (PRD v6 S3.1).
 import { getCollection } from "astro:content";
 import { withBase } from "../lib/path";
 import { formatDate } from "../lib/date";
