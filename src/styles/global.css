@@ -846,6 +846,17 @@ nav ul.links a[aria-current="page"] {
   max-width: 52ch;
 }
 
+/* PhD bridging line — a differentiator placed next to the proof, not as the
+   headline (PRD v6 S2.5 / D19). Visually subordinate to the pitch. */
+.hero-phd {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-normal);
+  max-width: 52ch;
+  border-left: 2px solid var(--text-accent);
+  padding-left: var(--space-3);
+}
+
 .hero-editorial .hero-metrics {
   margin-top: 0;
 }
@@ -915,6 +926,9 @@ nav ul.links a[aria-current="page"] {
     text-align: center;
   }
   .hero-pitch {
+    max-width: 48ch;
+  }
+  .hero-phd {
     max-width: 48ch;
   }
   .hero-visual {
