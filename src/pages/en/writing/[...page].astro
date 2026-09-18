@@ -90,6 +90,7 @@ const nextUrl = page < totalPages ? `${siteUrl}${withBase(pageHref(page + 1))}` 
             excerpt={post.data.excerpt}
             readTime={estimateReadTime(post.body ?? '')}
             lang="en"
+            filterableTag
           />
         ))
       )

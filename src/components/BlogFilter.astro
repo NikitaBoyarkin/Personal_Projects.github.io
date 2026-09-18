@@ -132,15 +132,15 @@ const hiddenTags = tags.filter((t) => t.count < 2);
     // Mirrors BlogCard.astro markup so the client-rendered filtered list looks
     // identical to the static paginated one.
     function cardHtml(p: Post): string {
-      return `<a href="${p.href}" class="blog-card" data-category="${p.category}">
+      return `<article class="blog-card" data-category="${p.category}">
         ${p.image ? `<img class="blog-card-image" src="${p.image}" alt="" width="600" height="200" loading="lazy" />` : ''}
         <div class="blog-card-body">
-          <span class="blog-card-tag">${p.categoryLabel}</span>
-          <div class="blog-card-title">${escapeHtml(p.title)}</div>
+          <button class="blog-card-tag" type="button" data-card-category="${p.category}">${p.categoryLabel}</button>
+          <a class="blog-card-link blog-card-title" href="${p.href}">${escapeHtml(p.title)}</a>
           <div class="blog-card-meta">${p.dateLabel}${p.readTimeLabel}</div>
           <div class="blog-card-excerpt">${escapeHtml(p.excerpt)}</div>
         </div>
-      </a>`;
+      </article>`;
     }
 
     function statusText(n: number, filter: string): string {
@@ -213,6 +213,23 @@ const hiddenTags = tags.filter((t) => t.count < 2);
       });
     });
 
+    // A card's category badge (BlogCard `filterableTag`) is a real button, so
+    // clicking it filters by that category instead of opening the post.
+    document.addEventListener('click', (e) => {
+      const badge = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-card-category]');
+      if (!badge) return;
+      const category = badge.dataset.cardCategory;
+      if (!category) return;
+      e.preventDefault();
+      activeCategory = category;
+      activeTag = null;
+      applyFilter();
+      const hash = `#${category}`;
+      if (location.hash !== hash) {
+        history.replaceState(null, '', `${location.pathname}${location.search}${hash}`);
+      }
+    });
+
     // Long-tail tags toggle: reveal/hide the single-use chips.
     if (moreBtn) {
       moreBtn.addEventListener('click', () => {
@@ -260,8 +277,8 @@ const hiddenTags = tags.filter((t) => t.count < 2);
     // ↑↓/Esc handling inside the search panel.
     document.addEventListener('keydown', (e) => {
       const active = document.activeElement;
-      if (!active || !active.classList.contains('blog-card')) return;
-      const cards = Array.from(document.querySelectorAll<HTMLElement>('.blog-card')).filter(
+      if (!active || !active.classList.contains('blog-card-link')) return;
+      const cards = Array.from(document.querySelectorAll<HTMLElement>('.blog-card-link')).filter(
         (c) => !c.closest('[hidden]'),
       );
       const idx = cards.indexOf(active as HTMLElement);

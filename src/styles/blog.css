@@ -50,6 +50,15 @@
   gap: var(--space-5);
 }
 
+/* The author `display` above beats the UA `[hidden] { display: none }` rule, so
+   the `hidden` attribute the writing filter toggles would not actually hide the
+   list — the static cards stayed visible and the filtered results were appended
+   below the fold. Same fix as `.kg-edge-panel[hidden]` in KnowledgeGraph. */
+.blog-list[hidden],
+.pagination[hidden] {
+  display: none;
+}
+
 .blog-card {
   display: flex;
   flex-direction: column;
@@ -120,6 +129,34 @@
   letter-spacing: 0.03em;
   text-transform: uppercase;
   margin-bottom: var(--space-2);
+}
+
+/* Filter variant (writing index): a real button sitting above the stretched
+   link, so a click filters instead of opening the post. */
+button.blog-card-tag {
+  position: relative;
+  z-index: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button.blog-card-tag:hover {
+  border-color: var(--text-accent);
+  background: color-mix(in srgb, var(--text-accent) 18%, transparent);
+}
+
+/* The card is an <article>, not an anchor: the title link stretches over the
+   whole card for click/keyboard navigation, which leaves room for the badge to
+   be a genuine control (no interactive nested inside a link). */
+.blog-card-link {
+  text-decoration: none;
+}
+
+.blog-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
 .blog-card-title {

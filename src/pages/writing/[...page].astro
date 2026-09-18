@@ -95,6 +95,7 @@ const canonical = page > 1 ? withBase('writing/') : undefined;
           updated={post.data.updated}
           excerpt={post.data.excerpt}
           readTime={estimateReadTime(post.body ?? '')}
+          filterableTag
         />
       ))
     }

@@ -13,9 +13,28 @@ interface Props {
   updated?: Date;
   readTime?: number;
   lang?: 'ru' | 'en';
+  /**
+   * On the writing index the category badge is a filter control: it renders as
+   * a real <button> wired to BlogFilter's `[data-card-category]` handler. The
+   * card itself is an <article> whose title link stretches over it, so the
+   * badge is never an interactive element nested inside an anchor. Everywhere
+   * else it stays a decorative <span>.
+   */
+  filterableTag?: boolean;
 }
 
-const { slug, title, category, date, excerpt, image, updated, readTime, lang = 'ru' } = Astro.props;
+const {
+  slug,
+  title,
+  category,
+  date,
+  excerpt,
+  image,
+  updated,
+  readTime,
+  lang = 'ru',
+  filterableTag = false,
+} = Astro.props;
 const minLabel = lang === 'en' ? 'min' : 'мин';
 // EN posts live at /en/posts/<slug>/ (their own collection); RU at /posts/<slug>/.
 const postHref = lang === 'en' ? withBase(`en/posts/${slug}/`) : withBase(`posts/${slug}/`);
@@ -24,9 +43,10 @@ const updatedText = updated
     ? `updated ${formatDate(updated)}`
     : `обновлено ${formatDate(updated)}`
   : null;
+const tagLabel = categoryLabel(category, lang);
 ---
 
-<a href={postHref} class="blog-card" data-category={category}>
+<article class="blog-card" data-category={category}>
   {
     image && (
       <img
@@ -40,8 +60,16 @@ const updatedText = updated
     )
   }
   <div class="blog-card-body">
-    <span class="blog-card-tag">{categoryLabel(category, lang)}</span>
-    <div class="blog-card-title">{title}</div>
+    {
+      filterableTag ? (
+        <button class="blog-card-tag" type="button" data-card-category={category}>
+          {tagLabel}
+        </button>
+      ) : (
+        <span class="blog-card-tag">{tagLabel}</span>
+      )
+    }
+    <a class="blog-card-link blog-card-title" href={postHref}>{title}</a>
     <div class="blog-card-meta">
       {formatDate(date)}{readTime ? ` · ${readTime} ${minLabel}` : ''}
     </div>
@@ -54,4 +82,4 @@ const updatedText = updated
     }
     <div class="blog-card-excerpt">{excerpt}</div>
   </div>
-</a>
+</article>
