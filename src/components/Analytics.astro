@@ -20,6 +20,7 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
 {posthogKey && (
   <script>
     import { posthog } from 'posthog-js';
+    import { reachedCaseStudyRead, caseStudySlug } from '../lib/scroll-depth';
 
     // Never instrument local development. Dev sessions (localhost / 127.0.0.1
     // / ::1 / 0.0.0.0) would pollute the PostHog project and skew funnels.
@@ -70,6 +71,30 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
         posthog.capture(`${personalMatch[1]}_viewed`, {
           locale: isEnPath ? 'en' : 'ru',
         });
+      }
+
+      // Proof-reach metric (PRD v6 S3.2 / D14): a case study counts as "read"
+      // once the visitor scrolls through 75% of a project page. Fires at most
+      // once per page load. Project detail pages and Volta sub-parts count;
+      // the `/projects/` index does not (it is a list, not a case study).
+      const caseStudySlugValue = caseStudySlug(path);
+      if (caseStudySlugValue) {
+        const slug = caseStudySlugValue;
+        const locale = isEnPath ? 'en' : 'ru';
+        let caseStudyRead = false;
+        const maybeFireCaseStudyRead = () => {
+          if (caseStudyRead) return;
+          const doc = document.documentElement;
+          if (!reachedCaseStudyRead(window.scrollY, doc.scrollHeight, window.innerHeight)) {
+            return;
+          }
+          caseStudyRead = true;
+          posthog.capture('case_study_read', { slug, locale });
+          window.removeEventListener('scroll', maybeFireCaseStudyRead);
+        };
+        window.addEventListener('scroll', maybeFireCaseStudyRead, { passive: true });
+        // Short pages are fully visible on load, so check once immediately.
+        maybeFireCaseStudyRead();
       }
 
       // Delegated click capture for any element carrying `data-analytics`.
