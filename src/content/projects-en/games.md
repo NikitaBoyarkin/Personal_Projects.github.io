@@ -93,4 +93,4 @@ python3 sync_games.py --dry-run   # preview sync to portfolio
 ## Documentation
 
 - [GitHub → browser-mini-games](https://github.com/NikitaBoyarkin/browser-mini-games)
-- [Live demo → /games/](https://nikitaboyarkin.github.io/Personal_Projects.github.io/games/)
+- [Live demo → /games/](https://nikitaboyarkin.github.io/games/)

@@ -2,7 +2,7 @@ import rss from "@astrojs/rss";
 import type { APIContext } from "astro";
 import { getCollection } from "astro:content";
 
-const BASE = "/Personal_Projects.github.io";
+const BASE = "";
 
 export async function GET(context: APIContext) {
   const posts = (await getCollection("posts", (p) => !p.data.draft)).sort(

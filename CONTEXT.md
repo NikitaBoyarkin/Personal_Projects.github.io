@@ -1,4 +1,4 @@
-# Portfolio Site (Personal_Projects.github.io)
+# Portfolio Site (NikitaBoyarkin.github.io)
 
 Персональный портфолио-сайт продуктового/data-аналитика: статический Astro, GitHub Pages, PostHog-аналитика. Этот контекст описывает язык конверсионной поверхности главной и метрик.
 

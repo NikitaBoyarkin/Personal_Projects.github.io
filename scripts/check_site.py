@@ -54,9 +54,9 @@ def strip_fragment(url: str) -> str:
 def resolve_relative(page: Path, url: str) -> Path:
     url = strip_fragment(url)
     if url.startswith("/"):
-        # The base path is part of the URL; strip it to resolve against dist/
-        base = "/Personal_Projects.github.io"
-        if url.startswith(base):
+        # Site is served from the domain root (user Pages site, no base prefix).
+        base = ""
+        if base and url.startswith(base):
             url = url[len(base) :]
         return (DIST / url.lstrip("/")).resolve()
     return (page.parent / url).resolve()
@@ -158,7 +158,7 @@ def check_internal_links() -> int:
                 target_ids = page_ids.get(target, set())
                 if fragment and fragment not in target_ids:
                     print(
-                        f"  ERROR {page.relative_to(DIST)}:{line} broken anchor: {url} (no id=\"{fragment}\" in {target.relative_to(DIST)})"
+                        f'  ERROR {page.relative_to(DIST)}:{line} broken anchor: {url} (no id="{fragment}" in {target.relative_to(DIST)})'
                     )
                     errors += 1
     return errors
@@ -224,7 +224,9 @@ def check_metrics_drift() -> int:
         )
         errors += 1
     else:
-        print(f"  OK    project cards ({card_count}) == METRICS.portfolio.projects ({declared})")
+        print(
+            f"  OK    project cards ({card_count}) == METRICS.portfolio.projects ({declared})"
+        )
     return errors
 
 

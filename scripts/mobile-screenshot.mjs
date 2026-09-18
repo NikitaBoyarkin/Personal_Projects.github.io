@@ -7,7 +7,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, '..', 'reports', 'mobile-screenshots');
 mkdirSync(outDir, { recursive: true });
 
-const baseUrl = process.env.BASE_URL || 'http://localhost:4321/Personal_Projects.github.io/';
+const baseUrl = process.env.BASE_URL || 'http://localhost:4321/';
 
 const pages = [
   { path: '', name: 'home' },

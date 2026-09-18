@@ -13,7 +13,7 @@ const allProjects = await getCollection('projects', (p) => !p.data.draft);
 const featuredProject =
   allProjects.find((p) => p.id === 'volta') || allProjects[0];
 
-const siteUrl = 'https://nikitaboyarkin.github.io/Personal_Projects.github.io/';
+const siteUrl = 'https://nikitaboyarkin.github.io/';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [

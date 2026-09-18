@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 An Astro-powered static portfolio site deployed to GitHub Pages. Source lives in `src/`, content is authored in Markdown with YAML frontmatter, and the production build is emitted to `dist/`.
 
-The site is published at `https://nikitaboyarkin.github.io/Personal_Projects.github.io/`, so `base: '/Personal_Projects.github.io'` is configured in `astro.config.mjs`.
+The site is published at `https://nikitaboyarkin.github.io/` (user Pages site, repository `NikitaBoyarkin.github.io`), so it is served from the domain root — `astro.config.mjs` sets no `base` (`base: '/'`).
 
 The site is **bilingual (RU / EN)**. Russian is the default; an `en/` page tree mirrors the main pages and renders the `projects-en` collection.
 

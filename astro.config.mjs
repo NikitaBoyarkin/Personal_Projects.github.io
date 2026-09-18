@@ -4,7 +4,6 @@ import sitemap from "@astrojs/sitemap";
 // https://astro.build/config
 export default defineConfig({
   site: "https://nikitaboyarkin.github.io",
-  base: "/Personal_Projects.github.io",
   output: "static",
   trailingSlash: "ignore",
   // v7 default is 'jsx', which strips whitespace between inline elements;

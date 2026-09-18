@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, '..', 'reports', 'mobile-screenshots');
 mkdirSync(outDir, { recursive: true });
-const baseUrl = process.env.BASE_URL || 'http://localhost:4322/Personal_Projects.github.io/';
+const baseUrl = process.env.BASE_URL || 'http://localhost:4322/';
 
 const viewports = [
   { name: 'iphone-se', width: 375, height: 667 },

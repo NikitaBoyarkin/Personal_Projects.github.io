@@ -7,13 +7,13 @@
 // below the fold — so the click looked like it did nothing.
 //
 // Run against a served build (dist), e.g.:
-//   bun run serve-dist &            # http://localhost:4321/Personal_Projects.github.io
+//   bun run serve-dist &            # http://localhost:4321
 //   bun run scripts/verify-writing-filter.mjs
 // Or point BASE_URL anywhere:
-//   BASE_URL=http://localhost:4330/Personal_Projects.github.io/ bun run scripts/verify-writing-filter.mjs
+//   BASE_URL=http://localhost:4330/ bun run scripts/verify-writing-filter.mjs
 import { chromium } from 'playwright';
 
-const baseUrl = process.env.BASE_URL || 'http://localhost:4321/Personal_Projects.github.io/';
+const baseUrl = process.env.BASE_URL || 'http://localhost:4321/';
 const path = process.env.WRITING_PATH || 'writing/';
 const tag = process.env.WRITING_TAG || 'python';
 

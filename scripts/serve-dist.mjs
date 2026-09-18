@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join, extname } from "node:path";
 
 const ROOT = join(import.meta.dir, "..", "dist");
-const BASE = process.env.BASE_PATH ?? "/Personal_Projects.github.io";
+const BASE = process.env.BASE_PATH ?? "";
 const PORT = Number(process.env.PORT ?? "4321");
 
 const MIME = {

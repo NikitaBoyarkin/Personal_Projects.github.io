@@ -62,7 +62,7 @@ GROUP BY customer_id;
 
 На выходе — таблица из одного клиента на строку с тремя числами. Дальше эти числа превращают в баллы 1–5 и собирают в сегменты.
 
-<iframe src="/Personal_Projects.github.io/demos/rfm/index.html" title="Интерактивная карта RFM-сегментов: сетка 5×5 по давности и частоте, наведите на ячейку" height="540" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
+<iframe src="/demos/rfm/index.html" title="Интерактивная карта RFM-сегментов: сетка 5×5 по давности и частоте, наведите на ячейку" height="540" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
 ## Как пишется
 

@@ -22,7 +22,7 @@ import { PNG } from 'pngjs';
 import fs from 'fs';
 import path from 'path';
 
-const BASE = process.env.BASE_URL || 'http://localhost:4321/Personal_Projects.github.io';
+const BASE = process.env.BASE_URL || 'http://localhost:4321';
 const OUT = 'reports/palette-audit';
 const THRESH = 25;   // max Euclidean RGB distance to count as a palette color
 const STEP = 2;      // sample every Nth pixel per dimension (4x downsample at 2)

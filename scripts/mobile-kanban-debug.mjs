@@ -1,6 +1,6 @@
 import { chromium, devices } from 'playwright';
 
-const baseUrl = 'http://localhost:4321/Personal_Projects.github.io/projects/';
+const baseUrl = 'http://localhost:4321/projects/';
 
 const viewports = [
   { name: 'iphone-se', width: 375, height: 667 },

@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, '..', 'reports', 'mobile-screenshots');
 mkdirSync(outDir, { recursive: true });
-const baseUrl = 'http://localhost:4321/Personal_Projects.github.io/projects/';
+const baseUrl = 'http://localhost:4321/projects/';
 
 async function run() {
   const browser = await chromium.launch();

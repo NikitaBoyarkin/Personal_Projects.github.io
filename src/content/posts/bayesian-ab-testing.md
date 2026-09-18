@@ -34,7 +34,7 @@ draft: false
 
 Мы пробовали sequential testing с границами О’Брайена–Флеминга. Это помогает, но математика непрозрачна для продакт-менеджеров: «почему сейчас p < 0.05, а остановить нельзя?» — объяснить трудно.
 
-<iframe src="/Personal_Projects.github.io/demos/bayesian/index.html" title="Peeking у p-value vs байесовский posterior: двигайте размер выборки, сравните, как ведёт себя каждая метрика" height="460" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
+<iframe src="/demos/bayesian/index.html" title="Peeking у p-value vs байесовский posterior: двигайте размер выборки, сравните, как ведёт себя каждая метрика" height="460" loading="lazy" style="width:100%;border:0;border-radius:10px"></iframe>
 
 ## Байесовская альтернатива
 
