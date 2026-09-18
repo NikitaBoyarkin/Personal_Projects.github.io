@@ -90,6 +90,17 @@ const labels = {
     color: var(--text-muted);
     line-height: 1.7;
     margin: 0;
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+  /* Each step is a single paragraph introduced by a label chip, so it starts a
+     section and takes no first-line indent — only the justified right edge. */
+  @media (max-width: 640px) {
+    .case-step p {
+      text-align: left;
+    }
   }
   .case-metrics {
     display: grid;
