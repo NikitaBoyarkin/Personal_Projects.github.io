@@ -21,7 +21,9 @@
     "cv:watch": "bun run --watch scripts/generate-cv-pdf.mjs",
     "sync:gh": "bun run scripts/sync-github-projects.mjs",
     "sync:gh:apply": "bun run scripts/sync-github-projects.mjs --apply",
-    "sync:gh:candidates": "bun run scripts/sync-github-projects.mjs --candidates"
+    "sync:gh:candidates": "bun run scripts/sync-github-projects.mjs --candidates",
+    "audit:content": "bun run scripts/content-drift-audit.mjs",
+    "audit:content:snapshot": "bun run scripts/content-drift-audit.mjs --snapshot"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
