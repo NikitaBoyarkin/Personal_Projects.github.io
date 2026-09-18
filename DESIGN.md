@@ -237,6 +237,9 @@ The cyberpunk theme keeps the dark theme's accent so accent-tint recipes (badges
 - Base text is the `sans` scale; code uses the mono stack.
 - Display headings (hero name, page titles) use the `--font-display` serif stack for editorial contrast against Inter. The stack is system-native to avoid an extra font download and Cyrillic gaps in pilot; revisit with a hosted face if needed.
 - Headings use weight contrast and tight letter-spacing rather than size alone; the hero name is the most extreme of both.
+- Project and post prose is justified (`text-align: justify`) with automatic hyphenation (`hyphens: auto`) so the even right edge does not open word gaps.
+- Paragraphs separate by a first-line indent (`text-indent: 1.5em`) with only a tight vertical gap, not by extra air; the indent drops after a heading, at the start of a section, and inside lists and quotes.
+- Justification is turned off below 640px — in a narrow column it produces rivers and uneven spacing.
 
 ## Layout
 

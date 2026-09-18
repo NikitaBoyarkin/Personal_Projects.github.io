@@ -272,7 +272,37 @@ button.blog-card-tag:hover {
   font-size: 1.05rem;
   color: var(--text-muted);
   line-height: 1.7;
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-3);
+  text-align: justify;
+  text-justify: inter-word;
+  text-indent: 1.5em;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* No first-line indent after a heading, at the very start of the body, or
+   inside lists/quotes — the classic «красная строка» convention. */
+.post-body > p:first-of-type,
+.post-content h1 + p,
+.post-content h2 + p,
+.post-content h3 + p,
+.post-content h4 + p,
+.post-content li p,
+.post-content blockquote p {
+  text-indent: 0;
+}
+
+.post-content li p,
+.post-content blockquote p {
+  text-align: left;
+}
+
+/* Justified text needs a wide-enough column: on narrow screens the gaps
+   between words outweigh the even right edge, so fall back to ragged right. */
+@media (max-width: 640px) {
+  .post-content p {
+    text-align: left;
+  }
 }
 
 .post-content a {

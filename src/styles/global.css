@@ -1703,8 +1703,38 @@ footer p {
 }
 
 #project-content p {
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   color: var(--text-muted);
+  text-align: justify;
+  text-justify: inter-word;
+  text-indent: 1.5em;
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+/* No first-line indent after a heading, at the very start of the body, or
+   inside lists/quotes — the classic «красная строка» convention. */
+#project-content > p:first-of-type,
+#project-content h1 + p,
+#project-content h2 + p,
+#project-content h3 + p,
+#project-content h4 + p,
+#project-content li p,
+#project-content blockquote p {
+  text-indent: 0;
+}
+
+#project-content li p,
+#project-content blockquote p {
+  text-align: left;
+}
+
+/* Justified text needs a wide-enough column: on narrow screens the gaps
+   between words outweigh the even right edge, so fall back to ragged right. */
+@media (max-width: 640px) {
+  #project-content p {
+    text-align: left;
+  }
 }
 
 #project-content ul,
