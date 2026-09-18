@@ -26,6 +26,7 @@
 | 18 | AskMe (главная) | «Спросить» (открывает панель) | `ask_me_open` | — (панель) |
 | 19 | SearchBox (header) | «Поиск» (открывает панель) | `search_open` | — (панель) |
 | 20 | ProjectCard | «Смотреть» / «Demo» / «GitHub» | `project_view_<slug>` / `project_demo_<slug>` / `project_github_<slug>` | внутренние + внешние |
+| 21 | HeadlineCases (главная, PRD v6 S2.6) | 3 кейса + сжатый список 14 | `headline_case_<slug>` / `headline_demo_<slug>` / `headline_github_<slug>` / `headline_all_projects` / `more_project_<slug>` | внутренние проекты + внешние артефакты |
 
 ## Гэпы, найденные аудитом
 

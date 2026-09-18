@@ -5,6 +5,7 @@ import HeroCta from '../../components/HeroCta.astro';
 import CareerSnapshot from '../../components/CareerSnapshot.astro';
 import ReadingBlock from '../../components/ReadingBlock.astro';
 import MaterialStrip from '../../components/MaterialStrip.astro';
+import HeadlineCases from '../../components/HeadlineCases.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../lib/path';
 
@@ -133,7 +134,10 @@ const jsonLd = {
     </div>
   </section>
 
-  <!-- EDITORIAL TOP — latest writing (with dates) + project breadth -->
+  <!-- HEADLINE PROOF — three deep case studies + compressed list (PRD v6 S2.6) -->
+  <HeadlineCases lang="en" />
+
+  <!-- EDITORIAL TOP — latest writing (with dates) -->
   <MaterialStrip lang="en" />
 
   <!-- BENTO BOTTOM -->
