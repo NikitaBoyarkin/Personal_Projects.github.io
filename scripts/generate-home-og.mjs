@@ -1,10 +1,12 @@
 // Homepage branded OG banner generator.
-// Renders a 1200x630 branded SVG for the portfolio homepage and converts it
-// to PNG via rsvg-convert into public/images/og/portfolio-banner.png.
+// Renders a 1200x630 branded SVG (hexagon-clipped portrait + retention
+// step curve) and converts it to PNG via rsvg-convert into
+// public/images/og/portfolio-banner-v2.png.
+// Palette: #1400c3 60% · #fe4e02 30% · #f8f2da 10%.
 // Run: bun run og:home
 // Not wired into the build — run manually; commit the PNG.
 
-import { writeFileSync, unlinkSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, readFileSync, unlinkSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
@@ -12,58 +14,116 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const OUT_DIR = join(ROOT, 'public/images/og');
-const OUT = join(OUT_DIR, 'portfolio-banner.png');
+const OUT = join(OUT_DIR, 'portfolio-banner-v2.png');
+const PORTRAIT = join(ROOT, 'public/images/00_profile.jpg');
 
 if (!existsSync(OUT_DIR)) mkdirSync(OUT_DIR, { recursive: true });
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-const SKILLS = ['SQL', 'Python', 'A/B Testing', 'Retention', 'Segmentation'];
+// Palette
+const BLUE = '#1400c3';
+const ORANGE = '#fe4e02';
+const CREAM = '#f8f2da';
 
-// Skill pills — laid out left-to-right from x=80.
-let pillX = 80;
-const pillY = 470;
-const pillH = 44;
-const pillGap = 16;
-const pills = SKILLS.map((s) => {
-  const w = Math.round(s.length * 13 + 36); // ~13px/char at 22px font + padding
-  const pill = `<rect x="${pillX}" y="${pillY}" width="${w}" height="${pillH}" rx="22" fill="#234044"/>
-  <text x="${pillX + w / 2}" y="${pillY + 29}" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="22" fill="#e4e4e7" text-anchor="middle">${esc(s)}</text>`;
-  pillX += w + pillGap;
-  return pill;
-}).join('\n  ');
+// rsvg uses fontconfig, which does not know `-apple-system`; name a font that
+// actually exists so the banner does not silently fall back to a default sans.
+const FONT = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+// Portrait inlined as a data URI so rsvg-convert resolves it from any cwd.
+const portraitData = `data:image/jpeg;base64,${readFileSync(PORTRAIT).toString('base64')}`;
+
+// Cohort retention step curve with axis labels — reads as a real retention
+// chart on larger previews. Every label is drawn in cream (#f8f2da).
+const STEP = (() => {
+  const x0 = 150;
+  const x1 = 600;
+  const yTop = 408;
+  const yBottom = 518;
+  const values = [100, 68, 52, 43, 38, 35, 33];
+  const seg = (x1 - x0) / (values.length - 1);
+  const y = (v) => yBottom - (v / 100) * (yBottom - yTop);
+
+  let d = `M${x0},${y(values[0]).toFixed(1)}`;
+  for (let i = 1; i < values.length; i++) {
+    d += ` H${(x0 + i * seg).toFixed(1)} V${y(values[i]).toFixed(1)}`;
+  }
+  d += ` H${x1}`;
+
+  const grid = [100, 75, 50, 25, 0]
+    .map((v) => {
+      const gy = y(v);
+      return `<line x1="${x0}" y1="${gy.toFixed(1)}" x2="${x1}" y2="${gy.toFixed(1)}" stroke="${CREAM}" stroke-width="1" opacity="0.14"/>
+  <text x="138" y="${(gy + 6).toFixed(1)}" font-family="${FONT}" font-size="19" font-weight="500" fill="${CREAM}" text-anchor="end">${v}%</text>`;
+    })
+    .join('\n  ');
+
+  const xLabels = values
+    .map(
+      (_, i) =>
+        `<text x="${(x0 + i * seg).toFixed(1)}" y="549" font-family="${FONT}" font-size="19" font-weight="500" fill="${CREAM}" text-anchor="middle">W${i}</text>`,
+    )
+    .join('\n  ');
+
+  const nodes = values
+    .slice(1)
+    .map(
+      (v, i) =>
+        `<circle cx="${(x0 + (i + 1) * seg).toFixed(1)}" cy="${y(v).toFixed(1)}" r="5.5" fill="${CREAM}"/>`,
+    )
+    .join('\n  ');
+
+  return `${grid}
+  <path d="${d} V${yBottom} H${x0} Z" fill="${ORANGE}" opacity="0.12"/>
+  <path d="${d}" fill="none" stroke="${ORANGE}" stroke-width="4" stroke-linejoin="round"/>
+  ${nodes}
+  ${xLabels}`;
+})();
+
+// Pointy-top hexagons centred at (975,305): cream tile R=232, photo clip R=225,
+// orange ring R=228.5 (stroke 7 — exactly covers the 225..232 band).
+const HEX_TILE = '975,73 1175.9,189 1175.9,421 975,537 774.1,421 774.1,189';
+const HEX_PHOTO = '975,80 1169.9,192.5 1169.9,417.5 975,530 780.1,417.5 780.1,192.5';
+const HEX_RING = '975,76.5 1172.9,190.8 1172.9,419.3 975,533.5 777.1,419.3 777.1,190.8';
+
+// The portrait box is deliberately oversized (390x600) so the source photo's
+// hard-cut shoulder edge is pushed below the hexagon and never shows.
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="630" viewBox="0 0 1200 630" text-rendering="geometricPrecision">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f2a2b"/>
-      <stop offset="1" stop-color="#1a3435"/>
-    </linearGradient>
+    <clipPath id="hexPhoto">
+      <polygon points="${HEX_PHOTO}"/>
+    </clipPath>
   </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <rect x="0" y="0" width="1200" height="6" fill="#ff6643"/>
+
+  <rect width="1200" height="630" fill="${BLUE}"/>
+  <rect x="0" y="0" width="1200" height="6" fill="${ORANGE}"/>
 
   <!-- decorative hexagons (subtle) -->
-  <g fill="none" stroke="#234044" stroke-width="2">
-    <polygon points="1050,120 1093,145 1093,195 1050,220 1007,195 1007,145" opacity="0.6"/>
-    <polygon points="1120,300 1163,325 1163,375 1120,400 1077,375 1077,325" opacity="0.4"/>
-    <polygon points="1000,480 1043,505 1043,555 1000,580 957,555 957,505" opacity="0.3"/>
+  <g fill="none" stroke="${CREAM}" stroke-width="2" opacity="0.12">
+    <polygon points="620,110 663,135 663,185 620,210 577,185 577,135"/>
+    <polygon points="700,470 743,495 743,545 700,570 657,545 657,495"/>
   </g>
 
-  <!-- hexagon logo (matches nav logo geometry, scaled 1.6x) -->
-  <g transform="translate(80,40) scale(1.6)">
-    <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="#ff8569" stroke-width="4"/>
-    <text x="50" y="61" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#e4e4e7" text-anchor="middle">NB</text>
+  <!-- portrait: cream tile + clipped photo + orange ring -->
+  <polygon points="${HEX_TILE}" fill="${CREAM}"/>
+  <image x="830" y="20" width="390" height="600" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexPhoto)" xlink:href="${portraitData}" href="${portraitData}"/>
+  <polygon points="${HEX_RING}" fill="none" stroke="${ORANGE}" stroke-width="7"/>
+
+  <!-- hexagon logo (matches nav logo geometry) -->
+  <g transform="translate(80,40) scale(1.4)">
+    <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="${ORANGE}" stroke-width="4"/>
+    <text x="50" y="61" font-family="${FONT}" font-size="30" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
   </g>
 
-  <text x="80" y="250" font-family="-apple-system, 'SF Pro Display', Helvetica, Arial, sans-serif" font-size="76" font-weight="700" fill="#e4e4e7">Nikita Boyarkin</text>
-  <text x="80" y="330" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="44" font-weight="600" fill="#ff8569">Data Analyst / Product Analyst</text>
-  <text x="80" y="400" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="30" fill="#a1a1aa">Данные → решения. От гипотезы до ship-gate.</text>
+  <text x="80" y="262" font-family="${FONT}" font-size="74" font-weight="700" letter-spacing="-1.5" fill="${CREAM}">${esc('Nikita Boyarkin')}</text>
+  <text x="80" y="330" font-family="${FONT}" font-size="38" font-weight="600" fill="${ORANGE}">${esc('Product / Data Analyst')}</text>
+  <text x="80" y="382" font-family="${FONT}" font-size="27" font-weight="500" fill="${CREAM}">${esc('Данные → решения. От гипотезы до ship-gate.')}</text>
 
-  ${pills}
+  <!-- cohort retention step curve with axis labels -->
+  ${STEP}
 
-  <rect x="80" y="545" width="120" height="3" fill="#ff6643"/>
-  <text x="80" y="590" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="24" fill="#71717a">nikitaboyarkin.github.io</text>
+  <rect x="80" y="566" width="120" height="3" fill="${ORANGE}"/>
+  <text x="80" y="606" font-family="${FONT}" font-size="24" font-weight="500" fill="${CREAM}">nikitaboyarkin.github.io</text>
 </svg>`;
 
 const svgPath = join(tmpdir(), 'og-home.svg');

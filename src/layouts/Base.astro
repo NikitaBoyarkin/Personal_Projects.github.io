@@ -14,6 +14,7 @@ interface Props {
   keywords?: string[];
   ogType?: 'website' | 'article';
   ogImage?: string;
+  ogImageAlt?: string;
   canonical?: string;
   relPrev?: string;
   relNext?: string;
@@ -28,7 +29,8 @@ const {
   description = 'Nikita Boyarkin — Data Analyst / Product Analyst portfolio. SQL, Python, Visualization, A/B Testing.',
   keywords = [],
   ogType = 'website',
-  ogImage = '/images/og/portfolio-banner.png',
+  ogImage = '/images/og/portfolio-banner-v2.png',
+  ogImageAlt = 'Nikita Boyarkin — Product / Data Analyst. Portfolio.',
   canonical,
   relPrev,
   relNext,
@@ -120,11 +122,15 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
     }
     <meta id="theme-color" name="theme-color" content="#0f2a2b" />
 
+    <meta property="og:site_name" content="Nikita Boyarkin" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={pageUrl} />
     <meta property="og:image" content={fullOgImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
