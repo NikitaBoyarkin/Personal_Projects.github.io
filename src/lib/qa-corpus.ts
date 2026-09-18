@@ -266,18 +266,24 @@ export const QA_CORPUS: QAPair[] = [
   },
   {
     id: "ml",
-    keywords: ["ml", "машин", "machine", "learning", "обучение", "scikit", "нейро", "deep", "модел", "пайплайн", "pipeline", "preprocess", "импутац", "imput", "сплит", "split", "скейл", "scale", "кодирован", "encode"],
+    keywords: ["ml", "машин", "machine", "learning", "обучение", "scikit", "модел", "нейро", "deep", "прогноз", "классификац"],
     ru: {
       question: "Есть ли ML в твоей работе?",
       answer:
-        "Базово — да: в портфолио есть ML-проект — preprocessing-пайплайн на scikit-learn (ColumnTransformer: импутация пропусков, кодирование категорий, детерминированный сплит 80/20, масштабирование). Я не позиционируюсь как ML-инженер: сильная сторона — SQL, статистика и продуктовая аналитика, а ML-инструменты подключаю там, где они решают задачу.",
-      links: [{ label: "ML-проект", href: "projects/ml/" }],
+        "Да, прикладной ML и causal inference: в портфолио — модель оттока без утечек (as-of признаки, хронологический сплит train/val/test, recall@top-10% 0.53, lift 3.07×) и CUPED/uplift для экспериментов (стандартная ошибка −26% при том же ATE). Я не позиционируюсь как ML-инженер: сильная сторона — SQL, статистика и продуктовая аналитика, а ML-инструменты подключаю там, где они решают задачу.",
+      links: [
+        { label: "Churn-модель", href: "projects/churn/" },
+        { label: "Causal / Uplift", href: "projects/causal/" },
+      ],
     },
     en: {
       question: "Do you do ML?",
       answer:
-        "Baseline yes: there's an ML project in my portfolio — a scikit-learn preprocessing pipeline (ColumnTransformer: missing-data imputation, categorical encoding, deterministic 80/20 split, feature scaling). I don't position myself as an ML engineer — my strength is SQL, statistics and product analytics, and I bring ML tools in where they solve the problem.",
-      links: [{ label: "ML project", href: "en/projects/ml/" }],
+        "Yes — applied ML and causal inference: the portfolio has a leakage-free churn model (as-of features, chronological train/val/test split, recall@top-10% 0.53, lift 3.07x) and CUPED/uplift for experiments (standard error −26% at the same ATE). I don't position myself as an ML engineer — my strength is SQL, statistics and product analytics, and I bring ML tools in where they solve the problem.",
+      links: [
+        { label: "Churn model", href: "en/projects/churn/" },
+        { label: "Causal / Uplift", href: "en/projects/causal/" },
+      ],
     },
   },
   {

@@ -1,0 +1,89 @@
+---
+title: Churn Prediction — Leakage-Free Retention Model
+description: Leakage-free churn model for a subscription product — as-of snapshot features, a future 30-day inactivity label, a chronological train/val/test split, and a business-first metric (recall@top-decile, lift@top-decile) with native TreeSHAP.
+track: analytics
+hero: images/churn.svg
+impact:
+  - Chronological snapshot split (train/val/test) — no future activity leaks into training
+  - Churn label = a future 30-day inactivity window for recently active users only
+  - Decision metric recall@top-10% = 0.53, lift@top-10% = 3.07x
+  - LightGBM Brier 0.068 vs 0.099 for the balanced logistic baseline
+tools:
+  - Python
+  - LightGBM
+  - scikit-learn
+  - pandas / NumPy
+  - matplotlib
+  - pytest
+  - uv
+github: https://github.com/NikitaBoyarkin/churn-prediction
+updated: 2026-09-18
+date: 2026-09-18
+related:
+  - /posts/churn-uplift-discount/
+caseStudy:
+  problem: "Модели оттока часто оценивают не так, как их используют: случайный train/test-сплит подкладывает будущую активность пользователя в обучение, а метрика (AUC) не отвечает на вопрос, ради которого модель строят — кого из топ-риска стоит трогать. Нужна модель, где схема оценки совпадает с продом."
+  approach: "Признаки считаются as-of на дату снимка: recency, активность за 7/14/30 дней, tenure, недавний тренд, средние сессии и категориальные channel/device/country/plan. Метка без утечки: отток = нет активности в окне [snapshot, snapshot+30d] у пользователя, активного предыдущие 30 дней. Сплит хронологический (train 2024-01-15 → val 2024-02-15 → test 2024-03-15) — случайный сплит был бы скрытой утечкой. Решение принимается по recall@top-decile и lift@top-decile, а не по AUC; SHAP — через нативный TreeSHAP LightGBM без пакета shap."
+  result: "На тестовом снимке LightGBM и логистический бейзлайн почти совпадают по AUC (0.904 против 0.917), но LightGBM заметно лучше калиброван (Brier 0.068 против 0.099). В топ-10% самых рискующих модель ловит 53% реальных отточников — lift 3.07x к случайному отбору. Честный вывод: сильный recency-признак делает lift скромным, ценность проекта — в схеме без утечек и в бизнес-метрике."
+  metrics:
+    - label: "Recall@top-10%"
+      value: "0.53"
+    - label: "Lift@top-10%"
+      value: "3.07×"
+    - label: "ROC-AUC"
+      value: "0.904"
+    - label: "Brier"
+      value: "0.068"
+---
+
+# Churn Prediction — Leakage-Free Retention Model
+
+## Business Context
+
+Модель оттока для подписочного продукта. Ценность проекта — не алгоритм, а **дисциплина**: признаки считаются «as-of» на дату снимка, целевая переменная — будущее окно неактивности, а разбиение хронологическое, поэтому модель оценивается так, как её использовали бы в проде. Это тот же принцип, что и в A/B-анализе: «нет утечки из будущего в моделируемый момент».
+
+## Data & Method
+
+Данные синтетические и детерминированные (seed = 42): 12 000 пользователей регистрируются с июня 2023 по январь 2024, канал задаёт tenure (экспоненциальное время жизни), тариф — вероятность дневной активности; активность слегка затухает к оттоку, доля оттока ~16% на снимок.
+
+- **Признаки as-of** — recency, активность за 7/14/30 дней, tenure, недавний тренд, средние сессии + категориальные `channel` / `device` / `country` / `plan`.
+- **Метка без утечки** — отток = нет активности в `[snapshot, snapshot+30d]` у пользователя, активного предыдущие 30 дней. Давно «мёртвые» пользователи исключены, а не помечены: предсказывать на призраках — не задача.
+- **Хронологический сплит** — train (2024-01-15) → val (2024-02-15) → test (2024-03-15). Случайный сплит подложил бы будущую активность пользователя в обучение и его прошлое в тест — это скрытая утечка, и ради её устранения проект и существует.
+- **Метрика бизнеса вперёд** — ROC-AUC и PR-AUC считаются, но решение принимают по **recall@top-decile** и **lift@top-decile**: если retention работает с топ-10% самых рискующих, сколько реальных отточников мы ловим.
+- **SHAP** — нативный `predict_proba(pred_contrib=True)` LightGBM (TreeSHAP без зависимости от пакета `shap`). Доминирует `recency_days`.
+- **Бейзлайн** — сбалансированная логистическая регрессия.
+- **Тесты** — 5 pytest: баланс, отсутствие утечек, корректность recency, «модель бьёт бейзлайн».
+
+| Метрика (test snapshot) | LightGBM | LogReg (balanced) |
+|---|---|---|
+| ROC-AUC | 0.904 | 0.917 |
+| PR-AUC | 0.809 | 0.825 |
+| Recall@top-10% | 0.53 | 0.54 |
+| Lift@top-10% | 3.07× | 3.08× |
+| Brier (калибровка) | **0.068** | 0.099 |
+
+## Run
+
+```bash
+# Python >=3.10. Deps: pandas, numpy, scikit-learn, lightgbm, matplotlib.
+uv run --with pandas --with numpy python data/generate_data.py
+uv run --with pandas --with numpy --with scikit-learn --with lightgbm --with matplotlib python run.py
+uv run --with pandas --with numpy --with scikit-learn --with lightgbm --with matplotlib --with pytest pytest -q
+```
+
+Результаты складываются в `reports/`: `metrics.json` + `evaluation.png` (ROC, PR, SHAP bar).
+
+## Insight
+
+AUC почти ничья (синтетические признаки почти линейны, поэтому логистика конкурентна), но LightGBM **значительно лучше калиброван** (Brier 0.068 против 0.099) — а это важно, когда скор управляет retention-бюджетом. Честный вывод: сильный recency-признак делает lift скромным; ценность проекта — в схеме без утечек и в бизнес-метрике, а не в «трофее» GBM.
+
+## Impact
+
+- **Хронологический сплит по снимкам** — нет утечки будущего в обучение.
+- **Метка из будущего окна** — не предсказываем на давно ушедших пользователях.
+- **Бизнес-метрика первой** — recall@top-10% 0.53, lift@top-10% 3.07×.
+- **Калибровка** — Brier 0.068 (LightGBM) против 0.099 (LogReg): скор пригоден для решений о retention-спенде.
+
+## Documentation
+
+- [GitHub → churn-prediction](https://github.com/NikitaBoyarkin/churn-prediction)

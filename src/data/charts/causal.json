@@ -1,0 +1,81 @@
+{
+  "slug": "causal",
+  "source": "github.com/NikitaBoyarkin/causal-uplift: metrics from run.py (reports/metrics.json) on the seeded synthetic randomized experiment (20,000 users, seed=42); regenerate with `uv run --with pandas --with numpy --with scikit-learn --with lightgbm --with matplotlib python run.py`",
+  "charts": [
+    {
+      "id": "cuped-variance-reduction",
+      "type": "bar",
+      "title": {
+        "ru": "CUPED: та же оценка ATE, более узкий интервал",
+        "en": "CUPED: same ATE, narrower interval"
+      },
+      "description": {
+        "ru": "Точечная оценка ATE и ширина 95% доверительного интервала для наивной оценки и CUPED на синтетическом рандомизированном эксперименте (20 000 пользователей, seed=42).",
+        "en": "ATE point estimate and 95% CI width for the naive estimator vs CUPED on a synthetic randomized experiment (20,000 users, seed=42)."
+      },
+      "xLabel": {
+        "ru": "Метод",
+        "en": "Method"
+      },
+      "yLabel": {
+        "ru": "Значение",
+        "en": "Value"
+      },
+      "data": {
+        "categories": ["Naive", "CUPED"],
+        "series": [
+          { "name": "ATE", "values": [0.27, 0.276] },
+          { "name": "95% CI width", "values": [0.076, 0.057] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Точечная оценка не меняется: ATE 0.270 → 0.276 (в пределах шума) — CUPED снижает дисперсию, а не эффект.",
+          "en": "The point estimate is unchanged: ATE 0.270 -> 0.276 (within noise) — CUPED reduces variance, not the effect."
+        },
+        {
+          "ru": "Ширина 95% CI падает с 0.076 до 0.057 (в 1.35×): эксперименту нужно ~5.6k пользователей на руку вместо 10k при той же мощности.",
+          "en": "The 95% CI width falls from 0.076 to 0.057 (1.35x): the experiment needs ~5.6k users per arm instead of 10k at the same power."
+        }
+      ]
+    },
+    {
+      "id": "uplift-segment-recovery",
+      "type": "bar",
+      "title": {
+        "ru": "Восстановление эффекта по сегментам",
+        "en": "Segment-level uplift recovery"
+      },
+      "description": {
+        "ru": "Истинный бинарный uplift против предсказанного T- и S-лернерами по сегментам. Латентная τ — 0.60 (new) и 0.08 (returning); сигмоида при высоком базовом уровне конверсии сжимает эффект до ~0.11 / 0.01.",
+        "en": "True binary uplift vs the T- and S-learner predictions per segment. The latent tau is 0.60 (new) and 0.08 (returning); the sigmoid at a high baseline conversion damps the effect to ~0.11 / 0.01."
+      },
+      "xLabel": {
+        "ru": "Сегмент",
+        "en": "Segment"
+      },
+      "yLabel": {
+        "ru": "Uplift",
+        "en": "Uplift"
+      },
+      "data": {
+        "categories": ["new", "returning"],
+        "series": [
+          { "name": "Truth", "values": [0.11, 0.01] },
+          { "name": "T-learner", "values": [0.126, 0.018] },
+          { "name": "S-learner", "values": [0.12, 0.019] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "Модель восстанавливает, что «новые» реагируют ~10× сильнее «возвращающихся» (0.110 против 0.010) — это сигнал для таргетинга скидок.",
+          "en": "The model recovers that new users respond ~10x more than returning users (0.110 vs 0.010) — the signal a discount campaign acts on."
+        },
+        {
+          "ru": "Предсказание близко к истине в обоих сегментах: 0.120 (S-learner) против 0.110 (truth) для new.",
+          "en": "Predictions are close to ground truth in both segments: 0.120 (S-learner) vs 0.110 (truth) for new."
+        }
+      ]
+    }
+  ]
+}

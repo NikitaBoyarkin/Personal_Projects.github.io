@@ -1,0 +1,43 @@
+{
+  "slug": "churn",
+  "source": "github.com/NikitaBoyarkin/churn-prediction: metrics from run.py (reports/metrics.json) on the seeded synthetic dataset (12,000 users, seed=42); regenerate with `uv run --with pandas --with numpy --with scikit-learn --with lightgbm --with matplotlib python run.py`",
+  "charts": [
+    {
+      "id": "model-vs-baseline",
+      "type": "bar",
+      "title": {
+        "ru": "LightGBM против логистического бейзлайна",
+        "en": "LightGBM vs the logistic baseline"
+      },
+      "description": {
+        "ru": "ROC-AUC, PR-AUC, recall@top-10% и Brier на тестовом снимке (2024-03-15). ROC-AUC и PR-AUC близки; разница проявляется в калибровке — главной метрике, когда скор управляет retention-бюджетом.",
+        "en": "ROC-AUC, PR-AUC, recall@top-10% and Brier on the test snapshot (2024-03-15). ROC-AUC and PR-AUC are close; the difference shows in calibration — the metric that matters when the score drives retention spend."
+      },
+      "xLabel": {
+        "ru": "Метрика",
+        "en": "Metric"
+      },
+      "yLabel": {
+        "ru": "Значение",
+        "en": "Value"
+      },
+      "data": {
+        "categories": ["ROC-AUC", "PR-AUC", "Recall@top-10%", "Brier"],
+        "series": [
+          { "name": "LightGBM", "values": [0.904, 0.809, 0.53, 0.068] },
+          { "name": "LogReg (balanced)", "values": [0.917, 0.825, 0.54, 0.099] }
+        ]
+      },
+      "conclusions": [
+        {
+          "ru": "ROC-AUC почти ничья (0.904 против 0.917), но по калибровке LightGBM заметно лучше: Brier 0.068 против 0.099.",
+          "en": "ROC-AUC is a near-tie (0.904 vs 0.917), but LightGBM is much better calibrated: Brier 0.068 vs 0.099."
+        },
+        {
+          "ru": "В топ-10% самых рискующих модель ловит 53% реальных отточников — это lift 3.07× к случайному отбору (у бейзлайна 3.08× при худшей калибровке).",
+          "en": "Within the top 10% riskiest users the model catches 53% of real churners — a 3.07x lift over random (the baseline gets 3.08x with worse calibration)."
+        }
+      ]
+    }
+  ]
+}
