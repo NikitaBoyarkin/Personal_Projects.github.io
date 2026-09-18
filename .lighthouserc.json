@@ -4,11 +4,11 @@
       "startServerCommand": "bun run preview",
       "startServerReadyPattern": "localhost",
       "url": [
-        "http://localhost:4321/Personal_Projects.github.io/",
-        "http://localhost:4321/Personal_Projects.github.io/en/",
-        "http://localhost:4321/Personal_Projects.github.io/writing/",
-        "http://localhost:4321/Personal_Projects.github.io/topics/",
-        "http://localhost:4321/Personal_Projects.github.io/projects/volta/"
+        "http://localhost:4321/",
+        "http://localhost:4321/en/",
+        "http://localhost:4321/writing/",
+        "http://localhost:4321/topics/",
+        "http://localhost:4321/projects/volta/"
       ],
       "numberOfRuns": 1,
       "settings": {
