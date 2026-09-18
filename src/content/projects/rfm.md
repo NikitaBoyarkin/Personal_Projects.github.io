@@ -1,6 +1,6 @@
 ---
 title: RFM Analysis of Bank Clients
-description: RFM analysis of bank clients to segment users by Recency, Frequency, and Monetary metrics. Surfaced key customer groups, optimized marketing campaigns, and improved retention efficiency.
+description: "Разбил клиентскую базу банка на 4 RFM-сегмента и показал, что малая доля high-value приносит основную выручку. Маркетинг перешёл от массовых рассылок к сегментированным сценариям."
 track: analytics
 hero: images/rfm.svg
 impact:

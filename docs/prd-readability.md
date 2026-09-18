@@ -20,7 +20,9 @@ Three rules apply:
 
 1. **Numbers are frozen.** Every metric token — %, p-value, €, Z, N, pp, K, M — must survive the
    rewrite byte-for-byte in value. A rewrite changes *presentation*, never *content*. The drift audit
-   (§5, Phase 0) enforces this mechanically.
+   (§5, Phase 0) enforces this mechanically. **Exception: the `description:` field (D20) is the subject
+   of Phase 1 and is excluded from the frozen set**; bodies, `impact`, `caseStudy`, `faq`, titles and
+   `excerpt` remain frozen.
 2. **Every task carries an acceptance criterion that fails when the task is not done.** Where a
    criterion cannot be checked mechanically, it says so explicitly and is marked manual.
 3. **Evidence classes are marked.** `[V]` verified by reading the file. `[I]` inferred from verified
@@ -177,6 +179,7 @@ not new work — but they live in the files this PRD touches, so they are fixed 
 | D17 | **PRD path `docs/prd-readability.md`**, matching the lowercase `prd-*` family. | Consistent with `docs/prd.md` … `docs/prd-v6.md` |
 | D18 | **Drift audit is a standalone script, not wired into `make check`.** `scripts/content-drift-audit.mjs` + `bun run audit:content`; baseline committed; run manually at Phase 0 and after every phase. | Wiring it into `make check` would fail CI on every legitimate content PR; the audit's job is to gate a rewrite, not every edit |
 | D19 | **After execution, document the skeleton convention in `CLAUDE.md`** (and `CONTEXT.md` if terminology is affected). | A convention nobody can look up will drift back |
+| D20 | **The drift audit excludes the `description:` field.** Bodies, `impact`, `caseStudy`, `faq`, titles and `excerpt` stay frozen. | Phase 1 rewrites descriptions to D12's result-first 120–200-char spec, which necessarily changes which narrative numbers appear there. Freezing the field would forbid the very edit D12 mandates. Consistency between a description's numbers and the frozen body numbers is checked manually |
 
 ---
 
@@ -187,15 +190,16 @@ not new work — but they live in the files this PRD touches, so they are fixed 
 #### S0.1 — Write `scripts/content-drift-audit.mjs`
 
 Standalone Node ESM script (repo convention: `scripts/*.mjs`). Extracts every numeric token from
-`src/content/**/*.md` (fenced code blocks stripped, thousands separators and intra-number spaces
-normalized), and compares against a committed baseline.
+`src/content/**/*.md` (fenced code blocks stripped, `description:` excluded per D20, thousands
+separators and intra-number spaces normalized), and compares against a committed baseline.
 
 - `bun run audit:content:snapshot` → writes `docs/content-baseline.json`
 - `bun run audit:content` → diffs current content against the baseline; **exit 1** on any added or
   removed numeric token, printing the per-file deltas
 
 **Acceptance:** script exists; `bun run audit:content:snapshot` produces `docs/content-baseline.json`;
-a second `bun run audit:content` exits 0.
+a second `bun run audit:content` exits 0; a changed body number flips it to exit 1 while a changed
+`description` does not.
 
 #### S0.2 — Capture the baseline
 

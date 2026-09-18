@@ -1,6 +1,6 @@
 ---
 title: Volta Neobank — Product Analytics
-description: "End-to-end neobank analytics narrative — 17 projects across 12 analytical domains + Market & Jobs: funnel, A/B, retention, segmentation, churn, RFM, CLV, attribution, anomaly, spend, NPS, JTBD, unit economics, upsell, referral. Synthetic fintech data, reproducible seeded pipelines, ship-gated statistical methodology."
+description: "Fixed a neobank's onboarding bottleneck with an A/B test: +6.24pp KYC conversion, €716K/year. A 17-project case on reproducible synthetic data."
 track: experiments
 hero: images/volta.svg
 impact:

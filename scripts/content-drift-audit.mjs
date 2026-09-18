@@ -15,6 +15,11 @@
  * decimal points ("6.24"). Fenced code blocks are stripped so code samples are
  * not treated as metrics. Comparison is a per-file multiset diff.
  *
+ * The `description:` field is excluded (decision D20 in docs/prd-readability.md):
+ * Phase 1 rewrites descriptions to a 120-200 char result-first spec, which
+ * necessarily changes which narrative numbers appear there. Everything else —
+ * bodies, `impact`, `caseStudy`, `faq`, titles, `excerpt` — stays frozen.
+ *
  * Known limitation: the numeric regex is deliberately greedy, so false
  * positives (e.g. reformatting "6,24" → "6.24") are possible and expected to be
  * reviewed by a human. Under-capture is the risk that matters, so nothing is
@@ -44,8 +49,22 @@ function stripFencedCode(md) {
   return md.replace(/```[\s\S]*?```/g, ' ');
 }
 
+/**
+ * Remove a key (and any folded/indented continuation) from the leading YAML
+ * frontmatter block, leaving the rest of the file intact.
+ */
+function stripFrontmatterField(md, field) {
+  const block = md.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!block) return md;
+  const fm = block[1];
+  const cleaned = fm.replace(new RegExp(`^${field}:.*(?:\\n[ \\t]+.*)*`, 'm'), '');
+  if (cleaned === fm) return md;
+  return md.replace(block[0], block[0].replace(fm, cleaned));
+}
+
 function numericTokens(md) {
-  const raw = stripFencedCode(md).match(/\d(?:[\d\s.,_]*\d)?/g) || [];
+  const text = stripFrontmatterField(stripFencedCode(md), 'description');
+  const raw = text.match(/\d(?:[\d\s.,_]*\d)?/g) || [];
   return raw.map((token) => token.replace(/[\s,_]/g, '')).filter((token) => /\d/.test(token));
 }
 

@@ -1,6 +1,6 @@
 ---
 title: SQL Analytics Case Study
-description: 25 end-to-end SQL case studies on a synthetic product dataset (~183k events), runnable on DuckDB with one command. Funnel, retention, LTV, streaks, A/B, attribution, sessionization, lifecycle, churn, Pareto, anomaly detection, RFM. Live report published to GitHub Pages.
+description: "25 SQL-кейсов на синтетическом датасете (~183k событий): воронка, retention, LTV, атрибуция, аномалии. Запуск на DuckDB одной командой, живой отчёт на GitHub Pages."
 track: analytics
 hero: images/sql.svg
 impact:
