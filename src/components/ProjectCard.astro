@@ -53,7 +53,7 @@ const i18n = {
   {impactText && <p class="Impact">{i18n.impact}: {impactText}</p>}
 
   <div class="project-actions">
-    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics={`project_view_${slug}`}>{i18n.view} <ArrowMorph /></a>
+    <a class="button" href={withBase(`${linkPrefix}projects/${slug}/`)} style="flex: 1 1 auto; justify-content: center;" data-analytics-project={slug} data-analytics-surface="card">{i18n.view} <ArrowMorph /></a>
     {
       demo && (
         <a

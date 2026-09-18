@@ -85,6 +85,8 @@ const hiddenTags = tags.filter((t) => t.count < 2);
 <span class="visually-hidden" role="status" id="blog-filter-status"></span>
 
 <script>
+  import { track } from "../lib/analytics";
+
   type Post = {
     slug: string;
     href: string;
@@ -187,6 +189,14 @@ const hiddenTags = tags.filter((t) => t.count < 2);
         const n = listEl ? listEl.querySelectorAll('.blog-card').length : 0;
         if (statusEl) statusEl.textContent = statusText(n, 'all');
       }
+
+      if (isFiltered) {
+        track('filter_applied', {
+          tag: activeTag ?? activeCategory,
+          results_count: filtered.length,
+          surface: 'writing',
+        });
+      }
     }
 
     filterTags.forEach((btn) => {
@@ -256,17 +266,7 @@ const hiddenTags = tags.filter((t) => t.count < 2);
       randomBtn.addEventListener('click', () => {
         if (!allPosts.length) return;
         const pick = allPosts[Math.floor(Math.random() * allPosts.length)];
-        const ph = (window as { posthog?: { capture: (n: string, p: Record<string, unknown>) => void } }).posthog;
-        if (ph) {
-          try {
-            ph.capture('random_post_click', {
-              slug: pick.slug,
-              path: window.location.pathname,
-            });
-          } catch {
-            // analytics must never block navigation
-          }
-        }
+        track('random_post_click', { slug: pick.slug, path: window.location.pathname });
         window.location.href = pick.href;
       });
     }

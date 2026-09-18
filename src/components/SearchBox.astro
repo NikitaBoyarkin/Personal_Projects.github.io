@@ -83,6 +83,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
 <script>
   import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
   import { ldWithin } from "../lib/fuzzy";
+  import { track } from "../lib/analytics";
 
   // Same stroke paths as the SSR render (see frontmatter). Morphing the
   // toggle magnifier ↔ close is a pure animation on the custom element.
@@ -149,6 +150,8 @@ const X_D = "M6 6l12 12M6 18L18 6";
     let index: Entry[] | null = null;
     let activeIndex = -1;
     let facet = "all";
+    // One `search_used` / `search_no_results` per open panel (REQ-A08).
+    let searchReported = false;
 
     async function getIndex() {
       if (!index) {
@@ -177,6 +180,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       input.removeAttribute("aria-activedescendant");
       activeIndex = -1;
       setFacet("all");
+      searchReported = false;
       // Return focus to the trigger so keyboard users aren't dropped to <body> —
       // but only if focus was inside this widget (don't steal it from a sibling).
       if (root?.contains(document.activeElement)) toggle.focus();
@@ -314,6 +318,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
       const idx = await getIndex();
       if (!idx) return;
       const q = input.value.trim().toLowerCase();
+      const rawQuery = input.value.trim();
       const tokens = q ? q.split(/\s+/).filter(Boolean) : [];
       let rows: Entry[];
       if (!q) {
@@ -340,6 +345,16 @@ const X_D = "M6 6l12 12M6 18L18 6";
           .map((x) => x.e);
       }
       render(rows, tokens);
+
+      // Emit once per panel session, when the first real query runs (REQ-A08).
+      if (rawQuery && !searchReported) {
+        searchReported = true;
+        track(rows.length > 0 ? "search_used" : "search_no_results", {
+          query: rawQuery.slice(0, 100),
+          results_count: rows.length,
+          locale: lang,
+        });
+      }
     }
 
     input.addEventListener("input", () => {

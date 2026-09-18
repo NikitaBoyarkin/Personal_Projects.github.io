@@ -272,9 +272,6 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
             const next = ORDER[(ORDER.indexOf(cur) + 1) % ORDER.length];
             applyTheme(next);
             persistTheme(next);
-            if (window.posthog) {
-              try { window.posthog.capture('theme_change', { theme: next }); } catch (e) { /* ignore */ }
-            }
           });
         }
 
@@ -344,6 +341,18 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
         });
       })();
 
+    </script>
+
+    <script>
+      // Theme toggle tracking (REQ-A02): the inline script above owns the theme
+      // cycle; this bundled module only emits the event through the shared
+      // analytics module, so no component reads the posthog global.
+      import { track } from '../lib/analytics';
+      document.getElementById('theme-toggle')?.addEventListener('click', () => {
+        track('theme_change', {
+          theme: document.documentElement.getAttribute('data-theme') || 'dark',
+        });
+      });
     </script>
 
     <slot name="scripts" />

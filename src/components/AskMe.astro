@@ -96,6 +96,7 @@ const X_D = "M6 6l12 12M6 18L18 6";
 <script>
   import { defineMorphIcon, type MorphIconElement } from "morphicons/element";
   import { matchPair, normalizeTokens } from "../lib/qa-corpus";
+  import { track } from "../lib/analytics";
 
   defineMorphIcon();
   let askIcon: MorphIconElement | null = null;
@@ -179,14 +180,6 @@ const X_D = "M6 6l12 12M6 18L18 6";
 
     const locale = document.documentElement.lang === "en" ? "en" : "ru";
     let lastQuestion = "";
-
-    // PostHog is only present when PUBLIC_POSTHOG_KEY is set at build time.
-    function track(question: string, matched: boolean) {
-      const ph = (window as { posthog?: { capture: (n: string, p: Record<string, unknown>) => void } }).posthog;
-      if (ph?.capture) {
-        ph.capture("ask_me_used", { question, answer_matched: matched, locale });
-      }
-    }
 
     function bestMatch(q: string): Pair | null {
       const tokens = normalizeTokens(q);
@@ -275,10 +268,10 @@ const X_D = "M6 6l12 12M6 18L18 6";
       const pair = bestMatch(question);
       if (pair) {
         renderAnswer(pair);
-        track(question, true);
+        track("ask_me_used", { question, answer_matched: true, locale });
       } else {
         renderFallback();
-        track(question, false);
+        track("ask_me_used", { question, answer_matched: false, locale });
       }
       lastQuestion = question;
     }

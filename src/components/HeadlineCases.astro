@@ -68,7 +68,7 @@ const shortLine = (p: (typeof projects)[number]) =>
             <a
               class="case-card-media"
               href={projectHref(slug)}
-              data-analytics={`headline_case_${slug}`}
+              data-analytics-project={slug} data-analytics-surface="headline"
               aria-label={p.data.title}
             >
               <img src={withBase(p.data.hero)} alt="" loading="lazy" width="600" height="200" />
@@ -77,7 +77,7 @@ const shortLine = (p: (typeof projects)[number]) =>
             <div class="case-card-body">
               <span class="case-card-track">{tracks.get(p.data.track) ?? p.data.track}</span>
               <h3>
-                <a href={projectHref(slug)} data-analytics={`headline_case_${slug}`}>
+                <a href={projectHref(slug)} data-analytics-project={slug} data-analytics-surface="headline">
                   {p.data.title}
                 </a>
               </h3>
@@ -98,7 +98,7 @@ const shortLine = (p: (typeof projects)[number]) =>
                 <a
                   class="case-card-open"
                   href={projectHref(slug)}
-                  data-analytics={`headline_case_${slug}`}
+                  data-analytics-project={slug} data-analytics-surface="headline"
                 >
                   {i18n.openCase} →
                 </a>

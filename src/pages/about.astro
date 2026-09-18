@@ -49,14 +49,14 @@ const jsonLd = {
       {JUMP.map((j) => <a href={j.href}>{j.label}</a>)}
     </nav>
 
-    <h2 id="who">Кто я</h2>
+    <h2 id="who" data-analytics-section="who">Кто я</h2>
     <p>
       Никита Бояркин, data / product analyst. Фокус — эксперименты, retention, сегментация.
       Портфолио воспроизводимых аналитических проектов — эксперименты, retention, сегментация —
       с полной методологией и кодом. Создано из проектной работы, а не из найма.
     </p>
 
-    <h2 id="how">Как работаю</h2>
+    <h2 id="how" data-analytics-section="how">Как работаю</h2>
     <p>
       От гипотезы до метрики. Вывод можно перепроверить: код + SQL + метрики.
       Предпочитаю reproducible-аналитику — код, SQL и визуализация выложены рядом с каждым кейсом,
@@ -67,7 +67,7 @@ const jsonLd = {
       методологией (CUPED, AA-тесты, коррекция множественных сравнений, ship-gates).
     </p>
 
-    <h2 id="now">Сейчас</h2>
+    <h2 id="now" data-analytics-section="now">Сейчас</h2>
     <p class="now-updated">Обновлено · {formatDate('2026-09-18')}</p>
     <ul>
       <li>Готовлюсь к BI / Data Analyst и Product Analyst middle-интервью: SQL, pandas, алгоритмы, моки.</li>
@@ -79,7 +79,7 @@ const jsonLd = {
       <li>Открыт к Data / Product Analyst ролям.</li>
     </ul>
 
-    <h2 id="work">Как со мной работать</h2>
+    <h2 id="work" data-analytics-section="work">Как со мной работать</h2>
     <p class="wwm-sub">Relationship manual — чтобы не тратить время на выяснение формата.</p>
 
     <div class="board-card wwm-block">
@@ -132,7 +132,7 @@ const jsonLd = {
       <a class="button button-secondary" href={withBase('value/')}>Чем могу быть полезен</a>
     </p>
 
-    <h2 id="location">Локация / формат</h2>
+    <h2 id="location" data-analytics-section="location">Локация / формат</h2>
     <p>Москва. Удалёнка / гибрид — по договорённости. Middle+.</p>
 
     <h2>Стек</h2>
