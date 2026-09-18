@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Draft — ready for execution |
+| Status | Phase 0 + Phase 1 executed 2026-09-18. Phases 2–4 pending. |
 | Date | 2026-09-18 |
 | Owner | Nikita Boyarkin |
 | Scope | `src/content/**` copy + structure; one typographic measure; incidental link/parity fixes. No redesign. |
@@ -190,8 +190,9 @@ not new work — but they live in the files this PRD touches, so they are fixed 
 #### S0.1 — Write `scripts/content-drift-audit.mjs`
 
 Standalone Node ESM script (repo convention: `scripts/*.mjs`). Extracts every numeric token from
-`src/content/**/*.md` (fenced code blocks stripped, `description:` excluded per D20, thousands
-separators and intra-number spaces normalized), and compares against a committed baseline.
+`src/content/**/*.md` (fenced code blocks stripped, `description:` excluded per D20, markdown
+ordered-list markers stripped as formatting, thousands separators and intra-number spaces
+normalized), and compares against a committed baseline.
 
 - `bun run audit:content:snapshot` → writes `docs/content-baseline.json`
 - `bun run audit:content` → diffs current content against the baseline; **exit 1** on any added or

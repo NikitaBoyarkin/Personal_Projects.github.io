@@ -1,6 +1,6 @@
 ---
 title: A/B Testing Methodology Toolkit
-description: Calibration-driven A/B testing methods, validated by simulation — SRM, CUPED, delta-method ratio metrics, alpha-spending boundaries, always-valid p-values (mSPRT), bootstrap CIs, HTE, multiple-comparison correction, novelty/primacy and switchback designs. Every module ships with an A/A null check and a power/coverage calibration.
+description: "15 A/B methodology modules, each calibrated by simulation: an A/A null check holds Type I error at α, and power curves show the effect size each method can actually detect."
 track: experiments
 hero: images/ab.svg
 impact:
@@ -17,7 +17,7 @@ tools:
 github: https://github.com/NikitaBoyarkin/ab_test
 updated: 2026-09-07
 related:
-  - /en/projects/volta/
+  - /projects/volta/
 caseStudy:
   problem: "A/B testing methods are sold on asymptotic promises, but nobody checks the Type I error under the null or the power under a real effect. Naive peeking, wrong SEs for ratio metrics, and multiple testing silently break decisions."
   approach: "Each module is implemented from the primary literature and calibrated by simulation: an A/A null check for Type I error ≈ α and a power curve under a real effect. 15 topics are covered — SRM, sizing, CUPED, delta method, alpha spending (Pocock/OBF), mSPRT, sequential ratio, Bayesian A/B, bootstrap BCa, HTE, Bonferroni/BH, novelty/primacy, switchback. All wired into an end-to-end pipeline: SRM → CUPED → CTR test → per-segment ATE with BH → novelty check → report."

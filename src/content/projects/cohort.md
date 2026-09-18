@@ -1,6 +1,6 @@
 ---
 title: Cohort Analysis Dashboard
-description: Cohort retention and LTV analysis on synthetic data — retention curves, churn patterns, and revenue/LTV by acquisition cohort. Python pipeline (pandas + matplotlib/seaborn) plus a Tableau-ready export with CSV and Hyper extract.
+description: "Треугольная когортная матрица удержания и LTV на синтетических данных: ARPU и LTV по когортам с поправкой на observation age, выгрузка в Tableau (CSV + Hyper)."
 track: analytics
 hero: images/cohort.svg
 impact:

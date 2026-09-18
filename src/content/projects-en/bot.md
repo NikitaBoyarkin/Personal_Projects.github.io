@@ -1,6 +1,6 @@
 ---
 title: Reporting Automation Telegram Bot
-description: A Telegram bot that automates weekly reporting and integrates with external APIs. Cuts time on routine tasks, ensures timely delivery of key metrics, and improves team communication.
+description: "A Telegram bot replaced manual weekly reporting with a cron job: 1–2 hours of prep became a scheduled report with a KPI table and sparklines."
 track: engineering
 hero: images/bot.svg
 impact:

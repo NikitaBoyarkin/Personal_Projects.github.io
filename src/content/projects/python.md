@@ -1,6 +1,6 @@
 ---
 title: Python Analytics Playground
-description: Module-based Python analytics toolkit — data loading, cleaning, EDA, and visualization — assembled into an end-to-end pipeline, with pytest coverage ≥80%. A reusable foundation I copy into every new analysis.
+description: "Модульный Python-тулкит для аналитики — загрузка, чистка, EDA, визуализация — собранный в один пайплайн с покрытием pytest ≥80%. База, которую я копирую в каждый новый анализ."
 track: analytics
 hero: images/python.svg
 impact:

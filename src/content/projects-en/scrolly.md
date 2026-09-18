@@ -1,6 +1,6 @@
 ---
 title: Scrolly English Speaking
-description: "A scrollytelling guide for improving spoken English in workplace conversations (A2–B1) — built on Astro 6 with an MDX narrative and D3 visualizations. Content and visuals are decoupled: MDX holds the text, data modules hold section structure and viz props."
+description: "A scrollytelling guide to spoken English for workplace conversations (A2–B1): an MDX narrative with D3 visualizations, content and visuals decoupled. Built on Astro 6."
 track: engineering
 hero: images/scrolly.svg
 impact:
@@ -17,8 +17,8 @@ tools:
 github: https://github.com/NikitaBoyarkin/scrolly-english-speaking
 updated: 2026-08-25
 related:
-  - /en/projects/site/
-  - /en/projects/garden/
+  - /projects/site/
+  - /projects/garden/
 ---
 
 # Scrolly English Speaking

@@ -1,6 +1,6 @@
 ---
 title: Product Analytics + A/B on Supabase
-description: Full-stack product analytics platform — a Streamlit dashboard reading live Supabase Postgres through Row Level Security, plus an Edge Function ingest API and a concluded A/B experiment with SQL-computed conversion and a chi-square significance test.
+description: "Full-stack analytics on Supabase: an A/B experiment lifted conversion +5.1pp (p = 0.0034, chi-square), with a Streamlit dashboard reading live data through Row Level Security."
 track: product
 hero: images/supabase.svg
 impact:
@@ -18,7 +18,7 @@ github: https://github.com/NikitaBoyarkin/supabase-product-analytics
 updated: 2026-09-15
 private: true
 related:
-  - /en/projects/streamlit/
+  - /projects/streamlit/
 caseStudy:
   problem: "A dashboard on synthetic data proves analytics skills, but it does not show how analytics lives inside a real multi-tenant product: auth, per-tenant data isolation, an ingest path, and experiment results computed where the data lives."
   approach: "Reused the UI from streamlit-app but swapped the data layer from an in-memory generator to Supabase Postgres. RLS is enabled on every table so a user sees only their org's rows; an Edge Function validates an API key (stored as SHA-256) and inserts events via a security-definer function. Analytics live in SQL views (funnel, cohort, MRR, DAU, channel conversion) and the A/B result is computed in the DB (v_results) with the chi-square test run on top."

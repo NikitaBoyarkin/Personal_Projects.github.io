@@ -1,6 +1,6 @@
 ---
 title: Churn Prediction — Leakage-Free Retention Model
-description: A leakage-free churn model for a subscription product — as-of snapshot features, a future 30-day inactivity label, a chronological train/val/test split, and a business-first metric (recall@top-decile, lift@top-decile) with native TreeSHAP.
+description: "A leakage-free churn model: recall@top-10% of 0.53 and 3.07x lift at 0.904 ROC-AUC, on a chronological split with no future activity leaking into features."
 track: analytics
 hero: images/churn.svg
 impact:

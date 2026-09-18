@@ -20,6 +20,9 @@
  * necessarily changes which narrative numbers appear there. Everything else —
  * bodies, `impact`, `caseStudy`, `faq`, titles, `excerpt` — stays frozen.
  *
+ * Markdown ordered-list markers (`1.`, `2)`) are stripped as formatting, not
+ * content: converting a numbered list to bullets is a valid readability edit.
+ *
  * Known limitation: the numeric regex is deliberately greedy, so false
  * positives (e.g. reformatting "6,24" → "6.24") are possible and expected to be
  * reviewed by a human. Under-capture is the risk that matters, so nothing is
@@ -63,7 +66,8 @@ function stripFrontmatterField(md, field) {
 }
 
 function numericTokens(md) {
-  const text = stripFrontmatterField(stripFencedCode(md), 'description');
+  const text = stripFrontmatterField(stripFencedCode(md), 'description')
+    .replace(/^[ \t]*\d+[.)][ \t]+/gm, '');
   const raw = text.match(/\d(?:[\d\s.,_]*\d)?/g) || [];
   return raw.map((token) => token.replace(/[\s,_]/g, '')).filter((token) => /\d/.test(token));
 }

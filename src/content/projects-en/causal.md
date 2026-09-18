@@ -1,6 +1,6 @@
 ---
 title: Causal / Uplift — CUPED and Individual Treatment Effects
-description: Causal inference for product experiments — CUPED variance reduction and T-/S-learner uplift on a synthetic randomized A/B test with a known heterogeneous effect, evaluated against ground truth with AUUC, Qini and per-segment recovery.
+description: "CUPED cut the standard error by 26% — the same power on 5.6k users per arm instead of 10k. Uplift models recovered a known heterogeneous effect, built from scratch."
 track: experiments
 hero: images/causal.svg
 impact:
@@ -39,14 +39,16 @@ caseStudy:
 
 # Causal / Uplift — CUPED and Individual Treatment Effects
 
-## Business Context
+## Context
 
-Causal inference for product experiments — two methods that go beyond "a t-test on the outcome":
+A standard two-sample t-test answers only "does the treatment work on average" and ignores the pre-period. Experiments therefore ask for more traffic than they need, and retention offers go to everyone while only part of the audience responds.
 
-1. **CUPED** — variance reduction using a pre-period covariate. Same ATE, smaller CI → experiments need fewer users to reach significance.
-2. **Uplift modeling** — estimate the *individual* treatment effect (ITE), so retention and discount actions target the users who actually respond, not everyone.
+The project closes both gaps with two methods:
 
-Both run on a synthetic randomized A/B experiment with a known, heterogeneous treatment effect, so the estimates can be checked against ground truth.
+- **CUPED** — variance reduction using a pre-period covariate: the same ATE with a narrower CI, so fewer users are needed for the same power.
+- **Uplift modeling** — estimation of the individual treatment effect (ITE), so offers target the users who actually respond rather than everyone.
+
+Both run on a synthetic randomized experiment with a known heterogeneous effect, so the estimates can be checked against ground truth.
 
 ## Data & Method
 
@@ -75,18 +77,9 @@ The point estimate is unchanged (0.270 → 0.276, within noise). The standard er
 | S-learner | 0.0057 | 0.0029 | 0.041 | 0.66 |
 | Random | 0.0014 | −0.0014 | −0.015 | 0.007 |
 
-Segment-level recovery (predicted vs empirical ground truth):
-
-| Segment | Truth (binary uplift) | T-learner | S-learner |
-|---|---|---|---|
-| new | 0.110 | 0.126 | 0.120 |
-| returning | 0.010 | 0.018 | 0.019 |
-
-The model recovers that "new" users respond ~10x more than "returning" users — the targeting signal a discount campaign would act on.
-
 A note on honesty: the latent ground-truth τ is 0.60 (new) / 0.08 (returning), but the *conversion* uplift is ~0.11 / 0.01 because the sigmoid at a high baseline conversion (~71%) damps large latent effects. Comparing predicted binary uplift to latent τ would be a scale mismatch; we report rank correlation (scale-free) and per-segment empirical recovery (same scale).
 
-## Run
+### Run
 
 ```bash
 uv run --with pandas --with numpy python data/generate_data.py
@@ -96,9 +89,20 @@ uv run --with pandas --with numpy --with scikit-learn --with lightgbm --with mat
 
 Outputs: `reports/metrics.json` + `reports/uplift.png` (QINI curves + segment uplift vs ground truth).
 
-## Insight
+## Findings
 
-CUPED buys power for free if you have a pre-period covariate — no new experiment design, just a better estimator on data you already collected. Uplift modeling answers a different question than A/B testing: not "does the treatment work on average" but "who does it work on". The two are complementary, not substitutes. Synthetic data with a true heterogeneous effect is the only reason recovery can be checked at all: on real data the ITE is never observed — the fundamental problem of causal inference.
+CUPED buys power for free: no new experiment design is needed, only a better estimator on data you already collected — provided a pre-period covariate exists.
+
+Uplift answers a different question than A/B testing: not "does the treatment work on average" but "who does it work on". The two are complementary, not substitutes.
+
+The model recovered the shape of the effect: "new" users respond ~10x more than "returning" users — the targeting signal a discount campaign would act on.
+
+| Segment | Truth (binary uplift) | T-learner | S-learner |
+|---|---|---|---|
+| new | 0.110 | 0.126 | 0.120 |
+| returning | 0.010 | 0.018 | 0.019 |
+
+Synthetic data with a true heterogeneous effect is the only reason recovery can be checked at all: on real data the ITE is never observed — the fundamental problem of causal inference.
 
 ## Impact
 

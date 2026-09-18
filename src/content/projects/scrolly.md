@@ -1,6 +1,6 @@
 ---
 title: Scrolly English Speaking
-description: "Scrollytelling-гайд по улучшению spoken English для рабочих разговоров (A2–B1) — построен на Astro 6 с MDX-нарративом и D3-визуализациями. Контент и визуализации разделены: MDX хранит текст, data-модули — структуру секций и props визуализаций."
+description: "Scrollytelling-гайд по spoken English для рабочих разговоров (A2–B1): MDX-нарратив и D3-визуализации, где контент и визуализации разделены. Astro 6, деплой на GitHub Pages."
 track: engineering
 hero: images/scrolly.svg
 impact:

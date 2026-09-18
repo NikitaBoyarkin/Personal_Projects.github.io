@@ -1,6 +1,6 @@
 ---
 title: This Portfolio Site
-description: The portfolio you are looking at — built with Astro 7, TypeScript, and Markdown content collections. Static output, dark/light theme, RSS, sitemap, JSON-LD, and a base-path-aware URL helper for GitHub Pages.
+description: "The site you are reading: Astro 7, TypeScript and Markdown content collections, static output, dark/light theme, RSS, sitemap, JSON-LD and GitHub Pages subpath support."
 track: engineering
 hero: images/site.svg
 impact:
@@ -16,8 +16,8 @@ tools:
 github: https://github.com/NikitaBoyarkin/Personal_Projects.github.io
 updated: 2026-09-16
 related:
-  - /en/projects/garden/
-  - /en/projects/scrolly/
+  - /projects/garden/
+  - /projects/scrolly/
   - /posts/data-analyst-portfolio-checklist/
 ---
 

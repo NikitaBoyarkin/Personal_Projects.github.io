@@ -1,6 +1,6 @@
 ---
 title: Volta — Funnel Analysis
-description: "Volta funnel analysis — locating onboarding drop-off. KYC is the critical bottleneck (56.6% step conversion); Registration loses the most in absolute terms. Channel and platform breakdown."
+description: "Воронка онбординга необанка: KYC — узкое место с 56,6% step conversion, регистрация теряет больше всех в абсолюте (2 682 пользователя). Разбивка по каналам и платформам."
 part: funnel
 order: 1
 impact:

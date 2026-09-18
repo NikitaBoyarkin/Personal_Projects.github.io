@@ -1,6 +1,6 @@
 ---
 title: "Volta — User Segmentation"
-description: "Volta user segmentation — StandardScaler + KMeans, data-driven K. Four segments (Power/Growth/Casual/Dormant); Lorenz concentration and +€310K/yr migration scenarios."
+description: "Сегментация пользователей необанка: 4 сегмента (Power 12% / Growth 24% / Casual 32% / Dormant 32%), 12% клиентов дают 41% выручки, миграция — до +€310K в год."
 part: segmentation
 order: 4
 impact:

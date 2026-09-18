@@ -1,6 +1,6 @@
 ---
 title: Product Analytics Dashboard (Streamlit)
-description: A self-contained product analytics dashboard on a synthetic SaaS dataset (8,000 users). Covers the AARRR funnel, cohort retention, revenue, and user segmentation.
+description: "A product analytics dashboard on a synthetic SaaS dataset (8,000 users): AARRR funnel, cohort retention, revenue (MRR, ARPU, churn) and segmentation — 5 Streamlit pages."
 track: product
 hero: images/streamlit.svg
 impact:
@@ -17,7 +17,7 @@ github: https://github.com/NikitaBoyarkin/streamlit-app
 updated: 2026-08-14
 private: true
 related:
-  - /en/projects/supabase/
+  - /projects/supabase/
 caseStudy:
   problem: "Product analytics interviews expect reasoning across the whole AARRR frame — acquisition, activation, retention, revenue — but most portfolio pieces show one metric in isolation."
   approach: "Built a multipage Streamlit dashboard on one synthetic SaaS dataset (8,000 users, deterministic seed = 42) shared across pages via @st.cache_data, so the dataset is identical across runs. Each page answers one AARRR question: Overview (KPIs, DAU, signups, channel conversion), Funnel (5-step drop-off), Retention (cohort heatmap), Revenue (MRR/ARPU/churn), Segments (conversion and ARPU by segment/channel/country/device)."

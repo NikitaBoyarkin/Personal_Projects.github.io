@@ -1,6 +1,6 @@
 ---
 title: Product Analytics + A/B on Supabase
-description: Full-stack product analytics platform — a Streamlit dashboard reading live Supabase Postgres through Row Level Security, plus an Edge Function ingest API and a concluded A/B experiment with SQL-computed conversion and a chi-square significance test.
+description: "Full-stack аналитика на Supabase: A/B-эксперимент дал +5,1 пп (p = 0.0034, chi-square), а Streamlit-дашборд читает живые данные через Row Level Security и SQL-вьюхи."
 track: product
 hero: images/supabase.svg
 impact:

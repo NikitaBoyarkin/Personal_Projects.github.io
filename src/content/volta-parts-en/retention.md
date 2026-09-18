@@ -1,6 +1,6 @@
 ---
 title: "Volta — Retention & Cohort"
-description: "Volta retention & cohort — did the KYC fix hold? +10pp M1 and +9.2pp M3 retention step-change; +€227K/yr incremental LTV via ARPU × retention decomposition."
+description: "Cohort retention after the KYC fix: M1 +10pp and M3 +9.2pp, +€227K/year in incremental LTV. The step-change shows up across cohorts, not in the average."
 part: retention
 order: 3
 impact:

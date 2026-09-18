@@ -1,6 +1,6 @@
 ---
 title: Digital Garden
-description: A personal digital garden and Zettelkasten published as a website with Quartz v4 — linked notes, backlinks, graph view, and atomic evergreen notes instead of chronological blog posts.
+description: "A personal digital garden and Zettelkasten published as a Quartz v4 site: linked notes, backlinks and a graph view instead of a chronological blog feed."
 track: engineering
 hero: images/garden.svg
 impact:
@@ -16,8 +16,8 @@ tools:
 github: https://github.com/NikitaBoyarkin/digital_garden
 updated: 2026-08-12
 related:
-  - /en/projects/site/
-  - /en/projects/scrolly/
+  - /projects/site/
+  - /projects/scrolly/
 ---
 
 # Digital Garden

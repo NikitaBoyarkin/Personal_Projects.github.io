@@ -1,6 +1,6 @@
 ---
 title: "Volta — User Segmentation"
-description: "Volta user segmentation — StandardScaler + KMeans, data-driven K. Four segments (Power/Growth/Casual/Dormant); Lorenz concentration and +€310K/yr migration scenarios."
+description: "Neobank user segmentation: 4 segments (Power 12% / Growth 24% / Casual 32% / Dormant 32%), where 12% of users drive 41% of revenue; migration worth up to +€310K/year."
 part: segmentation
 order: 4
 impact:

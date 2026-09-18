@@ -1,6 +1,6 @@
 ---
 title: "Volta — A/B Testing (KYC progress bar)"
-description: "Volta A/B test — KYC progress bar. +6.24pp lift (Z=6.35, p<0.0001) exceeding the +5pp MDE, with CUPED variance reduction, AA-test calibration (type-I=0.050) and Bonferroni correction. €716K/yr impact."
+description: "A/B-тест KYC-прогресс-бара в необанке: +6,24 пп (p<0.0001), выше MDE +5 пп, с CUPED, AA-тестом и Bonferroni. Эффект — €716K в год при ROI 48×."
 part: ab
 order: 2
 impact:

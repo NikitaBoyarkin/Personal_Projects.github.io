@@ -1,6 +1,6 @@
 ---
 title: Browser Mini-Games — Analytics Arcade
-description: "10 играбельных мини-игр как self-contained SVG: 7 аналитических (A/B до p<0.05, funnel drop, cohort catch, SQL-токены, metric match, retention day, funnel bottleneck) + 3 аркадных (snake, pong, 2048). Один файл = вся игра, zero-dependency, без сборки. Работают на телефоне и десктопе."
+description: "10 играбельных мини-игр в self-contained SVG: 7 аналитических (A/B до p<0.05, funnel drop, cohort catch, retention day) и 3 аркадных. Один файл — вся игра, без сборки."
 track: experiments
 hero: images/games.svg
 impact:

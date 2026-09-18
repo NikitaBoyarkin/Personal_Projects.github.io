@@ -1,6 +1,6 @@
 ---
 title: Sales Calls Analytics Dashboard
-description: Streamlit dashboard for AI sales-call analytics — a 4-step funnel (greeting → offer → meeting → qualification), step-1 leak breakdown by type, weighted contact loss, client reactions, engagement by hour and day, bot-quality defects, and drill-down into drop-off transcripts.
+description: "A Streamlit dashboard for AI sales calls on 16,891 synthetic calls: a 4-step funnel (greeting → offer → meeting → qualification), leak breakdown by type, and transcript drill-down."
 track: analytics
 hero: images/sales-calls.svg
 impact:
@@ -16,7 +16,7 @@ tools:
 github: https://github.com/NikitaBoyarkin/sales-calls-dashboard
 updated: 2026-06-16
 related:
-  - /en/projects/streamlit/
+  - /projects/streamlit/
 caseStudy:
   problem: "An outbound call flow is a funnel with big drop-off at early steps, but the production export does not answer the key question: which step the bot loses the client on, and what to fix — the script, the timing, or bot quality."
   approach: "The step a conversation reached is determined deterministically from markers in the bot's scripted replies (greeting → offer → meeting → qualification). The step-1 drop reason and the client reaction type are text heuristics; no LLM is used in the pipeline, but an llm_labels.csv hook is provided to strengthen reaction labeling. The dashboard breaks the funnel into weighted contact loss, engagement by hour/day, and bot defects, with drill-down into drop-off transcripts."

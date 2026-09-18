@@ -1,6 +1,6 @@
 ---
 title: TaskFlow — PostHog Product Analytics Pipeline
-description: End-to-end portfolio project — instrument a SaaS product with PostHog, generate realistic traffic, and analyze the events into a funnel, cohort retention, an A/B test, revenue/LTV, and time-to-convert, all in Python.
+description: "A SaaS product instrumented with PostHog end-to-end: a typed event catalog, generated traffic, and 7 analyses — funnel, retention, A/B, revenue/LTV and time-to-convert."
 track: product
 hero: images/posthog.svg
 impact:
@@ -21,7 +21,7 @@ github: https://github.com/NikitaBoyarkin/posthog-saas-analytics
 updated: 2026-09-15
 private: true
 related:
-  - /en/projects/supabase/
+  - /projects/supabase/
 caseStudy:
   problem: "Product analytics is usually shown on a cleaned CSV. The hard part — instrumenting a real app, capturing the right events without PII leaks, getting them into a tool, and turning raw events into decisions — stays invisible."
   approach: "Built a demo SaaS (FastAPI + Jinja2) with server-side PostHog capture over a typed event catalog (single source of truth), a PostHog wrapper that scrubs PII, and a feature flag driving an onboarding A/B. A simulator generates 30 days of realistic funnel traffic; analysis scripts turn the pulled events into funnel, cohort retention, A/B (chi-square + uplift + Wilson CI + SRM check), revenue/LTV, time-to-convert, and feature-usage → upgrade. The same metrics are written as SQL for BI/interview use, plus an interactive Streamlit dashboard."

@@ -1,6 +1,6 @@
 ---
 title: Browser Mini-Games — Analytics Arcade
-description: "10 playable mini-games as self-contained SVGs: 7 analytics (A/B until p<0.05, funnel drop, cohort catch, SQL tokens, metric match, retention day, funnel bottleneck) + 3 arcade (snake, pong, 2048). One file = the whole game, zero-dependency, no build step. Works on phone and desktop."
+description: "10 playable mini-games as self-contained SVGs: 7 analytics (A/B to p<0.05, funnel drop, cohort catch, retention day) and 3 arcade. One file per game, zero dependencies, no build."
 track: experiments
 hero: images/games.svg
 impact:
@@ -18,10 +18,10 @@ github: https://github.com/NikitaBoyarkin/browser-mini-games
 updated: 2026-09-04
 demo: games/
 related:
-  - /en/projects/ab/
-  - /en/projects/cohort/
-  - /en/projects/sql/
-  - /en/posts/cohort-triangles-retention/
+  - /projects/ab/
+  - /projects/cohort/
+  - /projects/sql/
+  - /posts/cohort-triangles-retention/
 caseStudy:
   problem: "Analytics concepts — p-values, retention, funnels — are abstract: a recruiter or student can't 'feel' them from text, and passive dashboards don't provide an interactive experience."
   approach: "Each game is a self-contained SVG: HTML, CSS and JS in one file, zero-dependency, no build step. Analytics games turn concepts into mechanics: A/B Test — collect data until p < 0.05; Funnel Drop — catch falling users; Cohort Catch — catch Returning, dodge Churned; SQL Query — pick the token that completes the query; Retention Day — pick the right retention day. Hub on Astro, dark/light/cyberpunk themes, PostHog tracking."
