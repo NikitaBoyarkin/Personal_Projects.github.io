@@ -38,6 +38,11 @@ const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
         session_recording: { maskAllInputs: true },
       });
 
+      // posthog-js is imported as a module, so `init()` never assigns the
+      // global. Several components read `window.posthog` (Base.astro
+      // `theme_change`, BlogFilter, AskMe); without this they silently no-op.
+      (window as unknown as { posthog: typeof posthog }).posthog = posthog;
+
       const base = import.meta.env.BASE_URL || '/';
       const norm = base.replace(/\/$/, '');
 
