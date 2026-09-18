@@ -76,6 +76,35 @@ export const GRAPH_GROUP_COLORS: Record<string, string> = {
   articles: '#4cc9f0',
 };
 
+/** Obsidian-style visual tokens, shared by the full graph and the per-project
+ *  mini-graph so both read as one system. */
+export const NODE_SIZE = 1.06; // node radius multiplier
+export const LINK_THICKNESS = 0.1; // link width multiplier (hairline links)
+
+/** Per-type edge dash pattern (empty string = solid). */
+export const GRAPH_EDGE_STYLE: Record<string, string> = {
+  related: '',
+  children: '',
+  topic: '6 4',
+  shared: '2 3',
+  core: '',
+};
+
+/** Per-type edge color, resolved against the theme tokens. Thematic and hub
+ *  edges are deliberately faint — they carry the layout but shouldn't compete
+ *  with the explicit related links for attention. */
+export const GRAPH_EDGE_COLOR: Record<string, string> = {
+  related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
+  children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
+  topic: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
+  shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
+  core: 'color-mix(in srgb, var(--text-accent) 25%, transparent)',
+};
+
+/** Hairline link width, weight-scaled like the Obsidian graph. */
+export const edgeWidth = (weight = 1): number =>
+  LINK_THICKNESS * (0.6 + 1.6 * weight) + 0.4;
+
 /** Community palette — 10 distinct hues for the emergent clusters. Hex (not
  *  CSS vars) so community colors stay distinguishable in both themes. */
 export const GRAPH_COMMUNITY_COLORS = [

@@ -1,10 +1,14 @@
 ---
 // Compact per-project knowledge subgraph. Renders the 1-hop neighborhood of a
 // project node (computed at build time via subgraphAround) as a small
-// force-directed SVG. Labels appear on hover/focus; the center node's label is
-// always visible as the anchor. Click a node to navigate to its page.
+// force-directed SVG. It shares the main graph's visual language: per-type edge
+// colors/dashes, hairline links trimmed at the node edge, always-on labels for
+// anchor nodes (hover-only for posts), and the same precomputed tooltips.
+// Labels appear on hover/focus; the center node's label is always visible as
+// the anchor. Click a node to navigate to its page.
 import { withBase } from '../lib/path';
 import type { GraphNode, GraphLink } from '../lib/graph';
+import { buildGraphTooltips } from '../lib/graph-tooltip';
 
 interface Props {
   nodes: GraphNode[];
@@ -18,11 +22,17 @@ const isEn = lang === 'en';
 // Taller canvas for denser subgraphs (volta's hub pulls in ~20 nodes).
 const height = Math.max(280, Math.min(460, 240 + nodes.length * 10));
 
+// Precompute tooltip lines (node / edge, aligned by index) so the client only
+// positions and renders them — same protocol as the main graph.
+const tooltips = buildGraphTooltips(nodes, links, lang);
+
 // Pre-resolve URLs with the base path so the client can navigate directly.
 const data = {
   nodes: nodes.map((n) => ({ ...n, href: withBase(n.url) })),
   links,
   centerId,
+  nodeT: tooltips.node,
+  edgeT: tooltips.edge,
 };
 // Escape `<` so a label can never close the JSON script tag early.
 const json = JSON.stringify(data).replace(/</g, '\\u003c');
@@ -34,29 +44,41 @@ const caption = isEn
 
 <div id="pg-root" class="pg-root">
   <svg id="pg-svg" class="pg-svg" style={`height:${height}px`} role="img" aria-label={ariaLabel}></svg>
+  <div id="pg-tooltip" class="pg-tooltip" role="tooltip" hidden></div>
   <p class="pg-caption">{caption}</p>
 </div>
 <script is:inline type="application/json" id="pg-data" set:html={json}></script>
 
 <script>
-  import { GRAPH_GROUP_COLORS } from '../lib/graph';
+  import {
+    GRAPH_GROUP_COLORS,
+    GRAPH_EDGE_STYLE,
+    GRAPH_EDGE_COLOR,
+    edgeWidth,
+    NODE_SIZE,
+  } from '../lib/graph';
 
   const rootEl = document.getElementById('pg-root');
   const svgEl = document.getElementById('pg-svg');
   const dataEl = document.getElementById('pg-data');
   if (!rootEl || !svgEl || !dataEl) throw new Error('pg-root / pg-svg / pg-data not found');
+  const root = rootEl as HTMLElement;
   const svg = svgEl as unknown as SVGSVGElement;
   const data = JSON.parse(dataEl.textContent || '{}');
 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const NS = 'http://www.w3.org/2000/svg';
   const el = (name: string) => document.createElementNS(NS, name);
+  /** Tooltip lines are precomputed server-side; `<title>` keeps them available
+   *  to no-JS / keyboard users, the DOM tooltip renders the hover case. */
+  const titleLines = (lines: string[] | undefined) => (lines || []).join('\n');
 
   let world = { w: 600, h: 280 };
   let nodes: any[] = [];
   let nodeEls: SVGGElement[] = [];
   let links: { source: any; target: any; weight: number; type: string }[] = [];
   let edges: SVGLineElement[] = [];
+  let edgeHits: SVGLineElement[] = [];
   let running = false;
   let frames = 0;
   let restart: (() => void) | null = null;
@@ -98,32 +120,57 @@ const caption = isEn
 
     const edgeLayer = el('g');
     svg.appendChild(edgeLayer);
-    edges = links.map((l) => {
+    edges = links.map((l, i) => {
       const line = el('line');
       line.setAttribute('class', 'pg-edge');
-      // Obsidian "Link thickness": strong edges draw thicker.
-      line.style.strokeWidth = String(0.6 + 1.6 * (l.weight || 1));
+      // Same per-type palette and hairline weight as the main graph. Painted
+      // inline (not via attribute) so it wins over the .pg-edge CSS fallback.
+      line.style.stroke = GRAPH_EDGE_COLOR[l.type] || GRAPH_EDGE_COLOR.related;
+      const dash = GRAPH_EDGE_STYLE[l.type];
+      if (dash) line.setAttribute('stroke-dasharray', dash);
+      line.style.strokeWidth = String(edgeWidth(l.weight || 1));
+      const title = el('title');
+      title.textContent = titleLines(data.edgeT?.[i]);
+      line.appendChild(title);
       edgeLayer.appendChild(line);
       return line as SVGLineElement;
     });
 
+    // Wide transparent hit areas (behind the nodes) so the thin links are
+    // actually hoverable for the tooltip.
+    edgeHits = edges.map((e) => {
+      const hit = el('line');
+      hit.setAttribute('class', 'pg-edge-hit');
+      hit.setAttribute('stroke', 'transparent');
+      hit.setAttribute('stroke-width', '12');
+      hit.setAttribute('fill', 'none');
+      hit.setAttribute('pointer-events', 'stroke');
+      e.after(hit);
+      return hit as SVGLineElement;
+    });
+
     const nodeLayer = el('g');
     svg.appendChild(nodeLayer);
-    nodeEls = nodes.map((n) => {
+    nodeEls = nodes.map((n, i) => {
       const g = el('g');
       g.setAttribute('tabindex', '0');
       g.setAttribute('role', 'link');
       g.setAttribute('aria-label', n.label);
       g.style.cursor = 'pointer';
       if (n.id === data.centerId) g.classList.add('pg-center');
-      const r = n.size || 6;
+      const title = el('title');
+      title.textContent = titleLines(data.nodeT?.[i]);
+      g.appendChild(title);
+      const r = (n.size || 6) * NODE_SIZE;
       const c = el('circle');
       c.setAttribute('r', String(r));
       c.setAttribute('fill', GRAPH_GROUP_COLORS[n.group] || 'var(--text-accent)');
       const txt = el('text');
       txt.setAttribute('x', String(r + 6));
       txt.setAttribute('y', '4');
-      txt.setAttribute('class', 'pg-label');
+      // Anchor nodes keep their label; post labels are hover/focus-only, same
+      // rule as the main graph (a text cloud otherwise).
+      txt.setAttribute('class', n.id.startsWith('post:') ? 'pg-label pg-label-hover' : 'pg-label');
       txt.textContent = n.label;
       g.appendChild(c);
       g.appendChild(txt);
@@ -159,6 +206,28 @@ const caption = isEn
     });
   }
 
+  /** Stop the line at the target's edge so it doesn't run under the circle —
+   *  the same endpoint trim the main graph applies. */
+  function drawEdges() {
+    links.forEach((l, i) => {
+      const dx = l.target.x - l.source.x;
+      const dy = l.target.y - l.source.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      const r = (l.target.size || 6) + 2;
+      const x1 = l.source.x;
+      const y1 = l.source.y;
+      const x2 = l.target.x - (dx / d) * r;
+      const y2 = l.target.y - (dy / d) * r;
+      for (const e of [edges[i], edgeHits[i]]) {
+        if (!e) continue;
+        e.setAttribute('x1', String(x1));
+        e.setAttribute('y1', String(y1));
+        e.setAttribute('x2', String(x2));
+        e.setAttribute('y2', String(y2));
+      }
+    });
+  }
+
   function clearHighlight() {
     nodes.forEach((_, i) => (nodeEls[i].style.opacity = ''));
     edges.forEach((e) => (e.style.opacity = ''));
@@ -183,12 +252,7 @@ const caption = isEn
 
   function renderStatic() {
     rebuild();
-    links.forEach((l, i) => {
-      edges[i].setAttribute('x1', String(l.source.x));
-      edges[i].setAttribute('y1', String(l.source.y));
-      edges[i].setAttribute('x2', String(l.target.x));
-      edges[i].setAttribute('y2', String(l.target.y));
-    });
+    drawEdges();
     nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
   }
 
@@ -236,12 +300,7 @@ const caption = isEn
         n.x = Math.max(margin, Math.min(world.w - margin, n.x));
         n.y = Math.max(margin, Math.min(world.h - margin, n.y));
       });
-      links.forEach((l, i) => {
-        edges[i].setAttribute('x1', String(l.source.x));
-        edges[i].setAttribute('y1', String(l.source.y));
-        edges[i].setAttribute('x2', String(l.target.x));
-        edges[i].setAttribute('y2', String(l.target.y));
-      });
+      drawEdges();
       nodes.forEach((n, i) => nodeEls[i].setAttribute('transform', `translate(${n.x},${n.y})`));
     }
 
@@ -306,26 +365,64 @@ const caption = isEn
   svg.addEventListener('pointerup', handlePointerUp);
   svg.addEventListener('pointercancel', handlePointerUp);
 
+  // --- Tooltip: content lines come precomputed (data.nodeT / data.edgeT) so
+  // the client only positions and renders them. Hover-only; keyboard users get
+  // the native SVG <title>. ---
+  const tooltipEl = document.getElementById('pg-tooltip') as HTMLDivElement | null;
+  function showTooltip(lines: string[] | undefined, clientX: number, clientY: number) {
+    if (!tooltipEl || !lines || !lines.length) return;
+    tooltipEl.replaceChildren();
+    for (const line of lines) {
+      const row = document.createElement('div');
+      row.textContent = line;
+      tooltipEl.appendChild(row);
+    }
+    tooltipEl.hidden = false;
+    const rect = root.getBoundingClientRect();
+    const w = tooltipEl.offsetWidth;
+    const h = tooltipEl.offsetHeight;
+    let x = clientX - rect.left + 14;
+    let y = clientY - rect.top + 14;
+    if (x + w > rect.width - 8) x = Math.max(8, clientX - rect.left - w - 14);
+    if (y + h > rect.height - 8) y = Math.max(8, clientY - rect.top - h - 8);
+    tooltipEl.style.transform = `translate(${x}px, ${y}px)`;
+  }
+  function hideTooltip() {
+    if (tooltipEl) tooltipEl.hidden = true;
+  }
+
   // Hover: highlight neighbors; the label appears via CSS on hover/focus.
   svg.addEventListener('pointerover', (e) => {
+    const hitIdx = edgeHits.indexOf(e.target as unknown as SVGLineElement);
+    if (hitIdx >= 0) {
+      showTooltip(data.edgeT?.[hitIdx], e.clientX, e.clientY);
+      return;
+    }
     const target = nodeEls.find((g) => g.contains(e.target as Node));
     if (!target) {
       clearHighlight();
+      hideTooltip();
       return;
     }
-    const n = nodes[nodeEls.indexOf(target)];
+    const idx = nodeEls.indexOf(target);
+    const n = nodes[idx];
     highlight(n.id);
+    showTooltip(data.nodeT?.[idx], e.clientX, e.clientY);
   });
   svg.addEventListener('pointerout', (e) => {
     const stillIn = (e.relatedTarget as Node | null) && svg.contains(e.relatedTarget as Node);
-    if (!stillIn) clearHighlight();
+    if (!stillIn) {
+      clearHighlight();
+      hideTooltip();
+    }
   });
 
   reduced ? renderStatic() : renderForce();
 </script>
 
-<style>
+<style is:global>
   .pg-root {
+    position: relative;
     background: var(--background-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -347,7 +444,7 @@ const caption = isEn
   }
   .pg-label {
     fill: var(--text-normal);
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     font-family: var(--font-sans);
     paint-order: stroke;
@@ -356,12 +453,12 @@ const caption = isEn
     stroke-opacity: 0.95;
     stroke-linejoin: round;
     pointer-events: none;
-    /* Labels appear only on hover/focus — except the center anchor. */
-    opacity: 0;
     transition: opacity 120ms ease;
   }
-  .pg-center .pg-label {
-    opacity: 1;
+  /* Post labels are hover/focus-only; projects, topics and Volta parts stay
+     labeled — the same rule as the main graph. */
+  .pg-label-hover {
+    opacity: 0;
   }
   .pg-root :is(g[tabindex]) {
     outline: none;
@@ -370,12 +467,32 @@ const caption = isEn
     outline: 2px solid var(--text-accent);
     outline-offset: 2px;
   }
-  .pg-root :is(g[tabindex]:hover) .pg-label,
-  .pg-root :is(g[tabindex]:focus) .pg-label {
+  .pg-root :is(g[tabindex]:hover) .pg-label-hover,
+  .pg-root :is(g[tabindex]:focus) .pg-label-hover {
     opacity: 1;
   }
   .pg-root :is(g[tabindex]:focus) text {
     fill: var(--text-accent);
+  }
+  .pg-tooltip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: var(--z-panel);
+    pointer-events: none;
+    background: var(--background-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.25);
+    padding: 0.4rem 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--text-normal);
+    max-width: 240px;
+    white-space: nowrap;
+  }
+  .pg-tooltip[hidden] {
+    display: none;
   }
   .pg-caption {
     color: var(--text-muted);

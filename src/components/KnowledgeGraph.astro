@@ -5,7 +5,15 @@
 // legend, color/arrow toggles and fullscreen. No fetch, no simulation.
 import { withBase } from '../lib/path';
 import { getGraphLayouts } from '../lib/graph-data';
-import { GRAPH_GROUP_COLORS, type GraphLink, type GraphNode } from '../lib/graph';
+import {
+  GRAPH_GROUP_COLORS,
+  GRAPH_EDGE_STYLE,
+  GRAPH_EDGE_COLOR,
+  NODE_SIZE,
+  LINK_THICKNESS,
+  type GraphLink,
+  type GraphNode,
+} from '../lib/graph';
 import { buildGraphTooltips } from '../lib/graph-tooltip';
 
 interface Props {
@@ -66,25 +74,6 @@ const nodeById = new Map(nodes.map((n) => [n.id, n]));
 const tooltips = buildGraphTooltips(nodes, links, lang);
 
 // Obsidian-style graph settings (match the vault's graph view).
-const NODE_SIZE = 1.06;         // node radius multiplier
-const LINK_THICKNESS = 0.1;     // link width multiplier (hairline links)
-
-const EDGE_STYLE: Record<string, string> = {
-  related: '',
-  children: '',
-  topic: '6 4',
-  shared: '2 3',
-  core: '',
-};
-const EDGE_COLOR: Record<string, string> = {
-  related: 'color-mix(in srgb, var(--text-accent) 65%, transparent)',
-  children: 'color-mix(in srgb, var(--text-normal) 55%, transparent)',
-  // Thematic and hub edges are deliberately faint — they carry the layout
-  // but shouldn't compete with the explicit related links for attention.
-  topic: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
-  shared: 'color-mix(in srgb, var(--text-muted) 35%, transparent)',
-  core: 'color-mix(in srgb, var(--text-accent) 25%, transparent)',
-};
 
 /** Stop each line at the target's edge so arrowheads (and lines) don't hide
  *  under the node circle. */
@@ -171,7 +160,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
       {links.map((l, i) => {
         const e = edgeEndpoints(l);
         if (!e) return null;
-        const dash = EDGE_STYLE[l.type];
+        const dash = GRAPH_EDGE_STYLE[l.type];
         return (
           <line
             class="kg-edge"
@@ -179,7 +168,7 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
             y1={e.y1}
             x2={e.x2}
             y2={e.y2}
-            stroke={EDGE_COLOR[l.type] || EDGE_COLOR.related}
+            stroke={GRAPH_EDGE_COLOR[l.type] || GRAPH_EDGE_COLOR.related}
             stroke-dasharray={dash || undefined}
             style={`stroke-width:${LINK_THICKNESS * (0.6 + 1.6 * (l.weight || 1)) + 0.4}`}
           >
@@ -1144,8 +1133,10 @@ const json = JSON.stringify(clientData).replace(/</g, '\\u003c');
     border-color: var(--text-accent);
     color: var(--text-accent);
   }
+  /* Per-type stroke comes from the server-rendered `stroke` attribute. Do NOT
+     set `stroke` here: a scoped CSS class rule outranks a presentation
+     attribute, which would flatten every edge to this one color. */
   .kg-edge {
-    stroke: color-mix(in srgb, var(--text-muted) 50%, transparent);
     stroke-width: 1;
   }
   .kg-label {
