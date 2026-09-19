@@ -54,6 +54,11 @@ root-path deployment (first `/projects/…` pageview at `2026-09-19T00:47:49+03:
 almost certainly a **controlled verification session, not an organic visitor**. Treat the
 organic read_depth count as **0 sessions to date**. `[I]`
 
+**Instrument ruled out as the cause `[V]`:** the deployed bundle
+(`dist/_astro/Analytics.astro_astro_type_script_index_0_lang.CCnD7ptb.js`) contains `read_depth`
+and the full threshold set `[25,50,75,100]`, so 75% is reachable. The 0 at 75% is genuine —
+that one session scrolled past 50% but not 75% — not an instrumentation bug.
+
 ### Denominator (for the rate)
 
 ```sql
@@ -111,11 +116,12 @@ rate (PRD v7 §6 interpretation rule). `[V]`
 
 ---
 
-## V1.1 — Decision interviews (10) — PENDING
+## V1.1 — Decision interviews (10) — PENDING (outreach ready)
 
-Not started. Requires the owner to name 10 real interview targets (PRD v7 §8). Script is
-fixed in `docs/prd-v7.md` §5 V1.1 (5 decision questions). Append one section per interview +
-the synthesised paragraph.
+Not started — blocked on the owner naming 10 real interview targets (PRD v7 §8). Outreach
+message (RU + EN) and the interview record format are ready in `docs/prd-v7-outreach.md` §2.
+Script is fixed in `docs/prd-v7.md` §5 V1.1 (5 decision questions). Append one section per
+interview + the synthesised paragraph here.
 
 ## V1.2 — Application experiment (20) — PENDING
 
@@ -123,9 +129,11 @@ Not started. Requires the owner's decision to spend 20 applications on middle−
 (PRD v7 §8). Log into `docs/contact-log.md`; compute the screening-invite rate; decide the
 ≥20% gate in writing here.
 
-## V1.3 — Message probes (5) — PENDING
+## V1.3 — Message probes (5) — PENDING (template ready)
 
-Not started.
+Not started. Probe message (RU + EN), positioning line, and proof-link rule are ready in
+`docs/prd-v7-outreach.md` §3. Blocked only on the owner choosing the public proof link and
+sending. Log probes in `docs/contact-log.md`; record reply rate here.
 
 ## V1.4 — Positioning A/B — PENDING
 
