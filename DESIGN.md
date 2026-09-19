@@ -149,10 +149,34 @@ Application budget: dominant 55–65% of any screen, secondary 25–35%, accent 
 
 **Scoped exceptions** (raw hex outside the token system, by technical necessity — not palette drift):
 - `Base.astro` `theme-color` meta + `THEME_COLORS` JS map — meta content cannot be a CSS variable; values mirror the dominant 60% per theme.
-- `IntroShader.astro` — WebGL shader uniforms cannot read CSS variables; palette hexes are duplicated in JS arrays.
 - `graph.ts` — the knowledge graph uses a categorical data-viz palette (~20 hues for node categories), a separate domain from the UI palette.
 - `cv.astro` — a print-only CV page with its own scoped `:root` (`--ink`, `--muted`, `--accent #c63d1f`, `--line`, `--bg`) optimized for print contrast on white. `#c63d1f` is a deliberate print accent, not the UI coral; the scoped `:root` confines it to `/cv`.
 - `AudienceBar.astro` — the pressed audience toggle overrides `--button-ink` to `#fff` in light theme: the dark brick accent `#a8331a` would give dark ink ~2.6:1, white lifts it to ~7.6:1 (WCAG 1.4.3). The only raw-hex override on a button-ink site.
+
+## Brand source of truth
+
+`src/lib/brand.ts` holds the palette and the hexagon geometry that the site and the
+OG banners share. It exports two **contextual** accents, one cream, the signal blue,
+and the marketing-surface depth tints:
+
+| Export | Value | Where it lands |
+|---|---|---|
+| `BRAND_BLUE` | `#1400c3` | `--button-bg` (dark + light); the OG banner surface |
+| `ACCENT_ON_TEAL` | `#ff8569` | `--text-accent` (dark + cyberpunk) |
+| `ACCENT_ON_TEAL_LIGHT` | `#a8331a` | `--text-accent` (light) |
+| `ACCENT_ON_BLUE` | `#fe4e02` | the OG banner accent — never site text |
+| `CREAM` | `#f4efca` | `--background-primary` (light) **and** the OG banner ink |
+
+The two accents are deliberate, not drift: the high-chroma orange reads on the
+royal-blue marketing surface, the coral on the teal site canvas. Swapping them
+would fail contrast in both places.
+
+`global.css` stays hand-written; agreement between it and `brand.ts` is enforced
+by `tests/lib/brand.test.ts`, which parses the `:root`, `[data-theme="light"]` and
+`[data-theme="cyberpunk"]` token blocks and fails on any divergence. The four
+banner generators (`scripts/generate-{cv-og,cv-linkedin,home-og,graph-og}.mjs`)
+import the same module, so there are no bare brand hexes outside it.
+
 
 ## Palette Swatches — 60-30-10
 

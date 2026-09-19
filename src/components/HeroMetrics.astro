@@ -18,11 +18,13 @@ type Metric = {
   label: string;
 };
 
+// Units are shared with the OG banners ("п.п." / "€656K"), so the strip and
+// the banner read as one series rather than two conventions.
 const METRICS: Metric[] = [
   { value: 5, label: isEn ? "years in data" : "лет в данных" },
   { value: SIG.portfolio.projects, label: isEn ? "portfolio projects" : "проектов в портфолио" },
-  { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: "pp", label: isEn ? "KYC conversion" : "KYC-конверсия" },
-  { value: SIG.abKyc.annualEurK, prefix: "€", suffix: "K/yr", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
+  { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: isEn ? "pp" : "п.п.", label: isEn ? "KYC conversion" : "KYC-конверсия" },
+  { value: SIG.abKyc.annualEurK, prefix: "€", suffix: isEn ? "K/yr" : "K/год", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
 ];
 
 const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(v)));
@@ -110,7 +112,8 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
   .hero-metrics {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: var(--space-3);
+    row-gap: var(--space-3);
     margin-top: var(--space-2);
   }
   .hero-metric {
@@ -118,8 +121,14 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
     flex-direction: column;
     gap: var(--space-1);
   }
+  /* Light separators between metrics — the banner scorecard has them too, so
+     the strip and the banner read as the same component. */
+  .hero-metric + .hero-metric {
+    padding-left: var(--space-3);
+    border-left: 1px solid color-mix(in srgb, var(--text-muted) 32%, transparent);
+  }
   .hero-metric-value {
-    font-family: var(--font-mono);
+    font-family: var(--font-sans);
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-accent);
@@ -136,6 +145,12 @@ const fmt = (v: number, d: number) => (d > 0 ? v.toFixed(d) : String(Math.round(
   @media (max-width: 640px) {
     .hero-metrics {
       gap: var(--space-3);
+    }
+    /* Stacked columns: a left rule on the first cell of a wrapped row would
+       read as a stray mark, so the separators drop out and gap does the work. */
+    .hero-metric + .hero-metric {
+      padding-left: 0;
+      border-left: none;
     }
     .hero-metric-value {
       font-size: 1.1rem;

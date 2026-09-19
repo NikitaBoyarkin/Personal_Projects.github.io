@@ -21,6 +21,7 @@
     "og:graph": "bun run scripts/generate-graph-og.mjs",
     "og:cv": "bun run scripts/generate-cv-og.mjs",
     "og:cv:li": "bun run scripts/generate-cv-linkedin.mjs",
+    "og:cv:cover": "bun run scripts/generate-cv-cover.mjs",
     "cv:pdf": "bun run scripts/sync-cv-pdf.mjs",
     "sync:gh": "bun run scripts/sync-github-projects.mjs",
     "sync:gh:apply": "bun run scripts/sync-github-projects.mjs --apply",
@@ -48,6 +49,7 @@
     "jsdom": "^30.0.1",
     "playwright": "^1.63.0",
     "pngjs": "^7.0.0",
+    "sharp": "^0.35.4",
     "typescript": "^5.9.3"
   },
   "patchedDependencies": {

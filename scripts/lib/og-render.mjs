@@ -72,6 +72,29 @@ export function renderSvgToPng(svg, outPath, { tmpName = 'og-banner' } = {}) {
   return outPath;
 }
 
+/**
+ * Same contract as renderSvgToPng, but rasterises to a vector PDF
+ * (`-f pdf`) — used for print-shaped assets such as the CV cover page.
+ */
+export function renderSvgToPdf(svg, outPath, { tmpName = 'og-banner' } = {}) {
+  mkdirSync(dirname(outPath), { recursive: true });
+  const svgPath = join(tmpdir(), `${tmpName}.svg`);
+  writeFileSync(svgPath, svg);
+  const res = spawnSync('rsvg-convert', ['-f', 'pdf', svgPath, '-o', outPath], {
+    encoding: 'utf8',
+    cwd: OG_FONTS_DIR,
+    env: ogFontEnv(),
+  });
+  try {
+    unlinkSync(svgPath);
+  } catch {}
+  if (res.status !== 0) {
+    console.error('rsvg-convert failed:', res.stderr || res.stdout);
+    process.exit(1);
+  }
+  return outPath;
+}
+
 // --- WCAG 2.x relative luminance / contrast --------------------------------
 
 const HEX = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i;

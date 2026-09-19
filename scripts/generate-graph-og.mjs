@@ -7,8 +7,8 @@
 // Single source of truth: imports buildGraph / layoutGraph / TOPICS and the
 // shared visual tokens straight from src/lib, so the preview can never drift
 // from the graph the site renders.
-// Palette matches the homepage banner (portfolio-banner-v2.png):
-// #1400c3 60% · #fe4e02 30% · #f8f2da 10%.
+// Palette matches the homepage banner (portfolio-banner-v2.png): the blue
+// surface, orange accent and unified cream come from src/lib/brand.ts.
 //
 // Fonts: identity name is Cormorant, all service text is Inter — the same
 // families the site ships. They are vendored as static TTF in scripts/og-fonts/
@@ -37,6 +37,13 @@ import {
 import { layoutGraph } from '../src/lib/graph-layout.ts';
 import { TOPICS } from '../src/lib/topics.ts';
 import {
+  ACCENT_ON_BLUE,
+  BRAND_BLUE,
+  CREAM,
+  hexPoints,
+  hexPointsFlat,
+} from '../src/lib/brand.ts';
+import {
   FONT_SANS,
   FONT_SERIF,
   assertContrast,
@@ -49,11 +56,10 @@ const CONTENT = join(ROOT, 'src/content');
 const OUT = join(ROOT, 'public/images/og/portfolio-graph-v2.png');
 const PORTRAIT = join(ROOT, 'public/images/00_profile.jpg');
 
-// --- Palette — homepage-banner brand tokens (graph hexes are SVG-only). ---
-const BG = '#1400c3'; // royal blue surface
-const CREAM = '#f8f2da'; // primary text
+// --- Palette — brand tokens + graph-only node tints. ---
+const BG = BRAND_BLUE; // royal blue surface
+const ORANGE = ACCENT_ON_BLUE; // brand accent — semantic, never body text
 const MUTED = '#bdb5ea'; // secondary text (cream dimmed toward the blue)
-const ORANGE = '#fe4e02'; // brand accent — semantic, never body text
 const PERI = '#9db4ff'; // light periwinkle — keeps topic nodes legible on blue
 const PEACH = '#ffb38a'; // warm tint for the Volta group
 
@@ -256,12 +262,16 @@ const legendSvg = LEGEND.map(([label, color], i) => {
   <text x="${x + 16}" y="${LEGEND_Y}" font-family="${FONT_SANS}" font-size="15" font-weight="500" fill="${MUTED}">${esc(label)}</text>`;
 }).join('\n  ');
 
-// Portrait on the right: same pointy-top hexagon as the fallback banner
-// (portfolio-banner-v2.png) so the two read as one series. Cream tile R=232,
-// photo clip R=225, orange ring R=228.5 (stroke 7 covers the 225..232 band).
-const HEX_TILE = '975,73 1175.9,189 1175.9,421 975,537 774.1,421 774.1,189';
-const HEX_PHOTO = '975,80 1169.9,192.5 1169.9,417.5 975,530 780.1,417.5 780.1,192.5';
-const HEX_RING = '975,76.5 1172.9,190.8 1172.9,419.3 975,533.5 777.1,419.3 777.1,190.8';
+// Portrait on the right: the same pointy-top hexagon as the fallback banner
+// (portfolio-banner-v2.png) so the two read as one series — one geometry from
+// brand.ts. Plate R=232, photo clip R=225, orange ring R=228.5 (stroke 7).
+const PORTRAIT_C = { cx: 975, cy: 305 };
+const TILE_R = 232;
+const HEX_HALO = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R);
+const HEX_PHOTO = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R - 7);
+const HEX_RING = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R - 3.5);
+// NB brand mark — flat-top hexagon reproducing the former 1.15x lockup.
+const LOGO = { cx: 113.5, cy: 101.5, r: 52.9, dy: 12.65 };
 // Oversized portrait box so the source photo's hard shoulder cut stays hidden.
 const PORTRAIT_BOX = { x: 830, y: 20, w: 390, h: 600 };
 // Inlined as a data URI so rsvg-convert resolves it from any cwd.
@@ -323,10 +333,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.
   <rect x="${PANEL.x + 0.5}" y="${PANEL.y + 0.5}" width="${PANEL.w - 1}" height="${PANEL.h - 1}" rx="18" fill="none" stroke="${CREAM}" stroke-opacity="0.14" stroke-width="1"/>
 
   <!-- compact identity header, top-left -->
-  <g transform="translate(56,44) scale(1.15)">
-    <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="${ORANGE}" stroke-width="4"/>
-    <text x="50" y="61" font-family="${FONT_SANS}" font-size="30" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
-  </g>
+  <polygon points="${hexPointsFlat(LOGO.cx, LOGO.cy, LOGO.r)}" fill="none" stroke="${ORANGE}" stroke-width="4.6"/>
+  <text x="${LOGO.cx}" y="${LOGO.cy + LOGO.dy}" font-family="${FONT_SANS}" font-size="34.5" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
   <text x="186" y="104" font-family="${FONT_SERIF}" font-size="52" font-weight="600" letter-spacing="-0.5" fill="${CREAM}">Nikita Boyarkin</text>
   <text x="186" y="142" font-family="${FONT_SANS}" font-size="22" font-weight="600" fill="${CREAM}">Product / Data Analyst</text>
   <rect x="186" y="158" width="110" height="3" fill="${ORANGE}"/>
@@ -337,8 +345,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.
 
   <text x="56" y="616" font-family="${FONT_SANS}" font-size="20" font-weight="500" fill="${CREAM}">nikitaboyarkin.github.io</text>
 
-  <!-- portrait: cream tile + clipped photo + orange ring (right) -->
-  <polygon points="${HEX_TILE}" fill="${CREAM}"/>
+  <!-- portrait: warm halo + clipped photo + orange ring (no cream plate) -->
+  <polygon points="${HEX_HALO}" fill="none" stroke="${ORANGE}" stroke-width="8" opacity="0.14"/>
   <image x="${PORTRAIT_BOX.x}" y="${PORTRAIT_BOX.y}" width="${PORTRAIT_BOX.w}" height="${PORTRAIT_BOX.h}" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexPhoto)" xlink:href="${portraitData}" href="${portraitData}"/>
   <polygon points="${HEX_RING}" fill="none" stroke="${ORANGE}" stroke-width="7"/>
 </svg>`;

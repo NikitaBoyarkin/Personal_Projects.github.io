@@ -2,7 +2,8 @@
 // Renders a 1200x630 branded SVG (hexagon-clipped portrait + retention
 // step curve) and converts it to PNG via rsvg-convert into
 // public/images/og/portfolio-banner-v2.png.
-// Palette: #1400c3 60% · #fe4e02 30% · #f8f2da 10%.
+// Palette: brand blue surface · orange accent · unified cream ink — all from
+// src/lib/brand.ts, so this script holds no brand hex of its own.
 //
 // Fonts: the identity name is Cormorant, all service text is Inter — the same
 // families the site ships. They are vendored as static TTF in scripts/og-fonts/
@@ -18,6 +19,13 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import {
+  ACCENT_ON_BLUE,
+  BRAND_BLUE,
+  CREAM,
+  hexPoints,
+  hexPointsFlat,
+} from '../src/lib/brand.ts';
+import {
   FONT_SANS,
   FONT_SERIF,
   assertContrast,
@@ -30,9 +38,8 @@ const OUT = join(ROOT, 'public/images/og/portfolio-banner-v2.png');
 const PORTRAIT = join(ROOT, 'public/images/00_profile.jpg');
 
 // Palette
-const BLUE = '#1400c3';
-const ORANGE = '#fe4e02';
-const CREAM = '#f8f2da';
+const BLUE = BRAND_BLUE;
+const ORANGE = ACCENT_ON_BLUE;
 
 // AA gate (REQ-03 / REQ-08): every text token clears 4.5:1 (3:1 for large).
 assertContrast(
@@ -53,7 +60,7 @@ assertContrast(
 const portraitData = `data:image/jpeg;base64,${readFileSync(PORTRAIT).toString('base64')}`;
 
 // Cohort retention step curve with axis labels — reads as a real retention
-// chart on larger previews. Every label is drawn in cream (#f8f2da).
+// chart on larger previews. Every label is drawn in the brand cream.
 const STEP = (() => {
   const x0 = 150;
   const x1 = 600;
@@ -99,11 +106,18 @@ const STEP = (() => {
   ${xLabels}`;
 })();
 
-// Pointy-top hexagons centred at (975,305): cream tile R=232, photo clip R=225,
-// orange ring R=228.5 (stroke 7 — exactly covers the 225..232 band).
-const HEX_TILE = '975,73 1175.9,189 1175.9,421 975,537 774.1,421 774.1,189';
-const HEX_PHOTO = '975,80 1169.9,192.5 1169.9,417.5 975,530 780.1,417.5 780.1,192.5';
-const HEX_RING = '975,76.5 1172.9,190.8 1172.9,419.3 975,533.5 777.1,419.3 777.1,190.8';
+// Pointy-top hexagons centred at (975,305): plate R=232, photo clip R=225,
+// orange ring R=228.5 (stroke 7 — exactly covers the 225..232 band). All
+// geometry comes from brand.ts so the four banners share one hexagon.
+const PORTRAIT_C = { cx: 975, cy: 305 };
+const TILE_R = 232;
+const HEX_PHOTO = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R - 7);
+const HEX_RING = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R - 3.5);
+const HEX_HALO = hexPoints(PORTRAIT_C.cx, PORTRAIT_C.cy, TILE_R);
+
+// NB brand mark — flat-top hexagon, geometry matches the nav logo. The centre
+// and radius reproduce the previous translate(80,40) scale(1.4) lockup exactly.
+const LOGO = { cx: 150, cy: 110, r: 64.4, dy: 15.4 };
 
 // The portrait box is deliberately oversized (390x600) so the source photo's
 // hard-cut shoulder edge is pushed below the hexagon and never shows.
@@ -132,8 +146,8 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.
 
   <!-- decorative hexagons (subtle) -->
   <g fill="none" stroke="${CREAM}" stroke-width="2" opacity="0.12">
-    <polygon points="620,110 663,135 663,185 620,210 577,185 577,135"/>
-    <polygon points="700,470 743,495 743,545 700,570 657,545 657,495"/>
+    <polygon points="${hexPoints(620, 160, 50)}"/>
+    <polygon points="${hexPoints(700, 520, 50)}"/>
   </g>
 
   <!-- retention chart surface: glow + vignette + frame, matching the graph banner -->
@@ -146,16 +160,14 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.
   </g>
   <rect x="88.5" y="396.5" width="539" height="169" rx="18" fill="none" stroke="${CREAM}" stroke-opacity="0.14" stroke-width="1"/>
 
-  <!-- portrait: cream tile + clipped photo + orange ring -->
-  <polygon points="${HEX_TILE}" fill="${CREAM}"/>
+  <!-- portrait: warm halo + clipped photo + orange ring (no cream plate) -->
+  <polygon points="${HEX_HALO}" fill="none" stroke="${ORANGE}" stroke-width="8" opacity="0.14"/>
   <image x="830" y="20" width="390" height="600" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexPhoto)" xlink:href="${portraitData}" href="${portraitData}"/>
   <polygon points="${HEX_RING}" fill="none" stroke="${ORANGE}" stroke-width="7"/>
 
-  <!-- hexagon logo (matches nav logo geometry) -->
-  <g transform="translate(80,40) scale(1.4)">
-    <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="${ORANGE}" stroke-width="4"/>
-    <text x="50" y="61" font-family="${FONT_SANS}" font-size="30" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
-  </g>
+  <!-- NB brand mark (nav-logo geometry; 42px/5.6 reproduce the former 1.4x lockup) -->
+  <polygon points="${hexPointsFlat(LOGO.cx, LOGO.cy, LOGO.r)}" fill="none" stroke="${ORANGE}" stroke-width="5.6"/>
+  <text x="${LOGO.cx}" y="${LOGO.cy + LOGO.dy}" font-family="${FONT_SANS}" font-size="42" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
 
   <text x="80" y="264" font-family="${FONT_SERIF}" font-size="74" font-weight="600" letter-spacing="-1" fill="${CREAM}">${esc('Nikita Boyarkin')}</text>
   <text x="80" y="328" font-family="${FONT_SANS}" font-size="38" font-weight="600" fill="${CREAM}">${esc('Product / Data Analyst')}</text>
