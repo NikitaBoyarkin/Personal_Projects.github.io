@@ -23,7 +23,7 @@ type Metric = {
 const METRICS: Metric[] = [
   { value: 5, label: isEn ? "years in data" : "лет в данных" },
   { value: SIG.portfolio.projects, label: isEn ? "portfolio projects" : "проектов в портфолио" },
-  { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: isEn ? "pp" : "п.п.", label: isEn ? "KYC conversion" : "KYC-конверсия" },
+  { value: SIG.abKyc.deltaPp, decimals: 2, prefix: "+", suffix: isEn ? " pp" : " п.п.", label: isEn ? "KYC conversion" : "KYC-конверсия" },
   { value: SIG.abKyc.annualEurK, prefix: "€", suffix: isEn ? "K/yr" : "K/год", label: isEn ? "annual fix impact" : "годовой эффект фикса" },
 ];
 

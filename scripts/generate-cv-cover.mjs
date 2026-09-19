@@ -13,7 +13,9 @@
 // the PDF past 1 MB. The hexagon shows ~264 pt of height, so the default
 // 700 px lands near 190 dpi — COVER_PHOTO_H tunes the trade-off.
 //
-// Palette: #1400c3 60% · #fe4e02 30% · #f8f2da 10%.
+// Palette: brand blue surface · orange accent · unified cream ink — all from
+// src/lib/brand.ts, so this script holds no brand hex of its own and the cover
+// can never drift from the CV banner it accompanies.
 //
 // Run: bun run og:cv:cover
 // Not wired into the build — run manually; commit the PDF.
@@ -23,6 +25,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import sharp from 'sharp';
 
+import {
+  ACCENT_ON_BLUE,
+  BRAND_BLUE,
+  CREAM,
+  hexPoints,
+  hexPointsFlat,
+} from '../src/lib/brand.ts';
 import {
   FONT_SANS,
   FONT_SERIF,
@@ -40,10 +49,9 @@ const W = 595.276;
 const H = 841.89;
 const CX = W / 2;
 
-// Palette
-const BLUE = '#1400c3';
-const ORANGE = '#fe4e02';
-const CREAM = '#f8f2da';
+// Palette — every value is the brand module's.
+const BLUE = BRAND_BLUE;
+const ORANGE = ACCENT_ON_BLUE;
 
 // AA gate: every text token clears 4.5:1 (3:1 for large text).
 assertContrast(
@@ -62,26 +70,19 @@ assertContrast(
   'CV cover',
 );
 
-// Pointy-top hexagon vertices for a given centre + circumradius.
-const hex = (cx, cy, r) => {
-  const dx = (r * Math.sqrt(3)) / 2;
-  return [
-    [cx, cy - r],
-    [cx + dx, cy - r / 2],
-    [cx + dx, cy + r / 2],
-    [cx, cy + r],
-    [cx - dx, cy + r / 2],
-    [cx - dx, cy - r / 2],
-  ]
-    .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
-    .join(' ');
-};
-
-// Portrait: cream tile R=132, photo clip R=125, orange ring R=128.5.
+// Portrait — pointy-top hexagon, one geometry from brand.ts.
+// Plate R=132, photo clip R=125, orange ring R=128.5.
 const PC = { cx: CX, cy: 415, r: 132 };
-const HEX_TILE = hex(PC.cx, PC.cy, PC.r);
-const HEX_PHOTO = hex(PC.cx, PC.cy, PC.r - 7);
-const HEX_RING = hex(PC.cx, PC.cy, PC.r - 3.5);
+const HEX_HALO = hexPoints(PC.cx, PC.cy, PC.r);
+const HEX_PHOTO = hexPoints(PC.cx, PC.cy, PC.r - 7);
+const HEX_RING = hexPoints(PC.cx, PC.cy, PC.r - 3.5);
+
+// Decorative hexagons, mirrored about the portrait's centre line.
+const DECOR_R = 37;
+const DECOR_Y = 337;
+
+// NB brand mark — flat-top hexagon reproducing the former 0.9x lockup.
+const LOGO = { cx: 71, cy: 69, r: 41.4, dy: 9.9 };
 
 // Image box is oversized vs the clip so the photo's hard shoulder edge never
 // reaches the hexagon border (same trick as generate-home-og.mjs).
@@ -121,18 +122,16 @@ function buildSvg(portraitData) {
 
   <!-- decorative hexagons (subtle) -->
   <g fill="none" stroke="${CREAM}" stroke-width="1.5" opacity="0.12">
-    <polygon points="120,300 152,318.5 152,355.5 120,374 88,355.5 88,318.5"/>
-    <polygon points="476,300 508,318.5 508,355.5 476,374 444,355.5 444,318.5"/>
+    <polygon points="${hexPoints(120, DECOR_Y, DECOR_R)}"/>
+    <polygon points="${hexPoints(476, DECOR_Y, DECOR_R)}"/>
   </g>
 
   <!-- warm glow behind the portrait -->
   <ellipse cx="${CX.toFixed(1)}" cy="${PC.cy}" rx="210" ry="200" fill="url(#glow)"/>
 
-  <!-- hexagon logo (matches nav logo geometry) -->
-  <g transform="translate(26,24) scale(0.9)">
-    <polygon points="96,50 73,89.8 27,89.8 4,50 27,10.2 73,10.2" fill="none" stroke="${ORANGE}" stroke-width="4"/>
-    <text x="50" y="61" font-family="${FONT_SANS}" font-size="30" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
-  </g>
+  <!-- NB brand mark (nav-logo geometry) -->
+  <polygon points="${hexPointsFlat(LOGO.cx, LOGO.cy, LOGO.r)}" fill="none" stroke="${ORANGE}" stroke-width="3.6"/>
+  <text x="${LOGO.cx}" y="${LOGO.cy + LOGO.dy}" font-family="${FONT_SANS}" font-size="27" font-weight="700" fill="${CREAM}" text-anchor="middle">NB</text>
 
   <text x="${CX.toFixed(1)}" y="150" font-family="${FONT_SERIF}" font-size="56" font-weight="600" letter-spacing="-1" fill="${CREAM}" text-anchor="middle">${esc('Nikita Boyarkin')}</text>
   <text x="${CX.toFixed(1)}" y="190" font-family="${FONT_SANS}" font-size="23" font-weight="600" fill="${CREAM}" text-anchor="middle">${esc('Product / Data Analyst')}</text>
@@ -143,8 +142,8 @@ function buildSvg(portraitData) {
 
   <rect x="${(CX - 32).toFixed(1)}" y="258" width="64" height="2.5" fill="${ORANGE}"/>
 
-  <!-- portrait: cream tile + clipped photo + orange ring -->
-  <polygon points="${HEX_TILE}" fill="${CREAM}"/>
+  <!-- portrait: warm halo + clipped photo + orange ring (no cream plate) -->
+  <polygon points="${HEX_HALO}" fill="none" stroke="${ORANGE}" stroke-width="6" opacity="0.14"/>
   <image x="${IMG_X.toFixed(1)}" y="${IMG_Y}" width="${IMG_W}" height="${IMG_H}" preserveAspectRatio="xMidYMid slice" clip-path="url(#hexPhoto)" xlink:href="${portraitData}" href="${portraitData}"/>
   <polygon points="${HEX_RING}" fill="none" stroke="${ORANGE}" stroke-width="5"/>
 
