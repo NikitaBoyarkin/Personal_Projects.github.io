@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Created | 2026-09-19 |
-| Source PRD | `docs/prd-v7.md` §5 V1.1 / V1.3 |
+| Source PRD | `docs/prd-v7.md` §5 V1.1 / V1.2 / V1.3 |
 | Owner | Nikita Boyarkin |
-| Status | Ready to send — owner-gated (needs named targets) |
+| Status | Ready to send — owner-gated (needs named targets + permission to apply) |
 
 Operational templates for Sprint 1. **Not findings** — results are logged in
 `docs/prd-v7-findings.md`. This file exists so the owner can start sending in minutes, not so
@@ -107,14 +107,102 @@ qualifies moves forward in the log. Record reply rate in `docs/prd-v7-findings.m
 
 ---
 
-## 4. Order of operations
+## 4. V1.2 — hh.ru application cover letters
+
+One letter per segment, tailored by **one inserted line** naming the product/team. Plain text (hh's
+cover-letter field has no markdown). Target length 1,200–1,700 characters — enough to be concrete,
+short enough to be read.
+
+**Fixed rules for every letter:**
+- Lead with the wedge (**A/B + retention**) and **one** public proof link.
+- State the career change plainly and turn it into a differentiator (PhD in work psychology →
+  research design, bias-aware interpretation). Never hide it.
+- **Never claim tenure.** Banned: «X лет опыта», «эксперт», «ведущий», «гуру», any guarantee.
+  The honest line is "коммерческого опыта в продуктовой аналитике пока нет".
+- Label synthetic data as synthetic (`CONTEXT.md` → Synthetic-as-feature).
+
+### Variant A — segment 1 (B2C product / experimentation)
+
+> Здравствуйте!
+>
+> Откликаюсь на вакансию «[Название]». Мой фокус — A/B-тесты и retention, и [Продукт/команда]
+> интересен мне именно этим: [одна строка — что в продукте/команде цепляет].
+>
+> Как я работаю, видно на публичном кейсе: [ссылка]. Там полный цикл эксперимента — гипотеза,
+> расчёт выборки, проверка значимости, разбор сегментов и честный вывод о том, что сработало, а
+> что нет. Данные синтетические и воспроизводимые — это осознанный выбор: без NDA, всё
+> перепроверяемо.
+>
+> Про профиль скажу прямо: это смена карьеры, коммерческого срока в продуктовой аналитике у меня
+> пока нет. Вместо него — PhD по психологии труда, и он даёт продуктовой команде то, что редко
+> приходит с опытом: умение строить исследование так, чтобы отвечать на вопрос, а не собирать
+> метрики ради дашборда — от формулировки гипотезы до интерпретации с учётом смещений. SQL, Python,
+> статистика и A/B — рабочая часть набора; портфолио показывает, как я их соединяю.
+>
+> Буду рад короткому разговору: покажу кейс и разберу на нём любой вопрос по методологии.
+>
+> С уважением,
+> Никита Бояркин
+> [телефон] · [Telegram] · [портфолио]
+
+### Variant B — segment 2 (fintech / subscription retention)
+
+> Здравствуйте!
+>
+> Откликаюсь на вакансию «[Название]». Мой фокус — A/B-тесты и retention, а в [Компания] это ядро
+> продукта: [подписки / платежи / онбординг] живут удержанием — churn, LTV, конверсия в оплату, —
+> и именно здесь я хочу работать.
+>
+> Публичный кейс: [ссылка]. Полный цикл эксперимента: гипотеза, расчёт выборки, значимость,
+> когортный анализ удержания, выводы с ограничениями. Синтетические воспроизводимые данные —
+> намеренно: всё можно перепроверить.
+>
+> Честно про профиль: это смена карьеры, коммерческого срока в продуктовой аналитике пока нет. Есть
+> PhD по психологии труда — про то, как строить исследование пользователя и принимать решения на
+> данных, а не на мнениях; плюс SQL, Python, статистика и A/B. Портфолио показывает, как это
+> работает на задачах, близких к [домен: подписки / платежи / онбординг].
+>
+> Готов к короткому разговору и разбору кейса.
+>
+> С уважением,
+> Никита Бояркин
+> [телефон] · [Telegram] · [портфолио]
+
+### Short version (when the field is tight)
+
+> Здравствуйте! Откликаюсь на «[Название]». Фокус — A/B-тесты и retention; публичный кейс с полным
+> циклом эксперимента: [ссылка]. Честно: это смена карьеры, коммерческого срока в аналитике пока
+> нет; есть PhD по психологии труда (дизайн исследований) плюс SQL, Python, статистика, A/B.
+> Готов показать кейс и разобрать методологию. Никита Бояркин, [Telegram].
+
+### Personalization slot — examples for the list
+
+| Role | Insert line |
+|---|---|
+| Ozon, оформление заказов | «оформление заказа — та самая воронка, где A/B даёт деньги, а не отчёты» |
+| ВсеИнструменты, core + A/B | «в названии роли стоит A/B — для меня это не бонус, а основной инструмент» |
+| Ozon Банк, подписочные продукты | «подписки держатся удержанием, и это ровно мой фокус» |
+| Т-Банк, Product Analyst (Middle) | «эксперимент-культура банка — среда, в которой я хочу расти» |
+| МТС, клиентский опыт | «клиентский опыт = retention и churn, метрики, которые я разбираю в кейсе» |
+
+### Before sending
+
+1. Read the vacancy; confirm it is still live and the level is acceptable.
+2. Fill the two placeholders — never send a letter with `[Компания]` left in.
+3. Attach the public proof link (not a private repo).
+4. Send, then immediately log a `contact` row in `docs/contact-log.md` (`source=hh`, company,
+   `segment`).
+
+---
+
+## 5. Order of operations
 
 1. Name the 10 interview targets → send the §2 message (V1.1). This is the gating item.
 2. In parallel, send the 5 probes (§3, V1.3) — they need no scheduling.
 3. Log every reply in `docs/contact-log.md` the day it arrives.
 4. Feed results into `docs/prd-v7-findings.md`; do not start V2.x until V1.2's gate is decided.
 
-## 5. What still needs the owner
+## 6. What still needs the owner
 
 | Item | Blocker |
 |---|---|

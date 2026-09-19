@@ -1,22 +1,23 @@
 ---
 title: SQL Analytics Case Study
-description: "25 SQL-кейсов на синтетическом датасете (~183k событий): воронка, retention, LTV, атрибуция, аномалии. Запуск на DuckDB одной командой, живой отчёт на GitHub Pages."
+description: "26 SQL-кейсов: 25 на синтетическом датасете (~183k событий) + 1 real-data на UCI Online Retail II. Воронка, retention, LTV, атрибуция, аномалии, dbt-слой. Запуск на DuckDB одной командой, живой отчёт на GitHub Pages."
 track: analytics
 hero: images/sql.svg
 impact:
-  - 25 self-contained SQL cases (funnel → RFM)
-  - DuckDB — no server, no credentials, one command
+  - 26 self-contained SQL cases (funnel → RFM) + 1 real-data case
+  - dbt model layer on DuckDB (staging → marts, 17 dbt tests)
   - Regression tests with deterministic invariants per case
-  - Synthetic deterministic data (seed=42 + additive seed=43)
+  - Synthetic deterministic data (seed=42 + additive seed=43) + UCI Online Retail II
   - Live interactive report on GitHub Pages
 tools:
   - SQL
+  - dbt
   - DuckDB
   - Python
   - pandas / NumPy
   - pytest
 github: https://github.com/NikitaBoyarkin/sql-analytics-case-study
-updated: 2026-09-15
+updated: 2026-09-19
 demo: https://nikitaboyarkin.github.io/sql-analytics-case-study/
 caseStudy:
   problem: "Аналитику нужно показать владение SQL на продуктовых задачах, но продакшен-данных нет, а учебные задачи не демонстрируют системное мышление. Как доказать, что SQL — рабочий инструмент, а не набор заученных синтаксисов?"
@@ -24,20 +25,20 @@ caseStudy:
   result: "25 кейсов от funnel до RFM: sessionization с валидацией против ground truth (99.6%), lifecycle-композиция, revenue-retention-треугольник, in-SQL z-test для A/B, MAD-анализ аномалий. Кейсы самопроверяемы: pytest подтверждает, что SQL продолжает давать ожидаемые метрики после любого изменения данных. Отчёт публикуется на GitHub Pages автоматически."
   metrics:
     - label: "SQL-кейсов"
-      value: "25"
+      value: "26"
     - label: "Событий в датасете"
       value: "~183k"
-    - label: "Signups"
-      value: "20k"
-    - label: "Тестов (regression)"
-      value: "41"
+    - label: "Real-data строк"
+      value: "1.07M"
+    - label: "Тестов (pytest + dbt)"
+      value: "43 + 17"
 ---
 
 # SQL Analytics Case Study
 
 ## Контекст
 
-Take-home–формат: 25 end-to-end SQL-кейсов на синтетическом продуктовом датасете. Каждый кейс — один самодостаточный `.sql` файл с вопросом и подходом в leading-комментарии. Без сервера, без кредов — одна команда строит данные и базу DuckDB.
+Take-home–формат: 25 end-to-end SQL-кейсов на синтетическом продуктовом датасете **плюс один real-data кейс** на UCI Online Retail II. Каждый кейс — один самодостаточный `.sql` файл с вопросом и подходом в leading-комментарии. Без сервера, без кредов — одна команда строит данные и базу DuckDB. Дополнительно — **dbt-слой** (staging → marts, 17 тестов) на той же базе.
 
 ## Данные и метод
 
@@ -51,8 +52,9 @@ Take-home–формат: 25 end-to-end SQL-кейсов на синтетиче
 | **Subscriptions** | 268 конверсий | monthly / annual plans |
 | **Cancellations** (seed=43) | 98 | `subscription_cancellations` |
 | **Refunds** (seed=43) | 53 | `refunds` |
+| **Online Retail II** (real) | 1,067,371 строк | UCI датасет 502, CC BY 4.0 — кейс 26 |
 
-Схема: `data/schema.sql`. Генератор: `data/generate_data.py`. Engagement геометрически убывает от signup; retention взвешен каналом привлечения. Аддитивные таблицы (кейсы 21–25) генерируются на отдельном RNG-потоке (seed=43) — числа кейсов 1–20 не меняются.
+Схема: `data/schema.sql`. Генератор: `data/generate_data.py`. Engagement геометрически убывает от signup; retention взвешен каналом привлечения. Аддитивные таблицы (кейсы 21–25) генерируются на отдельном RNG-потоке (seed=43) — числа кейсов 1–20 не меняются. Real-data таблица (кейс 26) грузится из закоммиченного parquet (`data/realdata/`) в ту же базу.
 
 **25 кейсов:**
 
@@ -83,16 +85,18 @@ Take-home–формат: 25 end-to-end SQL-кейсов на синтетиче
 | 23 | Pareto / revenue concentration | `NTILE(10)`, cumulative-share curve |
 | 24 | Daily revenue anomaly detection | robust MAD z-score, rolling baseline |
 | 25 | Purchase → subscription conversion | join к subscriptions, time-to-convert |
+| 26 | **Real data** — repeat purchase & concentration | rollup invoice→customer, order-count buckets, revenue shares |
 
 ### Запуск
 
 ```bash
-uv run python data/generate_data.py   # data/analytics.duckdb
+uv run python data/generate_data.py   # data/analytics.duckdb (incl. real-data table)
 uv run python run.py            # список кейсов
 uv run python run.py 1          # запустить кейс 1
-uv run python run.py 9 --limit 20
-uv run --extra dev pytest -q    # 41 regression-тест
+uv run python run.py 26         # real-data кейс
+uv run --extra dev pytest -q    # 43 regression-теста
 uv run python scripts/report.py # reports/index.html
+cd dbt && uv run dbt build --profiles-dir .   # dbt: модели + 17 тестов
 ```
 
 Runner печатает вопрос кейса, выполняет SQL против `data/analytics.duckdb`, рендерит результат таблицей. Отчёт с графиками публикуется на GitHub Pages автоматически при push.
@@ -101,20 +105,29 @@ Runner печатает вопрос кейса, выполняет SQL прот
 
 Каждый кейс покрывает конкретный оконно-функциональный паттерн. Ключевые находки честные, а не подогнанные:
 
-- repeat rate всего 3.5% (896 покупателей, 31 повторный) — это one-and-done purchase engine;
-- RFM вырождается в recency-историю;
-- топ-дециль даёт лишь 22% выручки (нет «китов»);
-- лого-churn растёт до ~15%/мес при растущем MRR.
+Три сигнала из teaser (числа сверены с `cases.md`):
+
+- воронка теряет **54%** на шаге add-to-cart → checkout;
+- retention падает с **~21%** (D1) до **~5%** (D30) — утечка в onboarding-окне;
+- повторных покупок всего **3.5%** (896 покупателей, 31 повторный) — one-and-done purchase engine.
+
+Дополнительно:
+
+- RFM вырождается в recency-историю; топ-дециль даёт лишь 22% выручки (нет «китов»);
+- лого-churn растёт до ~15%/мес при растущем MRR;
+- **real data переворачивает вывод**: на UCI Online Retail II 72.4% клиентов возвращаются, а топ-15% дают 65% выручки — тот же SQL, противоположный бизнес-вывод.
 
 Расхождение вопрос/подход в одном файле + regression-инварианты делают кейсы самопроверяемыми.
 
 ## Эффект
 
-- **25 самодостаточных SQL-кейсов** — от funnel до RFM, каждый со своим оконным паттерном.
+- **26 самодостаточных SQL-кейсов** — от funnel до RFM, каждый со своим оконным паттерном.
+- **dbt-слой на DuckDB** — staging → marts (fct_funnel, fct_retention, fct_mrr), 17 dbt-тестов включая golden-answers; `dbt build` зелёный в CI.
+- **Real-data кейс** — тот же паттерн на 1M+ реальных строк (UCI Online Retail II, CC BY 4.0): 72.4% repeat против 3.5% синтетики.
 - **Sessionization с валидацией** — 30-min gap воспроизводит 80k pre-assigned sessions с точностью 99.6%.
 - **Аддитивные данные без поломки золотых ответов** — seed=43 на отдельном RNG-потоке.
 - **DuckDB без инфраструктуры** — одна команда строит данные и базу.
-- **Regression-тесты на кейс** — 41 тест: инварианты + golden-answers держат `cases.md` и код в синхроне.
+- **Regression-тесты на кейс** — 43 pytest-теста (инварианты + golden-answers) держат `cases.md` и код в синхроне.
 - **Живой отчёт** — GitHub Pages обновляется на каждый push.
 
 ## Документация

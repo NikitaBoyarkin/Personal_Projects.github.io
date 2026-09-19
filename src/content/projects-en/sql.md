@@ -1,22 +1,23 @@
 ---
 title: SQL Analytics Case Study
-description: "25 end-to-end SQL case studies on a ~183k-event synthetic dataset: funnel, retention, LTV, attribution, anomalies. Runs on DuckDB with one command; live report on GitHub Pages."
+description: "26 SQL cases: 25 on a ~183k-event synthetic dataset + 1 real-data case on UCI Online Retail II. Funnel, retention, LTV, attribution, anomalies, plus a dbt layer. Runs on DuckDB with one command; live report on GitHub Pages."
 track: analytics
 hero: images/sql.svg
 impact:
-  - 25 self-contained SQL cases (funnel → RFM)
-  - DuckDB — no server, no credentials, one command
+  - 26 self-contained SQL cases (funnel → RFM) + 1 real-data case
+  - dbt model layer on DuckDB (staging → marts, 17 dbt tests)
   - Regression tests with deterministic invariants per case
-  - Synthetic deterministic data (seed=42 + additive seed=43)
+  - Synthetic deterministic data (seed=42 + additive seed=43) + UCI Online Retail II
   - Live interactive report on GitHub Pages
 tools:
   - SQL
+  - dbt
   - DuckDB
   - Python
   - pandas / NumPy
   - pytest
 github: https://github.com/NikitaBoyarkin/sql-analytics-case-study
-updated: 2026-09-15
+updated: 2026-09-19
 demo: https://nikitaboyarkin.github.io/sql-analytics-case-study/
 caseStudy:
   problem: "An analyst needs to show SQL skill on product tasks, but there is no production data, and textbook exercises do not demonstrate systems thinking. How do you prove SQL is a working tool rather than a set of memorised syntax?"
@@ -24,20 +25,20 @@ caseStudy:
   result: "25 cases from funnel to RFM: sessionization validated against ground truth (99.6%), lifecycle composition, a revenue-retention triangle, an in-SQL z-test for A/B, and MAD anomaly analysis. The cases are self-checking: pytest confirms the SQL keeps returning the expected metrics after any data change. The report is published to GitHub Pages automatically."
   metrics:
     - label: "SQL cases"
-      value: "25"
+      value: "26"
     - label: "Dataset events"
       value: "~183k"
-    - label: "Signups"
-      value: "20k"
-    - label: "Regression tests"
-      value: "41"
+    - label: "Real-data rows"
+      value: "1.07M"
+    - label: "Tests (pytest + dbt)"
+      value: "43 + 17"
 ---
 
 # SQL Analytics Case Study
 
 ## Context
 
-A take-home format: 25 end-to-end SQL cases on a synthetic product dataset. Each case is one self-contained `.sql` file with the question and approach in a leading comment. No server, no credentials — a single command builds the data and a DuckDB database.
+A take-home format: 25 end-to-end SQL cases on a synthetic product dataset **plus one real-data case** on UCI Online Retail II. Each case is one self-contained `.sql` file with the question and approach in a leading comment. No server, no credentials — a single command builds the data and a DuckDB database. Plus a **dbt layer** (staging → marts, 17 tests) on the same database.
 
 ## Data & Method
 
@@ -51,8 +52,9 @@ A take-home format: 25 end-to-end SQL cases on a synthetic product dataset. Each
 | **Subscriptions** | 268 conversions | monthly / annual plans |
 | **Cancellations** (seed=43) | 98 | `subscription_cancellations` |
 | **Refunds** (seed=43) | 53 | `refunds` |
+| **Online Retail II** (real) | 1,067,371 rows | UCI dataset 502, CC BY 4.0 — case 26 |
 
-Schema: `data/schema.sql`. Generator: `data/generate_data.py`. Engagement decays geometrically from signup; retention is weighted by acquisition channel. Additive tables (cases 21–25) are generated on a separate RNG stream (seed=43) so the seed-42 numbers in cases 1–20 never move.
+Schema: `data/schema.sql`. Generator: `data/generate_data.py`. Engagement decays geometrically from signup; retention is weighted by acquisition channel. Additive tables (cases 21–25) are generated on a separate RNG stream (seed=43) so the seed-42 numbers in cases 1–20 never move. The real-data table (case 26) is loaded from a committed parquet (`data/realdata/`) into the same database.
 
 **25 cases:**
 
@@ -83,16 +85,18 @@ Schema: `data/schema.sql`. Generator: `data/generate_data.py`. Engagement decays
 | 23 | Pareto / revenue concentration | `NTILE(10)`, cumulative-share curve |
 | 24 | Daily revenue anomaly detection | robust MAD z-score, rolling baseline |
 | 25 | Purchase → subscription conversion | join to subscriptions, time-to-convert |
+| 26 | **Real data** — repeat purchase & concentration | invoice→customer rollup, order-count buckets, revenue shares |
 
 ### Quick start
 
 ```bash
-uv run python data/generate_data.py   # data/analytics.duckdb
+uv run python data/generate_data.py   # data/analytics.duckdb (incl. real-data table)
 uv run python run.py            # list cases
 uv run python run.py 1          # run case 1
-uv run python run.py 9 --limit 20
-uv run --extra dev pytest -q    # 41 regression tests
+uv run python run.py 26         # real-data case
+uv run --extra dev pytest -q    # 43 regression tests
 uv run python scripts/report.py # reports/index.html
+cd dbt && uv run dbt build --profiles-dir .   # dbt: models + 17 tests
 ```
 
 The runner prints the case question, executes the SQL against `data/analytics.duckdb`, and renders the result as a table. The charted report is published to GitHub Pages automatically on every push.
@@ -101,20 +105,29 @@ The runner prints the case question, executes the SQL against `data/analytics.du
 
 Each case covers a specific window-function pattern that shows up in real product tasks. The findings are honest rather than engineered:
 
-- the repeat rate is just 3.5% (896 buyers, 31 repeat) — this is a one-and-done purchase engine;
-- RFM degenerates into a recency story;
-- the top decile delivers only 22% of revenue (no whales);
-- logo churn climbs to ~15%/month even as MRR compounds.
+Three teaser signals (numbers pinned to `cases.md`):
+
+- the funnel drops **54%** at add-to-cart → checkout;
+- retention falls from **~21%** (D1) to **~5%** (D30) — the leak is the onboarding window;
+- only **3.5%** of buyers repeat (896 buyers, 31 repeat) — a one-and-done purchase engine.
+
+Also:
+
+- RFM degenerates into a recency story; the top decile delivers only 22% of revenue (no whales);
+- logo churn climbs to ~15%/month even as MRR compounds;
+- **real data flips the conclusion**: on UCI Online Retail II, 72.4% of customers repeat and the top 15% drive 65% of revenue — same SQL, opposite business answer.
 
 Splitting question and SQL in one file plus regression invariants makes the cases self-checking.
 
 ## Impact
 
-- **25 self-contained SQL cases** — from funnel to RFM, each with its own window pattern.
+- **26 self-contained SQL cases** — from funnel to RFM, each with its own window pattern.
+- **dbt layer on DuckDB** — staging → marts (fct_funnel, fct_retention, fct_mrr), 17 dbt tests including golden answers; `dbt build` green in CI.
+- **Real-data case** — the same pattern on 1M+ real rows (UCI Online Retail II, CC BY 4.0): 72.4% repeat vs 3.5% synthetic.
 - **Sessionization with validation** — a 30-min gap reproduces 80k pre-assigned sessions at 99.6% fidelity.
 - **Additive data without breaking golden answers** — seed=43 on a separate RNG stream.
 - **DuckDB with no infrastructure** — one command builds data and database.
-- **Per-case regression tests** — 41 tests (invariants + golden answers) keep `cases.md` and the code in sync.
+- **Per-case regression tests** — 43 pytest tests (invariants + golden answers) keep `cases.md` and the code in sync.
 - **Live report** — GitHub Pages refreshes on every push.
 
 ## Documentation

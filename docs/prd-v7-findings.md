@@ -123,11 +123,12 @@ message (RU + EN) and the interview record format are ready in `docs/prd-v7-outr
 Script is fixed in `docs/prd-v7.md` §5 V1.1 (5 decision questions). Append one section per
 interview + the synthesised paragraph here.
 
-## V1.2 — Application experiment (20) — PENDING
+## V1.2 — Application experiment (20) — PENDING (target list ready)
 
-Not started. Requires the owner's decision to spend 20 applications on middle−/junior+ roles
-(PRD v7 §8). Log into `docs/contact-log.md`; compute the screening-invite rate; decide the
-≥20% gate in writing here.
+Not started — blocked on the owner's decision to spend 20 applications on middle−/junior+ roles
+(PRD v7 §8). The 20 target roles are selected and live in `docs/prd-v7-target-roles.md`
+(harvested from hh.ru on 2026-09-19: 11 segment-1 + 9 segment-2, 16 remote). Log each in
+`docs/contact-log.md`; compute the screening-invite rate; decide the ≥20% gate in writing here.
 
 ## V1.3 — Message probes (5) — PENDING (template ready)
 
