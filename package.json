@@ -19,6 +19,8 @@
     "og:home": "bun run scripts/generate-home-og.mjs",
     "og:home:watch": "bun run --watch scripts/generate-home-og.mjs",
     "og:graph": "bun run scripts/generate-graph-og.mjs",
+    "og:cv": "bun run scripts/generate-cv-og.mjs",
+    "og:cv:li": "bun run scripts/generate-cv-linkedin.mjs",
     "cv:pdf": "bun run scripts/sync-cv-pdf.mjs",
     "sync:gh": "bun run scripts/sync-github-projects.mjs",
     "sync:gh:apply": "bun run scripts/sync-github-projects.mjs --apply",
@@ -47,5 +49,8 @@
     "playwright": "^1.63.0",
     "pngjs": "^7.0.0",
     "typescript": "^5.9.3"
+  },
+  "patchedDependencies": {
+    "@oneworks/avatar@1.0.0-rc.9": "patches/@oneworks%2Favatar@1.0.0-rc.9.patch"
   }
 }

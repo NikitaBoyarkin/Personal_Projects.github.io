@@ -1,0 +1,13 @@
+diff --git a/dist/index.js b/dist/index.js
+index 109364235eb8da3c0b8b1003ddd8380c638620a7..22a08336acf96f14c3ea998162b72d46775c00da 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -2525,7 +2525,7 @@ const U = (e, t) => {
+     throw new TypeError(`OneWorks Avatar supports at most ${ze} animation tracks`);
+   const t = /* @__PURE__ */ new Set();
+   return e.forEach((a) => {
+-    if (a.trackId.trim().length === 0 || a.trackId !== a.trackId.trim() || t.has(a.trackId) || !Number.isFinite(a.elapsedMs) || a.elapsedMs < 0 || !Number.isFinite(a.speed ?? 1) || (a.speed ?? 1) <= 0 || !Number.isFinite(a.weight ?? 1) || (a.weight ?? 1) < 0 || (a.weight ?? 1) > 1 || a.muted !== void 0 && typeof a.muted != "boolean" || a.preserveAuxiliaryPartIds !== void 0 && typeof a.preserveAuxiliaryPartIds != "boolean" || a.solo !== void 0 && typeof a.solo != "boolean") throw new TypeError("Invalid OneWorks Avatar animation track");
++    if (a.trackId.trim().length === 0 || a.trackId !== a.trackId.trim() || t.has(a.trackId) || !Number.isFinite(a.elapsedMs) || (a.elapsedMs = Math.max(0, a.elapsedMs)) < 0 || !Number.isFinite(a.speed ?? 1) || (a.speed ?? 1) <= 0 || !Number.isFinite(a.weight ?? 1) || (a.weight ?? 1) < 0 || (a.weight ?? 1) > 1 || a.muted !== void 0 && typeof a.muted != "boolean" || a.preserveAuxiliaryPartIds !== void 0 && typeof a.preserveAuxiliaryPartIds != "boolean" || a.solo !== void 0 && typeof a.solo != "boolean") throw new TypeError("Invalid OneWorks Avatar animation track");
+     t.add(a.trackId);
+   }), e;
+ }, Ha = (e, t) => {
