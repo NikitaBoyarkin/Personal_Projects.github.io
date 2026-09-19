@@ -42,7 +42,9 @@ bun run og:watch
 bun run cv:watch
 
 # Generate OG images
-bun run og
+bun run og          # per-post OG cards
+bun run og:home     # homepage identity banner
+bun run og:graph    # homepage knowledge-graph preview (real content graph)
 
 # Validate the built site
 make check
@@ -105,7 +107,8 @@ bun run sync:activity
 │       └── topics.ts
 ├── scripts/
 │   ├── check_site.py        # validates the dist/ build
-│   └── generate-og.mjs      # OG image generator (bun run og)
+│   ├── generate-og.mjs      # per-post OG image generator (bun run og)
+│   └── generate-graph-og.mjs # homepage graph OG generator (bun run og:graph)
 ├── .github/workflows/
 │   └── deploy.yml           # builds, lighthouse CI, deploys dist/ to GitHub Pages
 └── .claude/

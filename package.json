@@ -18,6 +18,7 @@
     "og:watch": "bun run --watch scripts/generate-og.mjs",
     "og:home": "bun run scripts/generate-home-og.mjs",
     "og:home:watch": "bun run --watch scripts/generate-home-og.mjs",
+    "og:graph": "bun run scripts/generate-graph-og.mjs",
     "cv:pdf": "bun run scripts/generate-cv-pdf.mjs",
     "cv:watch": "bun run --watch scripts/generate-cv-pdf.mjs",
     "sync:gh": "bun run scripts/sync-github-projects.mjs",
