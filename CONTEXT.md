@@ -23,8 +23,16 @@ Primary-действие в hero: «Смотреть проекты» / «See my
 _Avoid_: hero CTA variant, A/B CTA
 
 **Contact action**:
-Любое событие, означающее контакт-инициативу: `cv_download_pdf` (единая кнопка «CV» → PDF), `github_footer`, `linkedin_footer`. `hero_projects` контактом НЕ является (переход в проекты).
+Любое событие, означающее контакт-инициативу: `cv_download_pdf` (единая кнопка «CV» → PDF), `github_footer`, `linkedin_footer`. `hero_projects` контактом НЕ является (переход в проекты). Это click-уровень (что нажали), а не исход контакта — исход ведётся в **Contact stage**.
 _Avoid_: click, conversion event (неспецифично)
+
+**Contact stage**:
+Исходная стадия контакта в воронке найма, дополняющая click-уровень **Contact action**: `contact` (первое входящее сообщение рекрутера/нанимающего) → `screening` (скрининг/HR-звонок/тест) → `interview` (предметное интервью) → `final` (финальный раунд) → `offer`; терминальная — `rejected`. Ведётся вручную в `docs/contact-log.md` (PRD v7, V0.1). `contact` — leading, `final`/`offer` — lagging.
+_Avoid_: contact action (это клики сайта, не исход), click
+
+**Staged contacts log**:
+Ручной лог входящих контактов (`docs/contact-log.md`) со схемой `date | source | company | segment | stage | evidence | next action`. Различает контакт, дошедший до скрина, и контакт, дошедший до финала — то, чего не может click-уровень `Contact action`.
+_Avoid_: contact form (это форма на сайте), CRM
 
 ## Метрики
 
@@ -47,7 +55,7 @@ _Avoid_: сайт (когда речь о всей системе)
 _Avoid_: технический долг, недоделка
 
 **North Star (контакты рекрутеров/мес)**:
-Число контакт-инициатив от рекрутеров/нанимающих в месяц — прямая цель профиля (Goal 14). Измеряется PostHog-дашбордом + ручным логом входящих контактов, не только кликами сайта.
+Число контакт-инициатив от рекрутеров/нанимающих в месяц — прямая цель профиля (Goal 14). С v7 двухуровневая: `contact` (leading, ручной **Staged contacts log**) + `final`/`offer` (lagging, абсолютный счёт). Измеряется PostHog-дашбордом + ручным логом входящих контактов, не только кликами сайта.
 _Avoid_: цель-конверсия (это Goal 10)
 
 **Synthetic-as-feature**:
