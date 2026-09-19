@@ -99,6 +99,8 @@ dist/
 !src/lib/
 # Allow tests/lib/ (vitest suites) too
 !tests/lib/
+# Allow scripts/lib/ (shared OG render helpers) too
+!scripts/lib/
 # LHCI local output
 .lighthouseci/
 lhci-reports/

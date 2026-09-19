@@ -53,6 +53,12 @@ make check
 bun run sync:activity
 ```
 
+> OG banners render through `rsvg-convert` with the vendored fonts in
+> `scripts/og-fonts/`, wired via `FONTCONFIG_FILE=scripts/og-fonts/fonts.conf` **and**
+> `PANGOCAIRO_BACKEND=fc` (macOS PangoCairo defaults to the CoreText backend, which
+> ignores fontconfig). Both are set by `scripts/lib/og-render.mjs`; the scripts need
+> `rsvg-convert` on PATH.
+
 ## Project Structure
 
 ```text
@@ -108,7 +114,10 @@ bun run sync:activity
 ├── scripts/
 │   ├── check_site.py        # validates the dist/ build
 │   ├── generate-og.mjs      # per-post OG image generator (bun run og)
-│   └── generate-graph-og.mjs # homepage graph OG generator (bun run og:graph)
+│   ├── generate-graph-og.mjs # homepage graph OG generator (bun run og:graph)
+│   ├── generate-home-og.mjs # homepage identity banner (bun run og:home)
+│   ├── og-fonts/            # static Inter/Cormorant TTF + fonts.conf for the OG renderer
+│   └── lib/og-render.mjs    # shared rsvg spawn + WCAG AA contrast assert
 ├── .github/workflows/
 │   └── deploy.yml           # builds, lighthouse CI, deploys dist/ to GitHub Pages
 └── .claude/
