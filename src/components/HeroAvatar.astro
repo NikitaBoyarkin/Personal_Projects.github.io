@@ -1,0 +1,63 @@
+---
+// Hero avatar — a live, animated OneWorks 3D avatar mounted in the browser.
+//
+// Progressive enhancement: the static profile photo renders first and does the
+// LCP work. The heavy 3D bundle is imported only after the page has loaded, and
+// the 3D scene replaces the photo only once a real mount succeeds. If
+// JavaScript is unavailable, WebGL fails, or the visitor prefers reduced
+// motion, the photo simply stays.
+import { withBase } from '../lib/path';
+
+interface Props {
+  size?: number;
+}
+const { size = 72 } = Astro.props;
+---
+
+<div class="hero-avatar-slot" data-hero-avatar>
+  <div class="hero-avatar-3d" data-hero-avatar-mount hidden></div>
+  <img
+    class="hero-avatar hero-avatar-photo"
+    src={withBase('images/00_profile.webp')}
+    alt="Nikita Boyarkin"
+    width={size}
+    height={size}
+    loading="eager"
+    fetchpriority="high"
+    data-hero-avatar-fallback
+  />
+</div>
+
+<script>
+  const slot = document.querySelector<HTMLElement>('[data-hero-avatar]');
+
+  if (slot) {
+    const scheduleMount = () => {
+      void import('../lib/avatar/mount-hero')
+        .then(({ mountHeroAvatar }) => mountHeroAvatar(slot))
+        .then((avatar) => {
+          if (avatar) {
+            window.addEventListener('pagehide', () => avatar.destroy(), {
+              once: true,
+            });
+          }
+        })
+        // Keep the photo on any failure — the 3D scene is never required.
+        .catch(() => {});
+    };
+
+    const idle = (
+      window as Window & {
+        requestIdleCallback?: (callback: () => void) => number;
+      }
+    ).requestIdleCallback;
+
+    const afterLoad = () => {
+      if (idle) idle(scheduleMount);
+      else window.setTimeout(scheduleMount, 200);
+    };
+
+    if (document.readyState === 'complete') afterLoad();
+    else window.addEventListener('load', afterLoad, { once: true });
+  }
+</script>

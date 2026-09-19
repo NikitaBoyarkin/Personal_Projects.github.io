@@ -7,32 +7,30 @@
 | # | Локация | Текст CTA | Событие PostHog | Целевой URL |
 |---|---|---|---|---|
 | 1 | Hero (index, RU+EN) | «С чего начать» / «Start here» (A/B: «Смотреть проекты» / «See my work») | `hero_cta_click` + `hero_cta_exposure` (variant) | `/start/` (A/B: `/projects/`) |
-| 2 | Hero (index) | «CV» | `hero_cv` | `/cv/` |
-| 3 | Hero (index) | «Скачать PDF» / «Download PDF» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
-| 4 | Hero (index) | GitHub / LinkedIn | `github_hero` / `linkedin_hero` | внешние |
-| 5 | Header nav | Telegram-иконка | `telegram_header` | `t.me/lofinibo` |
-| 6 | Footer | GitHub · LinkedIn · Telegram · CV · PDF · Writing | `github_footer` / `linkedin_footer` / `telegram_footer` / `cv_footer` / `cv_pdf_footer` / `writing_footer` | внешние + внутренние |
-| 7 | HomeBoard (главная) | Telegram / GitHub / LinkedIn | `telegram_board` / `github_board` / `linkedin_board` | внешние |
-| 8 | contact.astro | «Telegram: @lofinibo» | `telegram_contact` | `t.me/lofinibo` |
-| 9 | contact.astro | «Написать с контекстом →» | `telegram_deeplink` | tg deep-link |
-| 10 | contact.astro | «CV (PDF)» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
-| 11 | value.astro | «Написать в Telegram →» | `value_cta` | tg deep-link |
-| 12 | value.astro | «GitHub →» | `value_github` | `github.com/NikitaBoyarkin` |
-| 13 | about.astro (#work) | «Обсудить формат →» | `work_with_me_cta` | tg deep-link |
-| 14 | about.astro (links footer) | «Написать в Telegram →» | `whois_cta` | tg deep-link |
-| 15 | cv.astro | «Download PDF» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
-| 16 | cv.astro | «Source (GitHub)» | `cv_source_github` | `github.com/NikitaBoyarkin/cv` |
-| 17 | games (`/games/`) | LinkedIn / Telegram (contact-секция) | `contact_click` (channel) | внешние |
-| 18 | AskMe (главная) | «Спросить» (открывает панель) | `ask_me_open` | — (панель) |
-| 19 | SearchBox (header) | «Поиск» (открывает панель) | `search_open` | — (панель) |
-| 20 | ProjectCard | «Смотреть» / «Demo» / «GitHub» | `project_view_<slug>` / `project_demo_<slug>` / `project_github_<slug>` | внутренние + внешние |
-| 21 | HeadlineCases (главная, PRD v6 S2.6) | 3 кейса + сжатый список 14 | `headline_case_<slug>` / `headline_demo_<slug>` / `headline_github_<slug>` / `headline_all_projects` / `more_project_<slug>` | внутренние проекты + внешние артефакты |
+| 2 | Hero (index, RU+EN) | «CV» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
+| 3 | Hero (index) | GitHub / LinkedIn | `github_hero` / `linkedin_hero` | внешние |
+| 4 | Header nav | Telegram-иконка | `telegram_header` | `t.me/lofinibo` |
+| 5 | Footer | GitHub · LinkedIn · Telegram · CV · Writing | `github_footer` / `linkedin_footer` / `telegram_footer` / `cv_download_pdf` / `writing_footer` | внешние + внутренние |
+| 6 | HomeBoard (главная) | Telegram / GitHub / LinkedIn | `telegram_board` / `github_board` / `linkedin_board` | внешние |
+| 7 | contact.astro | «Telegram: @lofinibo» | `telegram_contact` | `t.me/lofinibo` |
+| 8 | contact.astro | «Написать с контекстом →» | `telegram_deeplink` | tg deep-link |
+| 9 | contact.astro | «CV» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
+| 10 | value.astro | «Написать в Telegram →» | `value_cta` | tg deep-link |
+| 11 | value.astro | «GitHub →» | `value_github` | `github.com/NikitaBoyarkin` |
+| 12 | about.astro (#work) | «Обсудить формат →» | `work_with_me_cta` | tg deep-link |
+| 13 | about.astro (links footer) | «Написать в Telegram →» | `whois_cta` | tg deep-link |
+| 14 | about.astro / value.astro / CareerSnapshot | «CV» | `cv_download_pdf` | `CV-Nikita-Boyarkin.pdf` |
+| 15 | games (`/games/`) | LinkedIn / Telegram (contact-секция) | `contact_click` (channel) | внешние |
+| 16 | AskMe (главная) | «Спросить» (открывает панель) | `ask_me_open` | — (панель) |
+| 17 | SearchBox (header) | «Поиск» (открывает панель) | `search_open` | — (панель) |
+| 18 | ProjectCard | «Смотреть» / «Demo» / «GitHub» | `project_view_<slug>` / `project_demo_<slug>` / `project_github_<slug>` | внутренние + внешние |
+| 19 | HeadlineCases (главная, PRD v6 S2.6) | 3 кейса + сжатый список 14 | `headline_case_<slug>` / `headline_demo_<slug>` / `headline_github_<slug>` / `headline_all_projects` / `more_project_<slug>` | внутренние проекты + внешние артефакты |
 
 ## Гэпы, найденные аудитом
 
 | Гэп | Статус |
 |---|---|
-| Hero-CTA «С чего начать» и «CV» не имели трекинга | ✅ закрыт 2026-09-09: `hero_cta_click`/`hero_cta_exposure` (A/B) + `hero_cv` |
+| Hero-CTA «С чего начать» и «CV» не имели трекинга | ✅ закрыт 2026-09-09: `hero_cta_click`/`hero_cta_exposure` (A/B); CV-кнопка теперь трекается как `cv_download_pdf` (2026-09-19, была `hero_cv`) |
 | Ссылки внутри панели AskMe не трекаются (только `ask_me_open`) | ⏳ опционально: `ask_me_link_<label>` |
 | `start.astro` — удалён (S1.4); маршрутизация перенесена в jump-nav на `/about` | ✅ закрыт 2026-09-18 |
 
@@ -79,3 +77,18 @@ Redirects in `astro.config.mjs`:
 
 No wired event was dropped. `start.astro` carried no `data-analytics` event, so its deletion
 removes no funnel signal.
+
+## CV unification (2026-09-19)
+
+All CV entry points collapsed to a single "CV" button that downloads the PDF
+(`CV-Nikita-Boyarkin.pdf`, sourced from the rendercv project `../cv`). Removed:
+
+| Removed | Was |
+|---|---|
+| `/cv/` HTML page (`src/pages/cv.astro`) | standalone light-themed CV route |
+| `hero_cv` | hero CV button (now `cv_download_pdf`) |
+| `cv_footer` / `cv_pdf_footer` | footer `Резюме` + `PDF` links (now one `cv_download_pdf`) |
+| `cv_source_github` | "Source (GitHub)" on the deleted CV page |
+
+The `CV-Nikita-Boyarkin.pdf` `Disallow` in `robots.txt` is unchanged. Historical
+rows for the removed events stay in PostHog.

@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import HeroMetrics from '../components/HeroMetrics.astro';
 import HeroCta from '../components/HeroCta.astro';
+import HeroAvatar from '../components/HeroAvatar.astro';
 import CareerSnapshot from '../components/CareerSnapshot.astro';
 import ReadingBlock from '../components/ReadingBlock.astro';
 import MaterialStrip from '../components/MaterialStrip.astro';
@@ -78,15 +79,7 @@ const jsonLd = {
   <section id="intro">
     <div class="intro-container hero-editorial">
       <div class="hero-body">
-        <img
-          class="hero-avatar"
-          src={withBase('images/00_profile.webp')}
-          alt="Nikita Boyarkin"
-          width="72"
-          height="72"
-          loading="eager"
-          fetchpriority="high"
-        />
+        <HeroAvatar />
         <h1 class="hero-name">Продуктовый аналитик</h1>
         <p class="hero-role">A/B-тесты и retention</p>
         <p class="hero-pitch tagline">
@@ -101,7 +94,7 @@ const jsonLd = {
         <p class="cta-row">
           <HeroCta lang="ru" />
           <a class="button button-secondary" href={withBase('contact/')} data-analytics="hero_contact">Связаться</a>
-          <a class="button button-secondary" href={withBase('cv/')} target="_blank" rel="noopener" data-analytics="hero_cv">CV</a>
+          <a class="button button-secondary" href={withBase('CV-Nikita-Boyarkin.pdf')} download data-analytics="cv_download_pdf">CV</a>
         </p>
       </div>
 

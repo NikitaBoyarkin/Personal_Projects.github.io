@@ -227,13 +227,14 @@ Auth: `GITHUB_TOKEN`/`GH_TOKEN` env (higher rate limit, sees private repos). Una
 
 ## CV Source of Truth
 
-The CV in this portfolio is **not** authored here — it lives in a separate rendercv project at `/Users/nikitaboarkin/Desktop/00 ide/00 portfolio/cv/` (source: `Boyarkin_Nikita_Product_Analyst_CV.yaml`). To update the CV section:
+The CV is **not** authored here — it lives in a separate rendercv project at `/Users/nikitaboarkin/Desktop/00 ide/00 portfolio/cv/` (source: `Boyarkin_Nikita_Product_Analyst_CV.yaml`). The portfolio ships it as one downloadable PDF (`public/CV-Nikita-Boyarkin.pdf`) and exposes a single "CV" button on every page (hero, footer, contact, about, value, career snapshot) that downloads it.
+
+To update the CV:
 
 1. Re-render there: `rendercv render Boyarkin_Nikita_Product_Analyst_CV.yaml`.
-2. Copy the generated PDF → `public/CV-Nikita-Boyarkin.pdf` (the "Download PDF" link).
-3. Update the hardcoded data blocks (`profile`, `projects`, `skillGroups`) in `src/pages/cv.astro` to match the YAML. Keep that comment ("Source of truth: rendercv") pointing at the cv project.
+2. Sync the PDF: `bun run cv:pdf` — copies `../cv/rendercv_output/Boyarkin_Nikita_CV.pdf` → `public/CV-Nikita-Boyarkin.pdf` (override the source dir with `CV_SOURCE_DIR`). Commit the PDF.
 
-Do not hand-edit the CV page content independent of the rendercv YAML — the YAML is the canonical source.
+The standalone `/cv/` HTML page was removed — the YAML is the canonical source and the PDF is the only artifact. Do not reintroduce a hand-authored CV page.
 
 ## Internal Links
 
@@ -281,13 +282,13 @@ Custom events captured (in addition to autocapture `$pageview`/`$pageleave`):
 
 Any element carrying `data-analytics="<name>"` fires `<name>` on click via a
 delegated listener in `Analytics.astro`. Existing attributes: `project_view_*`,
-`project_demo_*`, `project_github_*` (ProjectCard), `cv_download_pdf` (cv page, hero PDF button, contact),
+`project_demo_*`, `project_github_*` (ProjectCard), `cv_download_pdf` (every "CV" download button — hero, footer, contact, about, value, career snapshot),
 `telegram_deeplink` (contact «написать с контекстом»),
 `github_hero` / `linkedin_hero` (hero CTA row),
 `telegram_board` / `github_board` / `linkedin_board` (HomeBoard profile column),
 `telegram_contact` (contact main Telegram link),
 `telegram_header` / `github_footer` / `linkedin_footer` / `telegram_footer` /
-`cv_footer` / `cv_pdf_footer` / `writing_footer` (Base), `search_open`
+`writing_footer` (Base), `search_open`
 (SearchBox). `lang_switch_*` is special-cased into the structured
 `lang_switched` event above. New CTA elements should reuse this pattern instead
 of writing bespoke capture code.

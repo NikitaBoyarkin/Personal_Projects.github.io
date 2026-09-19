@@ -198,19 +198,19 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Как с тобой связаться?",
       answer:
-        "Быстрее всего — Telegram @lofinibo. Также GitHub, LinkedIn и страница контактов. Резюме (PDF) лежит на странице CV.",
+        "Быстрее всего — Telegram @lofinibo. Также GitHub, LinkedIn и страница контактов. CV — одной кнопкой, скачивается в PDF.",
       links: [
         { label: "Контакты", href: "contact/" },
-        { label: "CV", href: "cv/" },
+        { label: "CV", href: "CV-Nikita-Boyarkin.pdf" },
       ],
     },
     en: {
       question: "How can I reach you?",
       answer:
-        "Fastest — Telegram @lofinibo. Also GitHub, LinkedIn and the contact page. The CV (PDF) is on the CV page.",
+        "Fastest — Telegram @lofinibo. Also GitHub, LinkedIn and the contact page. The CV is a single button that downloads a PDF.",
       links: [
         { label: "Contact", href: "en/contact/" },
-        { label: "CV", href: "cv/" },
+        { label: "CV", href: "CV-Nikita-Boyarkin.pdf" },
       ],
     },
   },
@@ -324,20 +324,14 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Где резюме?",
       answer:
-        "Полное резюме — на странице CV, одностраничный PDF — по прямой ссылке. Оба синхронизированы с источником истины в rendercv.",
-      links: [
-        { label: "CV", href: "cv/" },
-        { label: "PDF", href: "CV-Nikita-Boyarkin.pdf" },
-      ],
+        "CV скачивается одной кнопкой «CV» на всех страницах — файл в формате PDF. Синхронизирован с источником истины в rendercv.",
+      links: [{ label: "CV", href: "CV-Nikita-Boyarkin.pdf" }],
     },
     en: {
       question: "Where is the CV?",
       answer:
-        "The full CV is on the CV page, the one-page PDF is a direct link. Both are synced with the rendercv source of truth.",
-      links: [
-        { label: "CV", href: "cv/" },
-        { label: "PDF", href: "CV-Nikita-Boyarkin.pdf" },
-      ],
+        "The CV downloads from the «CV» button on every page — a PDF file. Kept in sync with the rendercv source of truth.",
+      links: [{ label: "CV", href: "CV-Nikita-Boyarkin.pdf" }],
     },
   },
   {

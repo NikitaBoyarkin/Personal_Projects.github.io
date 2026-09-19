@@ -823,6 +823,33 @@ nav ul.links a[aria-current="page"] {
   box-shadow: 0 6px 20px var(--shadow-color);
 }
 
+/* Live OneWorks 3D avatar. The slot stacks the photo fallback and the 3D
+   mount in one cell so only one is visible without a layout shift. */
+.hero-avatar-slot {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  flex: none;
+}
+
+.hero-avatar-slot > * {
+  grid-area: 1 / 1;
+}
+
+.hero-avatar-3d {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  box-shadow: 0 6px 20px var(--shadow-color);
+  background: #efe5cc;
+}
+
+.hero-avatar-slot [hidden] {
+  display: none !important;
+}
+
 .hero-name {
   font-family: var(--font-display);
   font-size: clamp(2.4rem, 4.5vw, 3.8rem);

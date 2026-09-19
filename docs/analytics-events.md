@@ -41,9 +41,9 @@ These keep their historical names (they are the slider for the "hard naming" cas
 
 | Event | Where |
 |---|---|
-| `hero_projects`, `hero_contact`, `hero_cv`, `featured_project` | `HeroCta.astro`, `index.astro` / `en/index.astro` |
+| `hero_projects`, `hero_contact`, `featured_project` | `HeroCta.astro`, `index.astro` / `en/index.astro` |
 | `bento_stack`, `bento_graph`, `bento_notes` | `index.astro` / `en/index.astro` |
-| `cv_download_pdf`, `cv_source_github`, `cv_footer`, `cv_pdf_footer` | `cv.astro`, `contact.astro`, `Base.astro` footer |
+| `cv_download_pdf` | every "CV" button: `Base.astro` footer, `index.astro` / `en/index.astro` hero, `contact.astro` / `en/contact.astro`, `about.astro` / `en/about.astro`, `value.astro` / `en/value.astro`, `CareerSnapshot.astro` |
 | `telegram_contact`, `telegram_deeplink`, `telegram_footer` | `contact.astro`, `Base.astro` footer |
 | `github_footer`, `linkedin_footer`, `writing_footer` | `Base.astro` footer |
 | `value_cta`, `value_github` | `value.astro` / `en/value.astro` |
@@ -77,6 +77,7 @@ tracking off; PRD Phase A4).
 | `whois_viewed`, `value_viewed`, `work-with-me_viewed` | removed | routes 308-redirect to `/about`; events could never fire again (PRD §4.6) |
 | `telegram_board`, `github_board`, `linkedin_board` | removed | `HomeBoard.astro` is imported by no page (PRD §4.6) |
 | `hero_cta_click`, `hero_cta_exposure` | doc-only removal | A/B flag deactivated 2026-09-15; code already gone (PRD §4.6) |
+| `hero_cv`, `cv_footer`, `cv_pdf_footer`, `cv_source_github` | removed | CV unified into one "CV" download button → `cv_download_pdf` (2026-09-19); `/cv/` page deleted |
 
 Historical rows for every retired/removed event stay in PostHog and must not be
 deleted (PRD §0 rule 3).

@@ -101,8 +101,7 @@ export async function buildLlmsTxt(site: string): Promise<string> {
   }
 
   add("## Contact");
-  add(`- [CV](${abs("cv/")}): full CV.`);
-  add(`- [CV (PDF)](${abs("CV-Nikita-Boyarkin.pdf")}): printable one-page CV.`);
+  add(`- [CV](${abs("CV-Nikita-Boyarkin.pdf")}): one-page CV (PDF download).`);
   add("- GitHub: https://github.com/NikitaBoyarkin");
   add("- LinkedIn: https://www.linkedin.com/in/nikita-boyarkin");
   add("- Telegram: https://t.me/lofinibo");

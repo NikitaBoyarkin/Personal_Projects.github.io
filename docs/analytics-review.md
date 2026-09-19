@@ -10,7 +10,7 @@
 
 Шаги: **главная → /projects/ → контакт** (CV / Telegram / LinkedIn / GitHub — GroupNode OR).
 
-> **REQ-048 (PRD v4.0, 2026-09-15):** в контактную группу добавлен `hero_cv` (клик по CV-CTA нового hero). `hero_projects` контактом НЕ является. Метрика **track-only** до ≥100 уник./90д (порог значимости, «Traffic gate» в CONTEXT.md). Пост-редизайн baseline: **5.56% (3/54, 90д до 14.09)**, медиана до контакта 36с.
+> **REQ-048 (PRD v4.0, 2026-09-15):** в контактную группу добавлен клик по CV-CTA нового hero. `hero_projects` контактом НЕ является. Метрика **track-only** до ≥100 уник./90д (порог значимости, «Traffic gate» в CONTEXT.md). Пост-редизайн baseline: **5.56% (3/54, 90д до 14.09)**, медиана до контакта 36с. **2026-09-19:** все CV-кнопки унифицированы в одну «CV» (скачивание PDF) → событие `cv_download_pdf` (было `hero_cv`/`cv_footer`/`cv_pdf_footer`).
 
 Смотреть:
 - **Конверсия главная → контакт** — базовая ~6% на 30 дней. Падение ниже 5% → проверить CTA и /projects/.
@@ -42,8 +42,8 @@
 
 | Канал | События |
 |---|---|
-| Hero CTA (новый hero) | `hero_cv` (CV), `hero_projects` (→ проекты, НЕ контакт) |
-| CV | `cv_download_pdf`, `cv_pdf_footer`, `cv_footer`, `cv_source_github` |
+| Hero CTA (новый hero) | `hero_projects` (→ проекты, НЕ контакт) |
+| CV | `cv_download_pdf` (единая кнопка «CV» на всех страницах) |
 | Telegram | `telegram_contact`, `telegram_deeplink`, `telegram_header/footer/board` |
 | LinkedIn | `linkedin_hero`, `linkedin_footer`, `linkedin_board` |
 | GitHub | `github_hero`, `github_footer`, `github_board` |

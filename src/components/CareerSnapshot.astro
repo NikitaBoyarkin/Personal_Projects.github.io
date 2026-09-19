@@ -37,7 +37,7 @@ const I18N = {
     { degree: isEn ? "MSc · Work psychology" : "MSc · Психология труда", years: "2020–2022", place: isEn ? "UMC" : "UMC" },
     { degree: isEn ? "PhD · Work psychology" : "PhD · Психология труда", years: "2022–2025", place: isEn ? "UMC" : "UMC" },
   ],
-  link: isEn ? "Full CV →" : "Полное резюме →",
+  link: "CV →",
 };
 ---
 
@@ -71,7 +71,7 @@ const I18N = {
         ))}
       </ul>
       <p class="career-cta">
-        <a href={withBase("cv/")}>{I18N.link}</a>
+        <a href={withBase("CV-Nikita-Boyarkin.pdf")} download>{I18N.link}</a>
       </p>
     </div>
   </div>

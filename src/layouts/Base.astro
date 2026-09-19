@@ -63,7 +63,6 @@ const t = {
   navAbout: isEn ? 'About' : 'Обо мне',
   navValue: isEn ? 'Value' : 'Ценность',
   navContact: isEn ? 'Contact' : 'Контакты',
-  footerCv: isEn ? 'CV' : 'Резюме',
   footerWriting: isEn ? 'Writing' : 'Статьи',
   themeTitle: isEn ? 'Theme: dark / light / cyberpunk' : 'Тема: тёмная / светлая / киберпанк',
   themeLabel: isEn ? 'Theme: ' : 'Тема: ',
@@ -221,8 +220,7 @@ const NAV_CLOSE = 'M6 6l12 12M6 18L18 6';
       <a href="https://github.com/NikitaBoyarkin" data-analytics="github_footer">GitHub</a> ·
       <a href="https://www.linkedin.com/in/nikita-boyarkin" data-analytics="linkedin_footer">LinkedIn</a> ·
       <a href="https://t.me/lofinibo" data-analytics="telegram_footer">Telegram</a> ·
-      <a href={withBase('cv/')} data-analytics="cv_footer">{t.footerCv}</a> ·
-      <a href={withBase('CV-Nikita-Boyarkin.pdf')} data-analytics="cv_pdf_footer">PDF</a> ·
+      <a href={withBase('CV-Nikita-Boyarkin.pdf')} download data-analytics="cv_download_pdf">CV</a> ·
       <a href={writingHref} data-analytics="writing_footer">{t.footerWriting}</a>
       <p>© {new Date().getFullYear()} Nikita Boyarkin</p>
     </footer>
