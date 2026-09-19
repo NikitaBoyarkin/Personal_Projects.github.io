@@ -1,0 +1,47 @@
+name: Sync GitHub activity
+
+on:
+  schedule:
+    - cron: '41 3 * * *' # daily ~03:41 UTC, after the profile build
+  workflow_dispatch:
+  push:
+    branches: [master, main]
+    paths:
+      - 'scripts/sync-github-activity.mjs'
+      - '.github/workflows/github-activity.yml'
+
+concurrency:
+  group: github-activity
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+          cache: bun
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate GitHub activity payload
+        run: bun run sync:activity
+        env:
+          # Use a PAT when configured (more complete contribution calendar);
+          # fall back to the default Actions token for public data.
+          GITHUB_TOKEN: ${{ secrets.STREAK_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Commit payload
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: sync GitHub activity charts [skip ci]'
+          file_pattern: 'src/data/github-activity.json'

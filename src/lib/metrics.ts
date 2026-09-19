@@ -8,9 +8,9 @@
 export const METRICS = {
   abKyc: {
     /** A/B on KYC step: conversion lift in percentage points. */
-    deltaPp: 6.24,
+    deltaPp: 5.72,
     /** Annualized incremental impact, EUR K. */
-    annualEurK: 716,
+    annualEurK: 656,
   },
   retention: {
     /** M3 retention lift, percentage points. */

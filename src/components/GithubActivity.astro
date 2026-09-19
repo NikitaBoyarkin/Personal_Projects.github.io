@@ -1,0 +1,105 @@
+---
+// Automated GitHub activity section for /about.
+//
+// Data comes from src/data/github-activity.json, regenerated daily by
+// scripts/sync-github-activity.mjs (Actions). Charts render through the site's
+// native ChartCard components, so theme, i18n and a11y are inherited. When the
+// payload is missing the section renders nothing.
+import { loadGithubActivity } from '../lib/github-activity';
+import ChartCard from './charts/ChartCard.astro';
+
+interface Props {
+  lang?: 'ru' | 'en';
+}
+const { lang = 'ru' } = Astro.props;
+const isEn = lang === 'en';
+
+const data = loadGithubActivity();
+const number = new Intl.NumberFormat(isEn ? 'en-US' : 'ru-RU');
+
+const stats = data
+  ? [
+      { value: number.format(data.stats.contributions), label: isEn ? 'contributions this year' : 'вкладов за год' },
+      { value: number.format(data.stats.publicRepos), label: isEn ? 'public repos' : 'публичных репо' },
+      { value: number.format(data.stats.followers), label: isEn ? 'followers' : 'подписчиков' },
+      { value: number.format(data.stats.currentStreak), label: isEn ? 'current streak (days)' : 'текущий стрик, дней' },
+      { value: number.format(data.stats.longestStreak), label: isEn ? 'longest streak (days)' : 'макс. стрик, дней' },
+      { value: String(data.stats.activeSince), label: isEn ? 'on GitHub since' : 'на GitHub с' },
+    ]
+  : [];
+---
+
+{
+  data && (
+    <div class="github-activity">
+      <h2 id="activity" data-analytics-section="activity">
+        {isEn ? 'GitHub activity' : 'Активность на GitHub'}
+      </h2>
+      <p class="gh-source">
+        {isEn ? 'Source' : 'Источник'}: {data.source}
+      </p>
+
+      <dl class="gh-stats" aria-label={isEn ? 'GitHub summary' : 'Сводка GitHub'}>
+        {stats.map((s) => (
+          <div class="gh-stat">
+            <dt class="gh-stat-label">{s.label}</dt>
+            <dd class="gh-stat-value">{s.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div class="gh-charts">
+        {data.charts.map((chart) => (
+          <ChartCard chart={chart} lang={lang} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .gh-source {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin: var(--space-1) 0 var(--space-5);
+  }
+  .gh-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin: 0 0 var(--space-6);
+    padding: var(--space-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background: var(--background-secondary);
+  }
+  @media (min-width: 640px) {
+    .gh-stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .gh-stat {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-1);
+  }
+  .gh-stat-value {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-accent);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .gh-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+  .gh-charts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+</style>

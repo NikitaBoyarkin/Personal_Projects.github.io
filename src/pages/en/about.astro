@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import AskMe from '../../components/AskMe.astro';
+import GithubActivity from '../../components/GithubActivity.astro';
 import { withBase } from '../../lib/path';
 import { formatDate } from '../../lib/date';
 
@@ -15,6 +16,7 @@ const JUMP = [
   { label: 'Now', href: '#now' },
   { label: 'How to work with me', href: '#work' },
   { label: 'Location / format', href: '#location' },
+  { label: 'Activity', href: '#activity' },
 ];
 
 const jsonLd = {
@@ -155,6 +157,8 @@ const jsonLd = {
     <p class="cta-row">
       <a class="button" href={tgWhois} data-analytics="whois_cta" target="_blank" rel="noopener noreferrer">Message me on Telegram →</a>
     </p>
+
+    <GithubActivity lang="en" />
   </section>
 
   <style>

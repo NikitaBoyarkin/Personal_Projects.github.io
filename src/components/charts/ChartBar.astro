@@ -3,7 +3,7 @@
 // Build-time static SVG, themed via CSS variables. Native <title> tooltips.
 import type { ChartObject } from '../../lib/charts';
 import { CHART_PALETTE } from '../../lib/charts';
-import { area, ticksFor, linearScale, fmt } from '../../lib/chart-svg';
+import { area, axisTicks, linearScale, fmt } from '../../lib/chart-svg';
 
 interface Props {
   chart: ChartObject & { type: 'bar' | 'histogram' };
@@ -16,11 +16,13 @@ const { categories, series } = data;
 const n = categories.length;
 const k = series.length;
 
+// A caption row under the tick labels needs extra bottom room, otherwise the
+// caption overlaps the x-axis labels (mb 72 vs 54 reserves that row).
+const xLabel = chart.xLabel?.[lang];
 const H = n > 1 ? 300 : 240;
-const a = area(640, H, 54, 14, series.length > 1 ? 34 : 18, 54);
+const a = area(640, H, 54, 14, series.length > 1 ? 34 : 18, xLabel ? 72 : 54);
 const max = Math.max(0, ...series.flatMap((s) => s.values));
-const ticks = ticksFor(max, 4);
-const top = ticks[ticks.length - 1] || 1;
+const { ticks, top } = axisTicks(max, 4);
 const y = linearScale(0, top, a.ml + a.ph, a.ml);
 const gw = a.pw / n;
 const bw = Math.min((gw * 0.66) / k, 44);
@@ -29,8 +31,8 @@ const totalBars = n * k;
 
 const ariaLabel = `${chart.title[lang]}. ${chart.description[lang]}`;
 const showValues = totalBars <= 16;
-const xLabel = chart.xLabel?.[lang];
 const yLabel = chart.yLabel?.[lang];
+const labelEvery = chart.labelEvery ?? 1;
 ---
 
 <svg
@@ -90,11 +92,13 @@ const yLabel = chart.yLabel?.[lang];
   </g>
 
   <g class="x-axis">
-    {categories.map((c, i) => (
-      <text x={xc(i)} y={a.ml + a.ph + 18} text-anchor="middle" class="axis-label">
-        {c}
-      </text>
-    ))}
+    {categories.map((c, i) =>
+      i % labelEvery === 0 ? (
+        <text x={xc(i)} y={a.ml + a.ph + 18} text-anchor="middle" class="axis-label">
+          {c}
+        </text>
+      ) : null,
+    )}
   </g>
 
   {xLabel && (

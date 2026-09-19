@@ -1,10 +1,10 @@
 ---
 title: Volta Neobank — Product Analytics
-description: "Нашёл узкое место в онбординге необанка и закрыл A/B-тестом: +6,24 пп конверсии KYC и €716K в год. 17 аналитических проектов на синтетических данных."
+description: "Нашёл узкое место в онбординге необанка и закрыл A/B-тестом: +5,72 пп конверсии KYC и €656K в год. 17 аналитических проектов на синтетических данных."
 track: experiments
 hero: images/volta.svg
 impact:
-  - +6.24pp KYC conversion (Z=6.35, p<0.0001), €716K/yr (48× ROI)
+  - +5.72pp KYC conversion (Z=5.82, p<0.0001), €656K/yr (44× ROI)
   - +9.2pp M3 retention, +€227K/yr incremental LTV
   - 4 data-driven user segments with per-segment monetization strategy
   - CUPED variance reduction + AA-test (type-I = 0.050) + Bonferroni correction
@@ -22,12 +22,12 @@ faq:
   - question: "Где отток в онбординге?"
     answer: "KYC — критическое узкое место: наибольший относительный отток (56.6% step conversion)."
   - question: "Лечит ли progress bar проблему KYC?"
-    answer: "Да: +6.24pp lift (p<0.0001), 95% CI [+4.26%, +8.16%], превышает MDE +5pp → ship."
+    answer: "Да: +5.72pp lift (p<0.0001), 95% CI [+3.78%, +7.66%], превышает MDE +5pp → ship."
   - question: "Продержался ли эффект?"
     answer: "Да: +9.2pp M3 retention, +€227K/yr incremental LTV."
   - question: "Кто пользователи, как монетизировать?"
     answer: "4 сегмента (Power 12% / Growth 24% / Casual 32% / Dormant 32%) с per-segment стратегией; миграция до +€310K/yr."
-demo: demos/bayesian/index.html
+demo: demos/volta/index.html
 related:
   - /posts/bayesian-ab-testing/
 children:
@@ -38,14 +38,14 @@ children:
 caseStudy:
   problem: "Необанк терял пользователей на онбординге, но было непонятно, какой шаг критический и лечит ли его фикс. Изолированные анализы давали локальные числа без продуктовой связи."
   approach: "Четыре проекта одной петлёй discover → validate → measure → optimize: funnel нашёл KYC-бутылочное горло, A/B с CUPED + AA-test + Bonferroni валидировал progress-bar фикс под ship-gate из трёх условий (значимость ∧ lift≥MDE ∧ no SRM), retention подтвердил удержание эффекта, сегментация перевела эффект в деньги."
-  result: "Фикс KYC дал +6.24pp конверсии и €716K/yr (48× ROI), эффект удержался в retention (+9.2pp M3, +€227K/yr LTV), а сегментация показала, что 12% пользователей дают 41% выручки — миграция стоит до +€310K/yr. Воспроизводимая методология защищает от rollout'а статистически-значимых, но бизнес-незначимых изменений."
+  result: "Фикс KYC дал +5.72pp конверсии и €656K/yr (44× ROI), эффект удержался в retention (+9.2pp M3, +€227K/yr LTV), а сегментация показала, что 12% пользователей дают 41% выручки — миграция стоит до +€310K/yr. Воспроизводимая методология защищает от rollout'а статистически-значимых, но бизнес-незначимых изменений."
   metrics:
     - label: "KYC conversion lift"
-      value: "+6.24pp"
+      value: "+5.72pp"
     - label: "Annual revenue"
-      value: "€716K/yr"
+      value: "€656K/yr"
     - label: "ROI"
-      value: "48×"
+      value: "44×"
     - label: "M3 retention"
       value: "+9.2pp"
 ---
@@ -55,8 +55,8 @@ caseStudy:
 ## Итог в 30 секундах
 
 - **Проблема:** KYC — узкое место онбординга, наибольший относительный отток (56.6% step conversion).
-- **Фикс:** progress bar в KYC дал **+6.24pp** (p < 0.0001), выше MDE +5pp.
-- **Деньги:** бизнес-импакт **€716K/год** при ROI 48×.
+- **Фикс:** progress bar в KYC дал **+5.72pp** (p < 0.0001), выше MDE +5pp.
+- **Деньги:** бизнес-импакт **€656K/год** при ROI 44×.
 - **Удержание:** эффект продержался — **+9.2pp** M3 retention, **+€227K/год** инкрементального LTV.
 
 ## Дело
@@ -84,7 +84,7 @@ caseStudy:
 - **Bonferroni** для нескольких метрик — контроль множественности
 - **Ship-gate**: релиз только если значимость ∧ lift ≥ MDE ∧ no SRM
 
-Вердикт: контроль 55.8% → лечение 62.1%, **+6.24pp**, p < 0.0001, 95% CI [+4.26%, +8.16%], превышает MDE +5pp → **ship**. При реалистичной аудитории это ≈ **€716K/год** при ROI 48×.
+Вердикт: контроль 55.8% → лечение 61.5%, **+5.72pp**, p < 0.0001, 95% CI [+3.78%, +7.66%], превышает MDE +5pp → **ship**. При реалистичной аудитории это ≈ **€656K/год** при ROI 44×.
 
 → [A/B Testing — досье](ab/)
 
@@ -134,7 +134,7 @@ Ship — не конец: эффект проверили на удержани�
 
 1. **Funnel** — step conversion, absolute/relative drop-off, Chi-square тест каналов. Registration теряет больше всего пользователей в абсолютных числах (2,682, 73.2% step conv); KYC Complete — наибольший относительный отток (56.6% step conv). Referral конвертирует на 11.7pp лучше paid social; iOS обгоняет Android на каждом шаге (13.6% vs 11.7% end-to-end).
 
-2. **A/B (KYC progress bar)** — расчёт размера выборки, SRM-проверка (p=1.00), bootstrap CI, коррекция множественных сравнений (Bonferroni/Holm/BH), AA-test под H₀ (type-I = 0.050), CUPED (control-only θ), sensitivity at MDE. Контроль 55.8% → лечение 62.1%, **+6.24pp**, 95% CI [+4.26%, +8.16%], превышает +5pp MDE. Ship-gate: p<0.05 ∧ lift≥MDE ∧ no SRM → ship. 9/11 наивно-значимых сегментов, 4/11 после Bonferroni.
+2. **A/B (KYC progress bar)** — расчёт размера выборки, SRM-проверка (p=1.00), bootstrap CI, коррекция множественных сравнений (Bonferroni/Holm/BH), AA-test под H₀ (type-I = 0.050), CUPED (control-only θ), sensitivity at MDE. Контроль 55.8% → лечение 61.5%, **+5.72pp**, 95% CI [+3.78%, +7.66%], превышает +5pp MDE. Ship-gate: p<0.05 ∧ lift≥MDE ∧ no SRM → ship. 6/11 наивно-значимых сегментов, 4/11 после Bonferroni.
 
 3. **Retention** — когортные кривые, pre/post Welch t-test + Cohen's d, plan-specific LTV (ARPU × retention decomposition). M1 retention +10pp step-change, M3 +9.2pp.
 
@@ -144,7 +144,7 @@ Ship — не конец: эффект проверили на удержани�
 
 ## Эффект
 
-- **KYC conversion +6.24pp** (p<0.0001, превышает MDE) → бизнес-импакт **€716K/yr** (48× ROI на €15K dev cost).
+- **KYC conversion +5.72pp** (p<0.0001, превышает MDE) → бизнес-импакт **€656K/yr** (44× ROI на €15K dev cost).
 - **M3 retention +9.2pp** → **+€227K/yr** incremental LTV от KYC-фикса.
 - **4 сегмента** с per-segment стратегией и монетизацией до **+€310K/yr** через миграцию.
 - **Воспроизводимая методология** — CUPED, AA-test, Bonferroni, sensitivity at MDE; 4 рекомендованных A/B для валидации стратегии.

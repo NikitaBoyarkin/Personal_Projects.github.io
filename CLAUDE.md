@@ -46,6 +46,9 @@ bun run og
 
 # Validate the built site
 make check
+
+# Regenerate the GitHub activity snapshot (needs a GitHub token)
+bun run sync:activity
 ```
 
 ## Project Structure
@@ -195,6 +198,15 @@ All project and post copy follows a shared spec — see `docs/prd-readability.md
 Auth: `GITHUB_TOKEN`/`GH_TOKEN` env (higher rate limit, sees private repos). Unauthenticated works for public repos (~60 req/hr — enough for 16 projects). `.github/workflows/sync-github.yml` runs the apply weekly and opens a PR with changes.
 
 `updated:` is optional in the schema (`src/content.config.ts`); the page renders «Обновлено» only when present.
+
+### GitHub activity charts (automated)
+
+`scripts/sync-github-activity.mjs` fetches the owner's public GitHub data in one GraphQL call and writes `src/data/github-activity.json`: a `stats` block (contributions, repos, followers, streaks, active-since) plus five chart cards that validate against `chartFileSchema`. `src/components/GithubActivity.astro` renders it on `/about` (RU + EN) through the native `ChartCard` components, so the charts inherit theme, i18n and a11y. When the JSON is absent the section renders nothing.
+
+- `bun run sync:activity` — fetch and write the payload.
+- `bun run sync:activity --dry-run` — fetch, print a summary, write nothing.
+- Auth: `GITHUB_TOKEN` / `GH_TOKEN` / `STREAK_PAT`. `.github/workflows/github-activity.yml` runs it daily and commits only when the payload changed.
+- Long series use the optional `labelEvery` chart field to print a subset of x-axis labels (30-day and weekly lines would otherwise overlap).
 
 ### Add a blog post
 

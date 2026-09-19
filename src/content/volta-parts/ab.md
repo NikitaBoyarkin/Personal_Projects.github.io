@@ -1,12 +1,12 @@
 ---
 title: "Volta — A/B Testing (KYC progress bar)"
-description: "A/B-тест KYC-прогресс-бара в необанке: +6,24 пп (p<0.0001), выше MDE +5 пп, с CUPED, AA-тестом и Bonferroni. Эффект — €716K в год при ROI 48×."
+description: "A/B-тест KYC-прогресс-бара в необанке: +5,72 пп (p<0.0001), выше MDE +5 пп, с CUPED, AA-тестом и Bonferroni. Эффект — €656K в год при ROI 44×."
 part: ab
 order: 2
 impact:
-  - "+6.24pp KYC (Z=6.35, p<0.0001), 95% CI [+4.26%, +8.16%], exceeds +5pp MDE"
+  - "+5.72pp KYC (Z=5.82, p<0.0001), 95% CI [+3.78%, +7.66%], exceeds +5pp MDE"
   - "CUPED + AA-test (type-I=0.050) + Bonferroni (4/11 survive)"
-  - "€716K/yr business impact (48× ROI)"
+  - "€656K/yr business impact (44× ROI)"
 tools:
   - Python
   - pandas / NumPy
@@ -36,13 +36,13 @@ Progress bar в KYC поднимает конверсию завершения K
 
 ## Что нашли
 
-- Контроль **55.8%** → лечение **62.1%**, **+6.24pp**, 95% CI **[+4.26%, +8.16%]**.
-- Превышает MDE (+5pp), p<0.0001 (Z = 6.35).
-- **9/11** наивно-значимых сегментов → **4/11** после Bonferroni (коррекция убирает ложные срабатывания).
+- Контроль **55.8%** → лечение **61.5%**, **+5.72pp**, 95% CI **[+3.78%, +7.66%]**.
+- Превышает MDE (+5pp), p<0.0001 (Z = 5.82).
+- **6/11** наивно-значимых сегментов → **4/11** после Bonferroni (коррекция убирает ложные срабатывания).
 
 ## Эффект
 
-- **KYC conversion +6.24pp** → бизнес-импакт **€716K/yr** (48× ROI на €15K dev cost).
+- **KYC conversion +5.72pp** → бизнес-импакт **€656K/yr** (44× ROI на €15K dev cost).
 - Методология (CUPED + AA-test + Bonferroni + ship-gate) переиспользуема для следующих экспериментов.
 
 ## Документация

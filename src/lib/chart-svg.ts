@@ -29,6 +29,20 @@ export function ticksFor(max: number, count = 4): number[] {
   return out;
 }
 
+// Ticks plus an axis top that is always >= maxValue. The last "nice" tick can
+// fall below the data (e.g. 331 → …,300), which would render bars/points above
+// the axis; when that happens, extend the axis by one step so nothing overflows.
+export function axisTicks(maxValue: number, count = 4): { ticks: number[]; top: number } {
+  const ticks = ticksFor(maxValue, count);
+  let top = ticks[ticks.length - 1] || 1;
+  if (maxValue > top) {
+    const step = ticks.length > 1 ? ticks[1] - ticks[0] : top;
+    top = round(Math.ceil(maxValue / step) * step);
+    ticks.push(top);
+  }
+  return { ticks, top };
+}
+
 // Compact coordinate helper so components don't repeat the margin/scale math.
 export interface ChartArea {
   w: number;

@@ -96,7 +96,7 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Что у тебя с A/B-тестами?",
       answer:
-        "Полный toolkit: CUPED (сжатие SE), AA-тесты на Type I error, коррекция множественных сравнений (Bonferroni/BH), alpha-spending и always-valid p-values (mSPRT), delta-method для ratio-метрик. В кейсе Volta — ship-gate из 3 условий и +6.24pp KYC-конверсии (p<0.0001).",
+        "Полный toolkit: CUPED (сжатие SE), AA-тесты на Type I error, коррекция множественных сравнений (Bonferroni/BH), alpha-spending и always-valid p-values (mSPRT), delta-method для ratio-метрик. В кейсе Volta — ship-gate из 3 условий и +5.72pp KYC-конверсии (p<0.0001).",
       links: [
         { label: "A/B Toolkit", href: "projects/ab/" },
         { label: "Volta", href: "projects/volta/" },
@@ -105,7 +105,7 @@ export const QA_CORPUS: QAPair[] = [
     en: {
       question: "What about A/B testing?",
       answer:
-        "A full toolkit: CUPED (SE reduction), AA-tests on Type I error, multiple-comparison correction (Bonferroni/BH), alpha-spending and always-valid p-values (mSPRT), delta-method for ratio metrics. In the Volta case — a 3-condition ship-gate and +6.24pp KYC conversion (p<0.0001).",
+        "A full toolkit: CUPED (SE reduction), AA-tests on Type I error, multiple-comparison correction (Bonferroni/BH), alpha-spending and always-valid p-values (mSPRT), delta-method for ratio metrics. In the Volta case — a 3-condition ship-gate and +5.72pp KYC conversion (p<0.0001).",
       links: [
         { label: "A/B Toolkit", href: "en/projects/ab/" },
         { label: "Volta", href: "en/projects/volta/" },
@@ -182,13 +182,13 @@ export const QA_CORPUS: QAPair[] = [
     ru: {
       question: "Что за проект Volta?",
       answer:
-        "End-to-end аналитика необанка: funnel, A/B-тест, retention и сегментация одной петлёй на синтетических fintech-данных. Ключевой результат — +6.24pp KYC-конверсии (Z=6.35, p<0.0001), €716K/yr (48× ROI), с CUPED, AA-тестом и Bonferroni.",
+        "End-to-end аналитика необанка: funnel, A/B-тест, retention и сегментация одной петлёй на синтетических fintech-данных. Ключевой результат — +5.72pp KYC-конверсии (Z=5.82, p<0.0001), €656K/yr (44× ROI), с CUPED, AA-тестом и Bonferroni.",
       links: [{ label: "Volta", href: "projects/volta/" }],
     },
     en: {
       question: "What is the Volta project?",
       answer:
-        "End-to-end neobank analytics: funnel, A/B test, retention and segmentation in one loop on synthetic fintech data. Key result — +6.24pp KYC conversion (Z=6.35, p<0.0001), €716K/yr (48× ROI), with CUPED, AA-test and Bonferroni.",
+        "End-to-end neobank analytics: funnel, A/B test, retention and segmentation in one loop on synthetic fintech data. Key result — +5.72pp KYC conversion (Z=5.82, p<0.0001), €656K/yr (44× ROI), with CUPED, AA-test and Bonferroni.",
       links: [{ label: "Volta", href: "en/projects/volta/" }],
     },
   },

@@ -53,6 +53,9 @@ const chartObject = z
     description: localized,
     xLabel: localized.optional(),
     yLabel: localized.optional(),
+    // Print every Nth x-axis label (bar/line only). Long series (30-day, weekly)
+    // would otherwise overlap; the default prints every category.
+    labelEvery: z.number().int().min(1).optional(),
     conclusions: z.array(localized).min(1),
   })
   .and(chartBody);

@@ -1,10 +1,10 @@
 ---
 title: Volta Neobank — Product Analytics
-description: "Fixed a neobank's onboarding bottleneck with an A/B test: +6.24pp KYC conversion, €716K/year. A 17-project case on reproducible synthetic data."
+description: "Fixed a neobank's onboarding bottleneck with an A/B test: +5.72pp KYC conversion, €656K/year. A 17-project case on reproducible synthetic data."
 track: experiments
 hero: images/volta.svg
 impact:
-  - +6.24pp KYC conversion (Z=6.35, p<0.0001), €716K/yr (48× ROI)
+  - +5.72pp KYC conversion (Z=5.82, p<0.0001), €656K/yr (44× ROI)
   - +9.2pp M3 retention, +€227K/yr incremental LTV
   - 4 data-driven user segments with per-segment monetization strategy
   - CUPED variance reduction + AA-test (type-I = 0.050) + Bonferroni correction
@@ -17,13 +17,13 @@ tools:
   - uv + ruff
 github: https://github.com/NikitaBoyarkin/volta-banking
 updated: 2026-09-05
-demo: demos/bayesian/index.html
+demo: demos/volta/index.html
 date: 2026-08-11
 faq:
   - question: "Where is the onboarding drop-off?"
     answer: "KYC is the critical bottleneck: the largest relative drop-off (56.6% step conversion)."
   - question: "Does the progress bar fix the KYC problem?"
-    answer: "Yes: +6.24pp lift (p<0.0001), 95% CI [+4.26%, +8.16%], above the +5pp MDE → ship."
+    answer: "Yes: +5.72pp lift (p<0.0001), 95% CI [+3.78%, +7.66%], above the +5pp MDE → ship."
   - question: "Did the effect hold?"
     answer: "Yes: +9.2pp M3 retention, +€227K/yr incremental LTV."
   - question: "Who are the users, how to monetize?"
@@ -38,14 +38,14 @@ children:
 caseStudy:
   problem: "The neobank was losing users during onboarding, but it was unclear which step was critical and whether a fix would actually hold. Isolated analyses produced local numbers with no product-level connection."
   approach: "Four projects wired into a single discover → validate → measure → optimize loop: funnel found the KYC bottleneck, an A/B test with CUPED + AA-test + Bonferroni validated a progress-bar fix under a three-condition ship-gate (significance ∧ lift≥MDE ∧ no SRM), retention confirmed the effect held, and segmentation translated it into revenue."
-  result: "The KYC fix delivered +6.24pp conversion and €716K/yr (48× ROI), the effect held in retention (+9.2pp M3, +€227K/yr LTV), and segmentation showed 12% of users drive 41% of revenue — migration is worth up to +€310K/yr. The reproducible methodology protects against shipping statistically-significant but business-insignificant changes."
+  result: "The KYC fix delivered +5.72pp conversion and €656K/yr (44× ROI), the effect held in retention (+9.2pp M3, +€227K/yr LTV), and segmentation showed 12% of users drive 41% of revenue — migration is worth up to +€310K/yr. The reproducible methodology protects against shipping statistically-significant but business-insignificant changes."
   metrics:
     - label: "KYC conversion lift"
-      value: "+6.24pp"
+      value: "+5.72pp"
     - label: "Annual revenue"
-      value: "€716K/yr"
+      value: "€656K/yr"
     - label: "ROI"
-      value: "48×"
+      value: "44×"
     - label: "M3 retention"
       value: "+9.2pp"
 ---
@@ -55,8 +55,8 @@ caseStudy:
 ## The 30-second version
 
 - **Problem:** KYC was the onboarding bottleneck — the largest relative drop-off (56.6% step conversion).
-- **Fix:** a KYC progress bar lifted conversion **+6.24pp** (p < 0.0001), above the +5pp MDE.
-- **Money:** **€716K/yr** business impact at 48× ROI.
+- **Fix:** a KYC progress bar lifted conversion **+5.72pp** (p < 0.0001), above the +5pp MDE.
+- **Money:** **€656K/yr** business impact at 44× ROI.
 - **Retention:** the effect held — **+9.2pp** M3 retention, **+€227K/yr** incremental LTV.
 
 ## The Case
@@ -84,7 +84,7 @@ Test design:
 - **Bonferroni** across multiple metrics — multiplicity control
 - **Ship-gate**: ship only if significance ∧ lift ≥ MDE ∧ no SRM
 
-Verdict: control 55.8% → treatment 62.1%, **+6.24pp**, p < 0.0001, 95% CI [+4.26%, +8.16%], above the +5pp MDE → **ship**. At a realistic audience this is ≈ **€716K/yr** at 48× ROI.
+Verdict: control 55.8% → treatment 61.5%, **+5.72pp**, p < 0.0001, 95% CI [+3.78%, +7.66%], above the +5pp MDE → **ship**. At a realistic audience this is ≈ **€656K/yr** at 44× ROI.
 
 → [A/B Testing — case file](ab/)
 
@@ -132,7 +132,7 @@ The repo has grown from 4 core projects to **17** (12 analytical domains + Marke
 
 1. **Funnel** — step conversion, absolute/relative drop-off, Chi-square test across channels. Registration loses the most users in absolute terms (2,682, 73.2% step conv); KYC Complete has the largest relative drop-off (56.6% step conv). Referral converts 11.7pp better than paid social; iOS beats Android at every step (13.6% vs 11.7% end-to-end).
 
-2. **A/B (KYC progress bar)** — sample size calculation, SRM check (p=1.00), bootstrap CI, multiple-comparison correction (Bonferroni/Holm/BH), AA-test under H₀ (type-I = 0.050), CUPED (control-only θ), sensitivity at MDE. Control 55.8% → treatment 62.1%, **+6.24pp**, 95% CI [+4.26%, +8.16%], exceeds the +5pp MDE. Ship-gate: p<0.05 ∧ lift≥MDE ∧ no SRM → ship. 9/11 naively-significant segments, 4/11 after Bonferroni.
+2. **A/B (KYC progress bar)** — sample size calculation, SRM check (p=1.00), bootstrap CI, multiple-comparison correction (Bonferroni/Holm/BH), AA-test under H₀ (type-I = 0.050), CUPED (control-only θ), sensitivity at MDE. Control 55.8% → treatment 61.5%, **+5.72pp**, 95% CI [+3.78%, +7.66%], exceeds the +5pp MDE. Ship-gate: p<0.05 ∧ lift≥MDE ∧ no SRM → ship. 6/11 naively-significant segments, 4/11 after Bonferroni.
 
 3. **Retention** — cohort curves, pre/post Welch t-test + Cohen's d, plan-specific LTV (ARPU × retention decomposition). M1 retention +10pp step-change, M3 +9.2pp.
 
@@ -142,7 +142,7 @@ The repo has grown from 4 core projects to **17** (12 analytical domains + Marke
 
 ## Impact
 
-- **KYC conversion +6.24pp** (p<0.0001, exceeds MDE) → business impact **€716K/yr** (48× ROI on €15K dev cost).
+- **KYC conversion +5.72pp** (p<0.0001, exceeds MDE) → business impact **€656K/yr** (44× ROI on €15K dev cost).
 - **M3 retention +9.2pp** → **+€227K/yr** incremental LTV from the KYC fix.
 - **4 segments** with per-segment strategy and up to **+€310K/yr** monetization via migration.
 - **Reproducible methodology** — CUPED, AA-test, Bonferroni, sensitivity at MDE; 4 recommended A/B tests to validate the strategy.
