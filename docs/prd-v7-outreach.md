@@ -199,13 +199,15 @@ short enough to be read.
 
 1. Name the 10 interview targets → send the §2 message (V1.1). This is the gating item.
 2. In parallel, send the 5 probes (§3, V1.3) — they need no scheduling.
-3. Log every reply in `docs/contact-log.md` the day it arrives.
-4. Feed results into `docs/prd-v7-findings.md`; do not start V2.x until V1.2's gate is decided.
+3. Apply to the 20 target roles top-down (§4 letters; list in `docs/prd-v7-target-roles.md`, V1.2).
+4. Log every reply and every application in `docs/contact-log.md` the day it happens.
+5. Feed results into `docs/prd-v7-findings.md`; do not start V2.x until V1.2's gate is decided.
 
 ## 6. What still needs the owner
 
 | Item | Blocker |
 |---|---|
 | The 10 interview targets | Must be real named people in segments 1–2 (PRD §8) |
-| Permission to spend 20 applications on junior+ roles | A deliberate step down — owner's call (PRD §8) |
-| Choice of proof link for the probes | Public artefact selection |
+| Permission to spend 20 applications on junior+ roles | A deliberate step down — owner's call (PRD §8); list ready in `docs/prd-v7-target-roles.md` |
+| Choice of proof link for the probes and letters | Public artefact selection |
+| Fill the two placeholders per letter | `[Компания]`, `[Продукт/команда]` — never send unedited |
