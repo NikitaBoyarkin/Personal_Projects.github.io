@@ -29,6 +29,8 @@ export default defineConfig({
     "/en/start/": "/en/about/#start",
     // S1.3 (PRD v6): /guides/ merged into the parameterised /notes/ route.
     "/guides/": "/notes/guides/",
+    // 2026-09-19: the standalone /cv/ page became a PDF download button.
+    "/cv/": "/CV-Nikita-Boyarkin.pdf",
   },
   integrations: [
     sitemap({
